@@ -115,6 +115,7 @@ Scopes: core, ui, api, auth, tools, docs, tests
 * **Integration Tests:** Complex features should include integration tests
 * **Security Tests:** Security-related changes must include security tests
 * **Manual Testing:** All changes should be manually tested before submission
+* **Dependency Verification:** Run `python scripts/check_dependencies.py` to ensure all dependencies are properly installed
 
 ## Documentation Stack
 

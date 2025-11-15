@@ -147,6 +147,117 @@ Optionally you can map local folders for file persistence:
 > directory. You can access and edit these files directly on your machine, and 
 > the changes will be immediately reflected in the running container.
 
+## Troubleshooting Dependencies
+
+### Common Dependency Issues
+
+If you encounter dependency-related errors, here are the most common solutions:
+
+#### Missing Core Dependencies
+
+**Symptoms:**
+- `ModuleNotFoundError: No module named 'langchain_core'`
+- `ImportError: cannot import name 'X' from 'Y'`
+- Application fails to start with import errors
+
+**Solutions:**
+
+1. **Verify Docker Installation (Recommended)**
+   ```bash
+   # Pull the latest image
+   docker pull agent0ai/agent-zero
+   
+   # Run with clean environment
+   docker run --rm agent0ai/agent-zero python -c "import langchain_core, litellm, faiss; print('Dependencies OK')"
+   ```
+
+2. **Manual Installation (Development)**
+   ```bash
+   # Install from requirements.txt
+   pip install -r requirements.txt
+   
+   # Verify installation
+   python scripts/check_dependencies.py
+   ```
+
+3. **Platform-Specific Issues**
+   
+   **ARM64/M1 Mac Users:**
+   ```bash
+   # Some packages need special handling
+   pip install --no-cache-dir -r requirements.txt
+   ```
+   
+   **Linux Users:**
+   ```bash
+   # Install system dependencies first
+   sudo apt-get update
+   sudo apt-get install python3-dev build-essential
+   
+   # Then install Python packages
+   pip install -r requirements.txt
+   ```
+
+#### Dependency Conflicts
+
+**Symptoms:**
+- `ERROR: pip's dependency resolver does not currently take into account all the packages that are installed`
+- Version conflict errors during installation
+
+**Solutions:**
+```bash
+# Create clean virtual environment
+python -m venv agent-zero-env
+source agent-zero-env/bin/activate  # On Windows: agent-zero-env\Scripts\activate
+
+# Upgrade pip first
+pip install --upgrade pip
+
+# Install with dependency resolution
+pip install -r requirements.txt --force-reinstall
+```
+
+#### Optional Dependencies
+
+Some features require optional dependencies. If you see warnings about missing packages:
+
+```bash
+# Install optional dependencies for specific features
+pip install kokoro paramiko newspaper3k pypdf pytesseract
+
+# Or install all optional dependencies
+pip install -r requirements.txt --extra-index-url https://download.pytorch.org/whl/cpu
+```
+
+### Dependency Verification Script
+
+Use the included verification script to check your installation:
+
+```bash
+# Run the dependency checker
+python scripts/check_dependencies.py
+
+# Expected output for successful installation:
+# ✅ Dependency verification completed successfully!
+# Core: 10/10 passed
+```
+
+### Getting Help
+
+If you continue to experience dependency issues:
+
+1. **Check the GitHub Issues** - Search for similar problems
+2. **Create a New Issue** - Include:
+   - Your operating system and Python version
+   - The exact error message
+   - Output of `python scripts/check_dependencies.py`
+   - Steps you've already tried
+
+3. **Security Considerations**
+   - Review the [Security Policy](../SECURITY.md) for secure deployment guidelines
+   - Use Docker isolation for production environments
+   - Keep dependencies updated regularly
+
 3. Configure Agent Zero
 - Refer to the following sections for a full guide on how to configure Agent Zero.
 
