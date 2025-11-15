@@ -10,6 +10,7 @@ from python.helpers.shell_ssh import SSHInteractiveSession
 from python.helpers.docker import DockerContainerManager
 from python.helpers.strings import truncate_text as truncate_text_string
 from python.helpers.messages import truncate_text as truncate_text_agent
+from python.helpers.security import CommandValidator
 import re
 
 
@@ -135,6 +136,19 @@ class CodeExecution(Tool):
     async def execute_terminal_command(
         self, session: int, command: str, reset: bool = False
     ):
+        # Validate command for security
+        is_valid, error_message = CommandValidator.validate_command(command)
+        
+        if not is_valid:
+            # Log security event
+            CommandValidator.log_security_event("BLOCKED_COMMAND", command, error_message)
+            
+            # Return error response
+            error_response = f"Command blocked for security reasons: {error_message}"
+            prefix = "bash> " + self.format_command_for_output(command) + "\n\n"
+            self.log.update(content=prefix + error_response)
+            return error_response
+        
         prefix = "bash> " + self.format_command_for_output(command) + "\n\n"
         return await self.terminal_session(session, command, reset, prefix)
 
