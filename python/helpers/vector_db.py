@@ -1,5 +1,7 @@
 from typing import Any, List, Sequence
 import uuid
+import ast
+import operator
 from langchain_community.vectorstores import FAISS
 
 # faiss needs to be patched for python 3.12 on arm #TODO remove once not needed
@@ -137,10 +139,154 @@ def cosine_normalizer(val: float) -> float:
     return res
 
 
+# Safe operators whitelist for expression evaluation
+SAFE_OPERATORS = {
+    ast.Eq: operator.eq,
+    ast.NotEq: operator.ne,
+    ast.Lt: operator.lt,
+    ast.LtE: operator.le,
+    ast.Gt: operator.gt,
+    ast.GtE: operator.ge,
+    ast.And: lambda a, b: a and b,
+    ast.Or: lambda a, b: a or b,
+    ast.Not: lambda a: not a,
+    ast.In: lambda a, b: a in b,
+    ast.NotIn: lambda a, b: a not in b,
+}
+
+# Safe functions whitelist
+SAFE_FUNCTIONS = {
+    'len': len,
+    'str': str,
+    'int': int,
+    'float': float,
+    'bool': bool,
+    'abs': abs,
+    'min': min,
+    'max': max,
+    'sum': sum,
+    'any': any,
+    'all': all,
+}
+
+def _evaluate_node(node: ast.AST, data: dict[str, Any]) -> Any:
+    """Safely evaluate an AST node with restricted operations."""
+    if isinstance(node, ast.Constant):
+        return node.value
+    elif isinstance(node, ast.Name):
+        if node.id in data:
+            return data[node.id]
+        elif node.id in SAFE_FUNCTIONS:
+            return SAFE_FUNCTIONS[node.id]
+        else:
+            raise ValueError(f"Unsafe name access: {node.id}")
+    elif isinstance(node, ast.BinOp):
+        left = _evaluate_node(node.left, data)
+        right = _evaluate_node(node.right, data)
+        if type(node.op) in SAFE_OPERATORS:
+            return SAFE_OPERATORS[type(node.op)](left, right)
+        else:
+            raise ValueError(f"Unsafe binary operator: {type(node.op).__name__}")
+    elif isinstance(node, ast.UnaryOp):
+        operand = _evaluate_node(node.operand, data)
+        if type(node.op) in SAFE_OPERATORS:
+            return SAFE_OPERATORS[type(node.op)](operand)
+        else:
+            raise ValueError(f"Unsafe unary operator: {type(node.op).__name__}")
+    elif isinstance(node, ast.BoolOp):
+        values = [_evaluate_node(value, data) for value in node.values]
+        if type(node.op) in SAFE_OPERATORS:
+            result = values[0]
+            for value in values[1:]:
+                result = SAFE_OPERATORS[type(node.op)](result, value)
+            return result
+        else:
+            raise ValueError(f"Unsafe boolean operator: {type(node.op).__name__}")
+    elif isinstance(node, ast.Compare):
+        left = _evaluate_node(node.left, data)
+        for op, comparator in zip(node.ops, node.comparators):
+            right = _evaluate_node(comparator, data)
+            if type(op) not in SAFE_OPERATORS:
+                raise ValueError(f"Unsafe comparison operator: {type(op).__name__}")
+            if not SAFE_OPERATORS[type(op)](left, right):
+                return False
+            left = right
+        return True
+    elif isinstance(node, ast.Call):
+        func = _evaluate_node(node.func, data)
+        args = [_evaluate_node(arg, data) for arg in node.args]
+        if callable(func) and func in SAFE_FUNCTIONS.values():
+            return func(*args)
+        else:
+            raise ValueError("Unsafe function call")
+    elif isinstance(node, ast.Attribute):
+        obj = _evaluate_node(node.value, data)
+        if hasattr(obj, node.attr):
+            attr = getattr(obj, node.attr)
+            # Only allow safe attribute access
+            if not callable(attr) or attr in SAFE_FUNCTIONS.values():
+                return attr
+            else:
+                raise ValueError(f"Unsafe method access: {node.attr}")
+        else:
+            raise ValueError(f"Unsafe attribute access: {node.attr}")
+    elif isinstance(node, ast.Subscript):
+        # Allow safe subscript access like list[index] or dict[key]
+        value = _evaluate_node(node.value, data)
+        slice_val = _evaluate_node(node.slice, data) if hasattr(node, 'slice') else None
+        # Only allow safe subscript operations
+        if isinstance(value, (list, tuple, str)) and isinstance(slice_val, int):
+            if 0 <= slice_val < len(value):
+                return value[slice_val]
+            else:
+                raise ValueError(f"Index out of bounds: {slice_val}")
+        elif isinstance(value, dict):
+            return value.get(slice_val, None)
+        else:
+            raise ValueError(f"Unsafe subscript access on type: {type(value).__name__}")
+    else:
+        raise ValueError(f"Unsupported AST node type: {type(node).__name__}")
+
+def safe_eval_condition(condition: str, data: dict[str, Any]) -> Any:
+    """Safely evaluate a condition string using AST parsing."""
+    try:
+        # Parse the condition into an AST
+        tree = ast.parse(condition, mode='eval')
+        
+        # Validate the AST contains only safe operations
+        class SafeValidator(ast.NodeVisitor):
+            def visit(self, node):
+                if not isinstance(node, (
+                    ast.Expression, ast.BinOp, ast.UnaryOp, ast.BoolOp,
+                    ast.Compare, ast.Constant, ast.Name, ast.Call,
+                    ast.Attribute, ast.Load, ast.Subscript, ast.Index,
+                    ast.Num, ast.Str, ast.NameConstant, ast.List, ast.Tuple,
+                    # Allow all operator nodes that are in SAFE_OPERATORS
+                    ast.Eq, ast.NotEq, ast.Lt, ast.LtE, ast.Gt, ast.GtE,
+                    ast.And, ast.Or, ast.Not, ast.In, ast.NotIn,
+                    ast.Add, ast.Sub, ast.Mult, ast.Div, ast.Mod, ast.Pow,
+                    ast.LShift, ast.RShift, ast.BitOr, ast.BitXor, ast.BitAnd, ast.Invert,
+                    ast.FloorDiv, ast.MatMult
+                )):
+                    raise ValueError(f"Unsafe AST node: {type(node).__name__}")
+                return super().visit(node)
+        
+        validator = SafeValidator()
+        validator.visit(tree)
+        
+        # Evaluate the parsed AST safely
+        return _evaluate_node(tree.body, data)
+        
+    except Exception as e:
+        # Log the error for security monitoring
+        # In production, this should be logged to a security monitoring system
+        # PrintStyle.error(f"Safe evaluation failed for condition '{condition}': {e}")
+        return False
+
 def get_comparator(condition: str):
     def comparator(data: dict[str, Any]):
         try:
-            result = eval(condition, {}, data)
+            result = safe_eval_condition(condition, data)
             return result
         except Exception as e:
             # PrintStyle.error(f"Error evaluating condition: {e}")
