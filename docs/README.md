@@ -10,6 +10,9 @@ To begin with Agent Zero, follow the links below for detailed guides on various 
 - **[Architecture Overview](architecture.md):** Understand the internal workings of the framework.
 - **[Contributing](contribution.md):** Learn how to contribute to the Agent Zero project.
 - **[Troubleshooting and FAQ](troubleshooting.md):** Find answers to common issues and questions.
+- **[Roadmap](ROADMAP.md):** Strategic improvement plan and development priorities.
+- **[Technical Debt Analysis](TECHNICAL_DEBT.md):** Detailed analysis of code quality issues and solutions.
+- **[Development Tasks](DEVELOPMENT_TASKS.md):** Granular task list for systematic improvements.
 
 ### Your experience with Agent Zero starts now!
 
@@ -58,7 +61,21 @@ To begin with Agent Zero, follow the links below for detailed guides on various 
     - [Knowledge](architecture.md#5-knowledge)
     - [Instruments](architecture.md#6-instruments)
     - [Extensions](architecture.md#7-extensions)
-  - [Contributing](contribution.md)
+- [Roadmap & Planning](ROADMAP.md)
+  - [Strategic Improvement Plan](ROADMAP.md#strategic-improvement-plan)
+  - [Phase-based Implementation](ROADMAP.md#phase-based-implementation)
+  - [Success Metrics](ROADMAP.md#success-metrics)
+- [Technical Debt Analysis](TECHNICAL_DEBT.md)
+  - [Critical Security Issues](TECHNICAL_DEBT.md#critical-security-issues)
+  - [Performance Bottlenecks](TECHNICAL_DEBT.md#performance-issues)
+  - [Code Quality Issues](TECHNICAL_DEBT.md#code-quality-issues)
+  - [Architecture Problems](TECHNICAL_DEBT.md#architecture-issues)
+- [Development Tasks](DEVELOPMENT_TASKS.md)
+  - [Critical Security Tasks](DEVELOPMENT_TASKS.md#-critical-security-issues-fix-immediately)
+  - [High Priority Performance](DEVELOPMENT_TASKS.md#-high-priority-performance-issues)
+  - [Code Quality Improvements](DEVELOPMENT_TASKS.md#️-code-quality-improvements)
+  - [Implementation Timeline](DEVELOPMENT_TASKS.md#-implementation-timeline)
+- [Contributing](contribution.md)
   - [Getting Started](contribution.md#getting-started)
   - [Making Changes](contribution.md#making-changes)
   - [Submitting a Pull Request](contribution.md#submitting-a-pull-request)
