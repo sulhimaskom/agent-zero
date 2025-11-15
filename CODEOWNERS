@@ -1,0 +1,81 @@
+# CODEOWNERS for Agent Zero
+# This file defines who owns which parts of the repository.
+
+# Global owners - will be default owners for everything in the repo
+* @agent0ai
+
+# Core maintainers with full access
+/ @jan-tomasek @agent0ai
+
+# Documentation
+/docs/ @agent0ai
+*.md @agent0ai
+
+# Core Python modules
+/python/ @agent0ai
+agent.py @agent0ai
+models.py @agent0ai
+run_ui.py @agent0ai
+run_tunnel.py @agent0ai
+
+# Configuration and settings
+/conf/ @agent0ai
+.env.example @agent0ai
+requirements.txt @agent0ai
+
+# Docker and deployment
+/docker/ @agent0ai
+Dockerfile* @agent0ai
+docker-compose* @agent0ai
+
+# Web UI
+/webui/ @agent0ai
+
+# Agents and prompts
+/agents/ @agent0ai
+/prompts/ @agent0ai
+
+# Extensions and tools
+/instruments/ @agent0ai
+/extensions/ @agent0ai
+
+# Knowledge base
+/knowledge/ @agent0ai
+
+# Tests
+/tests/ @agent0ai
+*test*.py @agent0ai
+
+# GitHub workflows and CI/CD
+/.github/ @agent0ai
+
+# Security files
+SECURITY.md @agent0ai
+CODEOWNERS @agent0ai
+
+# Logs and temporary files (no owners - anyone can modify)
+/logs/ 
+/tmp/
+*.log
+*.tmp
+
+# Generated files (no owners)
+/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.venv/
+
+# IDE files (no owners)
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files (no owners)
+.DS_Store
+Thumbs.db
