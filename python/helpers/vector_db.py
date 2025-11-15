@@ -1,5 +1,6 @@
 from typing import Any, List, Sequence
 import uuid
+from simpleeval import simple_eval
 from langchain_community.vectorstores import FAISS
 
 # faiss needs to be patched for python 3.12 on arm #TODO remove once not needed
@@ -140,7 +141,7 @@ def cosine_normalizer(val: float) -> float:
 def get_comparator(condition: str):
     def comparator(data: dict[str, Any]):
         try:
-            result = eval(condition, {}, data)
+            result = simple_eval(condition, names=data)
             return result
         except Exception as e:
             # PrintStyle.error(f"Error evaluating condition: {e}")
