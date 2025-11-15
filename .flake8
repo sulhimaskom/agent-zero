@@ -1,0 +1,55 @@
+[flake8]
+# Maximum line length
+max-line-length = 120
+
+# Exclude certain directories and files
+exclude = 
+    .git,
+    __pycache__,
+    .venv,
+    venv,
+    build,
+    dist,
+    *.egg-info,
+    .tox,
+    .coverage,
+    htmlcov,
+    .pytest_cache
+
+# Error codes to ignore
+ignore = 
+    # E203: whitespace before ':' (conflicts with black)
+    E203,
+    # W503: line break before binary operator (conflicts with black)
+    W503,
+    # E501: line too long (handled by formatter, but keep as warning)
+    E501,
+    # E133: closing bracket is missing indentation (existing code style)
+    E133
+
+# Enable specific warnings
+select = 
+    # E: errors
+    E,
+    # W: warnings
+    W,
+    # F: pyflakes
+    F
+
+# Per-file ignores
+per-file-ignores = 
+    # Tests can have longer lines and unused imports
+    tests/*:E501,F401,F811
+    # __init__.py files can have unused imports
+    __init__.py:F401
+    # Migration files can have unused imports
+    */migrations/*:F401
+
+# Docstring conventions
+docstring-convention = google
+
+# Import order
+import-order-style = google
+
+# Multi-line handling
+hang-closing = True
