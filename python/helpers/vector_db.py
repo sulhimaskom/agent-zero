@@ -1,5 +1,7 @@
 from typing import Any, List, Sequence
 import uuid
+import ast
+import operator
 from langchain_community.vectorstores import FAISS
 
 # faiss needs to be patched for python 3.12 on arm #TODO remove once not needed
@@ -137,10 +139,144 @@ def cosine_normalizer(val: float) -> float:
     return res
 
 
+# Safe operators whitelist for expression evaluation
+SAFE_OPERATORS = {
+    ast.Eq: operator.eq,
+    ast.NotEq: operator.ne,
+    ast.Lt: operator.lt,
+    ast.LtE: operator.le,
+    ast.Gt: operator.gt,
+    ast.GtE: operator.ge,
+    ast.And: lambda a, b: a and b,
+    ast.Or: lambda a, b: a or b,
+    ast.In: lambda a, b: a in b,
+    ast.NotIn: lambda a, b: a not in b,
+}
+
+def safe_eval_condition(condition: str, data: dict[str, Any]) -> bool:
+    """
+    Safely evaluate a condition expression against metadata dictionary.
+    
+    This function uses AST parsing to safely evaluate expressions without using eval().
+    Only allows basic comparisons, logical operators, and field access.
+    
+    Args:
+        condition: String expression to evaluate (e.g., "status == 'active' and priority > 5")
+        data: Dictionary containing the data to evaluate against
+        
+    Returns:
+        Boolean result of the evaluation
+        
+    Raises:
+        ValueError: If the expression contains unsafe operations
+        SyntaxError: If the expression has invalid syntax
+    """
+    try:
+        # Parse the expression into an AST
+        tree = ast.parse(condition, mode='eval')
+        return _evaluate_node(tree.body, data)
+    except SyntaxError as e:
+        raise SyntaxError(f"Invalid syntax in condition: {e}")
+    except Exception as e:
+        # Log the error for security monitoring
+        # PrintStyle.error(f"Error evaluating condition '{condition}': {e}")
+        return False
+
+def _evaluate_node(node: ast.AST, data: dict[str, Any]) -> Any:
+    """
+    Recursively evaluate AST nodes safely.
+    
+    Args:
+        node: AST node to evaluate
+        data: Data dictionary for variable lookup
+        
+    Returns:
+        Evaluated result
+        
+    Raises:
+        ValueError: If unsafe operation is detected
+    """
+    if isinstance(node, ast.BoolOp):
+        # Handle and/or operations
+        values = [_evaluate_node(value, data) for value in node.values]
+        if isinstance(node.op, ast.And):
+            return all(values)
+        elif isinstance(node.op, ast.Or):
+            return any(values)
+        else:
+            raise ValueError(f"Unsupported boolean operator: {type(node.op)}")
+    
+    elif isinstance(node, ast.Compare):
+        # Handle comparison operations (==, !=, <, <=, >, >=, in, not in)
+        left = _evaluate_node(node.left, data)
+        
+        for op, comparator in zip(node.ops, node.comparators):
+            right = _evaluate_node(comparator, data)
+            
+            if type(op) not in SAFE_OPERATORS:
+                raise ValueError(f"Unsupported comparison operator: {type(op)}")
+            
+            result = SAFE_OPERATORS[type(op)](left, right)
+            
+            # For chained comparisons (a < b < c), all must be true
+            if not result:
+                return False
+            left = right  # For next comparison in chain
+        
+        return True
+    
+    elif isinstance(node, ast.Name):
+        # Handle variable/field access from data dictionary
+        if node.id in data:
+            return data[node.id]
+        else:
+            raise ValueError(f"Unknown field: {node.id}")
+    
+    elif isinstance(node, ast.Constant):
+        # Handle literal values (strings, numbers, booleans, None)
+        return node.value
+    
+    elif isinstance(node, ast.Attribute):
+        # Handle attribute access (e.g., obj.attr)
+        obj = _evaluate_node(node.value, data)
+        if hasattr(obj, node.attr):
+            return getattr(obj, node.attr)
+        else:
+            raise ValueError(f"Attribute '{node.attr}' not found on {type(obj)}")
+    
+    elif isinstance(node, ast.UnaryOp):
+        # Handle unary operations (not, +, -)
+        operand = _evaluate_node(node.operand, data)
+        
+        if isinstance(node.op, ast.Not):
+            return not operand
+        elif isinstance(node.op, ast.UAdd):
+            return +operand
+        elif isinstance(node.op, ast.USub):
+            return -operand
+        else:
+            raise ValueError(f"Unsupported unary operator: {type(node.op)}")
+    
+    else:
+        # Reject any other node types (function calls, imports, etc.)
+        raise ValueError(f"Unsupported operation: {type(node).__name__}")
+
 def get_comparator(condition: str):
+    """
+    Create a comparator function for filtering documents based on metadata.
+    
+    This function now uses safe_eval_condition instead of eval() to prevent
+    arbitrary code execution vulnerabilities.
+    
+    Args:
+        condition: String expression for filtering (e.g., "status == 'active'")
+        
+    Returns:
+        Comparator function that takes a metadata dictionary and returns boolean
+    """
     def comparator(data: dict[str, Any]):
         try:
-            result = eval(condition, {}, data)
+            result = safe_eval_condition(condition, data)
             return result
         except Exception as e:
             # PrintStyle.error(f"Error evaluating condition: {e}")
