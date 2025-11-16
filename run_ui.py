@@ -17,10 +17,12 @@ from python.helpers import runtime, dotenv, process
 from python.helpers.extract_tools import load_classes_from_folder
 from python.helpers.api import ApiHandler
 from python.helpers.print_style import PrintStyle
+from python.helpers.secure_auth import get_auth_manager, cleanup_expired_sessions
 
 # disable logging
 import logging
 logging.getLogger().setLevel(logging.WARNING)
+logger = logging.getLogger(__name__)
 
 
 # Set the new timezone to 'UTC'
@@ -117,22 +119,30 @@ def requires_loopback(f):
 
 
 def _get_credentials_hash():
-    user = dotenv.get_dotenv_value("AUTH_LOGIN")
-    password = dotenv.get_dotenv_value("AUTH_PASSWORD")
-    if not user:
-        return None
-    return hashlib.sha256(f"{user}:{password}".encode()).hexdigest()
+    """Get credentials hash for backward compatibility."""
+    auth_manager = get_auth_manager()
+    return auth_manager.get_credentials_hash()
 
 # require authentication for handlers
 def requires_auth(f):
     @wraps(f)
     async def decorated(*args, **kwargs):
-        user_pass_hash = _get_credentials_hash()
+        auth_manager = get_auth_manager()
+        user_pass_hash = auth_manager.get_credentials_hash()
+        
         # If no auth is configured, just proceed
         if not user_pass_hash:
             return await f(*args, **kwargs)
 
-        if session.get('authentication') != user_pass_hash:
+        # Check rate limiting based on IP address
+        client_ip = request.remote_addr
+        is_limited, lockout_time = auth_manager.is_rate_limited(client_ip)
+        if is_limited:
+            return Response(f"Too many failed attempts. Try again in {lockout_time} seconds.", 429)
+
+        # Validate session
+        session_token = session.get('authentication')
+        if not session_token or not auth_manager.validate_session(session_token):
             return redirect(url_for('login'))
         
         return await f(*args, **kwargs)
@@ -154,22 +164,47 @@ def csrf_protect(f):
 
 @webapp.route("/login", methods=["GET", "POST"])
 async def login():
+    auth_manager = get_auth_manager()
     error = None
+    
     if request.method == 'POST':
-        user = dotenv.get_dotenv_value("AUTH_LOGIN")
-        password = dotenv.get_dotenv_value("AUTH_PASSWORD")
+        username = request.form.get('username', '')
+        password = request.form.get('password', '')
+        client_ip = request.remote_addr
         
-        if request.form['username'] == user and request.form['password'] == password:
-            session['authentication'] = _get_credentials_hash()
-            return redirect(url_for('serve_index'))
+        # Check rate limiting
+        is_limited, lockout_time = auth_manager.is_rate_limited(client_ip)
+        if is_limited:
+            error = f'Too many failed attempts. Try again in {lockout_time} seconds.'
         else:
-            error = 'Invalid Credentials. Please try again.'
+            # Verify credentials
+            if auth_manager.verify_credentials(username, password):
+                # Record successful login
+                auth_manager.record_successful_login(client_ip)
+                
+                # Create secure session
+                user_data = {'username': username, 'login_time': time.time()}
+                session_token = auth_manager.create_session(user_data)
+                session['authentication'] = session_token
+                
+                return redirect(url_for('serve_index'))
+            else:
+                # Record failed attempt
+                is_now_locked, lockout_duration = auth_manager.record_failed_attempt(client_ip)
+                if is_now_locked:
+                    error = f'Account locked due to too many failed attempts. Try again in {lockout_duration // 60} minutes.'
+                else:
+                    error = 'Invalid Credentials. Please try again.'
             
     login_page_content = files.read_file("webui/login.html")
     return render_template_string(login_page_content, error=error)
 
 @webapp.route("/logout")
 async def logout():
+    auth_manager = get_auth_manager()
+    session_token = session.get('authentication')
+    if session_token:
+        auth_manager.invalidate_session(session_token)
     session.pop('authentication', None)
     return redirect(url_for('login'))
 
@@ -203,6 +238,18 @@ def run():
     from a2wsgi import ASGIMiddleware
 
     PrintStyle().print("Starting server...")
+    
+    # Start background cleanup task for expired sessions
+    def session_cleanup_task():
+        while True:
+            try:
+                cleanup_expired_sessions()
+            except Exception as e:
+                logger.error(f"Session cleanup error: {e}")
+            time.sleep(3600)  # Run every hour
+    
+    cleanup_thread = threading.Thread(target=session_cleanup_task, daemon=True)
+    cleanup_thread.start()
 
     class NoRequestLoggingWSGIRequestHandler(WSGIRequestHandler):
         def log_request(self, code="-", size="-"):
