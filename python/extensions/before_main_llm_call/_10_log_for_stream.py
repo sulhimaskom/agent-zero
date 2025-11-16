@@ -1,10 +1,10 @@
-from python.helpers import persist_chat, tokens
-from python.helpers.extension import Extension
-from agent import LoopData
 import asyncio
-from python.helpers.log import LogItem
-from python.helpers import log
 import math
+
+from agent import LoopData
+from python.helpers import log, persist_chat, tokens
+from python.helpers.extension import Extension
+from python.helpers.log import LogItem
 
 
 class LogForStream(Extension):
@@ -19,8 +19,10 @@ class LogForStream(Extension):
                 )
             )
 
+
 def build_heading(agent, text: str):
     return f"icon://network_intelligence {agent.agent_name}: {text}"
 
+
 def build_default_heading(agent):
-    return build_heading(agent, "Generating...") 
+    return build_heading(agent, "Generating...")

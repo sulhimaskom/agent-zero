@@ -1,9 +1,10 @@
-from agent import AgentContext, UserMessage
-from python.helpers.api import ApiHandler, Request, Response
-
-from python.helpers import files
 import os
+
 from werkzeug.utils import secure_filename
+
+from agent import AgentContext, UserMessage
+from python.helpers import files
+from python.helpers.api import ApiHandler, Request, Response
 from python.helpers.defer import DeferredTask
 from python.helpers.print_style import PrintStyle
 
@@ -30,7 +31,9 @@ class Message(ApiHandler):
             attachment_paths = []
 
             upload_folder_int = "/a0/tmp/uploads"
-            upload_folder_ext = files.get_abs_path("tmp/uploads") # for development environment
+            upload_folder_ext = files.get_abs_path(
+                "tmp/uploads"
+            )  # for development environment
 
             if attachments:
                 os.makedirs(upload_folder_ext, exist_ok=True)

@@ -1,5 +1,6 @@
-from flaredantic import FlareTunnel, FlareConfig, ServeoConfig, ServeoTunnel
 import threading
+
+from flaredantic import FlareConfig, FlareTunnel, ServeoConfig, ServeoTunnel
 
 
 # Singleton to manage the tunnel instance
@@ -35,7 +36,7 @@ class TunnelManager:
                         config = FlareConfig(port=port, verbose=True)
                         self.tunnel = FlareTunnel(config)
                     else:  # Default to serveo
-                        config = ServeoConfig(port=port) # type: ignore
+                        config = ServeoConfig(port=port)  # type: ignore
                         self.tunnel = ServeoTunnel(config)
 
                     self.tunnel.start()

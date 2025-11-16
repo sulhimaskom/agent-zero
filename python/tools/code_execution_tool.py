@@ -1,18 +1,18 @@
 import asyncio
-from dataclasses import dataclass
+import re
 import shlex
 import time
-from python.helpers.tool import Tool, Response
+from dataclasses import dataclass
+
 from python.helpers import files, rfc_exchange
+from python.helpers.command_validator import sanitize_command
+from python.helpers.docker import DockerContainerManager
+from python.helpers.messages import truncate_text as truncate_text_agent
 from python.helpers.print_style import PrintStyle
 from python.helpers.shell_local import LocalInteractiveSession
 from python.helpers.shell_ssh import SSHInteractiveSession
-from python.helpers.docker import DockerContainerManager
 from python.helpers.strings import truncate_text as truncate_text_string
-from python.helpers.messages import truncate_text as truncate_text_agent
-from python.helpers.command_validator import sanitize_command
-
-import re
+from python.helpers.tool import Response, Tool
 
 
 @dataclass
@@ -76,12 +76,17 @@ class CodeExecution(Tool):
         return f"icon://terminal {session_text}{text}"
 
     async def after_execution(self, response, **kwargs):
-        self.agent.hist_add_tool_result(self.name, response.message, **(response.additional or {}))
+        self.agent.hist_add_tool_result(
+            self.name, response.message, **(response.additional or {})
+        )
 
     async def prepare_state(self, reset=False, session: int | None = None):
         self.state: State | None = self.agent.get_data("_cet_state")
         # always reset state when ssh_enabled changes
-        if not self.state or self.state.ssh_enabled != self.agent.config.code_exec_ssh_enabled:
+        if (
+            not self.state
+            or self.state.ssh_enabled != self.agent.config.code_exec_ssh_enabled
+        ):
             # initialize shells dictionary if not exists
             shells: dict[int, LocalInteractiveSession | SSHInteractiveSession] = {}
         else:
@@ -118,7 +123,9 @@ class CodeExecution(Tool):
             shells[session] = shell
             await shell.connect()
 
-        self.state = State(shells=shells, ssh_enabled=self.agent.config.code_exec_ssh_enabled)
+        self.state = State(
+            shells=shells, ssh_enabled=self.agent.config.code_exec_ssh_enabled
+        )
         self.agent.set_data("_cet_state", self.state)
         return self.state
 
@@ -138,15 +145,17 @@ class CodeExecution(Tool):
         self, session: int, command: str, reset: bool = False
     ):
         # Security validation - prevent command injection
-        is_safe, sanitized_command, error_msg = self._validate_and_sanitize_command(command)
+        is_safe, sanitized_command, error_msg = self._validate_and_sanitize_command(
+            command
+        )
         if not is_safe:
             PrintStyle.error(f"Command blocked for security reasons: {error_msg}")
             response = self.agent.read_prompt(
-                "fw.code.info.md", 
-                info=f"Command blocked for security reasons: {error_msg}"
+                "fw.code.info.md",
+                info=f"Command blocked for security reasons: {error_msg}",
             )
             return response
-        
+
         prefix = "bash> " + self.format_command_for_output(command) + "\n\n"
         return await self.terminal_session(session, sanitized_command, reset, prefix)
 
@@ -382,23 +391,25 @@ class CodeExecution(Tool):
     def _validate_and_sanitize_command(self, command: str) -> tuple[bool, str, str]:
         """
         Validate and sanitize a command to prevent command injection.
-        
+
         Uses the centralized command validator for consistent security enforcement.
-        
+
         Args:
             command: The command string to validate and sanitize
-            
+
         Returns:
             Tuple of (is_safe, sanitized_command, error_message)
         """
         try:
             is_safe, sanitized_command, error_msg = sanitize_command(command)
-            
+
             if not is_safe:
-                PrintStyle.warning(f"Blocked dangerous command: {command} - {error_msg}")
-            
+                PrintStyle.warning(
+                    f"Blocked dangerous command: {command} - {error_msg}"
+                )
+
             return is_safe, sanitized_command, error_msg
-            
+
         except Exception as e:
             error_msg = f"Unexpected error during validation: {e}"
             PrintStyle.error(f"Command validation error: {command} - {error_msg}")
@@ -409,5 +420,7 @@ class CodeExecution(Tool):
         output = re.sub(r"(?<!\\)\\x[0-9A-Fa-f]{2}", "", output)
         # Strip every line of output before truncation
         output = "\n".join(line.strip() for line in output.splitlines())
-        output = truncate_text_agent(agent=self.agent, output=output, threshold=1000000) # ~1MB, larger outputs should be dumped to file, not read from terminal
+        output = truncate_text_agent(
+            agent=self.agent, output=output, threshold=1000000
+        )  # ~1MB, larger outputs should be dumped to file, not read from terminal
         return output

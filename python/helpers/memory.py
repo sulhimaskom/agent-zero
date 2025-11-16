@@ -1,98 +1,101 @@
+import os
 from datetime import datetime
 from typing import Any, List, Sequence
-import os
+
 # from langchain.storage import InMemoryByteStore, LocalFileStore  # Updated for compatibility
 # from langchain.embeddings import CacheBackedEmbeddings  # Updated for compatibility
+
 
 # Compatibility replacements for missing langchain.storage classes
 class InMemoryByteStore:
     """Simple in-memory byte store replacement."""
+
     def __init__(self):
         self._store = {}
-    
+
     def get(self, key: str):
         return self._store.get(key)
-    
+
     def set(self, key: str, value: bytes):
         self._store[key] = value
-    
+
     def delete(self, key: str):
         self._store.pop(key, None)
 
+
 class LocalFileStore:
     """Simple local file store replacement."""
+
     def __init__(self, base_path: str):
         self.base_path = base_path
         os.makedirs(base_path, exist_ok=True)
-    
+
     def get(self, key: str):
         file_path = os.path.join(self.base_path, key)
         if os.path.exists(file_path):
-            with open(file_path, 'rb') as f:
+            with open(file_path, "rb") as f:
                 return f.read()
         return None
-    
+
     def set(self, key: str, value: bytes):
         file_path = os.path.join(self.base_path, key)
-        with open(file_path, 'wb') as f:
+        with open(file_path, "wb") as f:
             f.write(value)
-    
+
     def delete(self, key: str):
         file_path = os.path.join(self.base_path, key)
         if os.path.exists(file_path):
             os.remove(file_path)
 
+
 class CacheBackedEmbeddings:
     """Simple cache-backed embeddings replacement."""
+
     def __init__(self, underlying_embeddings, byte_store, namespace: str = ""):
         self.underlying_embeddings = underlying_embeddings
         self.byte_store = byte_store
         self.namespace = namespace
-    
+
     @classmethod
     def from_bytes_store(cls, underlying_embeddings, byte_store, namespace: str = ""):
         return cls(underlying_embeddings, byte_store, namespace)
-    
+
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
         # Simple implementation without actual caching for now
         return self.underlying_embeddings.embed_documents(texts)
-    
+
     def embed_query(self, text: str) -> List[float]:
         # Simple implementation without actual caching for now
         return self.underlying_embeddings.embed_query(text)
-from python.helpers import guids
-from python.helpers.memory_monitor import get_memory_monitor, WeakValueDictionary
 
+
+import ast
+import json
+import logging
+import operator
+import os
+from enum import Enum
+
+import faiss
+import numpy as np
+from langchain_community.docstore.in_memory import InMemoryDocstore
 # from langchain_chroma import Chroma
 from langchain_community.vectorstores import FAISS
-
-# faiss needs to be patched for python 3.12 on arm #TODO remove once not needed
-from python.helpers import faiss_monkey_patch
-import faiss
-
-
-from langchain_community.docstore.in_memory import InMemoryDocstore
-from langchain_community.vectorstores.utils import (
-    DistanceStrategy,
-)
-from langchain_core.embeddings import Embeddings
-
-import os, json
-
-import numpy as np
-
-from python.helpers.print_style import PrintStyle
-from . import files
+from langchain_community.vectorstores.utils import DistanceStrategy
 from langchain_core.documents import Document
-from python.helpers import knowledge_import
-from python.helpers.log import Log, LogItem
-from enum import Enum
-from agent import Agent
-import models
-import logging
+from langchain_core.embeddings import Embeddings
 from simpleeval import simple_eval
-import ast
-import operator
+
+import models
+from agent import Agent
+# faiss needs to be patched for python 3.12 on arm #TODO remove once not needed
+from python.helpers import faiss_monkey_patch, guids, knowledge_import
+from python.helpers.log import Log, LogItem
+from python.helpers.memory_monitor import (WeakValueDictionary,
+                                           get_memory_monitor)
+from python.helpers.print_style import PrintStyle
+
+from . import files
 
 # Safe operators allowed in expressions (same as vector_db.py)
 SAFE_OPERATORS = {
@@ -125,36 +128,37 @@ SAFE_UNARY_OPERATORS = {
     ast.Not: operator.not_,
 }
 
+
 class SafeExpressionEvaluator:
     """
     Safe expression evaluator using AST parsing to prevent code injection.
     Only allows specific safe operations and prevents arbitrary code execution.
     This is the same implementation as in vector_db.py for consistency.
     """
-    
+
     def __init__(self):
         self.allowed_operators = SAFE_OPERATORS
         self.allowed_binary_operators = SAFE_BINARY_OPERATORS
         self.allowed_unary_operators = SAFE_UNARY_OPERATORS
-    
+
     def evaluate(self, condition: str, data: dict[str, Any]) -> bool:
         """
         Safely evaluate a condition string against provided data.
-        
+
         Args:
             condition: String expression to evaluate (e.g., "age > 18 and name == 'John'")
             data: Dictionary containing variable names and their values
-            
+
         Returns:
             Boolean result of the evaluation
-            
+
         Raises:
             ValueError: If the expression contains unsafe operations
             SyntaxError: If the expression has invalid syntax
         """
         try:
             # Parse the expression into an AST
-            tree = ast.parse(condition, mode='eval')
+            tree = ast.parse(condition, mode="eval")
             # Evaluate the AST safely
             result = self._evaluate_node(tree.body, data)
             # Ensure result is boolean
@@ -166,10 +170,10 @@ class SafeExpressionEvaluator:
         except Exception as e:
             # Any other exception means the expression is unsafe
             raise ValueError(f"Expression evaluation failed: {e}")
-    
+
     def _evaluate_node(self, node, data: dict[str, Any]):
         """Recursively evaluate AST nodes safely."""
-        
+
         if isinstance(node, ast.BoolOp):
             # Handle boolean operations (and, or)
             result = True if isinstance(node.op, ast.And) else False
@@ -184,19 +188,19 @@ class SafeExpressionEvaluator:
                     if result:  # Short-circuit
                         break
             return result
-        
+
         elif isinstance(node, ast.BinOp):
             # Handle binary operations
             left = self._evaluate_node(node.left, data)
             right = self._evaluate_node(node.right, data)
-            
+
             if type(node.op) in self.allowed_binary_operators:
                 return self.allowed_binary_operators[type(node.op)](left, right)
             elif type(node.op) in self.allowed_operators:
                 return self.allowed_operators[type(node.op)](left, right)
             else:
                 raise ValueError(f"Unsafe binary operator: {type(node.op).__name__}")
-        
+
         elif isinstance(node, ast.UnaryOp):
             # Handle unary operations
             operand = self._evaluate_node(node.operand, data)
@@ -204,7 +208,7 @@ class SafeExpressionEvaluator:
                 return self.allowed_unary_operators[type(node.op)](operand)
             else:
                 raise ValueError(f"Unsafe unary operator: {type(node.op).__name__}")
-        
+
         elif isinstance(node, ast.Compare):
             # Handle comparison operations
             left = self._evaluate_node(node.left, data)
@@ -217,36 +221,36 @@ class SafeExpressionEvaluator:
                 else:
                     raise ValueError(f"Unsafe comparison operator: {type(op).__name__}")
             return True
-        
+
         elif isinstance(node, ast.Name):
             # Handle variable names - only allow names from the provided data
             if node.id in data:
                 return data[node.id]
             else:
                 raise ValueError(f"Undefined variable: {node.id}")
-        
+
         elif isinstance(node, ast.Constant):
             # Handle literal values (strings, numbers, booleans, None)
             return node.value
-        
+
         elif isinstance(node, ast.List):
             # Handle list literals
             return [self._evaluate_node(elt, data) for elt in node.elts]
-        
+
         elif isinstance(node, ast.Tuple):
             # Handle tuple literals
             return tuple(self._evaluate_node(elt, data) for elt in node.elts)
-        
+
         elif isinstance(node, ast.Set):
             # Handle set literals
             return {self._evaluate_node(elt, data) for elt in node.elts}
-        
+
         elif isinstance(node, ast.Dict):
             # Handle dictionary literals
             keys = [self._evaluate_node(k, data) for k in node.keys]
             values = [self._evaluate_node(v, data) for v in node.values]
             return dict(zip(keys, values))
-        
+
         else:
             # Any other node type is potentially unsafe
             raise ValueError(f"Unsafe expression construct: {type(node).__name__}")
@@ -283,21 +287,22 @@ class Memory:
 
     # Use weak value dictionary to prevent memory leaks
     index: WeakValueDictionary = WeakValueDictionary()
-    
+
     # Track last access times for cleanup
     _last_access: dict[str, float] = {}
-    
+
     # Expiry time for unused databases (1 hour)
     _EXPIRY_TIME = 3600
 
     @staticmethod
     async def get(agent: Agent):
         import time
+
         memory_subdir = agent.config.memory_subdir or "default"
-        
+
         # Update last access time
         Memory._last_access[memory_subdir] = time.time()
-        
+
         # Check if database exists and is still valid
         db = Memory.index.get(memory_subdir)
         if db is None:
@@ -331,10 +336,10 @@ class Memory:
         preload_knowledge: bool = True,
     ):
         import time
-        
+
         # Update last access time
         Memory._last_access[memory_subdir] = time.time()
-        
+
         # Check if database exists and is still valid
         db = Memory.index.get(memory_subdir)
         if db is None:
@@ -670,13 +675,14 @@ class Memory:
     def _get_comparator(condition: str):
         """
         Create a safe comparator function for filtering memory documents.
-        
+
         Args:
             condition: String expression to evaluate against document metadata
-            
+
         Returns:
             Function that takes a data dictionary and returns boolean result
         """
+
         def comparator(data: dict[str, Any]):
             try:
                 result = _memory_evaluator.evaluate(condition, data)
@@ -725,41 +731,45 @@ class Memory:
     def cleanup_expired_databases():
         """Remove expired or unused databases to prevent memory leaks."""
         import time
+
         current_time = time.time()
         expired_keys = []
-        
+
         for key in list(Memory._last_access.keys()):
             if current_time - Memory._last_access[key] > Memory._EXPIRY_TIME:
                 expired_keys.append(key)
-        
+
         for key in expired_keys:
             if key in Memory.index:
                 del Memory.index[key]
             if key in Memory._last_access:
                 del Memory._last_access[key]
-        
+
         # Clean up dead weak references
         Memory.index.cleanup_dead_references()
-        
+
         if expired_keys:
-            PrintStyle.success(f"Cleaned up {len(expired_keys)} expired memory databases")
-    
+            PrintStyle.success(
+                f"Cleaned up {len(expired_keys)} expired memory databases"
+            )
+
     @staticmethod
     def get_memory_stats() -> dict[str, Any]:
         """Get memory usage statistics for debugging."""
         import time
+
         current_time = time.time()
-        
+
         stats = {
             "active_databases": Memory.index.size(),
             "tracked_access_times": len(Memory._last_access),
             "database_keys": Memory.index.keys(),
             "last_access_times": {
-                key: current_time - Memory._last_access[key] 
+                key: current_time - Memory._last_access[key]
                 for key in Memory._last_access.keys()
-            }
+            },
         }
-        
+
         return stats
 
 

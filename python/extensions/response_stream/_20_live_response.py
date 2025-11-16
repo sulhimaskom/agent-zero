@@ -1,9 +1,9 @@
-from python.helpers import persist_chat, tokens
-from python.helpers.extension import Extension
-from agent import LoopData
 import asyncio
+
+from agent import LoopData
+from python.helpers import log, persist_chat, tokens
+from python.helpers.extension import Extension
 from python.helpers.log import LogItem
-from python.helpers import log
 
 
 class LiveResponse(Extension):

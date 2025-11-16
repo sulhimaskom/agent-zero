@@ -1,8 +1,10 @@
 import asyncio
-from python.helpers.api import ApiHandler, Request, Response
-from python.helpers import dotenv, runtime
-from python.helpers.tunnel_manager import TunnelManager
+
 import aiohttp
+
+from python.helpers import dotenv, runtime
+from python.helpers.api import ApiHandler, Request, Response
+from python.helpers.tunnel_manager import TunnelManager
 
 
 class TunnelProxy(ApiHandler):
@@ -19,7 +21,9 @@ class TunnelProxy(ApiHandler):
         try:
             timeout = aiohttp.ClientTimeout(total=5.0)  # 5 second timeout
             async with aiohttp.ClientSession(timeout=timeout) as session:
-                async with session.post(f"http://localhost:{tunnel_api_port}/", json={"action": "health"}) as response:
+                async with session.post(
+                    f"http://localhost:{tunnel_api_port}/", json={"action": "health"}
+                ) as response:
                     if response.status == 200:
                         service_ok = True
         except (aiohttp.ClientError, asyncio.TimeoutError, ConnectionError) as e:
@@ -28,13 +32,19 @@ class TunnelProxy(ApiHandler):
         # forward this request to the tunnel service if OK
         if service_ok:
             try:
-                timeout = aiohttp.ClientTimeout(total=30.0)  # 30 second timeout for main request
+                timeout = aiohttp.ClientTimeout(
+                    total=30.0
+                )  # 30 second timeout for main request
                 async with aiohttp.ClientSession(timeout=timeout) as session:
-                    async with session.post(f"http://localhost:{tunnel_api_port}/", json=input) as response:
+                    async with session.post(
+                        f"http://localhost:{tunnel_api_port}/", json=input
+                    ) as response:
                         if response.status == 200:
                             return await response.json()
                         else:
-                            return {"error": f"HTTP {response.status}: {await response.text()}"}
+                            return {
+                                "error": f"HTTP {response.status}: {await response.text()}"
+                            }
             except (aiohttp.ClientError, asyncio.TimeoutError, ConnectionError) as e:
                 return {"error": f"Tunnel service error: {str(e)}"}
             except Exception as e:
@@ -42,4 +52,5 @@ class TunnelProxy(ApiHandler):
         else:
             # forward to API handler directly
             from python.api.tunnel import Tunnel
+
             return await Tunnel(self.app, self.thread_lock).process(input, request)

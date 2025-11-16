@@ -1,9 +1,12 @@
+import os
+import re
 from typing import Any
-from python.helpers.extension import Extension
+
 from python.helpers import files, persist_chat
-import os, re
+from python.helpers.extension import Extension
 
 LEN_MIN = 500
+
 
 class SaveToolCallFile(Extension):
     async def execute(self, data: dict[str, Any] | None = None, **kwargs):

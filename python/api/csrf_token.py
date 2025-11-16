@@ -1,13 +1,9 @@
 import secrets
-from python.helpers.api import (
-    ApiHandler,
-    Input,
-    Output,
-    Request,
-    Response,
-    session,
-)
+
 from python.helpers import runtime
+from python.helpers.api import (ApiHandler, Input, Output, Request, Response,
+                                session)
+
 
 class GetCsrfToken(ApiHandler):
 

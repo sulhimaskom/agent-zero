@@ -11,26 +11,29 @@
 # """
 
 # faiss_monkey_patch.py  – import this before faiss -----------------
-import sys, types, numpy as np
+import sys
+import types
 from types import SimpleNamespace
+
+import numpy as np
 
 # fake numpy.distutils and numpy.distutils.cpuinfo packages
 dist = types.ModuleType("numpy.distutils")
 cpuinfo = types.ModuleType("numpy.distutils.cpuinfo")
 
 # cpu attribute that looks like the real one
-cpuinfo.cpu = SimpleNamespace( # type: ignore
+cpuinfo.cpu = SimpleNamespace(  # type: ignore
     # FAISS only does   .info[0].get('Features', '')
     info=[{}]
 )
 
 # register in sys.modules
-dist.cpuinfo = cpuinfo # type: ignore
+dist.cpuinfo = cpuinfo  # type: ignore
 sys.modules["numpy.distutils"] = dist
 sys.modules["numpy.distutils.cpuinfo"] = cpuinfo
 
 # crucial: expose it as an *attribute* of the already-imported numpy package
-np.distutils = dist # type: ignore
+np.distutils = dist  # type: ignore
 # -------------------------------------------------------------------
 
 import faiss

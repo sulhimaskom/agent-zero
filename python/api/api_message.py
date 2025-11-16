@@ -1,13 +1,15 @@
 import base64
 import os
-from datetime import datetime, timedelta
-from agent import AgentContext, UserMessage, AgentContextType
-from python.helpers.api import ApiHandler, Request, Response
-from python.helpers import files
-from python.helpers.print_style import PrintStyle
-from werkzeug.utils import secure_filename
-from initialize import initialize_agent
 import threading
+from datetime import datetime, timedelta
+
+from werkzeug.utils import secure_filename
+
+from agent import AgentContext, AgentContextType, UserMessage
+from initialize import initialize_agent
+from python.helpers import files
+from python.helpers.api import ApiHandler, Request, Response
+from python.helpers.print_style import PrintStyle
 
 
 class ApiMessage(ApiHandler):
@@ -35,7 +37,11 @@ class ApiMessage(ApiHandler):
         lifetime_hours = input.get("lifetime_hours", 24)  # Default 24 hours
 
         if not message:
-            return Response('{"error": "Message is required"}', status=400, mimetype="application/json")
+            return Response(
+                '{"error": "Message is required"}',
+                status=400,
+                mimetype="application/json",
+            )
 
         # Handle attachments (base64 encoded)
         attachment_paths = []
@@ -45,7 +51,11 @@ class ApiMessage(ApiHandler):
             os.makedirs(upload_folder_ext, exist_ok=True)
 
             for attachment in attachments:
-                if not isinstance(attachment, dict) or "filename" not in attachment or "base64" not in attachment:
+                if (
+                    not isinstance(attachment, dict)
+                    or "filename" not in attachment
+                    or "base64" not in attachment
+                ):
                     continue
 
                 try:
@@ -63,14 +73,20 @@ class ApiMessage(ApiHandler):
 
                     attachment_paths.append(os.path.join(upload_folder_int, filename))
                 except Exception as e:
-                    PrintStyle.error(f"Failed to process attachment {attachment.get('filename', 'unknown')}: {e}")
+                    PrintStyle.error(
+                        f"Failed to process attachment {attachment.get('filename', 'unknown')}: {e}"
+                    )
                     continue
 
         # Get or create context
         if context_id:
             context = AgentContext.get(context_id)
             if not context:
-                return Response('{"error": "Context not found"}', status=404, mimetype="application/json")
+                return Response(
+                    '{"error": "Context not found"}',
+                    status=404,
+                    mimetype="application/json",
+                )
         else:
             config = initialize_agent()
             context = AgentContext(config=config, type=AgentContextType.USER)
@@ -78,12 +94,18 @@ class ApiMessage(ApiHandler):
 
         # Update chat lifetime
         with self._cleanup_lock:
-            self._chat_lifetimes[context_id] = datetime.now() + timedelta(hours=lifetime_hours)
+            self._chat_lifetimes[context_id] = datetime.now() + timedelta(
+                hours=lifetime_hours
+            )
 
         # Process message
         try:
             # Log the message
-            attachment_filenames = [os.path.basename(path) for path in attachment_paths] if attachment_paths else []
+            attachment_filenames = (
+                [os.path.basename(path) for path in attachment_paths]
+                if attachment_paths
+                else []
+            )
 
             PrintStyle(
                 background_color="#6C3483", font_color="white", bold=True, padding=True
@@ -109,14 +131,13 @@ class ApiMessage(ApiHandler):
             # Clean up expired chats
             self._cleanup_expired_chats()
 
-            return {
-                "context_id": context_id,
-                "response": result
-            }
+            return {"context_id": context_id, "response": result}
 
         except Exception as e:
             PrintStyle.error(f"External API error: {e}")
-            return Response(f'{{"error": "{str(e)}"}}', status=500, mimetype="application/json")
+            return Response(
+                f'{{"error": "{str(e)}"}}', status=500, mimetype="application/json"
+            )
 
     @classmethod
     def _cleanup_expired_chats(cls):
@@ -124,7 +145,8 @@ class ApiMessage(ApiHandler):
         with cls._cleanup_lock:
             now = datetime.now()
             expired_contexts = [
-                context_id for context_id, expiry in cls._chat_lifetimes.items()
+                context_id
+                for context_id, expiry in cls._chat_lifetimes.items()
                 if now > expiry
             ]
 

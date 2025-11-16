@@ -7,13 +7,13 @@ import subprocess
 from typing import Any, Literal, TypedDict, cast
 
 import models
-from python.helpers import runtime, whisper, defer, git
-from . import files, dotenv
+from python.helpers import defer, dirty_json, git, runtime, whisper
 from python.helpers.print_style import PrintStyle
 from python.helpers.providers import get_providers
 from python.helpers.secrets import SecretsManager
-from python.helpers import dirty_json
 from python.helpers.utility_patterns import create_background_task
+
+from . import dotenv, files
 
 
 class Settings(TypedDict):
@@ -88,7 +88,7 @@ class Settings(TypedDict):
     rfc_port_http: int
     rfc_port_ssh: int
 
-    shell_interface: Literal['local','ssh']
+    shell_interface: Literal["local", "ssh"]
 
     stt_model_size: str
     stt_language: str
@@ -111,6 +111,7 @@ class Settings(TypedDict):
 
     # LiteLLM global kwargs applied to all model calls
     litellm_global_kwargs: dict[str, Any]
+
 
 class PartialSettings(Settings, total=False):
     pass
@@ -853,7 +854,10 @@ def convert_out(settings: Settings) -> SettingsOutput:
             "description": "Terminal interface used for Code Execution Tool. Local Python TTY works locally in both dockerized and development environments. SSH always connects to dockerized environment (automatically at localhost or RFC host address).",
             "type": "select",
             "value": settings["shell_interface"],
-            "options": [{"value": "local", "label": "Local Python TTY"}, {"value": "ssh", "label": "SSH"}],
+            "options": [
+                {"value": "local", "label": "Local Python TTY"},
+                {"value": "ssh", "label": "SSH"},
+            ],
         }
     )
 
@@ -1108,7 +1112,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
         "tab": "mcp",
     }
 
-   # Secrets section
+    # Secrets section
     secrets_fields: list[SettingsField] = []
 
     secrets_manager = SecretsManager.get_instance()
@@ -1117,23 +1121,27 @@ def convert_out(settings: Settings) -> SettingsOutput:
     except Exception:
         secrets = ""
 
-    secrets_fields.append({
-        "id": "variables",
-        "title": "Variables Store",
-        "description": "Store non-sensitive variables in .env format e.g. EMAIL_IMAP_SERVER=\"imap.gmail.com\", one item per line. You can use comments starting with # to add descriptions for the agent. See <a href=\"javascript:openModal('settings/secrets/example-vars.html')\">example</a>.<br>These variables are visible to LLMs and in chat history, they are not being masked.",
-        "type": "textarea",
-        "value": settings["variables"].strip(),
-        "style": "height: 20em",
-    })
+    secrets_fields.append(
+        {
+            "id": "variables",
+            "title": "Variables Store",
+            "description": 'Store non-sensitive variables in .env format e.g. EMAIL_IMAP_SERVER="imap.gmail.com", one item per line. You can use comments starting with # to add descriptions for the agent. See <a href="javascript:openModal(\'settings/secrets/example-vars.html\')">example</a>.<br>These variables are visible to LLMs and in chat history, they are not being masked.',
+            "type": "textarea",
+            "value": settings["variables"].strip(),
+            "style": "height: 20em",
+        }
+    )
 
-    secrets_fields.append({
-        "id": "secrets",
-        "title": "Secrets Store",
-        "description": "Store secrets and credentials in .env format e.g. EMAIL_PASSWORD=\"s3cret-p4$$w0rd\", one item per line. You can use comments starting with # to add descriptions for the agent. See <a href=\"javascript:openModal('settings/secrets/example-secrets.html')\">example</a>.<br>These variables are not visile to LLMs and in chat history, they are being masked. ⚠️ only values with length >= 4 are being masked to prevent false positives. ",
-        "type": "textarea",
-        "value": secrets,
-        "style": "height: 20em",
-    })
+    secrets_fields.append(
+        {
+            "id": "secrets",
+            "title": "Secrets Store",
+            "description": 'Store secrets and credentials in .env format e.g. EMAIL_PASSWORD="s3cret-p4$$w0rd", one item per line. You can use comments starting with # to add descriptions for the agent. See <a href="javascript:openModal(\'settings/secrets/example-secrets.html\')">example</a>.<br>These variables are not visile to LLMs and in chat history, they are being masked. ⚠️ only values with length >= 4 are being masked to prevent false positives. ',
+            "type": "textarea",
+            "value": secrets,
+            "style": "height: 20em",
+        }
+    )
 
     secrets_section: SettingsSection = {
         "id": "secrets",
@@ -1195,7 +1203,6 @@ def convert_out(settings: Settings) -> SettingsOutput:
         "tab": "mcp",
     }
 
-
     # External API section
     external_api_fields: list[SettingsField] = []
 
@@ -1213,7 +1220,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
         "id": "external_api",
         "title": "External API",
         "description": "Agent Zero provides external API endpoints for integration with other applications. "
-                       "These endpoints use API key authentication and support text messages and file attachments.",
+        "These endpoints use API key authentication and support text messages and file attachments.",
         "fields": external_api_fields,
         "tab": "external",
     }
@@ -1296,19 +1303,22 @@ def convert_in(settings: dict) -> Settings:
             for field in section["fields"]:
                 # Skip saving if value is a placeholder
                 should_skip = (
-                    field["value"] == PASSWORD_PLACEHOLDER or
-                    field["value"] == API_KEY_PLACEHOLDER
+                    field["value"] == PASSWORD_PLACEHOLDER
+                    or field["value"] == API_KEY_PLACEHOLDER
                 )
 
                 if not should_skip:
                     # Special handling for browser_http_headers
-                    if field["id"] == "browser_http_headers" or field["id"].endswith("_kwargs"):
+                    if field["id"] == "browser_http_headers" or field["id"].endswith(
+                        "_kwargs"
+                    ):
                         current[field["id"]] = _env_to_dict(field["value"])
                     elif field["id"].startswith("api_key_"):
                         current["api_keys"][field["id"]] = field["value"]
                     else:
                         current[field["id"]] = field["value"]
     return current
+
 
 def get_settings() -> Settings:
     global _settings
@@ -1424,7 +1434,6 @@ def _write_sensitive_settings(settings: Settings):
     secrets_manager.clear_cache()  # Clear cache to reload secrets
 
 
-
 def get_default_settings() -> Settings:
     return Settings(
         version=_get_version(),
@@ -1525,8 +1534,7 @@ def _apply_settings(previous: Settings | None):
         # reload whisper model if necessary
         if not previous or _settings["stt_model_size"] != previous["stt_model_size"]:
             create_background_task(
-                whisper.preload(_settings["stt_model_size"]),
-                name="whisper_preload"
+                whisper.preload(_settings["stt_model_size"]), name="whisper_preload"
             )
 
         # force memory reload on embedding model change
@@ -1584,8 +1592,7 @@ def _apply_settings(previous: Settings | None):
                 )
 
             create_background_task(
-                update_mcp_settings(config.mcp_servers),
-                name="update_mcp_settings"
+                update_mcp_settings(config.mcp_servers), name="update_mcp_settings"
             )
 
         # update token in mcp server
@@ -1600,8 +1607,7 @@ def _apply_settings(previous: Settings | None):
                 DynamicMcpProxy.get_instance().reconfigure(token=token)
 
             create_background_task(
-                update_mcp_token(current_token),
-                name="update_mcp_token"
+                update_mcp_token(current_token), name="update_mcp_token"
             )
 
         # update token in a2a server
@@ -1613,8 +1619,7 @@ def _apply_settings(previous: Settings | None):
                 DynamicA2AProxy.get_instance().reconfigure(token=token)
 
             create_background_task(
-                update_a2a_token(current_token),
-                name="update_a2a_token"
+                update_a2a_token(current_token), name="update_a2a_token"
             )
 
 
@@ -1622,16 +1627,16 @@ def _env_to_dict(data: str):
     result = {}
     for line in data.splitlines():
         line = line.strip()
-        if not line or line.startswith('#'):
+        if not line or line.startswith("#"):
             continue
-        
-        if '=' not in line:
+
+        if "=" not in line:
             continue
-            
-        key, value = line.split('=', 1)
+
+        key, value = line.split("=", 1)
         key = key.strip()
         value = value.strip()
-        
+
         # If quoted, treat as string
         if value.startswith('"') and value.endswith('"'):
             result[key] = value[1:-1].replace('\\"', '"')  # Unescape quotes
@@ -1643,7 +1648,7 @@ def _env_to_dict(data: str):
                 result[key] = json.loads(value)
             except (json.JSONDecodeError, ValueError):
                 result[key] = value
-    
+
     return result
 
 
@@ -1659,8 +1664,8 @@ def _dict_to_env(data_dict):
             lines.append(f'{key}={json.dumps(value, separators=(",", ":"))}')
         else:
             # Numbers and other types as unquoted strings
-            lines.append(f'{key}={value}')
-    
+            lines.append(f"{key}={value}")
+
     return "\n".join(lines)
 
 

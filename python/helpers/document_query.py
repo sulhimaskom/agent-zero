@@ -1,33 +1,31 @@
+import asyncio
+import json
 import mimetypes
 import os
-import asyncio
+
 import aiohttp
-import json
 
 from python.helpers.vector_db import VectorDB
 
 os.environ["USER_AGENT"] = "@mixedbread-ai/unstructured"  # noqa E402
+from datetime import datetime
+from typing import Callable, List, Optional, Sequence, Tuple
+from urllib.parse import urlparse
+
+from langchain.schema import HumanMessage, SystemMessage
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_community.document_loaders import AsyncHtmlLoader
+from langchain_community.document_loaders.parsers.images import \
+    TesseractBlobParser
+from langchain_community.document_loaders.pdf import PyMuPDFLoader
+from langchain_community.document_loaders.text import TextLoader
+from langchain_community.document_transformers import MarkdownifyTransformer
+from langchain_core.documents import Document
 from langchain_unstructured import UnstructuredLoader  # noqa E402
 
-from urllib.parse import urlparse
-from typing import Callable, Sequence, List, Optional, Tuple
-from datetime import datetime
-
-from langchain_community.document_loaders import AsyncHtmlLoader
-from langchain_community.document_loaders.text import TextLoader
-from langchain_community.document_loaders.pdf import PyMuPDFLoader
-from langchain_community.document_transformers import MarkdownifyTransformer
-from langchain_community.document_loaders.parsers.images import TesseractBlobParser
-
-from langchain_core.documents import Document
-from langchain.schema import SystemMessage, HumanMessage
-
-from python.helpers.print_style import PrintStyle
-from python.helpers import files, errors
 from agent import Agent
-
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-
+from python.helpers import errors, files
+from python.helpers.print_style import PrintStyle
 
 DEFAULT_SEARCH_THRESHOLD = 0.5
 
@@ -581,8 +579,9 @@ class DocumentQueryHelper:
                 temp_file_path = temp_file.name
         elif scheme in ["http", "https"]:
             # download the file from the web url to a temporary file using python libraries for downloading
-            import requests
             import tempfile
+
+            import requests
 
             with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
                 response = requests.get(document, timeout=10.0)
@@ -652,8 +651,8 @@ class DocumentQueryHelper:
             # Use RFC file operations to read the file as binary
             file_content_bytes = files.read_file_bin(document)
             # Create a temporary file for UnstructuredLoader since it needs a file path
-            import tempfile
             import os
+            import tempfile
 
             # Get file extension to preserve it for proper processing
             _, ext = os.path.splitext(document)

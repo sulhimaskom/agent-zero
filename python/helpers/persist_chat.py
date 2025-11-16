@@ -1,12 +1,12 @@
+import json
+import uuid
 from collections import OrderedDict
 from datetime import datetime
 from typing import Any
-import uuid
-from agent import Agent, AgentConfig, AgentContext, AgentContextType
-from python.helpers import files, history
-import json
-from initialize import initialize_agent
 
+from agent import Agent, AgentConfig, AgentContext, AgentContextType
+from initialize import initialize_agent
+from python.helpers import files, history
 from python.helpers.log import Log, LogItem
 
 CHATS_FOLDER = "tmp/chats"
@@ -26,8 +26,10 @@ def get_chat_folder_path(ctxid: str):
     """
     return files.get_abs_path(CHATS_FOLDER, ctxid)
 
+
 def get_chat_msg_files_folder(ctxid: str):
     return files.get_abs_path(get_chat_folder_path(ctxid), "messages")
+
 
 def save_tmp_chat(context: AgentContext):
     """Save context to the chats folder"""

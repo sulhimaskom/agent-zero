@@ -1,13 +1,14 @@
-from dataclasses import dataclass, field
 import json
-from typing import Any, Literal, Optional, Dict, TypeVar
+from dataclasses import dataclass, field
+from typing import Any, Dict, Literal, Optional, TypeVar
 
 T = TypeVar("T")
+import copy
 import uuid
 from collections import OrderedDict  # Import OrderedDict
-from python.helpers.strings import truncate_text_by_ratio
-import copy
 from typing import TypeVar
+
+from python.helpers.strings import truncate_text_by_ratio
 
 T = TypeVar("T")
 
@@ -67,7 +68,7 @@ def _truncate_value(val: T) -> T:
             val[i] = _truncate_value(val[i])
         return val
     if isinstance(val, tuple):
-        return tuple(_truncate_value(x) for x in val) # type: ignore
+        return tuple(_truncate_value(x) for x in val)  # type: ignore
 
     # Convert non-str values to json for consistent length measurement
     if isinstance(val, str):

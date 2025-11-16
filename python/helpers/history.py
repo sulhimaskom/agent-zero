@@ -1,13 +1,16 @@
-from abc import abstractmethod
 import asyncio
-from collections import OrderedDict
-from collections.abc import Mapping
 import json
 import math
-from typing import Coroutine, Literal, TypedDict, cast, Union, Dict, List, Any
-from python.helpers import messages, tokens, settings, call_llm
+from abc import abstractmethod
+from collections import OrderedDict
+from collections.abc import Mapping
 from enum import Enum
-from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage, AIMessage
+from typing import Any, Coroutine, Dict, List, Literal, TypedDict, Union, cast
+
+from langchain_core.messages import (AIMessage, BaseMessage, HumanMessage,
+                                     SystemMessage)
+
+from python.helpers import call_llm, messages, settings, tokens
 
 BULK_MERGE_COUNT = 3
 TOPICS_KEEP_COUNT = 3
@@ -232,7 +235,9 @@ class Topic(Record):
                 # Check for raw image data
                 if isinstance(item, dict) and "content" in item:
                     content = item["content"]
-                    if isinstance(content, bytes) or (isinstance(content, str) and content.startswith("data:image")):
+                    if isinstance(content, bytes) or (
+                        isinstance(content, str) and content.startswith("data:image")
+                    ):
                         return True
             return False
         except Exception:
@@ -241,12 +246,10 @@ class Topic(Record):
     def _process_large_message(self, msg, out, leng, msg_max_size):
         """Process a single large message by truncating or summarizing it."""
         trim_to_chars = leng * (msg_max_size / msg.get_tokens())
-        
+
         # raw messages will be replaced as a whole, they would become invalid when truncated
         if _is_raw_message(out[0]["content"]):
-            msg.set_summary(
-                "Message content replaced to save space in context window"
-            )
+            msg.set_summary("Message content replaced to save space in context window")
         # regular messages will be truncated
         else:
             trunc = messages.truncate_dict_by_ratio(
@@ -502,17 +505,17 @@ def _stringify_content(content: MessageContent) -> str:
     # already a string
     if isinstance(content, str):
         return content
-    
+
     # raw messages return preview or trimmed json
     if _is_raw_message(content):
-        preview: str = content.get("preview", "") # type: ignore
+        preview: str = content.get("preview", "")  # type: ignore
         if preview:
             return preview
         text = _json_dumps(content)
         if len(text) > RAW_MESSAGE_OUTPUT_TEXT_TRIM:
             return text[:RAW_MESSAGE_OUTPUT_TEXT_TRIM] + "... TRIMMED"
         return text
-    
+
     # regular messages of non-string are dumped as json
     return _json_dumps(content)
 

@@ -1,22 +1,25 @@
+import os
 import re
 import threading
 import time
-import os
-from io import StringIO
 from dataclasses import dataclass
-from typing import Dict, Optional, List, Literal, Set, Callable
-from dotenv.parser import parse_stream
-from python.helpers.errors import RepairableException
-from python.helpers import files
+from io import StringIO
+from typing import Callable, Dict, List, Literal, Optional, Set
 
+from dotenv.parser import parse_stream
+
+from python.helpers import files
+from python.helpers.errors import RepairableException
 
 # New alias-based placeholder format §§secret(KEY)
 ALIAS_PATTERN = r"§§secret\(([A-Za-z_][A-Za-z0-9_]*)\)"
+
 
 def alias_for_key(key: str, placeholder: str = "§§secret({key})") -> str:
     # Return alias string for given key in upper-case
     key = key.upper()
     return placeholder.format(key=key)
+
 
 @dataclass
 class EnvLine:
@@ -251,9 +254,7 @@ class SecretsManager:
                 return secrets[key]
             else:
                 available_keys = ", ".join(secrets.keys())
-                error_msg = (
-                    f"Secret placeholder '{alias_for_key(key)}' not found in secrets store.\n"
-                )
+                error_msg = f"Secret placeholder '{alias_for_key(key)}' not found in secrets store.\n"
                 error_msg += f"Available secrets: {available_keys}"
 
                 raise RepairableException(error_msg)
@@ -276,7 +277,9 @@ class SecretsManager:
 
         return result
 
-    def mask_values(self, text: str, min_length: int = 4, placeholder: str = "§§secret({key})") -> str:
+    def mask_values(
+        self, text: str, min_length: int = 4, placeholder: str = "§§secret({key})"
+    ) -> str:
         """Replace actual secret values with placeholders in text"""
         if not text:
             return text
@@ -295,7 +298,7 @@ class SecretsManager:
 
     def get_masked_secrets(self) -> str:
         """Get content with values masked for frontend display (preserves comments and unrecognized lines)"""
-        if not (content:=self.read_secrets_raw()):
+        if not (content := self.read_secrets_raw()):
             return ""
 
         # Parse content for known keys using python-dotenv
@@ -408,7 +411,11 @@ class SecretsManager:
                 left = left_raw.upper()
                 val = ln.value if ln.value is not None else ""
                 comment = ln.inline_comment or ""
-                formatted_key = key_formatter(left) if key_formatter else f"{key_delimiter}{left}{key_delimiter}"
+                formatted_key = (
+                    key_formatter(left)
+                    if key_formatter
+                    else f"{key_delimiter}{left}{key_delimiter}"
+                )
                 val_part = f'="{val}"' if with_values else ""
                 comment_part = f" {comment}" if with_comments and comment else ""
                 out.append(f"{formatted_key}{val_part}{comment_part}")

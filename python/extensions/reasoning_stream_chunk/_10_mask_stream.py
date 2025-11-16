@@ -11,6 +11,7 @@ class MaskReasoningStreamChunk(Extension):
 
         try:
             from python.helpers.secrets import SecretsManager
+
             secrets_mgr = SecretsManager.get_instance()
 
             # Initialize filter if not exists
@@ -32,6 +33,7 @@ class MaskReasoningStreamChunk(Extension):
             # Print the processed chunk (this is where printing should happen)
             if processed_chunk:
                 from python.helpers.print_style import PrintStyle
+
                 PrintStyle().stream(processed_chunk)
         except Exception as e:
             # If masking fails, proceed without masking

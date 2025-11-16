@@ -1,56 +1,60 @@
-from typing import Any, List, Sequence
-import uuid
 import ast
 import operator
+import uuid
+from typing import Any, List, Sequence
+
+import faiss
+# from langchain.storage import InMemoryByteStore  # Updated for compatibility
+from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain_community.vectorstores import FAISS
+from langchain_community.vectorstores.utils import DistanceStrategy
+from langchain_core.documents import Document
 
 # faiss needs to be patched for python 3.12 on arm #TODO remove once not needed
 from python.helpers import faiss_monkey_patch
-import faiss
 
-
-from langchain_core.documents import Document
-# from langchain.storage import InMemoryByteStore  # Updated for compatibility
-from langchain_community.docstore.in_memory import InMemoryDocstore
-from langchain_community.vectorstores.utils import (
-    DistanceStrategy,
-)
 # from langchain.embeddings import CacheBackedEmbeddings  # Updated for compatibility
+
 
 # Compatibility replacements for missing langchain.storage classes
 class InMemoryByteStore:
     """Simple in-memory byte store replacement."""
+
     def __init__(self):
         self._store = {}
-    
+
     def get(self, key: str):
         return self._store.get(key)
-    
+
     def set(self, key: str, value: bytes):
         self._store[key] = value
-    
+
     def delete(self, key: str):
         self._store.pop(key, None)
 
+
 class CacheBackedEmbeddings:
     """Simple cache-backed embeddings replacement."""
+
     def __init__(self, underlying_embeddings, byte_store, namespace: str = ""):
         self.underlying_embeddings = underlying_embeddings
         self.byte_store = byte_store
         self.namespace = namespace
-    
+
     @classmethod
     def from_bytes_store(cls, underlying_embeddings, byte_store, namespace: str = ""):
         return cls(underlying_embeddings, byte_store, namespace)
-    
+
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
         return self.underlying_embeddings.embed_documents(texts)
-    
+
     def embed_query(self, text: str) -> List[float]:
         return self.underlying_embeddings.embed_query(text)
 
+
 from agent import Agent
-from python.helpers.memory_monitor import get_memory_monitor, WeakValueDictionary
+from python.helpers.memory_monitor import (WeakValueDictionary,
+                                           get_memory_monitor)
 
 
 class MyFaiss(FAISS):
@@ -70,16 +74,17 @@ class VectorDB:
 
     # Use weak value dictionary to prevent memory leaks
     _cached_embeddings: WeakValueDictionary = WeakValueDictionary()
-    
+
     # Track last access times for cleanup
     _last_access: dict[str, float] = {}
-    
+
     # Expiry time for unused embeddings (30 minutes)
     _EMBEDDING_EXPIRY_TIME = 1800
 
     @staticmethod
     def _get_embeddings(agent: Agent, cache: bool = True):
         import time
+
         model = agent.get_embedding_model()
         if not cache:
             return model  # return raw embeddings if cache is False
@@ -88,10 +93,10 @@ class VectorDB:
             "model_name",
             "default",
         )
-        
+
         # Update last access time
         VectorDB._last_access[namespace] = time.time()
-        
+
         # Check if embeddings exist and are still valid
         embeddings = VectorDB._cached_embeddings.get(namespace)
         if embeddings is None:
@@ -102,7 +107,7 @@ class VectorDB:
                 namespace=namespace,
             )
             VectorDB._cached_embeddings[namespace] = embeddings
-            
+
         return embeddings
 
     def __init__(self, agent: Agent, cache: bool = True):
@@ -170,43 +175,50 @@ class VectorDB:
     def cleanup_expired_embeddings():
         """Remove expired or unused embeddings to prevent memory leaks."""
         import time
+
         from python.helpers.print_style import PrintStyle
-        
+
         current_time = time.time()
         expired_keys = []
-        
+
         for key in list(VectorDB._last_access.keys()):
-            if current_time - VectorDB._last_access[key] > VectorDB._EMBEDDING_EXPIRY_TIME:
+            if (
+                current_time - VectorDB._last_access[key]
+                > VectorDB._EMBEDDING_EXPIRY_TIME
+            ):
                 expired_keys.append(key)
-        
+
         for key in expired_keys:
             if key in VectorDB._cached_embeddings:
                 del VectorDB._cached_embeddings[key]
             if key in VectorDB._last_access:
                 del VectorDB._last_access[key]
-        
+
         # Clean up dead weak references
         VectorDB._cached_embeddings.cleanup_dead_references()
-        
+
         if expired_keys:
-            PrintStyle.success(f"Cleaned up {len(expired_keys)} expired embedding caches")
-    
+            PrintStyle.success(
+                f"Cleaned up {len(expired_keys)} expired embedding caches"
+            )
+
     @staticmethod
     def get_embedding_stats() -> dict[str, Any]:
         """Get embedding cache statistics for debugging."""
         import time
+
         current_time = time.time()
-        
+
         stats = {
             "active_embeddings": VectorDB._cached_embeddings.size(),
             "tracked_access_times": len(VectorDB._last_access),
             "embedding_keys": VectorDB._cached_embeddings.keys(),
             "last_access_times": {
-                key: current_time - VectorDB._last_access[key] 
+                key: current_time - VectorDB._last_access[key]
                 for key in VectorDB._last_access.keys()
-            }
+            },
         }
-        
+
         return stats
 
 
@@ -266,30 +278,30 @@ class SafeExpressionEvaluator:
     Safe expression evaluator using AST parsing to prevent code injection.
     Only allows specific safe operations and prevents arbitrary code execution.
     """
-    
+
     def __init__(self):
         self.allowed_operators = SAFE_OPERATORS
         self.allowed_binary_operators = SAFE_BINARY_OPERATORS
         self.allowed_unary_operators = SAFE_UNARY_OPERATORS
-    
+
     def evaluate(self, condition: str, data: dict[str, Any]) -> bool:
         """
         Safely evaluate a condition string against provided data.
-        
+
         Args:
             condition: String expression to evaluate (e.g., "age > 18 and name == 'John'")
             data: Dictionary containing variable names and their values
-            
+
         Returns:
             Boolean result of the evaluation
-            
+
         Raises:
             ValueError: If the expression contains unsafe operations
             SyntaxError: If the expression has invalid syntax
         """
         try:
             # Parse the expression into an AST
-            tree = ast.parse(condition, mode='eval')
+            tree = ast.parse(condition, mode="eval")
             # Evaluate the AST safely
             result = self._evaluate_node(tree.body, data)
             # Ensure result is boolean
@@ -301,10 +313,10 @@ class SafeExpressionEvaluator:
         except Exception as e:
             # Any other exception means the expression is unsafe
             raise ValueError(f"Expression evaluation failed: {e}")
-    
+
     def _evaluate_node(self, node, data: dict[str, Any]):
         """Recursively evaluate AST nodes safely."""
-        
+
         if isinstance(node, ast.BoolOp):
             # Handle boolean operations (and, or)
             result = True if isinstance(node.op, ast.And) else False
@@ -319,19 +331,19 @@ class SafeExpressionEvaluator:
                     if result:  # Short-circuit
                         break
             return result
-        
+
         elif isinstance(node, ast.BinOp):
             # Handle binary operations
             left = self._evaluate_node(node.left, data)
             right = self._evaluate_node(node.right, data)
-            
+
             if type(node.op) in self.allowed_binary_operators:
                 return self.allowed_binary_operators[type(node.op)](left, right)
             elif type(node.op) in self.allowed_operators:
                 return self.allowed_operators[type(node.op)](left, right)
             else:
                 raise ValueError(f"Unsafe binary operator: {type(node.op).__name__}")
-        
+
         elif isinstance(node, ast.UnaryOp):
             # Handle unary operations
             operand = self._evaluate_node(node.operand, data)
@@ -339,7 +351,7 @@ class SafeExpressionEvaluator:
                 return self.allowed_unary_operators[type(node.op)](operand)
             else:
                 raise ValueError(f"Unsafe unary operator: {type(node.op).__name__}")
-        
+
         elif isinstance(node, ast.Compare):
             # Handle comparison operations
             left = self._evaluate_node(node.left, data)
@@ -352,36 +364,36 @@ class SafeExpressionEvaluator:
                 else:
                     raise ValueError(f"Unsafe comparison operator: {type(op).__name__}")
             return True
-        
+
         elif isinstance(node, ast.Name):
             # Handle variable names - only allow names from the provided data
             if node.id in data:
                 return data[node.id]
             else:
                 raise ValueError(f"Undefined variable: {node.id}")
-        
+
         elif isinstance(node, ast.Constant):
             # Handle literal values (strings, numbers, booleans, None)
             return node.value
-        
+
         elif isinstance(node, ast.List):
             # Handle list literals
             return [self._evaluate_node(elt, data) for elt in node.elts]
-        
+
         elif isinstance(node, ast.Tuple):
             # Handle tuple literals
             return tuple(self._evaluate_node(elt, data) for elt in node.elts)
-        
+
         elif isinstance(node, ast.Set):
             # Handle set literals
             return {self._evaluate_node(elt, data) for elt in node.elts}
-        
+
         elif isinstance(node, ast.Dict):
             # Handle dictionary literals
             keys = [self._evaluate_node(k, data) for k in node.keys]
             values = [self._evaluate_node(v, data) for v in node.values]
             return dict(zip(keys, values))
-        
+
         else:
             # Any other node type is potentially unsafe
             raise ValueError(f"Unsafe expression construct: {type(node).__name__}")
@@ -394,13 +406,14 @@ _evaluator = SafeExpressionEvaluator()
 def get_comparator(condition: str):
     """
     Create a safe comparator function for filtering documents.
-    
+
     Args:
         condition: String expression to evaluate against document metadata
-        
+
     Returns:
         Function that takes a data dictionary and returns boolean result
     """
+
     def comparator(data: dict[str, Any]):
         try:
             result = _evaluator.evaluate(condition, data)
