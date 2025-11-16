@@ -9,8 +9,7 @@ from pydantic import BaseModel
 from agent import Agent, InterventionException
 from python.extensions.message_loop_start._10_iteration_no import get_iter_no
 from python.helpers import defer, files, persist_chat, strings
-from python.helpers.browser_use import \
-    browser_use  # type: ignore[attr-defined]
+from python.helpers.browser_use import browser_use  # type: ignore[attr-defined]
 from python.helpers.dirty_json import DirtyJson
 from python.helpers.playwright import ensure_playwright_binary
 from python.helpers.print_style import PrintStyle
