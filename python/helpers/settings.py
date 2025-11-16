@@ -1589,9 +1589,7 @@ def _apply_settings(previous: Settings | None):
             )
 
         # update token in mcp server
-        current_token = (
-            create_auth_token()
-        )  # TODO: Refactor - token generation from dotenv creates inconsistency with settings cache
+        current_token = _settings["mcp_server_token"]
         if not previous or current_token != previous["mcp_server_token"]:
 
             async def update_mcp_token(token: str):

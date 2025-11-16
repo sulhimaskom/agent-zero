@@ -166,7 +166,7 @@ class State:
                 ),
                 controller=controller,
                 enable_memory=False,  # Disable memory to avoid state conflicts
-                llm_timeout=3000, # TODO: Review timeout value
+                llm_timeout=3000,  # 3 second timeout for LLM calls - reasonable balance between responsiveness and reliability
                 sensitive_data=cast(dict[str, str | dict[str, str]] | None, secrets_dict or {}),  # Pass secrets
             )
         except Exception as e:
