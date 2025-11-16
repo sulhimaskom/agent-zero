@@ -18,6 +18,7 @@ from langchain_community.vectorstores.utils import (
 from langchain.embeddings import CacheBackedEmbeddings
 
 from agent import Agent
+from .memory_manager import memory_manager, memory_health_check
 
 
 class MyFaiss(FAISS):
@@ -34,10 +35,10 @@ class MyFaiss(FAISS):
 
 
 class VectorDB:
-
-    _cached_embeddings: dict[str, CacheBackedEmbeddings] = {}
+    # Use managed cache instead of static dictionary to prevent memory leaks
 
     @staticmethod
+    @memory_health_check
     def _get_embeddings(agent: Agent, cache: bool = True):
         model = agent.get_embedding_model()
         if not cache:
@@ -47,16 +48,24 @@ class VectorDB:
             "model_name",
             "default",
         )
-        if namespace not in VectorDB._cached_embeddings:
-            store = InMemoryByteStore()
-            VectorDB._cached_embeddings[namespace] = (
-                CacheBackedEmbeddings.from_bytes_store(
-                    model,
-                    store,
-                    namespace=namespace,
-                )
-            )
-        return VectorDB._cached_embeddings[namespace]
+        
+        # Try to get from cache first
+        cached_embeddings = memory_manager.embedding_cache.get(namespace)
+        if cached_embeddings is not None:
+            return cached_embeddings
+        
+        # Create new cached embeddings
+        store = InMemoryByteStore()
+        embeddings = CacheBackedEmbeddings.from_bytes_store(
+            model,
+            store,
+            namespace=namespace,
+        )
+        
+        # Store in cache
+        memory_manager.embedding_cache.put(namespace, embeddings)
+        
+        return embeddings
 
     def __init__(self, agent: Agent, cache: bool = True):
         self.agent = agent
@@ -118,6 +127,21 @@ class VectorDB:
             rem_ids = [doc.metadata["id"] for doc in rem_docs]  # ids to remove
             await self.db.adelete(ids=rem_ids)
         return rem_docs
+    
+    @staticmethod
+    def cleanup_expired_embeddings():
+        """Clean up expired embedding caches."""
+        return memory_manager.embedding_cache.cleanup_expired()
+    
+    @staticmethod
+    def get_embedding_cache_size():
+        """Get current embedding cache size."""
+        return memory_manager.embedding_cache.size()
+    
+    @staticmethod
+    def clear_embedding_cache():
+        """Clear all embedding caches."""
+        memory_manager.embedding_cache.clear()
 
 
 def format_docs_plain(docs: list[Document]) -> list[str]:

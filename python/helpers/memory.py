@@ -34,6 +34,7 @@ import logging
 from simpleeval import simple_eval
 import ast
 import operator
+from .memory_manager import memory_manager, memory_health_check
 
 # Safe operators allowed in expressions (same as vector_db.py)
 SAFE_OPERATORS = {
@@ -222,65 +223,87 @@ class Memory:
         SOLUTIONS = "solutions"
         INSTRUMENTS = "instruments"
 
-    index: dict[str, "MyFaiss"] = {}
+    # Use managed cache instead of static dictionary to prevent memory leaks
 
     @staticmethod
+    @memory_health_check
     async def get(agent: Agent):
         memory_subdir = agent.config.memory_subdir or "default"
-        if Memory.index.get(memory_subdir) is None:
-            log_item = agent.context.log.log(
-                type="util",
-                heading=f"Initializing VectorDB in '/{memory_subdir}'",
+        
+        # Try to get from cache first
+        cached_db = memory_manager.database_cache.get(memory_subdir)
+        if cached_db is not None:
+            return Memory(db=cached_db, memory_subdir=memory_subdir)
+        
+        # Initialize new database
+        log_item = agent.context.log.log(
+            type="util",
+            heading=f"Initializing VectorDB in '/{memory_subdir}'",
+        )
+        db, created = Memory.initialize(
+            log_item,
+            agent.config.embeddings_model,
+            memory_subdir,
+            False,
+        )
+        
+        # Store in cache
+        memory_manager.database_cache.put(memory_subdir, db)
+        
+        wrap = Memory(db, memory_subdir=memory_subdir)
+        if agent.config.knowledge_subdirs:
+            await wrap.preload_knowledge(
+                log_item, agent.config.knowledge_subdirs, memory_subdir
             )
-            db, created = Memory.initialize(
-                log_item,
-                agent.config.embeddings_model,
-                memory_subdir,
-                False,
-            )
-            Memory.index[memory_subdir] = db
-            wrap = Memory(db, memory_subdir=memory_subdir)
-            if agent.config.knowledge_subdirs:
-                await wrap.preload_knowledge(
-                    log_item, agent.config.knowledge_subdirs, memory_subdir
-                )
-            return wrap
-        else:
-            return Memory(
-                db=Memory.index[memory_subdir],
-                memory_subdir=memory_subdir,
-            )
+        return wrap
 
     @staticmethod
+    @memory_health_check
     async def get_by_subdir(
         memory_subdir: str,
         log_item: LogItem | None = None,
         preload_knowledge: bool = True,
     ):
-        if not Memory.index.get(memory_subdir):
-            import initialize
+        # Try to get from cache first
+        cached_db = memory_manager.database_cache.get(memory_subdir)
+        if cached_db is not None:
+            return Memory(db=cached_db, memory_subdir=memory_subdir)
+        
+        # Initialize new database
+        import initialize
 
-            agent_config = initialize.initialize_agent()
-            model_config = agent_config.embeddings_model
-            db, _created = Memory.initialize(
-                log_item=log_item,
-                model_config=model_config,
-                memory_subdir=memory_subdir,
-                in_memory=False,
+        agent_config = initialize.initialize_agent()
+        model_config = agent_config.embeddings_model
+        db, _created = Memory.initialize(
+            log_item=log_item,
+            model_config=model_config,
+            memory_subdir=memory_subdir,
+            in_memory=False,
+        )
+        
+        # Store in cache
+        memory_manager.database_cache.put(memory_subdir, db)
+        
+        wrap = Memory(db, memory_subdir=memory_subdir)
+        if preload_knowledge and agent_config.knowledge_subdirs:
+            await wrap.preload_knowledge(
+                log_item, agent_config.knowledge_subdirs, memory_subdir
             )
-            wrap = Memory(db, memory_subdir=memory_subdir)
-            if preload_knowledge and agent_config.knowledge_subdirs:
-                await wrap.preload_knowledge(
-                    log_item, agent_config.knowledge_subdirs, memory_subdir
-                )
-            Memory.index[memory_subdir] = db
-        return Memory(db=Memory.index[memory_subdir], memory_subdir=memory_subdir)
+        
+        return Memory(db=db, memory_subdir=memory_subdir)
 
     @staticmethod
+    @memory_health_check
     async def reload(agent: Agent):
         memory_subdir = agent.config.memory_subdir or "default"
-        if Memory.index.get(memory_subdir):
-            del Memory.index[memory_subdir]
+        
+        # Remove from cache if exists
+        memory_manager.database_cache.remove(memory_subdir)
+        
+        # Force garbage collection
+        import gc
+        gc.collect()
+        
         return await Memory.get(agent)
 
     @staticmethod
@@ -638,6 +661,21 @@ class Memory:
     @staticmethod
     def get_timestamp():
         return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    
+    @staticmethod
+    def get_memory_stats():
+        """Get memory management statistics."""
+        return memory_manager.get_memory_stats()
+    
+    @staticmethod
+    def cleanup_expired():
+        """Clean up expired memory caches."""
+        return memory_manager.cleanup_all()
+    
+    @staticmethod
+    def emergency_cleanup():
+        """Perform emergency memory cleanup."""
+        memory_manager.emergency_cleanup()
 
 
 def get_memory_subdir_abs(agent: Agent) -> str:
@@ -652,5 +690,9 @@ def get_custom_knowledge_subdir_abs(agent: Agent) -> str:
 
 
 def reload():
-    # clear the memory index, this will force all DBs to reload
-    Memory.index = {}
+    # clear the memory cache, this will force all DBs to reload
+    memory_manager.database_cache.clear()
+    
+    # Force garbage collection
+    import gc
+    gc.collect()
