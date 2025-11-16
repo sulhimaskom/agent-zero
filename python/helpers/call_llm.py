@@ -46,7 +46,6 @@ async def call_llm(
 
     few_shot_prompt.format()
 
-
     final_prompt = ChatPromptTemplate.from_messages(
         [
             SystemMessage(content=system),
@@ -74,4 +73,3 @@ async def call_llm(
         response += content
 
     return response
-

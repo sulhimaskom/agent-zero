@@ -1,0 +1,6 @@
+# macOS-specific requirements
+# Excludes FAISS on ARM64 due to compatibility issues
+-r requirements-base.txt
+# Note: FAISS is not included for macOS ARM64 due to Python 3.12 compatibility issues
+# Users can manually install FAISS if needed: pip install faiss-cpu
+# Vector search functionality will be limited without FAISS

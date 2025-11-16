@@ -373,6 +373,49 @@ For developers or users who need to run Agent Zero directly on their system,see 
 > ```
 
       
+## Dependency Troubleshooting
+
+### Checking Dependencies
+
+Agent Zero includes a dependency validation script to help diagnose installation issues:
+
+```bash
+# Check all dependencies
+python check_dependencies.py
+
+# Install platform-specific dependencies
+python check_dependencies.py --install
+```
+
+### Common Issues and Solutions
+
+#### 1. FAISS Installation Issues on macOS ARM64
+
+**Problem:** FAISS fails to install on macOS with Apple Silicon (M1/M2/M3) or Python 3.12.
+
+**Solution:**
+- Use the platform-specific requirements: `pip install -r requirements-macos.txt`
+- FAISS is optional on macOS ARM64 - Agent Zero will run with limited vector search functionality
+- Manual installation: `pip install faiss-cpu` (may require additional setup)
+
+#### 2. LangChain Import Errors
+
+**Problem:** Import errors for langchain-core or langchain-community.
+
+**Solution:**
+```bash
+# Update LangChain packages
+pip install --upgrade langchain-core langchain-community
+
+# Or use version constraints
+pip install "langchain-core>=0.3.49,<1.0.0" "langchain-community>=0.3.19,<1.0.0"
+```
+
+#### 3. Missing LiteLLM
+
+**Problem:** `ModuleNotFoundError: No module named 'litellm'`
+
+**Solution:**
 ### Conclusion
 After following the instructions for your specific operating system, you should have Agent Zero successfully installed and running. You can now start exploring the framework's capabilities and experimenting with creating your own intelligent agents. 
 
