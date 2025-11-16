@@ -2,6 +2,7 @@ import base64
 from io import BytesIO
 import mimetypes
 import os
+import aiofiles
 
 from flask import Response
 from python.helpers.api import ApiHandler, Input, Output, Request
@@ -125,6 +126,6 @@ class DownloadFile(ApiHandler):
 
 
 async def fetch_file(path):
-    with open(path, "rb") as file:
-        file_content = file.read()
+    async with aiofiles.open(path, "rb") as file:
+        file_content = await file.read()
         return base64.b64encode(file_content).decode("utf-8")

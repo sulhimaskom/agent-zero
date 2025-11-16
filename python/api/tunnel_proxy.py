@@ -1,7 +1,8 @@
+import asyncio
 from python.helpers.api import ApiHandler, Request, Response
 from python.helpers import dotenv, runtime
 from python.helpers.tunnel_manager import TunnelManager
-import requests
+import aiohttp
 
 
 class TunnelProxy(ApiHandler):
@@ -16,19 +17,28 @@ class TunnelProxy(ApiHandler):
         # first verify the service is running:
         service_ok = False
         try:
-            response = requests.post(f"http://localhost:{tunnel_api_port}/", json={"action": "health"})
-            if response.status_code == 200:
-                service_ok = True
-        except Exception as e:
+            timeout = aiohttp.ClientTimeout(total=5.0)  # 5 second timeout
+            async with aiohttp.ClientSession(timeout=timeout) as session:
+                async with session.post(f"http://localhost:{tunnel_api_port}/", json={"action": "health"}) as response:
+                    if response.status == 200:
+                        service_ok = True
+        except (aiohttp.ClientError, asyncio.TimeoutError, ConnectionError) as e:
             service_ok = False
 
         # forward this request to the tunnel service if OK
         if service_ok:
             try:
-                response = requests.post(f"http://localhost:{tunnel_api_port}/", json=input)
-                return response.json()
+                timeout = aiohttp.ClientTimeout(total=30.0)  # 30 second timeout for main request
+                async with aiohttp.ClientSession(timeout=timeout) as session:
+                    async with session.post(f"http://localhost:{tunnel_api_port}/", json=input) as response:
+                        if response.status == 200:
+                            return await response.json()
+                        else:
+                            return {"error": f"HTTP {response.status}: {await response.text()}"}
+            except (aiohttp.ClientError, asyncio.TimeoutError, ConnectionError) as e:
+                return {"error": f"Tunnel service error: {str(e)}"}
             except Exception as e:
-                return {"error": str(e)}
+                return {"error": f"Unexpected error: {str(e)}"}
         else:
             # forward to API handler directly
             from python.api.tunnel import Tunnel
