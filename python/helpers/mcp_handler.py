@@ -739,9 +739,9 @@ class MCPConfig(BaseModel):
                     prompt += (
                         f"#### Usage:\n"
                         f"{{\n"
-                        # f'    "observations": ["..."],\n' # TODO: this should be a prompt file with placeholders
+                        # f'    "observations": ["..."],\n' # TODO: Extract to prompt file with placeholders for better maintainability
                         f'    "thoughts": ["..."],\n'
-                        # f'    "reflection": ["..."],\n' # TODO: this should be a prompt file with placeholders
+                        # f'    "reflection": ["..."],\n' # TODO: Extract to prompt file with placeholders for better maintainability
                         f"    \"tool_name\": \"{server_name}.{tool['name']}\",\n"
                         f'    "tool_args": !follow schema above\n'
                         f"}}\n"
