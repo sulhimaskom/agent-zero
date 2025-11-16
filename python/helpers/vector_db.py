@@ -18,6 +18,7 @@ from langchain_community.vectorstores.utils import (
 from langchain.embeddings import CacheBackedEmbeddings
 
 from agent import Agent
+from python.helpers.memory_monitor import get_memory_monitor, WeakValueDictionary
 
 
 class MyFaiss(FAISS):
@@ -35,10 +36,18 @@ class MyFaiss(FAISS):
 
 class VectorDB:
 
-    _cached_embeddings: dict[str, CacheBackedEmbeddings] = {}
+    # Use weak value dictionary to prevent memory leaks
+    _cached_embeddings: WeakValueDictionary = WeakValueDictionary()
+    
+    # Track last access times for cleanup
+    _last_access: dict[str, float] = {}
+    
+    # Expiry time for unused embeddings (30 minutes)
+    _EMBEDDING_EXPIRY_TIME = 1800
 
     @staticmethod
     def _get_embeddings(agent: Agent, cache: bool = True):
+        import time
         model = agent.get_embedding_model()
         if not cache:
             return model  # return raw embeddings if cache is False
@@ -47,16 +56,22 @@ class VectorDB:
             "model_name",
             "default",
         )
-        if namespace not in VectorDB._cached_embeddings:
+        
+        # Update last access time
+        VectorDB._last_access[namespace] = time.time()
+        
+        # Check if embeddings exist and are still valid
+        embeddings = VectorDB._cached_embeddings.get(namespace)
+        if embeddings is None:
             store = InMemoryByteStore()
-            VectorDB._cached_embeddings[namespace] = (
-                CacheBackedEmbeddings.from_bytes_store(
-                    model,
-                    store,
-                    namespace=namespace,
-                )
+            embeddings = CacheBackedEmbeddings.from_bytes_store(
+                model,
+                store,
+                namespace=namespace,
             )
-        return VectorDB._cached_embeddings[namespace]
+            VectorDB._cached_embeddings[namespace] = embeddings
+            
+        return embeddings
 
     def __init__(self, agent: Agent, cache: bool = True):
         self.agent = agent
@@ -118,6 +133,49 @@ class VectorDB:
             rem_ids = [doc.metadata["id"] for doc in rem_docs]  # ids to remove
             await self.db.adelete(ids=rem_ids)
         return rem_docs
+
+    @staticmethod
+    def cleanup_expired_embeddings():
+        """Remove expired or unused embeddings to prevent memory leaks."""
+        import time
+        from python.helpers.print_style import PrintStyle
+        
+        current_time = time.time()
+        expired_keys = []
+        
+        for key in list(VectorDB._last_access.keys()):
+            if current_time - VectorDB._last_access[key] > VectorDB._EMBEDDING_EXPIRY_TIME:
+                expired_keys.append(key)
+        
+        for key in expired_keys:
+            if key in VectorDB._cached_embeddings:
+                del VectorDB._cached_embeddings[key]
+            if key in VectorDB._last_access:
+                del VectorDB._last_access[key]
+        
+        # Clean up dead weak references
+        VectorDB._cached_embeddings.cleanup_dead_references()
+        
+        if expired_keys:
+            PrintStyle.success(f"Cleaned up {len(expired_keys)} expired embedding caches")
+    
+    @staticmethod
+    def get_embedding_stats() -> dict[str, Any]:
+        """Get embedding cache statistics for debugging."""
+        import time
+        current_time = time.time()
+        
+        stats = {
+            "active_embeddings": VectorDB._cached_embeddings.size(),
+            "tracked_access_times": len(VectorDB._last_access),
+            "embedding_keys": VectorDB._cached_embeddings.keys(),
+            "last_access_times": {
+                key: current_time - VectorDB._last_access[key] 
+                for key in VectorDB._last_access.keys()
+            }
+        }
+        
+        return stats
 
 
 def format_docs_plain(docs: list[Document]) -> list[str]:
