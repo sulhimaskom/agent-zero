@@ -1671,6 +1671,26 @@ def set_root_password(password: str):
     dotenv.save_dotenv_value(dotenv.KEY_ROOT_PASSWORD, password)
 
 
+async def set_root_password_async(password: str):
+    """Async version of set_root_password for use in async contexts"""
+    if not runtime.is_dockerized():
+        raise Exception("root password can only be set in dockerized environments")
+    
+    import asyncio
+    proc = await asyncio.create_subprocess_exec(
+        "chpasswd",
+        stdin=asyncio.subprocess.PIPE,
+        stdout=asyncio.subprocess.PIPE,
+        stderr=asyncio.subprocess.PIPE
+    )
+    stdout, stderr = await proc.communicate(input=f"root:{password}".encode())
+    
+    if proc.returncode != 0:
+        raise Exception(f"chpasswd failed: {stderr.decode()}")
+    
+    dotenv.save_dotenv_value(dotenv.KEY_ROOT_PASSWORD, password)
+
+
 def get_runtime_config(set: Settings):
     if runtime.is_dockerized():
         return {
