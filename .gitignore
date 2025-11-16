@@ -40,3 +40,13 @@ instruments/**
 # Global rule to include .gitkeep files anywhere
 !**/.gitkeep
 agent_history.gif
+
+# Linting and formatting cache files
+.flake8
+.pytest_cache
+.coverage
+htmlcov/
+.mypy_cache/
+.tox/
+.cache/
+.venv*/

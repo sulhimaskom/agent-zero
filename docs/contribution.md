@@ -14,6 +14,7 @@ Contributions to improve Agent Zero are very welcome!  This guide outlines how t
 ## Making Changes
 
 * **Code Style:** Follow the existing code style. Agent Zero generally follows PEP 8 conventions.
+* **Linting:** Use flake8 for code linting. Install it with `pip install flake8` and run `flake8 .` before committing. Configuration is in `.flake8`.
 * **Documentation:**  Update the documentation if your changes affect user-facing functionality. The documentation is written in Markdown.
 * **Commit Messages:**  Write clear and concise commit messages that explain the purpose of your changes.
 
