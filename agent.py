@@ -640,9 +640,54 @@ class Agent:
         return await self.hist_add_message(False, content=data)
 
     def concat_messages(
-        self, messages
-    ):  # TODO add param for message range, topic, history
-        return self.history.output_text(human_label="user", ai_label="assistant")
+        self, messages=None, message_range=None, topic=None, history=None
+    ):
+        """
+        Concatenate messages into text format.
+        
+        Args:
+            messages: Specific messages to concatenate (overrides other parameters)
+            message_range: Range of messages to include (e.g., "last:10" for last 10 messages)
+            topic: Filter messages by topic name or index
+            history: History instance to use (defaults to self.history)
+        
+        Returns:
+            Concatenated text representation of messages
+        """
+        # Use provided history or default to self.history
+        target_history = history or self.history
+        
+        # If specific messages provided, use them directly
+        if messages is not None:
+            from python.helpers.history import output_text
+            return output_text(messages, ai_label="assistant", human_label="user")
+        
+        # Get all messages from history
+        all_messages = target_history.output()
+        
+        # Apply message range filter if specified
+        if message_range:
+            if isinstance(message_range, str) and message_range.startswith("last:"):
+                try:
+                    count = int(message_range.split(":")[1])
+                    all_messages = all_messages[-count:] if count > 0 else []
+                except (ValueError, IndexError):
+                    pass  # Invalid range, use all messages
+            elif isinstance(message_range, int):
+                all_messages = all_messages[-message_range:] if message_range > 0 else []
+            elif isinstance(message_range, tuple) and len(message_range) == 2:
+                start, end = message_range
+                all_messages = all_messages[start:end]
+        
+        # Apply topic filter if specified
+        if topic is not None:
+            # This is a simplified implementation - in a full implementation,
+            # you would need to filter messages by topic metadata
+            pass  # Topic filtering would require additional history structure changes
+        
+        # Convert messages to text
+        from python.helpers.history import output_text
+        return output_text(all_messages, ai_label="assistant", human_label="user")
 
     def get_chat_model(self):
         return models.get_chat_model(

@@ -736,16 +736,24 @@ class MCPConfig(BaseModel):
 
                     prompt += "\n"
 
-                    prompt += (
-                        f"#### Usage:\n"
-                        f"{{\n"
-                        # f'    "observations": ["..."],\n' # TODO: Extract to prompt file with placeholders for better maintainability
-                        f'    "thoughts": ["..."],\n'
-                        # f'    "reflection": ["..."],\n' # TODO: Extract to prompt file with placeholders for better maintainability
-                        f"    \"tool_name\": \"{server_name}.{tool['name']}\",\n"
-                        f'    "tool_args": !follow schema above\n'
-                        f"}}\n"
-                    )
+                    # Load tool usage template from file for better maintainability
+                    try:
+                        from python.helpers.files import read_prompt_file
+                        usage_template = read_prompt_file("mcp.tool_usage.md", _directories=["prompts"])
+                        usage_prompt = usage_template.replace("{{tool_name}}", f"{server_name}.{tool['name']}")
+                        prompt += usage_prompt + "\n"
+                    except Exception:
+                        # Fallback to hardcoded template if file not found
+                        prompt += (
+                            f"#### Usage:\n"
+                            f"{{\n"
+                            f'    "observations": ["..."],\n'
+                            f'    "thoughts": ["..."],\n'
+                            f'    "reflection": ["..."],\n'
+                            f"    \"tool_name\": \"{server_name}.{tool['name']}\",\n"
+                            f'    "tool_args": !follow schema above\n'
+                            f"}}\n"
+                        )
 
         return prompt
 
