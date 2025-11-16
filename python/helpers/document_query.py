@@ -6,27 +6,48 @@ import json
 
 from python.helpers.vector_db import VectorDB
 
-os.environ["USER_AGENT"] = "@mixedbread-ai/unstructured"  # noqa E402
-from langchain_unstructured import UnstructuredLoader  # noqa E402
+# Safe imports for optional LangChain dependencies
+from python.helpers.safe_imports import get_langchain_components
+
+# Get LangChain components
+langchain = get_langchain_components()
+
+# Import with graceful degradation
+UnstructuredLoader = langchain.get('UnstructuredLoader')
+AsyncHtmlLoader = langchain.get('AsyncHtmlLoader')
+TextLoader = langchain.get('TextLoader')
+PyMuPDFLoader = langchain.get('PyMuPDFLoader')
+MarkdownifyTransformer = langchain.get('MarkdownifyTransformer')
+TesseractBlobParser = langchain.get('TesseractBlobParser')
+Document = langchain.get('Document')
+
+# For langchain.schema, try to import from newer locations
+try:
+    from langchain_core.messages import SystemMessage, HumanMessage
+except ImportError:
+    try:
+        from langchain.schema import SystemMessage, HumanMessage
+    except ImportError:
+        SystemMessage = None
+        HumanMessage = None
+        print("Warning: Message classes not available")
 
 from urllib.parse import urlparse
 from typing import Callable, Sequence, List, Optional, Tuple
 from datetime import datetime
 
-from langchain_community.document_loaders import AsyncHtmlLoader
-from langchain_community.document_loaders.text import TextLoader
-from langchain_community.document_loaders.pdf import PyMuPDFLoader
-from langchain_community.document_transformers import MarkdownifyTransformer
-from langchain_community.document_loaders.parsers.images import TesseractBlobParser
-
-from langchain_core.documents import Document
-from langchain.schema import SystemMessage, HumanMessage
-
 from python.helpers.print_style import PrintStyle
 from python.helpers import files, errors
 from agent import Agent
 
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+# LangChain text splitter with graceful degradation
+try:
+    from langchain.text_splitter import RecursiveCharacterTextSplitter
+    TEXT_SPLITTER_AVAILABLE = True
+except ImportError:
+    TEXT_SPLITTER_AVAILABLE = False
+    RecursiveCharacterTextSplitter = None
+    print("Warning: RecursiveCharacterTextSplitter not available")
 
 
 DEFAULT_SEARCH_THRESHOLD = 0.5

@@ -1,5 +1,14 @@
 from typing import Any
-from browser_use.llm import ChatGoogle
+
+# Browser-use with graceful degradation
+try:
+    from browser_use.llm import ChatGoogle
+    BROWSER_USE_AVAILABLE = True
+except ImportError as e:
+    BROWSER_USE_AVAILABLE = False
+    ChatGoogle = None
+    print(f"Warning: browser_use not available - browser automation features will be limited: {e}")
+
 from python.helpers import dirty_json
 
 
@@ -159,4 +168,7 @@ def _patched_fix_gemini_schema(self, schema: dict[str, Any]) -> dict[str, Any]:
 
 def apply():
     """Applies the monkey-patch to ChatGoogle."""
+    if not BROWSER_USE_AVAILABLE or ChatGoogle is None:
+        print("Warning: Cannot apply browser_use monkey patch - browser_use not available")
+        return
     ChatGoogle._fix_gemini_schema = _patched_fix_gemini_schema

@@ -5,7 +5,14 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 from enum import Enum
 
-from langchain_core.documents import Document
+# Safe imports for optional LangChain dependencies
+from python.helpers.safe_imports import get_langchain_components
+
+# Get LangChain components
+langchain = get_langchain_components()
+
+# Import with graceful degradation
+Document = langchain.get('Document')
 
 from python.helpers.memory import Memory
 from python.helpers.dirty_json import DirtyJson

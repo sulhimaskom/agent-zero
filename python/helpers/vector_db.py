@@ -2,19 +2,23 @@ from typing import Any, List, Sequence
 import uuid
 import ast
 import operator
-from langchain_community.vectorstores import FAISS
 
-# faiss needs to be patched for python 3.12 on arm #TODO remove once not needed
-from python.helpers import faiss_monkey_patch
-import faiss
+# Safe imports for optional dependencies
+from python.helpers.safe_imports import get_langchain_components, get_faiss
 
+# Get LangChain components
+langchain = get_langchain_components()
+faiss, faiss_available = get_faiss()
 
-from langchain_core.documents import Document
+# Import what we can from LangChain
+Document = langchain.get('Document')
+FAISS = langchain.get('FAISS')
+InMemoryDocstore = langchain.get('InMemoryDocstore')
+DistanceStrategy = langchain.get('DistanceStrategy')
 # from langchain.storage import InMemoryByteStore  # Updated for compatibility
-from langchain_community.docstore.in_memory import InMemoryDocstore
-from langchain_community.vectorstores.utils import (
-    DistanceStrategy,
-)
+# These are now imported from safe_imports above
+# from langchain_community.docstore.in_memory import InMemoryDocstore
+# from langchain_community.vectorstores.utils import DistanceStrategy
 # from langchain.embeddings import CacheBackedEmbeddings  # Updated for compatibility
 
 # Compatibility replacements for missing langchain.storage classes
@@ -52,6 +56,13 @@ class CacheBackedEmbeddings:
 from agent import Agent
 from python.helpers.memory_monitor import get_memory_monitor, WeakValueDictionary
 
+
+# Create a fallback base class if FAISS is not available (if not already created)
+if 'FAISS' not in globals() or FAISS is None:
+    class FAISS:
+        """Fallback base class when FAISS is not available."""
+        def __init__(self, *args, **kwargs):
+            raise NotImplementedError("FAISS requires langchain_community to be installed")
 
 class MyFaiss(FAISS):
     # override aget_by_ids

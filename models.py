@@ -15,10 +15,26 @@ from typing import (
     TypedDict,
 )
 
-from litellm import completion, acompletion, embedding
-import litellm
-import openai
-from litellm.types.utils import ModelResponse
+# LiteLLM and OpenAI with graceful degradation
+try:
+    from litellm import completion, acompletion, embedding
+    import litellm
+    from litellm.types.utils import ModelResponse
+    LITELLM_AVAILABLE = True
+except ImportError as e:
+    LITELLM_AVAILABLE = False
+    completion = acompletion = embedding = None
+    litellm = None
+    ModelResponse = None
+    print(f"Warning: LiteLLM not available - LLM features will be limited: {e}")
+
+try:
+    import openai
+    OPENAI_AVAILABLE = True
+except ImportError as e:
+    OPENAI_AVAILABLE = False
+    openai = None
+    print(f"Warning: OpenAI not available - OpenAI features will be limited: {e}")
 
 from python.helpers import dotenv
 from python.helpers import settings, dirty_json
@@ -28,26 +44,30 @@ from python.helpers.rate_limiter import RateLimiter
 from python.helpers.tokens import approximate_tokens
 from python.helpers import dirty_json, browser_use_monkeypatch
 
-from langchain_core.language_models.chat_models import SimpleChatModel
-from langchain_core.outputs.chat_generation import ChatGenerationChunk
-from langchain_core.callbacks.manager import (
-    CallbackManagerForLLMRun,
-    AsyncCallbackManagerForLLMRun,
-)
-from langchain_core.messages import (
-    BaseMessage,
-    AIMessageChunk,
-    HumanMessage,
-    SystemMessage,
-)
-from langchain.embeddings.base import Embeddings
-from sentence_transformers import SentenceTransformer
+# Safe imports for optional LangChain dependencies
+from python.helpers.safe_imports import get_langchain_components, get_sentence_transformers
+
+# Get LangChain components
+langchain = get_langchain_components()
+SentenceTransformer, _ = get_sentence_transformers()
+
+# Import with graceful degradation
+SimpleChatModel = langchain.get('SimpleChatModel')
+ChatGenerationChunk = langchain.get('ChatGenerationChunk')
+CallbackManagerForLLMRun = langchain.get('CallbackManagerForLLMRun')
+AsyncCallbackManagerForLLMRun = langchain.get('AsyncCallbackManagerForLLMRun')
+BaseMessage = langchain.get('BaseMessage')
+AIMessageChunk = langchain.get('AIMessageChunk')
+HumanMessage = langchain.get('HumanMessage')
+SystemMessage = langchain.get('SystemMessage')
+Embeddings = langchain.get('Embeddings')
 
 
 # disable extra logging, must be done repeatedly, otherwise browser-use will turn it back on for some reason
 def turn_off_logging():
     os.environ["LITELLM_LOG"] = "ERROR"  # only errors
-    litellm.suppress_debug_info = True
+    if LITELLM_AVAILABLE and litellm is not None:
+        litellm.suppress_debug_info = True
     # Silence **all** LiteLLM sub-loggers (utils, cost_calculator…)
     for name in logging.Logger.manager.loggerDict:
         if name.lower().startswith("litellm"):
@@ -58,8 +78,8 @@ def turn_off_logging():
 load_dotenv()
 turn_off_logging()
 browser_use_monkeypatch.apply()
-
-litellm.modify_params = True # helps fix anthropic tool calls by browser-use
+if LITELLM_AVAILABLE and litellm is not None:
+    litellm.modify_params = True # helps fix anthropic tool calls by browser-use
 
 class ModelType(Enum):
     CHAT = "Chat"
@@ -281,13 +301,23 @@ def apply_rate_limiter_sync(
 ):
     if not model_config:
         return
-    import asyncio, nest_asyncio
-
-    nest_asyncio.apply()
+    import asyncio
+    try:
+        import nest_asyncio
+        nest_asyncio.apply()
+    except ImportError:
+        print("Warning: nest_asyncio not available, nested event loops may not work")
     return asyncio.run(
         apply_rate_limiter(model_config, input_text, rate_limiter_callback)
     )
 
+
+# Create a fallback base class if SimpleChatModel is not available
+if SimpleChatModel is None:
+    class SimpleChatModel:
+        """Fallback base class when LangChain is not available."""
+        def __init__(self, *args, **kwargs):
+            raise NotImplementedError("SimpleChatModel requires LangChain to be installed")
 
 class LiteLLMChatWrapper(SimpleChatModel):
     model_name: str
@@ -599,7 +629,21 @@ class AsyncAIChatReplacement:
         self.chat = AsyncAIChatReplacement._Chat(wrapper)
 
 
-from browser_use.llm import ChatOllama, ChatOpenRouter, ChatGoogle, ChatAnthropic, ChatGroq, ChatOpenAI
+# Browser-use LLM imports with graceful degradation
+try:
+    from browser_use.llm import ChatOllama, ChatOpenRouter, ChatGoogle, ChatAnthropic, ChatGroq, ChatOpenAI
+    BROWSER_USE_LLM_AVAILABLE = True
+except ImportError as e:
+    BROWSER_USE_LLM_AVAILABLE = False
+    ChatOllama = ChatOpenRouter = ChatGoogle = ChatAnthropic = ChatGroq = ChatOpenAI = None
+    print(f"Warning: Browser-use LLM classes not available: {e}")
+
+# Create a fallback base class if ChatOpenRouter is not available
+if ChatOpenRouter is None:
+    class ChatOpenRouter:
+        """Fallback base class when browser-use LLM classes are not available."""
+        def __init__(self, *args, **kwargs):
+            raise NotImplementedError("ChatOpenRouter requires browser-use to be installed")
 
 class BrowserCompatibleChatWrapper(ChatOpenRouter):
     """
@@ -675,6 +719,13 @@ class BrowserCompatibleChatWrapper(ChatOpenRouter):
             pass
 
         return resp
+
+# Create a fallback base class if Embeddings is not available
+if Embeddings is None:
+    class Embeddings:
+        """Fallback base class when LangChain is not available."""
+        def __init__(self, *args, **kwargs):
+            raise NotImplementedError("Embeddings requires LangChain to be installed")
 
 class LiteLLMEmbeddingWrapper(Embeddings):
     model_name: str

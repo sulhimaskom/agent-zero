@@ -1,14 +1,22 @@
-from typing import Callable, TypedDict
-from langchain.prompts import (
-    ChatPromptTemplate,
-    FewShotChatMessagePromptTemplate,
-)
+from typing import Callable, TypedDict, Union, List, Optional, TYPE_CHECKING, Any
 
-from langchain.schema import AIMessage
-from langchain_core.messages import HumanMessage, SystemMessage
+# Safe imports for optional LangChain dependencies
+from python.helpers.safe_imports import get_langchain_components
 
-from langchain_core.language_models.chat_models import BaseChatModel
-from langchain_core.language_models.llms import BaseLLM
+# Get LangChain components
+langchain = get_langchain_components()
+
+# Import with graceful degradation
+ChatPromptTemplate = langchain.get('ChatPromptTemplate')
+FewShotChatMessagePromptTemplate = langchain.get('FewShotChatMessagePromptTemplate')
+AIMessage = langchain.get('AIMessage')
+HumanMessage = langchain.get('HumanMessage')
+SystemMessage = langchain.get('SystemMessage')
+BaseChatModel = langchain.get('BaseChatModel')
+BaseLLM = langchain.get('BaseLLM')
+
+if TYPE_CHECKING:
+    from typing import Any
 
 
 class Example(TypedDict):
@@ -17,9 +25,9 @@ class Example(TypedDict):
 
 async def call_llm(
     system: str,
-    model: BaseChatModel | BaseLLM,
+    model: Any,  # BaseChatModel | BaseLLM when available
     message: str,
-    examples: list[Example] = [],
+    examples: List[Example] = [],
     callback: Callable[[str], None] | None = None
 ):
 

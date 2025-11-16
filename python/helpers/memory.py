@@ -1,6 +1,26 @@
 from datetime import datetime
 from typing import Any, List, Sequence
 import os
+
+# Safe imports for optional dependencies
+from python.helpers.safe_imports import get_langchain_components, get_faiss
+
+# Get LangChain components
+langchain = get_langchain_components()
+faiss, faiss_available = get_faiss()
+
+# Import what we can from LangChain
+BaseMessage = langchain.get('BaseMessage')
+HumanMessage = langchain.get('HumanMessage')
+SystemMessage = langchain.get('SystemMessage')
+AIMessage = langchain.get('AIMessage')
+Document = langchain.get('Document')
+Embeddings = langchain.get('Embeddings')
+FAISS = langchain.get('FAISS')
+InMemoryDocstore = langchain.get('InMemoryDocstore')
+DistanceStrategy = langchain.get('DistanceStrategy')
+
+# Legacy compatibility
 # from langchain.storage import InMemoryByteStore, LocalFileStore  # Updated for compatibility
 # from langchain.embeddings import CacheBackedEmbeddings  # Updated for compatibility
 
@@ -64,33 +84,38 @@ from python.helpers import guids
 from python.helpers.memory_monitor import get_memory_monitor, WeakValueDictionary
 
 # from langchain_chroma import Chroma
-from langchain_community.vectorstores import FAISS
-
-# faiss needs to be patched for python 3.12 on arm #TODO remove once not needed
-from python.helpers import faiss_monkey_patch
-import faiss
-
-
-from langchain_community.docstore.in_memory import InMemoryDocstore
-from langchain_community.vectorstores.utils import (
-    DistanceStrategy,
-)
-from langchain_core.embeddings import Embeddings
+# FAISS and related imports are now handled by safe_imports above
+# from langchain_community.docstore.in_memory import InMemoryDocstore
+# from langchain_community.vectorstores.utils import DistanceStrategy
+# from langchain_core.embeddings import Embeddings
 
 import os, json
 
-import numpy as np
+try:
+    import numpy as np
+    NUMPY_AVAILABLE = True
+except ImportError:
+    NUMPY_AVAILABLE = False
+    np = None
+    print("Warning: NumPy not available - some features will be limited")
 
 from python.helpers.print_style import PrintStyle
 from . import files
-from langchain_core.documents import Document
+# Document is now imported from safe_imports above
 from python.helpers import knowledge_import
 from python.helpers.log import Log, LogItem
 from enum import Enum
 from agent import Agent
 import models
 import logging
-from simpleeval import simple_eval
+
+try:
+    from simpleeval import simple_eval
+    SIMPLE_EVAL_AVAILABLE = True
+except ImportError:
+    SIMPLE_EVAL_AVAILABLE = False
+    simple_eval = None
+    print("Warning: simpleeval not available - expression evaluation will be limited")
 import ast
 import operator
 
@@ -259,6 +284,13 @@ _memory_evaluator = SafeExpressionEvaluator()
 # Raise the log level so WARNING messages aren't shown
 logging.getLogger("langchain_core.vectorstores.base").setLevel(logging.ERROR)
 
+
+# Create a fallback base class if FAISS is not available
+if FAISS is None:
+    class FAISS:
+        """Fallback base class when FAISS is not available."""
+        def __init__(self, *args, **kwargs):
+            raise NotImplementedError("FAISS requires langchain_community to be installed")
 
 class MyFaiss(FAISS):
     # override aget_by_ids
@@ -562,7 +594,7 @@ class Memory:
 
         return index
 
-    def get_document_by_id(self, id: str) -> Document | None:
+    def get_document_by_id(self, id: str) -> "Document | None":
         return self.db.get_by_ids(id)[0]
 
     async def search_similarity_threshold(

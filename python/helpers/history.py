@@ -7,7 +7,18 @@ import math
 from typing import Coroutine, Literal, TypedDict, cast, Union, Dict, List, Any
 from python.helpers import messages, tokens, settings, call_llm
 from enum import Enum
-from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage, AIMessage
+
+# Safe imports for optional LangChain dependencies
+from python.helpers.safe_imports import get_langchain_components
+
+# Get LangChain components
+langchain = get_langchain_components()
+
+# Import with graceful degradation
+BaseMessage = langchain.get('BaseMessage')
+HumanMessage = langchain.get('HumanMessage')
+SystemMessage = langchain.get('SystemMessage')
+AIMessage = langchain.get('AIMessage')
 
 BULK_MERGE_COUNT = 3
 TOPICS_KEEP_COUNT = 3

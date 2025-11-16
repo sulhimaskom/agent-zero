@@ -1,8 +1,17 @@
 import base64
 import warnings
-import whisper
 import tempfile
 import asyncio
+
+# Whisper with graceful degradation
+try:
+    import whisper
+    WHISPER_AVAILABLE = True
+except ImportError as e:
+    WHISPER_AVAILABLE = False
+    whisper = None
+    print(f"Warning: Whisper not available - audio transcription will be limited: {e}")
+
 from python.helpers import runtime, rfc, settings, files
 from python.helpers.print_style import PrintStyle
 from python.helpers.notification import NotificationManager, NotificationType, NotificationPriority
@@ -15,6 +24,9 @@ _model_name = ""
 is_updating_model = False  # Tracks whether the model is currently updating
 
 async def preload(model_name:str):
+    if not WHISPER_AVAILABLE:
+        PrintStyle.warning("Whisper is not available - cannot preload model")
+        return None
     try:
         # return await runtime.call_development_function(_preload, model_name)
         return await _preload(model_name)
@@ -23,6 +35,8 @@ async def preload(model_name:str):
         raise e
         
 async def _preload(model_name:str):
+    if not WHISPER_AVAILABLE:
+        return None
     global _model, _model_name, is_updating_model
 
     while is_updating_model:
@@ -70,11 +84,16 @@ def _is_downloaded():
     return _model is not None
 
 async def transcribe(model_name:str, audio_bytes_b64: str):
+    if not WHISPER_AVAILABLE:
+        PrintStyle.warning("Whisper is not available - cannot transcribe audio")
+        return {"text": "Whisper not available for audio transcription"}
     # return await runtime.call_development_function(_transcribe, model_name, audio_bytes_b64)
     return await _transcribe(model_name, audio_bytes_b64)
 
 
 async def _transcribe(model_name:str, audio_bytes_b64: str):
+    if not WHISPER_AVAILABLE or _model is None:
+        return {"text": "Whisper not available for audio transcription"}
     await _preload(model_name)
     
     # Decode audio bytes if encoded as a base64 string
