@@ -1,6 +1,7 @@
 # Core dependencies with version ranges for better compatibility
 # Security Note: All dependencies should have both lower and upper version bounds
 # to prevent automatic installation of vulnerable versions while ensuring compatibility
+bcrypt>=4.0.0,<5.0.0
 a2wsgi>=1.10.8,<2.0.0
 ansio>=0.0.1,<1.0.0
 browser-use>=0.5.11,<1.0.0
