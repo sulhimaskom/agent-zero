@@ -4,6 +4,7 @@ import uuid
 from typing import Any, List, Sequence
 
 import faiss
+
 # from langchain.storage import InMemoryByteStore  # Updated for compatibility
 from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain_community.vectorstores import FAISS
@@ -53,8 +54,7 @@ class CacheBackedEmbeddings:
 
 
 from agent import Agent
-from python.helpers.memory_monitor import (WeakValueDictionary,
-                                           get_memory_monitor)
+from python.helpers.memory_monitor import WeakValueDictionary, get_memory_monitor
 
 
 class MyFaiss(FAISS):
