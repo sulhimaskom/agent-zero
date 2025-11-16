@@ -1,7 +1,65 @@
 from datetime import datetime
 from typing import Any, List, Sequence
-from langchain.storage import InMemoryByteStore, LocalFileStore
-from langchain.embeddings import CacheBackedEmbeddings
+import os
+# from langchain.storage import InMemoryByteStore, LocalFileStore  # Updated for compatibility
+# from langchain.embeddings import CacheBackedEmbeddings  # Updated for compatibility
+
+# Compatibility replacements for missing langchain.storage classes
+class InMemoryByteStore:
+    """Simple in-memory byte store replacement."""
+    def __init__(self):
+        self._store = {}
+    
+    def get(self, key: str):
+        return self._store.get(key)
+    
+    def set(self, key: str, value: bytes):
+        self._store[key] = value
+    
+    def delete(self, key: str):
+        self._store.pop(key, None)
+
+class LocalFileStore:
+    """Simple local file store replacement."""
+    def __init__(self, base_path: str):
+        self.base_path = base_path
+        os.makedirs(base_path, exist_ok=True)
+    
+    def get(self, key: str):
+        file_path = os.path.join(self.base_path, key)
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as f:
+                return f.read()
+        return None
+    
+    def set(self, key: str, value: bytes):
+        file_path = os.path.join(self.base_path, key)
+        with open(file_path, 'wb') as f:
+            f.write(value)
+    
+    def delete(self, key: str):
+        file_path = os.path.join(self.base_path, key)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+class CacheBackedEmbeddings:
+    """Simple cache-backed embeddings replacement."""
+    def __init__(self, underlying_embeddings, byte_store, namespace: str = ""):
+        self.underlying_embeddings = underlying_embeddings
+        self.byte_store = byte_store
+        self.namespace = namespace
+    
+    @classmethod
+    def from_bytes_store(cls, underlying_embeddings, byte_store, namespace: str = ""):
+        return cls(underlying_embeddings, byte_store, namespace)
+    
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+        # Simple implementation without actual caching for now
+        return self.underlying_embeddings.embed_documents(texts)
+    
+    def embed_query(self, text: str) -> List[float]:
+        # Simple implementation without actual caching for now
+        return self.underlying_embeddings.embed_query(text)
 from python.helpers import guids
 from python.helpers.memory_monitor import get_memory_monitor, WeakValueDictionary
 

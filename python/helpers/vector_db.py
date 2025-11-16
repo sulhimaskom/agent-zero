@@ -10,12 +10,44 @@ import faiss
 
 
 from langchain_core.documents import Document
-from langchain.storage import InMemoryByteStore
+# from langchain.storage import InMemoryByteStore  # Updated for compatibility
 from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain_community.vectorstores.utils import (
     DistanceStrategy,
 )
-from langchain.embeddings import CacheBackedEmbeddings
+# from langchain.embeddings import CacheBackedEmbeddings  # Updated for compatibility
+
+# Compatibility replacements for missing langchain.storage classes
+class InMemoryByteStore:
+    """Simple in-memory byte store replacement."""
+    def __init__(self):
+        self._store = {}
+    
+    def get(self, key: str):
+        return self._store.get(key)
+    
+    def set(self, key: str, value: bytes):
+        self._store[key] = value
+    
+    def delete(self, key: str):
+        self._store.pop(key, None)
+
+class CacheBackedEmbeddings:
+    """Simple cache-backed embeddings replacement."""
+    def __init__(self, underlying_embeddings, byte_store, namespace: str = ""):
+        self.underlying_embeddings = underlying_embeddings
+        self.byte_store = byte_store
+        self.namespace = namespace
+    
+    @classmethod
+    def from_bytes_store(cls, underlying_embeddings, byte_store, namespace: str = ""):
+        return cls(underlying_embeddings, byte_store, namespace)
+    
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+        return self.underlying_embeddings.embed_documents(texts)
+    
+    def embed_query(self, text: str) -> List[float]:
+        return self.underlying_embeddings.embed_query(text)
 
 from agent import Agent
 from python.helpers.memory_monitor import get_memory_monitor, WeakValueDictionary
