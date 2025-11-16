@@ -73,11 +73,11 @@ class VisionLoad(Tool):
                     )
             # append as raw message content for LLMs with vision tokens estimate
             msg = history.RawMessage(raw_content=content, preview="<Base64 encoded image data>")
-            self.agent.hist_add_message(
+            await self.agent.hist_add_message(
                 False, content=msg, tokens=TOKENS_ESTIMATE * len(content)
             )
         else:
-            self.agent.hist_add_tool_result(self.name, "No images processed")
+            await self.agent.hist_add_tool_result(self.name, "No images processed")
 
         # print and log short version
         message = (
