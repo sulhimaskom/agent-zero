@@ -1,36 +1,59 @@
-# import sys
-# from types import ModuleType, SimpleNamespace
+"""
+FAISS Monkey Patch for Python 3.12 on ARM platforms.
 
-# import numpy  # real numpy
+This disgusting hack was brought to you by:
+https://github.com/facebookresearch/faiss/issues/3936
 
-# # for python 3.12 on arm, faiss needs a fake cpuinfo module
+Import this module before importing faiss to fix compatibility issues.
+"""
 
-
-# """ This disgusting hack was brought to you by:
-# https://github.com/facebookresearch/faiss/issues/3936
-# """
-
-# faiss_monkey_patch.py  – import this before faiss -----------------
-import sys, types, numpy as np
+import sys
+import types
 from types import SimpleNamespace
 
-# fake numpy.distutils and numpy.distutils.cpuinfo packages
-dist = types.ModuleType("numpy.distutils")
-cpuinfo = types.ModuleType("numpy.distutils.cpuinfo")
+try:
+    import numpy as np
+    NUMPY_AVAILABLE = True
+except ImportError:
+    NUMPY_AVAILABLE = False
+    raise ImportError("NumPy is required for FAISS compatibility patch")
 
-# cpu attribute that looks like the real one
-cpuinfo.cpu = SimpleNamespace( # type: ignore
-    # FAISS only does   .info[0].get('Features', '')
-    info=[{}]
-)
+def apply_faiss_monkey_patch():
+    """Apply the monkey patch for FAISS compatibility."""
+    if not NUMPY_AVAILABLE:
+        raise ImportError("Cannot apply FAISS patch without NumPy")
+    
+    # Create fake numpy.distutils and numpy.distutils.cpuinfo packages
+    dist = types.ModuleType("numpy.distutils")
+    cpuinfo = types.ModuleType("numpy.distutils.cpuinfo")
 
-# register in sys.modules
-dist.cpuinfo = cpuinfo # type: ignore
-sys.modules["numpy.distutils"] = dist
-sys.modules["numpy.distutils.cpuinfo"] = cpuinfo
+    # CPU attribute that looks like the real one
+    cpuinfo.cpu = SimpleNamespace(  # type: ignore
+        # FAISS only does .info[0].get('Features', '')
+        info=[{}]
+    )
 
-# crucial: expose it as an *attribute* of the already-imported numpy package
-np.distutils = dist # type: ignore
-# -------------------------------------------------------------------
+    # Register in sys.modules
+    dist.cpuinfo = cpuinfo  # type: ignore
+    sys.modules["numpy.distutils"] = dist
+    sys.modules["numpy.distutils.cpuinfo"] = cpuinfo
 
-import faiss
+    # Crucial: expose it as an *attribute* of the already-imported numpy package
+    np.distutils = dist  # type: ignore
+
+# Apply the patch
+apply_faiss_monkey_patch()
+
+# Now import faiss with error handling
+try:
+    import faiss
+    FAISS_AVAILABLE = True
+except ImportError as e:
+    FAISS_AVAILABLE = False
+    raise ImportError(
+        f"Failed to import FAISS after applying compatibility patch: {e}. "
+        "Please ensure FAISS is installed: pip install faiss-cpu"
+    )
+
+# Export availability flag
+__all__ = ['FAISS_AVAILABLE', 'faiss']

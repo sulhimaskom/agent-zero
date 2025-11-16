@@ -15,10 +15,16 @@ from python.helpers import extract_tools, files, errors, history, tokens
 from python.helpers import dirty_json
 from python.helpers.print_style import PrintStyle
 
-from langchain_core.prompts import (
-    ChatPromptTemplate,
-)
-from langchain_core.messages import SystemMessage, BaseMessage
+# Safe imports for optional LangChain dependencies
+from python.helpers.safe_imports import get_langchain_components
+
+# Get LangChain components
+langchain = get_langchain_components()
+
+# Import with graceful degradation
+ChatPromptTemplate = langchain.get('ChatPromptTemplate')
+SystemMessage = langchain.get('SystemMessage')
+BaseMessage = langchain.get('BaseMessage')
 
 import python.helpers.log as Log
 from python.helpers.dirty_json import DirtyJson

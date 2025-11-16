@@ -2,12 +2,19 @@ import glob
 import os
 import hashlib
 from typing import Any, Dict, Literal, TypedDict
-from langchain_community.document_loaders import (
-    CSVLoader,
-    PyPDFLoader,
-    TextLoader,
-    UnstructuredHTMLLoader,
-)
+
+# Safe imports for optional LangChain dependencies
+from python.helpers.safe_imports import get_langchain_components
+
+# Get LangChain components
+langchain = get_langchain_components()
+
+# Import document loaders with graceful degradation
+CSVLoader = langchain.get('CSVLoader')
+PyPDFLoader = langchain.get('PyPDFLoader') 
+TextLoader = langchain.get('TextLoader')
+UnstructuredHTMLLoader = langchain.get('UnstructuredHTMLLoader')
+
 from python.helpers.log import LogItem
 from python.helpers.print_style import PrintStyle
 
