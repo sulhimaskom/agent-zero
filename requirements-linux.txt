@@ -1,0 +1,4 @@
+# Linux-specific requirements
+# Includes FAISS for vector search functionality
+-r requirements-base.txt
+faiss-cpu>=1.11.0,<2.0.0

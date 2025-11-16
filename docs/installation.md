@@ -373,6 +373,113 @@ For developers or users who need to run Agent Zero directly on their system,see 
 > ```
 
       
+## Dependency Troubleshooting
+
+### Checking Dependencies
+
+Agent Zero includes a dependency validation script to help diagnose installation issues:
+
+```bash
+# Check all dependencies
+python check_dependencies.py
+
+# Install platform-specific dependencies
+python check_dependencies.py --install
+```
+
+### Common Issues and Solutions
+
+#### 1. FAISS Installation Issues on macOS ARM64
+
+**Problem:** FAISS fails to install on macOS with Apple Silicon (M1/M2/M3) or Python 3.12.
+
+**Solution:**
+- Use the platform-specific requirements: `pip install -r requirements-macos.txt`
+- FAISS is optional on macOS ARM64 - Agent Zero will run with limited vector search functionality
+- Manual installation: `pip install faiss-cpu` (may require additional setup)
+
+#### 2. LangChain Import Errors
+
+**Problem:** Import errors for langchain-core or langchain-community.
+
+**Solution:**
+```bash
+# Update LangChain packages
+pip install --upgrade langchain-core langchain-community
+
+# Or use version constraints
+pip install "langchain-core>=0.3.49,<1.0.0" "langchain-community>=0.3.19,<1.0.0"
+```
+
+#### 3. Missing LiteLLM
+
+**Problem:** `ModuleNotFoundError: No module named 'litellm'`
+
+**Solution:**
+```bash
+pip install "litellm>=1.75.0,<2.0.0"
+```
+
+#### 4. Platform-Specific Installation
+
+Use the appropriate requirements file for your platform:
+
+```bash
+# Linux
+pip install -r requirements-linux.txt
+
+# macOS  
+pip install -r requirements-macos.txt
+
+# Windows
+pip install -r requirements-windows.txt
+```
+
+#### 5. Python Version Compatibility
+
+**Requirement:** Python 3.8 or higher (3.11+ recommended)
+
+**Check your version:**
+```bash
+python --version
+```
+
+#### 6. Docker Installation Issues
+
+**Problem:** Permission denied errors or Docker daemon not running.
+
+**Solution:**
+- Ensure Docker Desktop is running
+- On Linux, add user to docker group: `sudo usermod -aG docker $USER`
+- Restart your terminal or log out/in
+
+#### 7. Memory Issues During Installation
+
+**Problem:** Installation fails due to insufficient memory.
+
+**Solution:**
+- Install packages one by one instead of all at once
+- Use `--no-cache-dir` flag: `pip install --no-cache-dir -r requirements.txt`
+
+### Graceful Degradation
+
+Agent Zero implements graceful degradation for optional dependencies:
+
+- **FAISS unavailable:** Vector search functionality limited, basic memory still works
+- **LangChain unavailable:** Some AI features disabled, core functionality preserved  
+- **Document processing unavailable:** File upload and parsing limited
+
+The system will warn you about missing dependencies but continue to function with reduced capabilities.
+
+### Getting Help
+
+If you continue to experience issues:
+
+1. Run the dependency checker: `python check_dependencies.py`
+2. Check the [troubleshooting documentation](troubleshooting.md)
+3. Visit the [Agent Zero Discord](https://discord.gg/B8KZKNsPpj) for community support
+4. [Open an issue](https://github.com/agent0ai/agent-zero/issues) on GitHub
+
 ### Conclusion
 After following the instructions for your specific operating system, you should have Agent Zero successfully installed and running. You can now start exploring the framework's capabilities and experimenting with creating your own intelligent agents. 
 

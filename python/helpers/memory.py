@@ -63,19 +63,27 @@ class CacheBackedEmbeddings:
 from python.helpers import guids
 from python.helpers.memory_monitor import get_memory_monitor, WeakValueDictionary
 
-# from langchain_chroma import Chroma
-from langchain_community.vectorstores import FAISS
+# Try to import dependencies with graceful degradation
+try:
+    from langchain_community.vectorstores import FAISS
+    from langchain_community.docstore.in_memory import InMemoryDocstore
+    from langchain_community.vectorstores.utils import (
+        DistanceStrategy,
+    )
+    from langchain_core.embeddings import Embeddings
+    LANGCHAIN_AVAILABLE = True
+except ImportError as e:
+    LANGCHAIN_AVAILABLE = False
+    print(f"⚠️ LangChain not available: {e}. Memory functionality will be limited.")
 
-# faiss needs to be patched for python 3.12 on arm #TODO remove once not needed
-from python.helpers import faiss_monkey_patch
-import faiss
-
-
-from langchain_community.docstore.in_memory import InMemoryDocstore
-from langchain_community.vectorstores.utils import (
-    DistanceStrategy,
-)
-from langchain_core.embeddings import Embeddings
+try:
+    # faiss needs to be patched for python 3.12 on arm #TODO remove once not needed
+    from python.helpers import faiss_monkey_patch
+    import faiss
+    FAISS_AVAILABLE = True
+except ImportError as e:
+    FAISS_AVAILABLE = False
+    print(f"⚠️ FAISS not available: {e}. Vector memory functionality will be limited.")
 
 import os, json
 

@@ -2,19 +2,44 @@ from typing import Any, List, Sequence
 import uuid
 import ast
 import operator
-from langchain_community.vectorstores import FAISS
 
-# faiss needs to be patched for python 3.12 on arm #TODO remove once not needed
-from python.helpers import faiss_monkey_patch
-import faiss
+# Try to import dependencies with graceful degradation
+try:
+    from langchain_community.vectorstores import FAISS
+    from langchain_core.documents import Document
+    from langchain_community.docstore.in_memory import InMemoryDocstore
+    from langchain_community.vectorstores.utils import (
+        DistanceStrategy,
+    )
+    LANGCHAIN_AVAILABLE = True
+except ImportError as e:
+    # Create dummy classes if LangChain is not available
+    class Document:
+        def __init__(self, page_content: str, metadata: dict | None = None):
+            self.page_content = page_content
+            self.metadata = metadata or {}
+    
+    class DistanceStrategy:
+        COSINE = "cosine"
+    
+    LANGCHAIN_AVAILABLE = False
+    print(f"⚠️ LangChain not available: {e}. Vector search functionality will be limited.")
 
-
-from langchain_core.documents import Document
+try:
+    # faiss needs to be patched for python 3.12 on arm #TODO remove once not needed
+    from python.helpers import faiss_monkey_patch
+    import faiss
+    FAISS_AVAILABLE = True
+except ImportError as e:
+    # Create dummy faiss module if not available
+    class DummyFaiss:
+        class IndexFlatIP:
+            def __init__(self, *args, **kwargs):
+                pass
+    faiss = DummyFaiss()
+    FAISS_AVAILABLE = False
+    print(f"⚠️ FAISS not available: {e}. Vector search functionality will be limited.")
 # from langchain.storage import InMemoryByteStore  # Updated for compatibility
-from langchain_community.docstore.in_memory import InMemoryDocstore
-from langchain_community.vectorstores.utils import (
-    DistanceStrategy,
-)
 # from langchain.embeddings import CacheBackedEmbeddings  # Updated for compatibility
 
 # Compatibility replacements for missing langchain.storage classes
@@ -49,11 +74,18 @@ class CacheBackedEmbeddings:
     def embed_query(self, text: str) -> List[float]:
         return self.underlying_embeddings.embed_query(text)
 
+# Import InMemoryDocstore if available, otherwise create dummy
+if not LANGCHAIN_AVAILABLE:
+    class InMemoryDocStore:
+        """Simple in-memory document store replacement."""
+        def __init__(self):
+            self._dict = {}
+
 from agent import Agent
 from python.helpers.memory_monitor import get_memory_monitor, WeakValueDictionary
 
 
-class MyFaiss(FAISS):
+class MyFaiss(FAISS if (LANGCHAIN_AVAILABLE and FAISS_AVAILABLE) else object):
     # override aget_by_ids
     def get_by_ids(self, ids: Sequence[str], /) -> List[Document]:
         # return all self.docstore._dict[id] in ids
@@ -111,15 +143,19 @@ class VectorDB:
         self.embeddings = self._get_embeddings(agent, cache=cache)
         self.index = faiss.IndexFlatIP(len(self.embeddings.embed_query("example")))
 
-        self.db = MyFaiss(
-            embedding_function=self.embeddings,
-            index=self.index,
-            docstore=InMemoryDocstore(),
-            index_to_docstore_id={},
-            distance_strategy=DistanceStrategy.COSINE,
-            # normalize_L2=True,
-            relevance_score_fn=cosine_normalizer,
-        )
+        if LANGCHAIN_AVAILABLE and FAISS_AVAILABLE:
+            self.db = MyFaiss(
+                embedding_function=self.embeddings,
+                index=self.index,
+                docstore=InMemoryDocstore() if LANGCHAIN_AVAILABLE else InMemoryDocStore(),
+                index_to_docstore_id={},
+                distance_strategy=DistanceStrategy.COSINE,
+                # normalize_L2=True,
+                relevance_score_fn=cosine_normalizer,
+            )
+        else:
+            self.db = MyFaiss()
+            print("⚠️ Vector database initialized with limited functionality due to missing dependencies")
 
     async def search_by_similarity_threshold(
         self, query: str, limit: int, threshold: float, filter: str = ""
