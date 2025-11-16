@@ -215,6 +215,9 @@ class WeakValueDictionary:
             return initial_size - len(self._data)
 
 
+# Alias for backward compatibility
+WeakValueCache = WeakValueDictionary
+
 # Global memory monitor instance
 _global_monitor: Optional[MemoryMonitor] = None
 
