@@ -188,9 +188,9 @@ class TestSafeExpressionEvaluator:
             "age ==",  # Incomplete expression
             "age > 20 and",  # Incomplete boolean expression
             "name == 'John' or",  # Incomplete OR expression
-            "age + + 5",  # Invalid syntax
+            "age +",  # Incomplete expression
+            "age +*",  # Invalid operator
             "age && 20",  # Invalid operator
-            "age || 20",  # Invalid operator
         ]
         
         for expr in invalid_expressions:
