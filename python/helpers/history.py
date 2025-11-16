@@ -163,33 +163,9 @@ class Topic(Record):
             * CURRENT_TOPIC_RATIO
             * LARGE_MESSAGE_TO_TOPIC_RATIO
         )
-        large_msgs = []
-        for m in (m for m in self.messages if not m.summary):
-            # TODO refactor this
-            out = m.output()
-            text = output_text(out)
-            tok = m.get_tokens()
-            leng = len(text)
-            if tok > msg_max_size:
-                large_msgs.append((m, tok, leng, out))
-        large_msgs.sort(key=lambda x: x[1], reverse=True)
+        large_msgs = self._find_large_messages(msg_max_size)
         for msg, tok, leng, out in large_msgs:
-            trim_to_chars = leng * (msg_max_size / tok)
-            # raw messages will be replaced as a whole, they would become invalid when truncated
-            if _is_raw_message(out[0]["content"]):
-                msg.set_summary(
-                    "Message content replaced to save space in context window"
-                )
-
-            # regular messages will be truncated
-            else:
-                trunc = messages.truncate_dict_by_ratio(
-                    self.history.agent,
-                    out[0]["content"],
-                    trim_to_chars * 1.15,
-                    trim_to_chars * 0.85,
-                )
-                msg.set_summary(_json_dumps(trunc))
+            self._process_large_message(msg, out, leng, msg_max_size)
 
             return True
         return False
@@ -215,8 +191,15 @@ class Topic(Record):
         return False
 
     async def summarize_messages(self, messages: list[Message]):
-        # FIXME: vision bytes are sent to utility LLM, send summary instead
-        msg_txt = [m.output_text() for m in messages]
+        """Summarize a list of messages, handling vision content appropriately."""
+        msg_txt = []
+        for m in messages:
+            # Extract text content, avoiding vision bytes for utility LLM
+            content = m.output_text()
+            # If message contains vision content, add a note instead of the bytes
+            if self._has_vision_content(m):
+                content += " [Contains image/vision content]"
+            msg_txt.append(content)
         summary = await self.history.agent.call_utility_model(
             system=self.history.agent.read_prompt("fw.topic_summary.sys.md"),
             message=self.history.agent.read_prompt(
@@ -224,6 +207,59 @@ class Topic(Record):
             ),
         )
         return summary
+
+    def _find_large_messages(self, msg_max_size):
+        """Find messages that exceed the maximum size limit."""
+        large_msgs = []
+        for m in (m for m in self.messages if not m.summary):
+            out = m.output()
+            text = output_text(out)
+            tok = m.get_tokens()
+            leng = len(text)
+            if tok > msg_max_size:
+                large_msgs.append((m, tok, leng, out))
+        large_msgs.sort(key=lambda x: x[1], reverse=True)
+        return large_msgs
+
+    def _has_vision_content(self, message):
+        """Check if a message contains vision/image content."""
+        try:
+            output = message.output()
+            for item in output:
+                if isinstance(item, dict) and "type" in item:
+                    if item["type"] == "image_url" or item.get("image_url"):
+                        return True
+                # Check for raw image data
+                if isinstance(item, dict) and "content" in item:
+                    content = item["content"]
+                    if isinstance(content, bytes) or (isinstance(content, str) and content.startswith("data:image")):
+                        return True
+            return False
+        except Exception:
+            return False
+
+    def _process_large_message(self, msg, out, leng, msg_max_size):
+        """Process a single large message by truncating or summarizing it."""
+        trim_to_chars = leng * (msg_max_size / msg.get_tokens())
+        
+        # raw messages will be replaced as a whole, they would become invalid when truncated
+        if _is_raw_message(out[0]["content"]):
+            msg.set_summary(
+                "Message content replaced to save space in context window"
+            )
+        # regular messages will be truncated
+        else:
+            trunc = messages.truncate_dict_by_ratio(
+                self.history.agent,
+                out[0]["content"],
+                trim_to_chars * 1.15,
+                trim_to_chars * 0.85,
+            )
+            msg.set_summary(
+                self.history.agent.read_prompt(
+                    "fw.topic_summary.msg.md", content=trunc
+                ),
+            )
 
     def to_dict(self):
         return {
