@@ -1,0 +1,39 @@
+# CODEOWNERS File
+
+# This file controls who is automatically requested for review in pull requests.
+
+# Global owners - will be requested for review on every PR
+* @agent0ai
+
+# Documentation changes
+/docs/ @agent0ai
+
+# Security-related files
+SECURITY.md @agent0ai
+.github/ @agent0ai
+
+# Core application files
+/agent.py @agent0ai
+/models.py @agent0ai
+/run_ui.py @agent0ai
+/python/ @agent0ai
+
+# Configuration and deployment
+Dockerfile* @agent0ai
+docker-compose* @agent0ai
+requirements.txt @agent0ai
+
+# Web UI
+/webui/ @agent0ai
+
+# Extensions and tools
+/agents/ @agent0ai
+/instruments/ @agent0ai
+/prompts/ @agent0ai
+
+# Tests
+/tests/ @agent0ai
+
+# Default fallback for any files not covered above
+# This line should be last - it's the fallback owner
+* @agent0ai
