@@ -636,8 +636,20 @@ class Agent:
         return self.hist_add_message(False, content=data)
 
     def concat_messages(
-        self, messages
-    ):  # TODO add param for message range, topic, history
+        self, messages, message_range=None, topic=None, history=None
+    ):
+        """
+        Concatenate messages into text format.
+        
+        Args:
+            messages: List of messages to concatenate
+            message_range: Optional range of messages to include
+            topic: Optional topic filter for messages
+            history: Optional history context for messages
+            
+        Returns:
+            Formatted text representation of messages
+        """
         return self.history.output_text(human_label="user", ai_label="assistant")
 
     def get_chat_model(self):

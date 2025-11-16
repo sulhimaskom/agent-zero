@@ -736,16 +736,29 @@ class MCPConfig(BaseModel):
 
                     prompt += "\n"
 
-                    prompt += (
-                        f"#### Usage:\n"
-                        f"{{\n"
-                        # f'    "observations": ["..."],\n' # TODO: this should be a prompt file with placeholders
-                        f'    "thoughts": ["..."],\n'
-                        # f'    "reflection": ["..."],\n' # TODO: this should be a prompt file with placeholders
-                        f"    \"tool_name\": \"{server_name}.{tool['name']}\",\n"
-                        f'    "tool_args": !follow schema above\n'
-                        f"}}\n"
-                    )
+                    # Try to load template from file, fallback to hardcoded version
+                    try:
+                        template_path = os.path.join(os.path.dirname(__file__), "..", "..", "prompts", "mcp.tool_usage.md")
+                        if os.path.exists(template_path):
+                            with open(template_path, "r", encoding="utf-8") as f:
+                                template_content = f.read()
+                            # Replace placeholders
+                            template_content = template_content.replace("{{SERVER_NAME}}", server_name)
+                            template_content = template_content.replace("{{TOOL_NAME}}", tool['name'])
+                            template_content = template_content.replace("{{TOOL_INPUT_SCHEMA}}", "!follow schema above")
+                            prompt += template_content
+                        else:
+                            raise FileNotFoundError("Template not found")
+                    except Exception:
+                        # Fallback to hardcoded version
+                        prompt += (
+                            f"#### Usage:\n"
+                            f"{{\n"
+                            f'    "thoughts": ["..."],\n'
+                            f"    \"tool_name\": \"{server_name}.{tool['name']}\",\n"
+                            f'    "tool_input": !follow schema above\n'
+                            f"}}\n"
+                        )
 
         return prompt
 
