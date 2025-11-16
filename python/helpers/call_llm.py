@@ -1,12 +1,10 @@
 from typing import Callable, TypedDict
-from langchain.prompts import (
+
+from langchain_core.prompts import (
     ChatPromptTemplate,
     FewShotChatMessagePromptTemplate,
-)
-
-from langchain.schema import AIMessage
-from langchain_core.messages import HumanMessage, SystemMessage
-
+    )
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.language_models.llms import BaseLLM
 
@@ -15,37 +13,37 @@ class Example(TypedDict):
     input: str
     output: str
 
+
 async def call_llm(
-    system: str,
-    model: BaseChatModel | BaseLLM,
-    message: str,
-    examples: list[Example] = [],
-    callback: Callable[[str], None] | None = None
-):
+        system: str,
+        model: BaseChatModel | BaseLLM,
+        message: str,
+        examples: list[Example] = [],
+        callback: Callable[[str], None] | None = None
+        ):
 
     example_prompt = ChatPromptTemplate.from_messages(
         [
             HumanMessage(content="{input}"),
             AIMessage(content="{output}"),
-        ]
-    )
+            ]
+        )
 
     few_shot_prompt = FewShotChatMessagePromptTemplate(
         example_prompt=example_prompt,
         examples=examples,  # type: ignore
         input_variables=[],
-    )
+        )
 
     few_shot_prompt.format()
-
 
     final_prompt = ChatPromptTemplate.from_messages(
         [
             SystemMessage(content=system),
             few_shot_prompt,
             HumanMessage(content=message),
-        ]
-    )
+            ]
+        )
 
     chain = final_prompt | model
 
@@ -66,4 +64,3 @@ async def call_llm(
         response += content
 
     return response
-
