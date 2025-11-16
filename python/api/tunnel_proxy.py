@@ -1,7 +1,7 @@
 from python.helpers.api import ApiHandler, Request, Response
 from python.helpers import dotenv, runtime
 from python.helpers.tunnel_manager import TunnelManager
-import requests
+import aiohttp
 
 
 class TunnelProxy(ApiHandler):
@@ -16,17 +16,21 @@ class TunnelProxy(ApiHandler):
         # first verify the service is running:
         service_ok = False
         try:
-            response = requests.post(f"http://localhost:{tunnel_api_port}/", json={"action": "health"})
-            if response.status_code == 200:
-                service_ok = True
+            timeout = aiohttp.ClientTimeout(total=5.0)  # 5 second timeout
+            async with aiohttp.ClientSession(timeout=timeout) as session:
+                async with session.post(f"http://localhost:{tunnel_api_port}/", json={"action": "health"}) as response:
+                    if response.status == 200:
+                        service_ok = True
         except Exception as e:
             service_ok = False
 
         # forward this request to the tunnel service if OK
         if service_ok:
             try:
-                response = requests.post(f"http://localhost:{tunnel_api_port}/", json=input)
-                return response.json()
+                timeout = aiohttp.ClientTimeout(total=30.0)  # 30 second timeout for main request
+                async with aiohttp.ClientSession(timeout=timeout) as session:
+                    async with session.post(f"http://localhost:{tunnel_api_port}/", json=input) as response:
+                        return await response.json()
             except Exception as e:
                 return {"error": str(e)}
         else:
