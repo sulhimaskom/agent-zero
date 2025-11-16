@@ -79,6 +79,7 @@ from enum import Enum
 import faiss
 import numpy as np
 from langchain_community.docstore.in_memory import InMemoryDocstore
+
 # from langchain_chroma import Chroma
 from langchain_community.vectorstores import FAISS
 from langchain_community.vectorstores.utils import DistanceStrategy
@@ -88,11 +89,11 @@ from simpleeval import simple_eval
 
 import models
 from agent import Agent
+
 # faiss needs to be patched for python 3.12 on arm #TODO remove once not needed
 from python.helpers import faiss_monkey_patch, guids, knowledge_import
 from python.helpers.log import Log, LogItem
-from python.helpers.memory_monitor import (WeakValueDictionary,
-                                           get_memory_monitor)
+from python.helpers.memory_monitor import WeakValueDictionary, get_memory_monitor
 from python.helpers.print_style import PrintStyle
 
 from . import files

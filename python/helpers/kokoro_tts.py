@@ -8,9 +8,11 @@ import warnings
 import soundfile as sf
 
 from python.helpers import runtime
-from python.helpers.notification import (NotificationManager,
-                                         NotificationPriority,
-                                         NotificationType)
+from python.helpers.notification import (
+    NotificationManager,
+    NotificationPriority,
+    NotificationType,
+)
 from python.helpers.print_style import PrintStyle
 
 warnings.filterwarnings("ignore", category=FutureWarning)

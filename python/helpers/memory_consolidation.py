@@ -12,8 +12,7 @@ from python.helpers.dirty_json import DirtyJson
 from python.helpers.log import LogItem
 from python.helpers.memory import Memory
 from python.helpers.print_style import PrintStyle
-from python.tools.memory_load import \
-    DEFAULT_THRESHOLD as DEFAULT_MEMORY_THRESHOLD
+from python.tools.memory_load import DEFAULT_THRESHOLD as DEFAULT_MEMORY_THRESHOLD
 
 
 class ConsolidationAction(Enum):

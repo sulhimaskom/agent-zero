@@ -6,9 +6,11 @@ import warnings
 import whisper
 
 from python.helpers import files, rfc, runtime, settings
-from python.helpers.notification import (NotificationManager,
-                                         NotificationPriority,
-                                         NotificationType)
+from python.helpers.notification import (
+    NotificationManager,
+    NotificationPriority,
+    NotificationType,
+)
 from python.helpers.print_style import PrintStyle
 
 # Suppress FutureWarning from torch.load
