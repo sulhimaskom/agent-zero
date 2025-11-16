@@ -1,18 +1,21 @@
 #!/usr/bin/env python3
 """
-Dependency Security Verification Script
+Dependency Verification Script for Agent Zero
 
-This script helps maintain security by:
+This script helps maintain security and functionality by:
 1. Checking for duplicate dependencies
 2. Verifying version bounds are properly set
 3. Running security vulnerability scans
 4. Validating requirements.txt format
+5. Testing critical imports to ensure dependencies work
 """
 
 import re
 import subprocess
 import sys
+import importlib
 from pathlib import Path
+from typing import List, Tuple
 
 
 def check_duplicate_packages(requirements_file):
@@ -175,6 +178,133 @@ def validate_format(requirements_file):
         return True
 
 
+# Critical dependencies that must be importable
+CRITICAL_DEPENDENCIES = [
+    "litellm",
+    "langchain_core", 
+    "langchain_community",
+    "faiss",
+    "sentence_transformers",
+    "flask",
+    "docker",
+    "aiohttp",
+    "aiofiles",
+    "mcp",
+    "fastmcp",
+    "browser_use",
+    "transformers",
+    "torch",
+    "numpy",
+    "pandas"
+]
+
+# Optional dependencies that are nice to have but not critical
+# Note: Some packages import under different names than their package names
+OPTIONAL_DEPENDENCIES = [
+    "openai",
+    "anthropic", 
+    "groq",
+    "playwright",
+    "spacy",
+    "newspaper",  # newspaper3k package imports as 'newspaper'
+    "paramiko",
+    "git"  # GitPython package imports as 'git'
+]
+
+def check_import(package_name: str) -> Tuple[bool, str]:
+    """Check if a package can be imported."""
+    try:
+        importlib.import_module(package_name)
+        return True, f"✓ {package_name} imported successfully"
+    except ImportError as e:
+        return False, f"✗ {package_name} failed to import: {e}"
+    except Exception as e:
+        return False, f"✗ {package_name} error: {e}"
+
+def test_critical_imports():
+    """Test that critical dependencies can be imported."""
+    print("\n🔍 Testing critical imports...")
+    
+    critical_failed = []
+    for dep in CRITICAL_DEPENDENCIES:
+        success, message = check_import(dep)
+        print(message)
+        if not success:
+            critical_failed.append(dep)
+    
+    if critical_failed:
+        print(f"\n❌ {len(critical_failed)} critical dependencies failed to import")
+        return False
+    else:
+        print("\n✅ All critical dependencies imported successfully")
+        return True
+
+def test_optional_imports():
+    """Test that optional dependencies can be imported."""
+    print("\n🔍 Testing optional imports...")
+    
+    optional_failed = []
+    for dep in OPTIONAL_DEPENDENCIES:
+        success, message = check_import(dep)
+        print(message)
+        if not success:
+            optional_failed.append(dep)
+    
+    if optional_failed:
+        print(f"\n⚠️  {len(optional_failed)} optional dependencies failed to import")
+        print("These are optional but may limit functionality.")
+        return False
+    else:
+        print("\n✅ All optional dependencies imported successfully")
+        return True
+
+def check_version_conflicts():
+    """Check for common version conflicts."""
+    print("\n🔍 Checking for common version conflicts...")
+    
+    # Check aiofiles version (common conflict source)
+    try:
+        import aiofiles
+        import pkg_resources
+        version = pkg_resources.get_distribution("aiofiles").version
+        print(f"✓ aiofiles version: {version}")
+        
+        # Parse version to check if it meets minimum requirements
+        major, minor, patch = map(int, version.split('.'))
+        if major > 24 or (major == 24 and minor >= 1):
+            print("✓ aiofiles version meets requirements (>=24.1.0)")
+        else:
+            print(f"⚠ aiofiles version {version} may cause conflicts with unstructured-client")
+    except ImportError:
+        print("✗ aiofiles not installed")
+    except Exception as e:
+        print(f"⚠ Could not check aiofiles version: {e}")
+
+def verify_dependency_installation():
+    """Verify that pip can resolve dependencies without conflicts."""
+    print("\n🔍 Verifying dependency resolution...")
+    
+    try:
+        result = subprocess.run([
+            sys.executable, "-m", "pip", "check"
+        ], capture_output=True, text=True, timeout=30)
+        
+        if result.returncode == 0:
+            print("✓ No dependency conflicts detected")
+            return True
+        else:
+            print("⚠ Dependency conflicts found:")
+            print(result.stdout)
+            if result.stderr:
+                print("Errors:", result.stderr)
+            return False
+    except subprocess.TimeoutExpired:
+        print("✗ Dependency check timed out")
+        return False
+    except Exception as e:
+        print(f"✗ Error checking dependencies: {e}")
+        return False
+
 def main():
     """Main verification function"""
     requirements_file = Path("requirements.txt")
@@ -183,22 +313,40 @@ def main():
         print("❌ requirements.txt not found")
         sys.exit(1)
     
-    print("🚀 Starting dependency security verification...\n")
+    print("🚀 Starting comprehensive dependency verification...\n")
     
     all_passed = True
     
-    # Run all checks
+    # Run security and format checks
     all_passed &= check_duplicate_packages(requirements_file)
     all_passed &= check_version_bounds(requirements_file)
     all_passed &= validate_format(requirements_file)
     all_passed &= run_security_scan()
     
+    # Run functionality checks
+    all_passed &= verify_dependency_installation()
+    check_version_conflicts()
+    
+    # Test imports (critical for functionality)
+    imports_ok = test_critical_imports()
+    all_passed &= imports_ok
+    
+    # Test optional imports (don't fail the script but warn)
+    test_optional_imports()
+    
     print(f"\n{'='*50}")
-    if all_passed:
-        print("✅ All security checks passed!")
+    print("VERIFICATION SUMMARY")
+    print("="*50)
+    
+    if all_passed and imports_ok:
+        print("✅ All checks passed! Dependencies are secure and functional.")
         sys.exit(0)
     else:
-        print("❌ Some security checks failed. Please review the issues above.")
+        print("❌ Some checks failed. Please review the issues above.")
+        if not imports_ok:
+            print("\n💡 To fix import issues, try:")
+            print("   pip install -r requirements.txt")
+            print("   python scripts/verify_dependencies.py")
         sys.exit(1)
 
 

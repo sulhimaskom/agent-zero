@@ -375,21 +375,43 @@ For developers or users who need to run Agent Zero directly on their system,see 
       
 ## Dependency Troubleshooting
 
-### Checking Dependencies
+### Comprehensive Dependency Verification
 
-Agent Zero includes a dependency validation script to help diagnose installation issues:
+Agent Zero includes a comprehensive dependency verification script to help diagnose and resolve installation issues:
 
 ```bash
-# Check all dependencies
-python check_dependencies.py
+# Run comprehensive dependency check
+python scripts/verify_dependencies.py
 
-# Install platform-specific dependencies
-python check_dependencies.py --install
+# This script checks:
+# - Security vulnerabilities
+# - Version conflicts  
+# - Import functionality
+# - Requirements.txt format
+# - Duplicate dependencies
 ```
 
 ### Common Issues and Solutions
 
-#### 1. FAISS Installation Issues on macOS ARM64
+#### 1. Dependency Conflicts During Installation
+
+**Problem:** `ResolutionImpossible: for help visit https://pip.pypa.io/en/latest/topics/dependency-resolution/`
+
+**Common Cause:** Version conflicts between packages, especially with `aiofiles`.
+
+**Solution:**
+```bash
+# Clear pip cache and retry
+pip cache purge
+pip install -r requirements.txt
+
+# If aiofiles conflict persists, the requirements.txt has been updated to resolve this
+# Make sure you have the latest version of the repository
+git pull origin main
+pip install -r requirements.txt
+```
+
+#### 2. FAISS Installation Issues on macOS ARM64
 
 **Problem:** FAISS fails to install on macOS with Apple Silicon (M1/M2/M3) or Python 3.12.
 
@@ -397,8 +419,9 @@ python check_dependencies.py --install
 - Use the platform-specific requirements: `pip install -r requirements-macos.txt`
 - FAISS is optional on macOS ARM64 - Agent Zero will run with limited vector search functionality
 - Manual installation: `pip install faiss-cpu` (may require additional setup)
+- The requirements.txt automatically handles platform-specific FAISS installation
 
-#### 2. LangChain Import Errors
+#### 3. LangChain Import Errors
 
 **Problem:** Import errors for langchain-core or langchain-community.
 
@@ -407,15 +430,153 @@ python check_dependencies.py --install
 # Update LangChain packages
 pip install --upgrade langchain-core langchain-community
 
-# Or use version constraints
+# Or use version constraints from requirements.txt
 pip install "langchain-core>=0.3.49,<1.0.0" "langchain-community>=0.3.19,<1.0.0"
 ```
 
-#### 3. Missing LiteLLM
+#### 4. Missing LiteLLM
 
 **Problem:** `ModuleNotFoundError: No module named 'litellm'`
 
 **Solution:**
+```bash
+# Install litellm directly
+pip install "litellm>=1.75.0,<2.0.0"
+
+# Or reinstall all dependencies
+pip install -r requirements.txt
+```
+
+#### 5. Sentence Transformers Issues
+
+**Problem:** `ModuleNotFoundError: No module named 'sentence_transformers'`
+
+**Solution:**
+```bash
+# Install sentence-transformers
+pip install "sentence-transformers>=3.0.1,<4.0.0"
+
+# This may also install torch and transformers if not present
+```
+
+#### 6. Docker Permission Issues (Linux)
+
+**Problem:** Permission denied when trying to run Docker commands.
+
+**Solution:**
+```bash
+# Add user to docker group
+sudo usermod -aG docker $USER
+
+# Log out and log back in, then run
+newgrp docker
+
+# Test docker access
+docker ps
+```
+
+#### 7. Python Version Compatibility
+
+**Problem:** Dependencies fail to install due to Python version incompatibility.
+
+**Solution:**
+- Agent Zero requires Python 3.9 or higher
+- Python 3.12 is supported but some packages may need specific versions
+- Check your Python version: `python --version`
+- If using Python 3.12+, ensure you have the latest requirements.txt
+
+#### 8. Memory/Resource Issues During Installation
+
+**Problem:** Installation fails due to insufficient memory or disk space.
+
+**Solution:**
+```bash
+# Install packages one by one to identify problematic packages
+pip install bcrypt
+pip install flask
+pip install aiohttp
+# ... continue with other packages
+
+# Use --no-cache-dir if disk space is limited
+pip install -r requirements.txt --no-cache-dir
+```
+
+#### 9. Network/Proxy Issues
+
+**Problem:** Installation fails due to network restrictions or corporate proxies.
+
+**Solution:**
+```bash
+# Use proxy if required
+pip install -r requirements.txt --proxy http://your-proxy:port
+
+# Increase timeout for slow connections
+pip install -r requirements.txt --timeout 1000
+
+# Use different index if needed
+pip install -r requirements.txt --index-url https://pypi.org/simple/
+```
+
+#### 10. Platform-Specific Issues
+
+**Windows:**
+- Some packages may require Microsoft Visual C++ Build Tools
+- Install from: https://visualstudio.microsoft.com/visual-cpp-build-tools/
+
+**macOS:**
+- Install Xcode command line tools: `xcode-select --install`
+- Some packages may require Homebrew: `/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"`
+
+**Linux:**
+- Install system dependencies:
+  ```bash
+  # Ubuntu/Debian
+  sudo apt-get update
+  sudo apt-get install python3-dev build-essential
+  
+  # CentOS/RHEL
+  sudo yum install python3-devel gcc
+  ```
+
+### Verification Steps
+
+After installation, verify everything works:
+
+```bash
+# 1. Run the comprehensive verification script
+python scripts/verify_dependencies.py
+
+# 2. Test critical imports manually
+python -c "
+import litellm
+import langchain_core
+import faiss
+import sentence_transformers
+print('All critical dependencies imported successfully!')
+"
+
+# 3. Test Agent Zero startup
+python agent.py --help
+```
+
+### Getting Help
+
+If you continue to experience issues:
+
+1. **Check the logs**: Run the verification script with verbose output
+2. **Community support**: Visit the [Agent Zero Discord](https://discord.gg/B8KZKNsPpj)
+3. **GitHub Issues**: Check existing issues or create a new one
+4. **Provide details**: Include your OS, Python version, and exact error messages
+
+### Prevention Tips
+
+To avoid dependency issues in the future:
+
+1. **Keep requirements updated**: Regularly pull the latest version
+2. **Use virtual environments**: Isolate Agent Zero dependencies
+3. **Run verification script**: Check dependencies before major updates
+4. **Read changelog**: Check for breaking changes in updates
+5. **Backup configuration**: Save your settings before updating
 ### Conclusion
 After following the instructions for your specific operating system, you should have Agent Zero successfully installed and running. You can now start exploring the framework's capabilities and experimenting with creating your own intelligent agents. 
 
