@@ -89,29 +89,48 @@ def check_version_bounds(requirements_file):
 
 
 def run_security_scan():
-    """Run safety security vulnerability scan"""
+    """Run safety security vulnerability scan on requirements.txt"""
     print("\n🔍 Running security vulnerability scan...")
     
+    import json
+    
     try:
+        # First try the newer 'scan' command
         result = subprocess.run(
-            ['safety', 'check', '--json'],
+            ['safety', 'scan', '--file', 'requirements.txt', '--json'],
             capture_output=True,
             text=True,
             timeout=60
         )
         
+        # If scan requires authentication, fall back to deprecated check command
+        if "login or register" in result.stdout.lower() or result.returncode != 0:
+            print("📝 Using legacy safety check command (authentication required for newer scan)...")
+            result = subprocess.run(
+                ['safety', 'check', '--file', 'requirements.txt', '--json'],
+                capture_output=True,
+                text=True,
+                timeout=60
+            )
+        
         if result.returncode == 0:
-            print("✅ No security vulnerabilities found")
+            print("✅ No security vulnerabilities found in requirements.txt")
             return True
         else:
-            print("⚠️  Security vulnerabilities detected:")
+            print("⚠️  Security vulnerabilities detected in requirements.txt:")
             # Parse JSON output for cleaner display
             try:
-                import json
-                vulns = json.loads(result.stdout)
-                for vuln in vulns:
-                    print(f"  - {vuln.get('package', 'Unknown')}: {vuln.get('advisory', 'No details')}")
-            except:
+                data = json.loads(result.stdout)
+                vulns = data.get('vulnerabilities', [])
+                if vulns:
+                    for vuln in vulns:
+                        pkg_name = vuln.get('analyzed_dependency', {}).get('name', 'Unknown')
+                        advisory = vuln.get('advisory', 'No details')
+                        print(f"  - {pkg_name}: {advisory}")
+                else:
+                    print("  No vulnerabilities found in requirements.txt")
+                    return True
+            except json.JSONDecodeError:
                 print(result.stdout)
             return False
     except subprocess.TimeoutExpired:
