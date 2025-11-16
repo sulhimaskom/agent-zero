@@ -1,5 +1,7 @@
 from typing import Any, List, Sequence
 import uuid
+import ast
+import operator
 from langchain_community.vectorstores import FAISS
 
 # faiss needs to be patched for python 3.12 on arm #TODO remove once not needed
@@ -137,12 +139,185 @@ def cosine_normalizer(val: float) -> float:
     return res
 
 
+# Safe operators allowed in expressions
+SAFE_OPERATORS = {
+    ast.Eq: operator.eq,
+    ast.NotEq: operator.ne,
+    ast.Lt: operator.lt,
+    ast.LtE: operator.le,
+    ast.Gt: operator.gt,
+    ast.GtE: operator.ge,
+    ast.And: lambda a, b: a and b,
+    ast.Or: lambda a, b: a or b,
+    ast.In: lambda a, b: a in b,
+    ast.NotIn: lambda a, b: a not in b,
+}
+
+# Safe binary operators for arithmetic operations
+SAFE_BINARY_OPERATORS = {
+    ast.Add: operator.add,
+    ast.Sub: operator.sub,
+    ast.Mult: operator.mul,
+    ast.Div: operator.truediv,
+    ast.Mod: operator.mod,
+    ast.Pow: operator.pow,
+}
+
+# Safe unary operators
+SAFE_UNARY_OPERATORS = {
+    ast.UAdd: operator.pos,
+    ast.USub: operator.neg,
+    ast.Not: operator.not_,
+}
+
+
+class SafeExpressionEvaluator:
+    """
+    Safe expression evaluator using AST parsing to prevent code injection.
+    Only allows specific safe operations and prevents arbitrary code execution.
+    """
+    
+    def __init__(self):
+        self.allowed_operators = SAFE_OPERATORS
+        self.allowed_binary_operators = SAFE_BINARY_OPERATORS
+        self.allowed_unary_operators = SAFE_UNARY_OPERATORS
+    
+    def evaluate(self, condition: str, data: dict[str, Any]) -> bool:
+        """
+        Safely evaluate a condition string against provided data.
+        
+        Args:
+            condition: String expression to evaluate (e.g., "age > 18 and name == 'John'")
+            data: Dictionary containing variable names and their values
+            
+        Returns:
+            Boolean result of the evaluation
+            
+        Raises:
+            ValueError: If the expression contains unsafe operations
+            SyntaxError: If the expression has invalid syntax
+        """
+        try:
+            # Parse the expression into an AST
+            tree = ast.parse(condition, mode='eval')
+            # Evaluate the AST safely
+            result = self._evaluate_node(tree.body, data)
+            # Ensure result is boolean
+            return bool(result)
+        except (SyntaxError, ValueError) as e:
+            # Log the error for security monitoring
+            # In production, you might want to log this to a security system
+            raise ValueError(f"Unsafe or invalid expression: {e}")
+        except Exception as e:
+            # Any other exception means the expression is unsafe
+            raise ValueError(f"Expression evaluation failed: {e}")
+    
+    def _evaluate_node(self, node, data: dict[str, Any]):
+        """Recursively evaluate AST nodes safely."""
+        
+        if isinstance(node, ast.BoolOp):
+            # Handle boolean operations (and, or)
+            result = True if isinstance(node.op, ast.And) else False
+            for value_node in node.values:
+                value = self._evaluate_node(value_node, data)
+                if isinstance(node.op, ast.And):
+                    result = result and value
+                    if not result:  # Short-circuit
+                        break
+                else:  # Or
+                    result = result or value
+                    if result:  # Short-circuit
+                        break
+            return result
+        
+        elif isinstance(node, ast.BinOp):
+            # Handle binary operations
+            left = self._evaluate_node(node.left, data)
+            right = self._evaluate_node(node.right, data)
+            
+            if type(node.op) in self.allowed_binary_operators:
+                return self.allowed_binary_operators[type(node.op)](left, right)
+            elif type(node.op) in self.allowed_operators:
+                return self.allowed_operators[type(node.op)](left, right)
+            else:
+                raise ValueError(f"Unsafe binary operator: {type(node.op).__name__}")
+        
+        elif isinstance(node, ast.UnaryOp):
+            # Handle unary operations
+            operand = self._evaluate_node(node.operand, data)
+            if type(node.op) in self.allowed_unary_operators:
+                return self.allowed_unary_operators[type(node.op)](operand)
+            else:
+                raise ValueError(f"Unsafe unary operator: {type(node.op).__name__}")
+        
+        elif isinstance(node, ast.Compare):
+            # Handle comparison operations
+            left = self._evaluate_node(node.left, data)
+            for op, comparator_node in zip(node.ops, node.comparators):
+                right = self._evaluate_node(comparator_node, data)
+                if type(op) in self.allowed_operators:
+                    if not self.allowed_operators[type(op)](left, right):
+                        return False
+                    left = right  # For chained comparisons
+                else:
+                    raise ValueError(f"Unsafe comparison operator: {type(op).__name__}")
+            return True
+        
+        elif isinstance(node, ast.Name):
+            # Handle variable names - only allow names from the provided data
+            if node.id in data:
+                return data[node.id]
+            else:
+                raise ValueError(f"Undefined variable: {node.id}")
+        
+        elif isinstance(node, ast.Constant):
+            # Handle literal values (strings, numbers, booleans, None)
+            return node.value
+        
+        elif isinstance(node, ast.List):
+            # Handle list literals
+            return [self._evaluate_node(elt, data) for elt in node.elts]
+        
+        elif isinstance(node, ast.Tuple):
+            # Handle tuple literals
+            return tuple(self._evaluate_node(elt, data) for elt in node.elts)
+        
+        elif isinstance(node, ast.Set):
+            # Handle set literals
+            return {self._evaluate_node(elt, data) for elt in node.elts}
+        
+        elif isinstance(node, ast.Dict):
+            # Handle dictionary literals
+            keys = [self._evaluate_node(k, data) for k in node.keys]
+            values = [self._evaluate_node(v, data) for v in node.values]
+            return dict(zip(keys, values))
+        
+        else:
+            # Any other node type is potentially unsafe
+            raise ValueError(f"Unsafe expression construct: {type(node).__name__}")
+
+
+# Global evaluator instance
+_evaluator = SafeExpressionEvaluator()
+
+
 def get_comparator(condition: str):
+    """
+    Create a safe comparator function for filtering documents.
+    
+    Args:
+        condition: String expression to evaluate against document metadata
+        
+    Returns:
+        Function that takes a data dictionary and returns boolean result
+    """
     def comparator(data: dict[str, Any]):
         try:
-            result = eval(condition, {}, data)
+            result = _evaluator.evaluate(condition, data)
             return result
         except Exception as e:
+            # Log the error for security monitoring
+            # In production, you might want to log suspicious attempts
             # PrintStyle.error(f"Error evaluating condition: {e}")
             return False
 
