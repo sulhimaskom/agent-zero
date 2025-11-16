@@ -10,6 +10,8 @@ from python.helpers.shell_ssh import SSHInteractiveSession
 from python.helpers.docker import DockerContainerManager
 from python.helpers.strings import truncate_text as truncate_text_string
 from python.helpers.messages import truncate_text as truncate_text_agent
+from python.helpers.command_validator import sanitize_command
+
 import re
 
 
@@ -135,8 +137,18 @@ class CodeExecution(Tool):
     async def execute_terminal_command(
         self, session: int, command: str, reset: bool = False
     ):
+        # Security validation - prevent command injection
+        is_safe, sanitized_command, error_msg = self._validate_and_sanitize_command(command)
+        if not is_safe:
+            PrintStyle.error(f"Command blocked for security reasons: {error_msg}")
+            response = self.agent.read_prompt(
+                "fw.code.info.md", 
+                info=f"Command blocked for security reasons: {error_msg}"
+            )
+            return response
+        
         prefix = "bash> " + self.format_command_for_output(command) + "\n\n"
-        return await self.terminal_session(session, command, reset, prefix)
+        return await self.terminal_session(session, sanitized_command, reset, prefix)
 
     async def terminal_session(
         self, session: int, command: str, reset: bool = False, prefix: str = ""
@@ -366,6 +378,31 @@ class CodeExecution(Tool):
             return self.get_heading(line) + done_icon
 
         return self.get_heading() + done_icon
+
+    def _validate_and_sanitize_command(self, command: str) -> tuple[bool, str, str]:
+        """
+        Validate and sanitize a command to prevent command injection.
+        
+        Uses the centralized command validator for consistent security enforcement.
+        
+        Args:
+            command: The command string to validate and sanitize
+            
+        Returns:
+            Tuple of (is_safe, sanitized_command, error_message)
+        """
+        try:
+            is_safe, sanitized_command, error_msg = sanitize_command(command)
+            
+            if not is_safe:
+                PrintStyle.warning(f"Blocked dangerous command: {command} - {error_msg}")
+            
+            return is_safe, sanitized_command, error_msg
+            
+        except Exception as e:
+            error_msg = f"Unexpected error during validation: {e}"
+            PrintStyle.error(f"Command validation error: {command} - {error_msg}")
+            return False, "", error_msg
 
     def fix_full_output(self, output: str):
         # remove any single byte \xXX escapes
