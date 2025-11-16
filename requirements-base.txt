@@ -1,4 +1,4 @@
-# Core dependencies
+# Base requirements - common across all platforms
 a2wsgi==1.10.8
 ansio==0.0.1
 browser-use==0.5.11
@@ -43,11 +43,6 @@ newspaper3k==0.2.8
 pypdf==6.0.0
 unstructured[all-docs]>=0.16.23,<0.17.0
 unstructured-client>=0.31.0,<1.0.0
-
-# Platform-specific FAISS dependency
-# faiss-cpu with platform considerations for ARM/Python 3.12 compatibility
-faiss-cpu>=1.11.0,<2.0.0; sys_platform != "darwin" or platform_machine != "arm64"
-faiss-cpu>=1.11.0,<2.0.0; sys_platform == "linux"
 
 # Type stubs for better development experience
 types-requests>=2.31.0
