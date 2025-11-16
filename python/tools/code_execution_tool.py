@@ -10,6 +10,7 @@ from python.helpers.shell_ssh import SSHInteractiveSession
 from python.helpers.docker import DockerContainerManager
 from python.helpers.strings import truncate_text as truncate_text_string
 from python.helpers.messages import truncate_text as truncate_text_agent
+from python.helpers.command_validator import sanitize_command
 
 import re
 
@@ -382,106 +383,22 @@ class CodeExecution(Tool):
         """
         Validate and sanitize a command to prevent command injection.
         
+        Uses the centralized command validator for consistent security enforcement.
+        
         Args:
             command: The command string to validate and sanitize
             
         Returns:
             Tuple of (is_safe, sanitized_command, error_message)
         """
-        # Dangerous patterns to block
-        dangerous_patterns = [
-            r'[;&|`$()]',  # Shell metacharacters
-            r'\|\|',       # OR operator
-            r'&&',         # AND operator
-            r'>>',         # Append redirection
-            r'<',          # Input redirection
-            r'>',          # Output redirection
-            r'\$\(',       # Command substitution
-            r'`',          # Backtick command substitution
-            r'\$\{',       # Variable expansion
-            r'\$\w+',      # Simple variable expansion
-            r'&\s*$',      # Background process at end
-            r'\s+&\s+',    # Background process in middle
-            r'!!',         # History expansion
-            r'!\d+',       # History reference
-            r'!\w+',       # History by name
-            r'<\(',        # Process substitution
-            r'>\(',        # Process substitution
-            r'\$\(\(',     # Arithmetic expansion
-            r'\[\[',       # Conditional expression
-            r'/dev/',      # Device file access
-            r'/proc/',     # Process filesystem
-            r'/sys/',      # System filesystem
-        ]
-        
-        # Check for dangerous patterns
-        for pattern in dangerous_patterns:
-            if re.search(pattern, command, re.IGNORECASE):
-                error_msg = f"Command contains dangerous pattern: {pattern}"
-                PrintStyle.warning(f"Blocked dangerous command: {command} - {error_msg}")
-                return False, "", error_msg
-        
-        # Parse command safely
         try:
-            parts = shlex.split(command)
-            if not parts:
-                return False, "", "Unable to parse command"
+            is_safe, sanitized_command, error_msg = sanitize_command(command)
             
-            base_cmd = parts[0]
+            if not is_safe:
+                PrintStyle.warning(f"Blocked dangerous command: {command} - {error_msg}")
             
-            # Allowed commands (whitelist approach)
-            allowed_commands = {
-                # File operations
-                'ls', 'cat', 'head', 'tail', 'grep', 'find', 'locate', 'which', 'whereis',
-                'file', 'stat', 'wc', 'sort', 'uniq', 'cut', 'awk', 'sed', 'tr',
-                
-                # Directory operations
-                'pwd', 'cd', 'mkdir', 'rmdir', 'rm', 'cp', 'mv', 'ln',
-                
-                # Text processing
-                'echo', 'printf', 'date', 'whoami', 'id', 'uname', 'uptime',
-                
-                # System information
-                'ps', 'top', 'htop', 'df', 'du', 'free', 'mount', 'umount',
-                
-                # Network (basic diagnostics only)
-                'ping', 'traceroute', 'nslookup', 'dig', 'netstat', 'ss',
-                
-                # Compression
-                'tar', 'gzip', 'gunzip', 'zip', 'unzip',
-                
-                # Development tools
-                'git', 'python', 'python3', 'node', 'npm', 'pip', 'pip3',
-                'make', 'cmake', 'gcc', 'g++', 'javac', 'java',
-                
-                # Package managers (read-only operations)
-                'apt', 'apt-cache', 'yum', 'dnf', 'pacman',
-                
-                # Editors (safe mode)
-                'nano', 'vim', 'vi', 'emacs',
-            }
+            return is_safe, sanitized_command, error_msg
             
-            # Check if base command is allowed
-            if base_cmd not in allowed_commands:
-                error_msg = f"Command '{base_cmd}' is not in the allowed commands list"
-                PrintStyle.warning(f"Blocked unauthorized command: {command} - {error_msg}")
-                return False, "", error_msg
-            
-            # Special handling for dangerous commands
-            if base_cmd in ['rm', 'cp', 'mv']:
-                # Limit the number of arguments for potentially dangerous commands
-                if len(parts) > 11:  # base command + 10 args max
-                    error_msg = f"Too many arguments for command '{base_cmd}'. Maximum allowed: 10"
-                    return False, "", error_msg
-            
-            # Reconstruct command with proper quoting
-            sanitized_command = ' '.join(shlex.quote(part) for part in parts)
-            return True, sanitized_command, ""
-            
-        except ValueError as e:
-            error_msg = f"Failed to parse command: {e}"
-            PrintStyle.warning(f"Command parsing failed: {command} - {error_msg}")
-            return False, "", error_msg
         except Exception as e:
             error_msg = f"Unexpected error during validation: {e}"
             PrintStyle.error(f"Command validation error: {command} - {error_msg}")
