@@ -1,8 +1,67 @@
 from datetime import datetime
 from typing import Any, List, Sequence
-from langchain.storage import InMemoryByteStore, LocalFileStore
-from langchain.embeddings import CacheBackedEmbeddings
+import os
+# from langchain.storage import InMemoryByteStore, LocalFileStore  # Updated for compatibility
+# from langchain.embeddings import CacheBackedEmbeddings  # Updated for compatibility
+
+# Compatibility replacements for missing langchain.storage classes
+class InMemoryByteStore:
+    """Simple in-memory byte store replacement."""
+    def __init__(self):
+        self._store = {}
+    
+    def get(self, key: str):
+        return self._store.get(key)
+    
+    def set(self, key: str, value: bytes):
+        self._store[key] = value
+    
+    def delete(self, key: str):
+        self._store.pop(key, None)
+
+class LocalFileStore:
+    """Simple local file store replacement."""
+    def __init__(self, base_path: str):
+        self.base_path = base_path
+        os.makedirs(base_path, exist_ok=True)
+    
+    def get(self, key: str):
+        file_path = os.path.join(self.base_path, key)
+        if os.path.exists(file_path):
+            with open(file_path, 'rb') as f:
+                return f.read()
+        return None
+    
+    def set(self, key: str, value: bytes):
+        file_path = os.path.join(self.base_path, key)
+        with open(file_path, 'wb') as f:
+            f.write(value)
+    
+    def delete(self, key: str):
+        file_path = os.path.join(self.base_path, key)
+        if os.path.exists(file_path):
+            os.remove(file_path)
+
+class CacheBackedEmbeddings:
+    """Simple cache-backed embeddings replacement."""
+    def __init__(self, underlying_embeddings, byte_store, namespace: str = ""):
+        self.underlying_embeddings = underlying_embeddings
+        self.byte_store = byte_store
+        self.namespace = namespace
+    
+    @classmethod
+    def from_bytes_store(cls, underlying_embeddings, byte_store, namespace: str = ""):
+        return cls(underlying_embeddings, byte_store, namespace)
+    
+    def embed_documents(self, texts: List[str]) -> List[List[float]]:
+        # Simple implementation without actual caching for now
+        return self.underlying_embeddings.embed_documents(texts)
+    
+    def embed_query(self, text: str) -> List[float]:
+        # Simple implementation without actual caching for now
+        return self.underlying_embeddings.embed_query(text)
 from python.helpers import guids
+from python.helpers.memory_monitor import get_memory_monitor, WeakValueDictionary
 
 # from langchain_chroma import Chroma
 from langchain_community.vectorstores import FAISS
@@ -222,12 +281,26 @@ class Memory:
         SOLUTIONS = "solutions"
         INSTRUMENTS = "instruments"
 
-    index: dict[str, "MyFaiss"] = {}
+    # Use weak value dictionary to prevent memory leaks
+    index: WeakValueDictionary = WeakValueDictionary()
+    
+    # Track last access times for cleanup
+    _last_access: dict[str, float] = {}
+    
+    # Expiry time for unused databases (1 hour)
+    _EXPIRY_TIME = 3600
 
     @staticmethod
     async def get(agent: Agent):
+        import time
         memory_subdir = agent.config.memory_subdir or "default"
-        if Memory.index.get(memory_subdir) is None:
+        
+        # Update last access time
+        Memory._last_access[memory_subdir] = time.time()
+        
+        # Check if database exists and is still valid
+        db = Memory.index.get(memory_subdir)
+        if db is None:
             log_item = agent.context.log.log(
                 type="util",
                 heading=f"Initializing VectorDB in '/{memory_subdir}'",
@@ -247,7 +320,7 @@ class Memory:
             return wrap
         else:
             return Memory(
-                db=Memory.index[memory_subdir],
+                db=db,
                 memory_subdir=memory_subdir,
             )
 
@@ -257,7 +330,14 @@ class Memory:
         log_item: LogItem | None = None,
         preload_knowledge: bool = True,
     ):
-        if not Memory.index.get(memory_subdir):
+        import time
+        
+        # Update last access time
+        Memory._last_access[memory_subdir] = time.time()
+        
+        # Check if database exists and is still valid
+        db = Memory.index.get(memory_subdir)
+        if db is None:
             import initialize
 
             agent_config = initialize.initialize_agent()
@@ -274,13 +354,15 @@ class Memory:
                     log_item, agent_config.knowledge_subdirs, memory_subdir
                 )
             Memory.index[memory_subdir] = db
-        return Memory(db=Memory.index[memory_subdir], memory_subdir=memory_subdir)
+        return Memory(db=db, memory_subdir=memory_subdir)
 
     @staticmethod
     async def reload(agent: Agent):
         memory_subdir = agent.config.memory_subdir or "default"
-        if Memory.index.get(memory_subdir):
+        if memory_subdir in Memory.index:
             del Memory.index[memory_subdir]
+        if memory_subdir in Memory._last_access:
+            del Memory._last_access[memory_subdir]
         return await Memory.get(agent)
 
     @staticmethod
@@ -639,6 +721,47 @@ class Memory:
     def get_timestamp():
         return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
+    @staticmethod
+    def cleanup_expired_databases():
+        """Remove expired or unused databases to prevent memory leaks."""
+        import time
+        current_time = time.time()
+        expired_keys = []
+        
+        for key in list(Memory._last_access.keys()):
+            if current_time - Memory._last_access[key] > Memory._EXPIRY_TIME:
+                expired_keys.append(key)
+        
+        for key in expired_keys:
+            if key in Memory.index:
+                del Memory.index[key]
+            if key in Memory._last_access:
+                del Memory._last_access[key]
+        
+        # Clean up dead weak references
+        Memory.index.cleanup_dead_references()
+        
+        if expired_keys:
+            PrintStyle.success(f"Cleaned up {len(expired_keys)} expired memory databases")
+    
+    @staticmethod
+    def get_memory_stats() -> dict[str, Any]:
+        """Get memory usage statistics for debugging."""
+        import time
+        current_time = time.time()
+        
+        stats = {
+            "active_databases": Memory.index.size(),
+            "tracked_access_times": len(Memory._last_access),
+            "database_keys": Memory.index.keys(),
+            "last_access_times": {
+                key: current_time - Memory._last_access[key] 
+                for key in Memory._last_access.keys()
+            }
+        }
+        
+        return stats
+
 
 def get_memory_subdir_abs(agent: Agent) -> str:
     return files.get_abs_path("memory", agent.config.memory_subdir or "default")
@@ -653,4 +776,5 @@ def get_custom_knowledge_subdir_abs(agent: Agent) -> str:
 
 def reload():
     # clear the memory index, this will force all DBs to reload
-    Memory.index = {}
+    Memory.index = WeakValueDictionary()
+    Memory._last_access = {}

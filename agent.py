@@ -28,6 +28,14 @@ from python.helpers.localization import Localization
 from python.helpers.extension import call_extensions
 from python.helpers.errors import RepairableException
 
+# Initialize memory management to prevent memory leaks
+try:
+    from python.helpers.memory_init import setup_memory_management
+    setup_memory_management()
+except ImportError:
+    # Memory management not available, continue without it
+    pass
+
 
 class AgentContextType(Enum):
     USER = "user"
