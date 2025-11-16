@@ -1,39 +1,48 @@
-from typing import Callable, TypedDict
+from typing import Callable, TypedDict, Union, List, Optional, TYPE_CHECKING, Any
 
-from langchain_core.prompts import (
-    ChatPromptTemplate,
-    FewShotChatMessagePromptTemplate,
-    )
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
-from langchain_core.language_models.chat_models import BaseChatModel
-from langchain_core.language_models.llms import BaseLLM
+# Safe imports for optional LangChain dependencies
+from python.helpers.safe_imports import get_langchain_components
+
+# Get LangChain components
+langchain = get_langchain_components()
+
+# Import with graceful degradation
+ChatPromptTemplate = langchain.get('ChatPromptTemplate')
+FewShotChatMessagePromptTemplate = langchain.get('FewShotChatMessagePromptTemplate')
+AIMessage = langchain.get('AIMessage')
+HumanMessage = langchain.get('HumanMessage')
+SystemMessage = langchain.get('SystemMessage')
+BaseChatModel = langchain.get('BaseChatModel')
+BaseLLM = langchain.get('BaseLLM')
+
+if TYPE_CHECKING:
+    from typing import Any
 
 
 class Example(TypedDict):
     input: str
     output: str
 
-
 async def call_llm(
-        system: str,
-        model: BaseChatModel | BaseLLM,
-        message: str,
-        examples: list[Example] = [],
-        callback: Callable[[str], None] | None = None
-        ):
+    system: str,
+    model: Any,  # BaseChatModel | BaseLLM when available
+    message: str,
+    examples: List[Example] = [],
+    callback: Callable[[str], None] | None = None
+):
 
     example_prompt = ChatPromptTemplate.from_messages(
         [
             HumanMessage(content="{input}"),
             AIMessage(content="{output}"),
-            ]
-        )
+        ]
+    )
 
     few_shot_prompt = FewShotChatMessagePromptTemplate(
         example_prompt=example_prompt,
         examples=examples,  # type: ignore
         input_variables=[],
-        )
+    )
 
     few_shot_prompt.format()
 
@@ -42,8 +51,8 @@ async def call_llm(
             SystemMessage(content=system),
             few_shot_prompt,
             HumanMessage(content=message),
-            ]
-        )
+        ]
+    )
 
     chain = final_prompt | model
 
