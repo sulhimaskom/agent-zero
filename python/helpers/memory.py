@@ -66,8 +66,6 @@ from python.helpers.memory_monitor import get_memory_monitor, WeakValueDictionar
 # from langchain_chroma import Chroma
 from langchain_community.vectorstores import FAISS
 
-# faiss needs to be patched for python 3.12 on arm #TODO remove once not needed
-from python.helpers import faiss_monkey_patch
 import faiss
 
 
