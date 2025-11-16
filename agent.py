@@ -306,132 +306,146 @@ class Agent:
         asyncio.run(self.call_extensions("agent_init"))
 
     async def monologue(self):
+        """Main conversation loop for the agent."""
         while True:
             try:
-                # loop data dictionary to pass to extensions
-                self.loop_data = LoopData(user_message=self.last_user_message)
-                # call monologue_start extensions
-                await self.call_extensions("monologue_start", loop_data=self.loop_data)
-
-                printer = PrintStyle(italic=True, font_color="#b3ffd9", padding=False)
-
-                # let the agent run message loop until he stops it with a response tool
-                while True:
-
-                    self.context.streaming_agent = self  # mark self as current streamer
-                    self.loop_data.iteration += 1
-                    self.loop_data.params_temporary = {}  # clear temporary params
-
-                    # call message_loop_start extensions
-                    await self.call_extensions(
-                        "message_loop_start", loop_data=self.loop_data
-                    )
-
-                    try:
-                        # prepare LLM chain (model, system, history)
-                        prompt = await self.prepare_prompt(loop_data=self.loop_data)
-
-                        # call before_main_llm_call extensions
-                        await self.call_extensions("before_main_llm_call", loop_data=self.loop_data)
-
-                        async def reasoning_callback(chunk: str, full: str):
-                            await self.handle_intervention()
-                            if chunk == full:
-                                printer.print("Reasoning: ")  # start of reasoning
-                            # Pass chunk and full data to extensions for processing
-                            stream_data = {"chunk": chunk, "full": full}
-                            await self.call_extensions(
-                                "reasoning_stream_chunk", loop_data=self.loop_data, stream_data=stream_data
-                            )
-                            # Stream masked chunk after extensions processed it
-                            if stream_data.get("chunk"):
-                                printer.stream(stream_data["chunk"])
-                            # Use the potentially modified full text for downstream processing
-                            await self.handle_reasoning_stream(stream_data["full"])
-
-                        async def stream_callback(chunk: str, full: str):
-                            await self.handle_intervention()
-                            # output the agent response stream
-                            if chunk == full:
-                                printer.print("Response: ")  # start of response
-                            # Pass chunk and full data to extensions for processing
-                            stream_data = {"chunk": chunk, "full": full}
-                            await self.call_extensions(
-                                "response_stream_chunk", loop_data=self.loop_data, stream_data=stream_data
-                            )
-                            # Stream masked chunk after extensions processed it
-                            if stream_data.get("chunk"):
-                                printer.stream(stream_data["chunk"])
-                            # Use the potentially modified full text for downstream processing
-                            await self.handle_response_stream(stream_data["full"])
-
-                        # call main LLM
-                        agent_response, _reasoning = await self.call_chat_model(
-                            messages=prompt,
-                            response_callback=stream_callback,
-                            reasoning_callback=reasoning_callback,
-                        )
-
-                        # Notify extensions to finalize their stream filters
-                        await self.call_extensions(
-                            "reasoning_stream_end", loop_data=self.loop_data
-                        )
-                        await self.call_extensions(
-                            "response_stream_end", loop_data=self.loop_data
-                        )
-
-                        await self.handle_intervention(agent_response)
-
-                        if (
-                            self.loop_data.last_response == agent_response
-                        ):  # if assistant_response is the same as last message in history, let him know
-                            # Append the assistant's response to the history
-                            self.hist_add_ai_response(agent_response)
-                            # Append warning message to the history
-                            warning_msg = self.read_prompt("fw.msg_repeat.md")
-                            self.hist_add_warning(message=warning_msg)
-                            PrintStyle(font_color="orange", padding=True).print(
-                                warning_msg
-                            )
-                            self.context.log.log(type="warning", content=warning_msg)
-
-                        else:  # otherwise proceed with tool
-                            # Append the assistant's response to the history
-                            self.hist_add_ai_response(agent_response)
-                            # process tools requested in agent message
-                            tools_result = await self.process_tools(agent_response)
-                            if tools_result:  # final response of message loop available
-                                return tools_result  # break the execution if the task is done
-
-                    # exceptions inside message loop:
-                    except InterventionException as e:
-                        pass  # intervention message has been handled in handle_intervention(), proceed with conversation loop
-                    except RepairableException as e:
-                        # Forward repairable errors to the LLM, maybe it can fix them
-                        msg = {"message": errors.format_error(e)}
-                        await self.call_extensions("error_format", msg=msg)
-                        self.hist_add_warning(msg["message"])
-                        PrintStyle(font_color="red", padding=True).print(msg["message"])
-                        self.context.log.log(type="error", content=msg["message"])
-                    except Exception as e:
-                        # Other exception kill the loop
-                        self.handle_critical_exception(e)
-
-                    finally:
-                        # call message_loop_end extensions
-                        await self.call_extensions(
-                            "message_loop_end", loop_data=self.loop_data
-                        )
-
-            # exceptions outside message loop:
-            except InterventionException as e:
+                await self._initialize_conversation_loop()
+                result = await self._run_message_loop()
+                if result:
+                    return result
+            except InterventionException:
                 pass  # just start over
             except Exception as e:
                 self.handle_critical_exception(e)
             finally:
-                self.context.streaming_agent = None  # unset current streamer
-                # call monologue_end extensions
-                await self.call_extensions("monologue_end", loop_data=self.loop_data)  # type: ignore
+                await self._cleanup_conversation_loop()
+
+    async def _initialize_conversation_loop(self):
+        """Initialize the conversation loop with loop data and extensions."""
+        self.loop_data = LoopData(user_message=self.last_user_message)
+        await self.call_extensions("monologue_start", loop_data=self.loop_data)
+
+    async def _cleanup_conversation_loop(self):
+        """Clean up the conversation loop and notify extensions."""
+        self.context.streaming_agent = None  # unset current streamer
+        await self.call_extensions("monologue_end", loop_data=self.loop_data)  # type: ignore
+
+    async def _run_message_loop(self):
+        """Run the main message processing loop."""
+        printer = PrintStyle(italic=True, font_color="#b3ffd9", padding=False)
+        
+        while True:
+            self.context.streaming_agent = self  # mark self as current streamer
+            self.loop_data.iteration += 1
+            self.loop_data.params_temporary = {}  # clear temporary params
+
+            await self.call_extensions("message_loop_start", loop_data=self.loop_data)
+
+            try:
+                result = await self._process_message_iteration(printer)
+                if result:
+                    return result
+            except InterventionException:
+                pass  # intervention message has been handled in handle_intervention(), proceed with conversation loop
+            except RepairableException as e:
+                await self._handle_repairable_exception(e)
+            except Exception as e:
+                self.handle_critical_exception(e)
+            finally:
+                await self.call_extensions("message_loop_end", loop_data=self.loop_data)
+
+    async def _process_message_iteration(self, printer):
+        """Process a single message iteration in the conversation."""
+        prompt = await self.prepare_prompt(loop_data=self.loop_data)
+        await self.call_extensions("before_main_llm_call", loop_data=self.loop_data)
+
+        reasoning_callback = self._create_reasoning_callback(printer)
+        stream_callback = self._create_stream_callback(printer)
+
+        agent_response, _reasoning = await self.call_chat_model(
+            messages=prompt,
+            response_callback=stream_callback,
+            reasoning_callback=reasoning_callback,
+        )
+
+        await self._finalize_streaming()
+        await self.handle_intervention(agent_response)
+
+        return await self._process_agent_response(agent_response)
+
+    def _create_reasoning_callback(self, printer):
+        """Create callback for handling reasoning stream."""
+        async def reasoning_callback(chunk: str, full: str):
+            await self.handle_intervention()
+            if chunk == full:
+                printer.print("Reasoning: ")  # start of reasoning
+            # Pass chunk and full data to extensions for processing
+            stream_data = {"chunk": chunk, "full": full}
+            await self.call_extensions(
+                "reasoning_stream_chunk", loop_data=self.loop_data, stream_data=stream_data
+            )
+            # Stream masked chunk after extensions processed it
+            if stream_data.get("chunk"):
+                printer.stream(stream_data["chunk"])
+            # Use the potentially modified full text for downstream processing
+            await self.handle_reasoning_stream(stream_data["full"])
+        return reasoning_callback
+
+    def _create_stream_callback(self, printer):
+        """Create callback for handling response stream."""
+        async def stream_callback(chunk: str, full: str):
+            await self.handle_intervention()
+            # output the agent response stream
+            if chunk == full:
+                printer.print("Response: ")  # start of response
+            # Pass chunk and full data to extensions for processing
+            stream_data = {"chunk": chunk, "full": full}
+            await self.call_extensions(
+                "response_stream_chunk", loop_data=self.loop_data, stream_data=stream_data
+            )
+            # Stream masked chunk after extensions processed it
+            if stream_data.get("chunk"):
+                printer.stream(stream_data["chunk"])
+            # Use the potentially modified full text for downstream processing
+            await self.handle_response_stream(stream_data["full"])
+        return stream_callback
+
+    async def _finalize_streaming(self):
+        """Finalize streaming by notifying extensions."""
+        await self.call_extensions("reasoning_stream_end", loop_data=self.loop_data)
+        await self.call_extensions("response_stream_end", loop_data=self.loop_data)
+
+    async def _process_agent_response(self, agent_response):
+        """Process the agent's response and handle repeated messages or tool execution."""
+        if self.loop_data.last_response == agent_response:
+            return await self._handle_repeated_response()
+        else:
+            return await self._handle_new_response(agent_response)
+
+    async def _handle_repeated_response(self):
+        """Handle case when agent response is repeated."""
+        warning_msg = self.read_prompt("fw.msg_repeat.md")
+        self.hist_add_ai_response(self.loop_data.last_response)
+        self.hist_add_warning(message=warning_msg)
+        PrintStyle(font_color="orange", padding=True).print(warning_msg)
+        self.context.log.log(type="warning", content=warning_msg)
+        return None  # continue the loop
+
+    async def _handle_new_response(self, agent_response):
+        """Handle case when agent provides a new response."""
+        self.hist_add_ai_response(agent_response)
+        tools_result = await self.process_tools(agent_response)
+        if tools_result:  # final response of message loop available
+            return tools_result  # break the execution if the task is done
+        return None
+
+    async def _handle_repairable_exception(self, e):
+        """Handle repairable exceptions by forwarding them to the LLM."""
+        msg = {"message": errors.format_error(e)}
+        await self.call_extensions("error_format", msg=msg)
+        self.hist_add_warning(msg["message"])
+        PrintStyle(font_color="red", padding=True).print(msg["message"])
+        self.context.log.log(type="error", content=msg["message"])
 
     async def prepare_prompt(self, loop_data: LoopData) -> list[BaseMessage]:
         self.context.log.set_progress("Building prompt")

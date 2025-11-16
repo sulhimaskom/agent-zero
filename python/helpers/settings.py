@@ -13,6 +13,7 @@ from python.helpers.print_style import PrintStyle
 from python.helpers.providers import get_providers
 from python.helpers.secrets import SecretsManager
 from python.helpers import dirty_json
+from python.helpers.utility_patterns import create_background_task
 
 
 class Settings(TypedDict):
@@ -1523,9 +1524,10 @@ def _apply_settings(previous: Settings | None):
 
         # reload whisper model if necessary
         if not previous or _settings["stt_model_size"] != previous["stt_model_size"]:
-            task = defer.DeferredTask().start_task(
-                whisper.preload, _settings["stt_model_size"]
-            )  # TODO overkill, replace with background task
+            create_background_task(
+                whisper.preload(_settings["stt_model_size"]),
+                name="whisper_preload"
+            )
 
         # force memory reload on embedding model change
         if not previous or (
@@ -1581,9 +1583,10 @@ def _apply_settings(previous: Settings | None):
                     type="info", content="Finished updating MCP settings.", temp=True
                 )
 
-            task2 = defer.DeferredTask().start_task(
-                update_mcp_settings, config.mcp_servers
-            )  # TODO overkill, replace with background task
+            create_background_task(
+                update_mcp_settings(config.mcp_servers),
+                name="update_mcp_settings"
+            )
 
         # update token in mcp server
         current_token = (
@@ -1596,9 +1599,10 @@ def _apply_settings(previous: Settings | None):
 
                 DynamicMcpProxy.get_instance().reconfigure(token=token)
 
-            task3 = defer.DeferredTask().start_task(
-                update_mcp_token, current_token
-            )  # TODO overkill, replace with background task
+            create_background_task(
+                update_mcp_token(current_token),
+                name="update_mcp_token"
+            )
 
         # update token in a2a server
         if not previous or current_token != previous["mcp_server_token"]:
@@ -1608,9 +1612,10 @@ def _apply_settings(previous: Settings | None):
 
                 DynamicA2AProxy.get_instance().reconfigure(token=token)
 
-            task4 = defer.DeferredTask().start_task(
-                update_a2a_token, current_token
-            )  # TODO overkill, replace with background task
+            create_background_task(
+                update_a2a_token(current_token),
+                name="update_a2a_token"
+            )
 
 
 def _env_to_dict(data: str):

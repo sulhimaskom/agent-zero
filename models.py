@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 import logging
 import os
+import asyncio
 from typing import (
     Any,
     Awaitable,
@@ -464,88 +465,120 @@ class LiteLLMChatWrapper(SimpleChatModel):
         ) = None,
         **kwargs: Any,
     ) -> Tuple[str, str]:
-
+        """Unified method for calling LLM with streaming, rate limiting, and retry logic."""
         turn_off_logging()
 
+        messages = self._prepare_messages(messages, system_message, user_message)
+        msgs_conv = self._convert_messages(messages)
+        limiter = await apply_rate_limiter(
+            self.a0_model_conf, str(msgs_conv), rate_limiter_callback
+        )
+        call_kwargs, retry_config = self._prepare_call_kwargs(kwargs)
+
+        return await self._execute_llm_call_with_retry(
+            msgs_conv, call_kwargs, retry_config, limiter,
+            response_callback, reasoning_callback, tokens_callback
+        )
+
+    def _prepare_messages(self, messages, system_message, user_message):
+        """Prepare and validate the message list."""
         if not messages:
             messages = []
-        # construct messages
         if system_message:
             messages.insert(0, SystemMessage(content=system_message))
         if user_message:
             messages.append(HumanMessage(content=user_message))
+        return messages
 
-        # convert to litellm format
-        msgs_conv = self._convert_messages(messages)
-
-        # Apply rate limiting if configured
-        limiter = await apply_rate_limiter(
-            self.a0_model_conf, str(msgs_conv), rate_limiter_callback
-        )
-
-        # Prepare call kwargs and retry config (strip A0-only params before calling LiteLLM)
+    def _prepare_call_kwargs(self, kwargs):
+        """Prepare call kwargs and extract retry configuration."""
         call_kwargs: dict[str, Any] = {**self.kwargs, **kwargs}
         max_retries: int = int(call_kwargs.pop("a0_retry_attempts", 2))
         retry_delay_s: float = float(call_kwargs.pop("a0_retry_delay_seconds", 1.5))
+        return call_kwargs, {"max_retries": max_retries, "retry_delay_s": retry_delay_s}
 
-        # results
+    async def _execute_llm_call_with_retry(
+        self, msgs_conv, call_kwargs, retry_config, limiter,
+        response_callback, reasoning_callback, tokens_callback
+    ):
+        """Execute LLM call with retry logic."""
         result = ChatGenerationResult()
-
         attempt = 0
+        
         while True:
             got_any_chunk = False
             try:
-                # call model
-                _completion = await acompletion(
-                    model=self.model_name,
-                    messages=msgs_conv,
-                    stream=True,
-                    **call_kwargs,
+                return await self._process_llm_stream(
+                    msgs_conv, call_kwargs, result, limiter,
+                    response_callback, reasoning_callback, tokens_callback
                 )
-
-                # iterate over chunks
-                async for chunk in _completion:  # type: ignore
-                    got_any_chunk = True
-                    # parse chunk
-                    parsed = _parse_chunk(chunk)
-                    output = result.add_chunk(parsed)
-
-                    # collect reasoning delta and call callbacks
-                    if output["reasoning_delta"]:
-                        if reasoning_callback:
-                            await reasoning_callback(output["reasoning_delta"], result.reasoning)
-                        if tokens_callback:
-                            await tokens_callback(
-                                output["reasoning_delta"],
-                                approximate_tokens(output["reasoning_delta"]),
-                            )
-                        # Add output tokens to rate limiter if configured
-                        if limiter:
-                            limiter.add(output=approximate_tokens(output["reasoning_delta"]))
-                    # collect response delta and call callbacks
-                    if output["response_delta"]:
-                        if response_callback:
-                            await response_callback(output["response_delta"], result.response)
-                        if tokens_callback:
-                            await tokens_callback(
-                                output["response_delta"],
-                                approximate_tokens(output["response_delta"]),
-                            )
-                        # Add output tokens to rate limiter if configured
-                        if limiter:
-                            limiter.add(output=approximate_tokens(output["response_delta"]))
-
-                # Successful completion of stream
-                return result.response, result.reasoning
-
             except Exception as e:
-                import asyncio
-                
-                # Retry only if no chunks received and error is transient
-                if got_any_chunk or not _is_transient_litellm_error(e) or attempt >= max_retries:
+                got_any_chunk = result.response != "" or result.reasoning != ""
+                if not self._should_retry(e, got_any_chunk, attempt, retry_config):
                     raise
                 attempt += 1
-                await asyncio.sleep(retry_delay_s)
+                await asyncio.sleep(retry_config["retry_delay_s"])
+
+    def _should_retry(self, error, got_any_chunk, attempt, retry_config):
+        """Determine if the call should be retried based on error and attempt count."""
+        return (
+            not got_any_chunk 
+            and _is_transient_litellm_error(error) 
+            and attempt < retry_config["max_retries"]
+        )
+
+    async def _process_llm_stream(
+        self, msgs_conv, call_kwargs, result, limiter,
+        response_callback, reasoning_callback, tokens_callback
+    ):
+        """Process the LLM stream and handle callbacks."""
+        _completion = await acompletion(
+            model=self.model_name,
+            messages=msgs_conv,
+            stream=True,
+            **call_kwargs,
+        )
+
+        async for chunk in _completion:  # type: ignore
+            parsed = _parse_chunk(chunk)
+            output = result.add_chunk(parsed)
+            
+            await self._handle_stream_output(
+                output, result, limiter,
+                response_callback, reasoning_callback, tokens_callback
+            )
+
+        return result.response, result.reasoning
+
+    async def _handle_stream_output(
+        self, output, result, limiter,
+        response_callback, reasoning_callback, tokens_callback
+    ):
+        """Handle streaming output with callbacks and rate limiting."""
+        # Handle reasoning delta
+        if output["reasoning_delta"]:
+            await self._process_delta(
+                output["reasoning_delta"], result.reasoning,
+                reasoning_callback, tokens_callback, limiter
+            )
+        
+        # Handle response delta
+        if output["response_delta"]:
+            await self._process_delta(
+                output["response_delta"], result.response,
+                response_callback, tokens_callback, limiter
+            )
+
+    async def _process_delta(
+        self, delta, full_text, callback, tokens_callback, limiter
+    ):
+        """Process a single delta (reasoning or response) with callbacks."""
+        if callback:
+            await callback(delta, full_text)
+        if tokens_callback:
+            await tokens_callback(delta, approximate_tokens(delta))
+        if limiter:
+            limiter.add(output=approximate_tokens(delta))
 
 
 class AsyncAIChatReplacement:
