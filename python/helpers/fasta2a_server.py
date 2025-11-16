@@ -12,7 +12,6 @@ from agent import AgentContext, AgentContextType, UserMessage
 from initialize import initialize_agent
 from python.helpers import settings
 from python.helpers.persist_chat import remove_chat
-
 # Local imports
 from python.helpers.print_style import PrintStyle
 
@@ -20,7 +19,8 @@ from python.helpers.print_style import PrintStyle
 try:
     from fasta2a import FastA2A, Worker  # type: ignore
     from fasta2a.broker import InMemoryBroker  # type: ignore
-    from fasta2a.schema import AgentProvider, Artifact, Message, Skill  # type: ignore
+    from fasta2a.schema import (AgentProvider, Artifact,  # type: ignore
+                                Message, Skill)
     from fasta2a.storage import InMemoryStorage  # type: ignore
 
     FASTA2A_AVAILABLE = True

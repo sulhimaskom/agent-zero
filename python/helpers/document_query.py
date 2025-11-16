@@ -15,7 +15,8 @@ from urllib.parse import urlparse
 from langchain.schema import HumanMessage, SystemMessage
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import AsyncHtmlLoader
-from langchain_community.document_loaders.parsers.images import TesseractBlobParser
+from langchain_community.document_loaders.parsers.images import \
+    TesseractBlobParser
 from langchain_community.document_loaders.pdf import PyMuPDFLoader
 from langchain_community.document_loaders.text import TextLoader
 from langchain_community.document_transformers import MarkdownifyTransformer

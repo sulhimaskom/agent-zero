@@ -7,7 +7,8 @@ from collections.abc import Mapping
 from enum import Enum
 from typing import Any, Coroutine, Dict, List, Literal, TypedDict, Union, cast
 
-from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
+from langchain_core.messages import (AIMessage, BaseMessage, HumanMessage,
+                                     SystemMessage)
 
 from python.helpers import call_llm, messages, settings, tokens
 

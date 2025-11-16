@@ -561,7 +561,8 @@ class BackupService:
 
                     if pattern_lines:
                         from pathspec import PathSpec
-                        from pathspec.patterns.gitwildmatch import GitWildMatchPattern
+                        from pathspec.patterns.gitwildmatch import \
+                            GitWildMatchPattern
 
                         restore_spec = PathSpec.from_lines(
                             GitWildMatchPattern, pattern_lines
@@ -756,7 +757,8 @@ class BackupService:
 
                     if pattern_lines:
                         from pathspec import PathSpec
-                        from pathspec.patterns.gitwildmatch import GitWildMatchPattern
+                        from pathspec.patterns.gitwildmatch import \
+                            GitWildMatchPattern
 
                         restore_spec = PathSpec.from_lines(
                             GitWildMatchPattern, pattern_lines

@@ -7,7 +7,8 @@ import os
 import threading
 
 from python.helpers.memory import Memory
-from python.helpers.memory_monitor import get_memory_monitor, start_memory_monitoring
+from python.helpers.memory_monitor import (get_memory_monitor,
+                                           start_memory_monitoring)
 from python.helpers.vector_db import VectorDB
 
 

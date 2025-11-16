@@ -329,12 +329,12 @@ class DynamicMcpProxy:
     ):
         """Create a custom HTTP app that manages the session manager manually."""
         import anyio
-        from fastmcp.server.http import (
-            create_base_app,
-            setup_auth_middleware_and_routes,
-        )
-        from mcp.server.auth.middleware.bearer_auth import RequireAuthMiddleware
-        from mcp.server.streamable_http_manager import StreamableHTTPSessionManager
+        from fastmcp.server.http import (create_base_app,
+                                         setup_auth_middleware_and_routes)
+        from mcp.server.auth.middleware.bearer_auth import \
+            RequireAuthMiddleware
+        from mcp.server.streamable_http_manager import \
+            StreamableHTTPSessionManager
         from starlette.routing import Mount
 
         server_routes = []

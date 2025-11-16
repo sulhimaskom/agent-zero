@@ -3,12 +3,9 @@ import hashlib
 import os
 from typing import Any, Dict, Literal, TypedDict
 
-from langchain_community.document_loaders import (
-    CSVLoader,
-    PyPDFLoader,
-    TextLoader,
-    UnstructuredHTMLLoader,
-)
+from langchain_community.document_loaders import (CSVLoader, PyPDFLoader,
+                                                  TextLoader,
+                                                  UnstructuredHTMLLoader)
 
 from python.helpers.log import LogItem
 from python.helpers.print_style import PrintStyle
