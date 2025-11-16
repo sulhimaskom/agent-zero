@@ -41,6 +41,7 @@ from pydantic import BaseModel, Field, Discriminator, Tag, PrivateAttr
 from python.helpers import dirty_json
 from python.helpers.print_style import PrintStyle
 from python.helpers.tool import Tool, Response
+from python.helpers.files import read_prompt_file
 
 
 def normalize_name(name: str) -> str:
@@ -736,16 +737,25 @@ class MCPConfig(BaseModel):
 
                     prompt += "\n"
 
-                    prompt += (
-                        f"#### Usage:\n"
-                        f"{{\n"
-                        # f'    "observations": ["..."],\n' # TODO: this should be a prompt file with placeholders
-                        f'    "thoughts": ["..."],\n'
-                        # f'    "reflection": ["..."],\n' # TODO: this should be a prompt file with placeholders
-                        f"    \"tool_name\": \"{server_name}.{tool['name']}\",\n"
-                        f'    "tool_args": !follow schema above\n'
-                        f"}}\n"
-                    )
+                    # Load tool usage template from prompt file
+                    try:
+                        usage_template = read_prompt_file("mcp.tool_usage.md", _directories=["prompts"])
+                        prompt += usage_template.format(
+                            server_name=server_name,
+                            tool_name=tool['name']
+                        )
+                    except Exception:
+                        # Fallback to hardcoded template if file not found
+                        prompt += (
+                            f"#### Usage:\n"
+                            f"{{\n"
+                            f'    "observations": ["..."],\n'
+                            f'    "thoughts": ["..."],\n'
+                            f'    "reflection": ["..."],\n'
+                            f"    \"tool_name\": \"{server_name}.{tool['name']}\",\n"
+                            f'    "tool_args": !follow schema above\n'
+                            f"}}\n"
+                        )
 
         return prompt
 

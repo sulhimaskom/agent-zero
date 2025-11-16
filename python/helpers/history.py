@@ -205,11 +205,8 @@ class Topic(Record):
         """Summarize a list of messages, handling vision content appropriately."""
         msg_txt = []
         for m in messages:
-            # Extract text content, avoiding vision bytes for utility LLM
+            # Extract text content, vision content is now handled by _stringify_content
             content = m.output_text()
-            # If message contains vision content, add a note instead of the bytes
-            if self._has_vision_content(m):
-                content += " [Contains image/vision content]"
             msg_txt.append(content)
         summary = await self.history.agent.call_utility_model(
             system=self.history.agent.read_prompt("fw.topic_summary.sys.md"),
@@ -513,6 +510,16 @@ def _stringify_content(content: MessageContent) -> str:
     # already a string
     if isinstance(content, str):
         return content
+    
+    # Check for vision/image content and return appropriate placeholder
+    if isinstance(content, dict):
+        if content.get("type") == "image_url" or content.get("image_url"):
+            return "[Image content]"
+        # Check for raw image data in content field
+        if "content" in content:
+            content_value = content["content"]
+            if isinstance(content_value, bytes) or (isinstance(content_value, str) and content_value.startswith("data:image")):
+                return "[Image content]"
     
     # raw messages return preview or trimmed json
     if _is_raw_message(content):

@@ -11,10 +11,11 @@ SLEEP_TIME = 60
 
 keep_running = True
 pause_time = 0
+last_tick_time = 0
 
 
 async def run_loop():
-    global pause_time, keep_running
+    global pause_time, keep_running, last_tick_time
 
     while True:
         if runtime.is_development():
@@ -28,10 +29,14 @@ async def run_loop():
             resume_loop()
         if keep_running:
             try:
-                await scheduler_tick()
+                # Only run scheduler tick if enough time has passed since last tick
+                current_time = time.time()
+                if current_time - last_tick_time >= SLEEP_TIME:
+                    await scheduler_tick()
+                    last_tick_time = current_time
             except Exception as e:
                 PrintStyle().error(errors.format_error(e))
-        await asyncio.sleep(SLEEP_TIME)  # TODO! - if we lower it under 1min, it can run a 5min job multiple times in it's target minute
+        await asyncio.sleep(SLEEP_TIME)
 
 
 async def scheduler_tick():

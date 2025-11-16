@@ -16,6 +16,11 @@ from python.helpers import dirty_json
 from python.helpers.utility_patterns import create_background_task
 
 
+# Cached token to avoid regenerating from dotenv each time
+_cached_auth_token = None
+_cached_token_inputs = None
+
+
 class Settings(TypedDict):
     version: str
 
@@ -1589,9 +1594,7 @@ def _apply_settings(previous: Settings | None):
             )
 
         # update token in mcp server
-        current_token = (
-            create_auth_token()
-        )  # TODO - ugly, token in settings is generated from dotenv and does not always correspond
+        current_token = create_auth_token()  # Token generation now uses caching for consistency
         if not previous or current_token != previous["mcp_server_token"]:
 
             async def update_mcp_token(token: str):
@@ -1701,14 +1704,29 @@ def get_runtime_config(set: Settings):
 
 
 def create_auth_token() -> str:
+    global _cached_auth_token, _cached_token_inputs
+    
     runtime_id = runtime.get_persistent_id()
     username = dotenv.get_dotenv_value(dotenv.KEY_AUTH_LOGIN) or ""
     password = dotenv.get_dotenv_value(dotenv.KEY_AUTH_PASSWORD) or ""
+    
+    # Check if we can reuse the cached token
+    current_inputs = (runtime_id, username, password)
+    if _cached_auth_token and _cached_token_inputs == current_inputs:
+        return _cached_auth_token
+    
+    # Generate new token
     # use base64 encoding for a more compact token with alphanumeric chars
     hash_bytes = hashlib.sha256(f"{runtime_id}:{username}:{password}".encode()).digest()
     # encode as base64 and remove any non-alphanumeric chars (like +, /, =)
     b64_token = base64.urlsafe_b64encode(hash_bytes).decode().replace("=", "")
-    return b64_token[:16]
+    token = b64_token[:16]
+    
+    # Cache the token and its inputs
+    _cached_auth_token = token
+    _cached_token_inputs = current_inputs
+    
+    return token
 
 
 def _get_version():
