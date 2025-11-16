@@ -37,7 +37,6 @@ litellm>=1.75.0,<2.0.0
 # AI/ML dependencies with platform considerations
 # FAISS with platform-specific installation
 faiss-cpu>=1.11.0,<2.0.0; sys_platform != "darwin" or platform_machine != "arm64"
-faiss-cpu>=1.11.0,<2.0.0; sys_platform == "linux"
 
 # LangChain ecosystem with compatible versions
 langchain-core>=0.3.49,<1.0.0
