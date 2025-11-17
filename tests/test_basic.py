@@ -25,7 +25,7 @@ def test_core_modules_import():
         memory_module = __import__("python.helpers.memory", fromlist=["Memory"])
         assert agent_module is not None
         assert memory_module is not None
-    except ImportError as e:
+    except ImportError:
         # If modules are not available, just pass the test
         # This is expected in CI environments without full setup
         pass
@@ -43,6 +43,7 @@ def test_imports_work():
     import json
     import os
     import sys
+
     assert json is not None
     assert os is not None
     assert sys is not None
