@@ -1,6 +1,14 @@
 # Core dependencies with version ranges for better compatibility
 # Security Note: All dependencies should have both lower and upper version bounds
 # to prevent automatic installation of vulnerable versions while ensuring compatibility
+
+# Critical security dependencies - updated to secure versions
+cryptography>=42.0.5,<44.0.0
+requests>=2.32.4,<3.0.0
+urllib3>=2.5.0,<3.0.0
+certifi>=2024.07.04,<2026.0.0
+jinja2>=3.1.6,<4.0.0
+
 bcrypt>=4.0.0,<5.0.0
 a2wsgi>=1.10.8,<2.0.0
 ansio>=0.0.1,<1.0.0
@@ -68,7 +76,7 @@ pytest>=8.0.0,<9.0.0
 pytest-cov>=4.0.0,<5.0.0
 pytest-asyncio>=0.21.0,<1.0.0
 flake8>=6.0.0,<7.0.0
-black>=23.0.0,<24.0.0
+black>=23.0.0,<25.0.0
 isort>=5.12.0,<6.0.0
 bandit>=1.7.0,<2.0.0
-safety>=2.3.0,<3.0.0
+safety>=3.7.0,<4.0.0
