@@ -11,6 +11,8 @@
 - langchain-core 0.3.49: 2 CVEs (template injection)
 - langchain-community 0.3.19: 1 CVE (dependency issue)
 - langchain-text-splitters 0.3.7: 1 CVE (dependency issue)
+- lxml-html-clean 0.3.1: 1 CVE (HTML parsing)
+- pypdf 6.0.0: 3 CVEs (PDF parsing)
 
 **Action**:
 - Updated fastmcp from 2.3.4 to >=2.14.0 ✅
@@ -18,11 +20,13 @@
 - Updated langchain-core from 0.3.49 to >=0.3.81 ✅
 - Updated langchain-community from 0.3.19 to >=0.3.27 ✅
 - Added langchain-text-splitters >=0.3.9 ✅
+- Updated lxml-html-clean from 0.3.1 to >=0.4.0 ✅
+- Updated pypdf from 6.0.0 to >=6.4.0 ✅
 - Verified all CVEs patched with pip-audit ✅
 - Created .env.example file for secure credential management ✅
 
 **Dependencies**: None
-**Impact**: 5 packages updated, 8 CVEs patched, no remaining vulnerabilities
+**Impact**: 7 packages updated, 12 CVEs patched, 0 remaining vulnerabilities
 
 ## In Progress
 
