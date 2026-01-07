@@ -89,6 +89,55 @@
 **Dependencies**: None
 **Impact**: 7 packages updated, 12 CVEs patched, 0 remaining vulnerabilities
 
+---
+
+## DevOps / CI/CD (In Progress 2026-01-07)
+
+### 13. Fix CI/CD Pipeline Failures (P0 - CRITICAL)
+**Status**: In Progress (2026-01-07)
+**Module**: `.github/workflows/on-push.yml`, `.github/workflows/on-pull.yml`
+**Problem**: CI/CD pipelines failing with "Input required and not supplied: token" error
+- Error occurs in `actions/checkout@v5` step
+- Redundant `GITHUB_TOKEN` configuration causing conflicts
+- GITHUB_TOKEN is automatically provided by GitHub Actions, shouldn't be explicitly configured
+
+**Impact**:
+- CI builds failing intermittently
+- Cannot merge PRs until CI passes
+- Blocks all development work
+
+**Action**:
+- Identified root cause: redundant GITHUB_TOKEN configuration ✅
+- Prepared fix locally (commit `d83156b`) ✅
+- Remove `GITHUB_TOKEN` from job-level env in both workflows ✅
+- Remove explicit `token` parameter from checkout actions ✅
+- Remove `GITHUB_TOKEN` from turnstyle action env ✅
+- Added comment to PR #67 documenting fix ✅
+- **Awaiting**: Maintainer with `workflows` permission to apply fix
+
+**Changes Required**:
+1. `.github/workflows/on-push.yml`:
+   - Line 19: Remove `GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}`
+   - Line 43: Remove `token: ${{ secrets.GITHUB_TOKEN }}`
+   - Line 36: Remove `GITHUB_TOKEN` from turnstyle env
+2. `.github/workflows/on-pull.yml`:
+   - Line 24: Remove `GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}`
+   - Line 40: Remove `token: ${{ secrets.GITHUB_TOKEN }}`
+   - Line 34: Remove `GITHUB_TOKEN` from turnstyle env
+
+**Dependencies**: None (requires GitHub App permissions)
+**Estimated Impact**: CI/CD pipelines will pass reliably
+**Actual Impact**: Fix prepared, awaiting permission to apply
+**Blockers**: GitHub App lacks `workflows` permission to modify workflow files
+
+**Success Criteria**:
+- [ ] Redundant GITHUB_TOKEN configuration removed
+- [ ] CI/CD pipelines passing reliably
+- [ ] No more "Input required and not supplied: token" errors
+- [ ] Workflow run times reasonable (<60 minutes)
+
+---
+
 ## In Progress
 
 ### 10. Add Comprehensive Unit Tests for ToolCoordinator (HIGH PRIORITY)
@@ -148,7 +197,7 @@
 ---
 
 ### 2. Extract History Management (HIGH PRIORITY)
-**Status**: Pending
+**Status**: Completed (2026-01-07)
 **Module**: `agent.py` - Agent class
 **Problem**: History operations scattered throughout Agent
 - `hist_add_*` methods mixed with business logic
@@ -156,14 +205,15 @@
 - History state managed in Agent
 
 **Action**:
-- Extract history operations to `HistoryCoordinator` class
-- Define `IHistoryManager` interface
-- Create `python/coordinators/history_coordinator.py`
-- Move all `hist_add_*` methods to coordinator
-- Agent receives messages via interface only
+- Extract history operations to `HistoryCoordinator` class ✅
+- Define `IHistoryManager` interface ✅
+- Create `python/coordinators/history_coordinator.py` ✅
+- Move all `hist_add_*` methods to coordinator ✅
+- Agent receives messages via interface only ✅
 
 **Dependencies**: None
 **Estimated Impact**: 150 lines extracted from Agent
+**Actual Impact**: ~38 lines extracted from Agent, interface pattern established
 
 ---
 

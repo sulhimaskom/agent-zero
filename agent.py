@@ -28,7 +28,7 @@ from python.helpers.localization import Localization
 from python.helpers.extension import call_extensions
 from python.helpers.errors import RepairableException
 from python.helpers.tool import Tool
-from python.coordinators import ToolCoordinator
+from python.coordinators import ToolCoordinator, HistoryCoordinator
 
 
 class AgentContextType(Enum):
@@ -353,6 +353,7 @@ class Agent:
         self.intervention: UserMessage | None = None
         self.data: dict[str, Any] = {}  # free data object all the tools can use
         self.tool_coordinator = ToolCoordinator(self)
+        self.history_coordinator = HistoryCoordinator(self)
 
         asyncio.run(self.call_extensions("agent_init"))
 
@@ -606,62 +607,24 @@ class Agent:
     def hist_add_message(
         self, ai: bool, content: history.MessageContent, tokens: int = 0
     ):
-        self.last_message = datetime.now(timezone.utc)
-        # Allow extensions to process content before adding to history
-        content_data = {"content": content}
-        asyncio.run(self.call_extensions("hist_add_before", content_data=content_data, ai=ai))
-        return self.history.add_message(ai=ai, content=content_data["content"], tokens=tokens)
+        return self.history_coordinator.hist_add_message(ai, content, tokens)
 
     def hist_add_user_message(self, message: UserMessage, intervention: bool = False):
-        self.history.new_topic()  # user message starts a new topic in history
-
-        # load message template based on intervention
-        if intervention:
-            content = self.parse_prompt(
-                "fw.intervention.md",
-                message=message.message,
-                attachments=message.attachments,
-                system_message=message.system_message,
-            )
-        else:
-            content = self.parse_prompt(
-                "fw.user_message.md",
-                message=message.message,
-                attachments=message.attachments,
-                system_message=message.system_message,
-            )
-
-        # remove empty parts from template
-        if isinstance(content, dict):
-            content = {k: v for k, v in content.items() if v}
-
-        # add to history
-        msg = self.hist_add_message(False, content=content)  # type: ignore
-        self.last_user_message = msg
-        return msg
+        return self.history_coordinator.hist_add_user_message(message, intervention)
 
     def hist_add_ai_response(self, message: str):
-        self.loop_data.last_response = message
-        content = self.parse_prompt("fw.ai_response.md", message=message)
-        return self.hist_add_message(True, content=content)
+        return self.history_coordinator.hist_add_ai_response(message)
 
     def hist_add_warning(self, message: history.MessageContent):
-        content = self.parse_prompt("fw.warning.md", message=message)
-        return self.hist_add_message(False, content=content)
+        return self.history_coordinator.hist_add_warning(message)
 
     def hist_add_tool_result(self, tool_name: str, tool_result: str, **kwargs):
-        data = {
-            "tool_name": tool_name,
-            "tool_result": tool_result,
-            **kwargs,
-        }
-        asyncio.run(self.call_extensions("hist_add_tool_result", data=data))
-        return self.hist_add_message(False, content=data)
+        return self.history_coordinator.hist_add_tool_result(tool_name, tool_result, **kwargs)
 
     def concat_messages(
         self, messages
     ):  # TODO add param for message range, topic, history
-        return self.history.output_text(human_label="user", ai_label="assistant")
+        return self.history_coordinator.concat_messages(messages)
 
     def get_chat_model(self):
         return models.get_chat_model(

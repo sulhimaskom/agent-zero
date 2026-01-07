@@ -160,16 +160,16 @@ class Agent:
 ### Phase 1: Extract Interfaces - IN PROGRESS
 - Define contracts for coordinators ✅
 - Extract tool execution to separate module ✅
-- Extract history management to separate module (Pending)
+- Extract history management to separate module ✅
 
 ### Phase 2: Extract Coordinators - IN PROGRESS
 - Create ToolCoordinator ✅
-- Create HistoryCoordinator (Pending)
+- Create HistoryCoordinator ✅
 - Create StreamCoordinator (Pending)
 
 ### Phase 3: Refactor Agent - IN PROGRESS
 - Replace direct tool calls with ToolCoordinator ✅
-- Replace history calls with HistoryCoordinator (Pending)
+- Replace history calls with HistoryCoordinator ✅
 - Replace stream handling with StreamCoordinator (Pending)
 - Reduce Agent to orchestration only (Pending)
 
