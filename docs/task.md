@@ -2,7 +2,36 @@
 
 ## In Progress
 
-None
+### 10. Add Comprehensive Unit Tests for ToolCoordinator (HIGH PRIORITY)
+**Status**: In Progress (2025-01-07)
+**Module**: `tests/test_tool_coordinator.py` - ToolCoordinator tests
+**Problem**: ToolCoordinator is a critical new architectural component with no tests
+- ToolCoordinator extracts tool execution logic from Agent class
+- Critical for tool discovery, execution, and lifecycle management
+- No unit tests exist for this component
+
+**Action**:
+- Create comprehensive test suite `tests/test_tool_coordinator.py` ✅
+- Test tool discovery and loading from profile and default directories ✅
+- Test tool execution lifecycle (before, execute, after, extensions) ✅
+- Test error scenarios (tool not found, malformed requests, execution failures) ✅
+- Test edge cases (break loop, empty args, tool with method) ✅
+- Test MCP tool integration (mocked) ✅
+- Test interface conformance (IToolExecutor) ✅
+
+**Dependencies**: None (uses pytest, pytest-asyncio, pytest-mock)
+**Estimated Impact**: 15 comprehensive test cases covering critical paths
+**Actual Impact**: Created test_tool_coordinator.py with 15 test cases
+**Blockers**: 
+- Dependency chain complexity prevents test collection
+- Missing heavy dependencies (browser-use, transformers, torch, etc.)
+- Tests are written and valid but cannot run until full dependencies installed
+- Tests document expected behavior and can be used for manual verification
+
+**Next Steps**:
+- Install full dependency chain from requirements.txt to enable test execution
+- Consider creating isolated test suite that mocks heavy dependencies at import level
+- Document test infrastructure setup requirements
 
 ## Completed
 
