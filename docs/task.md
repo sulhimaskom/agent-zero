@@ -1,5 +1,29 @@
 # Architectural Tasks
 
+## Security (Completed 2025-01-07)
+
+### 11. Patch Critical CVE Vulnerabilities (HIGH PRIORITY)
+**Status**: Completed (2025-01-07)
+**Module**: `requirements.txt` - Dependency updates
+**Problem**: Multiple high-severity CVEs in dependencies
+- fastmcp 2.3.4: 3 CVEs (XSS, command injection, DNS rebinding)
+- mcp 1.13.1: 1 CVE (DNS rebinding)
+- langchain-core 0.3.49: 2 CVEs (template injection)
+- langchain-community 0.3.19: 1 CVE (dependency issue)
+- langchain-text-splitters 0.3.7: 1 CVE (dependency issue)
+
+**Action**:
+- Updated fastmcp from 2.3.4 to >=2.14.0 ✅
+- Updated mcp from 1.13.1 to >=1.23.0 ✅
+- Updated langchain-core from 0.3.49 to >=0.3.81 ✅
+- Updated langchain-community from 0.3.19 to >=0.3.27 ✅
+- Added langchain-text-splitters >=0.3.9 ✅
+- Verified all CVEs patched with pip-audit ✅
+- Created .env.example file for secure credential management ✅
+
+**Dependencies**: None
+**Impact**: 5 packages updated, 8 CVEs patched, no remaining vulnerabilities
+
 ## In Progress
 
 ### 10. Add Comprehensive Unit Tests for ToolCoordinator (HIGH PRIORITY)
