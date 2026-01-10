@@ -1,0 +1,134 @@
+name: on-pull
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+  repository-projects: write
+
+concurrency:
+  group: oc-agent
+  cancel-in-progress: false
+
+jobs:
+  ci:
+    name: on-pull
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
+
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      IFLOW_API_KEY: ${{ secrets.IFLOW_API_KEY }}
+
+    steps:
+      - name: Wait in Queue
+        uses: softprops/turnstyle@v2
+        with:
+          poll-interval-seconds: 30
+          same-branch-only: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        continue-on-error: true
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        continue-on-error: true
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+
+      - name: Branch Management
+        run: |
+          git fetch --all
+          if git branch -r | grep "origin/agent-workspace"; then
+            git checkout agent-workspace
+            git pull origin agent-workspace
+          else
+            git checkout -b agent-workspace
+          fi
+          git merge origin/main --no-edit || echo "Merge conflict or already up to date"
+
+      - name: Install Dependencies
+        continue-on-error: true
+        run: npm ci
+
+      - name: Install OpenCode CLI
+        run: |
+          curl -fsSL https://opencode.ai/install | bash
+          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+
+      - name: Check if Changes in PR
+        id: check_changes
+        run: |
+          if [ "$(git diff --name-only origin/main HEAD | wc -l)" -eq 0 ]; then
+            echo "no_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "no_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Skip if No Changes
+        if: steps.check_changes.outputs.no_changes == 'true'
+        run: |
+          echo "No code changes detected in PR, skipping auto-fix"
+          exit 0
+
+      - name: Parallel Code Analysis (Flows 00-04)
+        if: steps.check_changes.outputs.no_changes == 'false'
+        continue-on-error: true
+        strategy:
+          matrix:
+            flow: ["00", "01", "02", "03", "04"]
+          fail-fast: false
+        timeout-minutes: 25
+        run: |
+          if opencode run "$(cat .github/prompt/${{ matrix.flow }}.md)" \
+            --model opencode/glm-4.7-free \
+            --share false; then
+            echo "✓ Flow ${{ matrix.flow }} succeeded"
+          else
+            echo "✗ Flow ${{ matrix.flow }} failed"
+            exit 1
+
+      - name: Auto-fix CI Failures
+        if: steps.check_changes.outputs.no_changes == 'false'
+        timeout-minutes: 45
+        run: |
+          max_retries=3
+          retry_count=0
+          base_delay=10
+
+          while [ $retry_count -lt $max_retries ]; do
+            echo "Attempt $((retry_count + 1)) of $max_retries"
+
+            if opencode run "$(cat .github/prompt/11.md)" \
+              --model opencode/glm-4.7-free \
+              --share false; then
+              echo "✓ OpenCode auto-fix succeeded"
+              break
+            else
+              retry_count=$((retry_count + 1))
+              delay=$((base_delay * (2 ** retry_count)))
+              echo "Retry $retry_count in $delay seconds..."
+              sleep $delay
+
+              if [ $retry_count -eq $max_retries ]; then
+                echo "✗ All retry attempts failed"
+                exit 1
+              fi
+            fi
+          done

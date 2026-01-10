@@ -1,0 +1,153 @@
+name: on-push
+
+on:
+  workflow_dispatch:
+  push:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: global
+  cancel-in-progress: false
+
+jobs:
+  analyze:
+    name: on-push
+    runs-on: ubuntu-24.04-arm
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      IFLOW_API_KEY: ${{ secrets.IFLOW_API_KEY }}
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_KEY: ${{ secrets.VITE_SUPABASE_KEY }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_KEY }}
+
+    steps:
+      - name: Wait in Queue
+        uses: softprops/turnstyle@v2
+        with:
+          poll-interval-seconds: 30
+          same-branch-only: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Extended Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.opencode
+            ~/.npm
+          key: opencode-${{ runner.os }}-${{ hashFiles('.github/prompt/*.md') }}-v3
+          restore-keys: |
+            opencode-${{ runner.os }}-v3
+            opencode-${{ runner.os }}-
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+
+      - name: Check if Changes Exist
+        id: check_changes
+        run: |
+          if [ "$(git diff --name-only HEAD~1 HEAD | wc -l)" -eq 0 ]; then
+            echo "no_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "no_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Skip if No Changes
+        if: steps.check_changes.outputs.no_changes == 'true'
+        run: |
+          echo "No changes detected, skipping analysis"
+          exit 0
+
+      - name: Install OpenCode
+        if: steps.check_changes.outputs.no_changes == 'false'
+        run: |
+          curl -fsSL https://opencode.ai/install | bash
+          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+
+      - name: Check Open Issues
+        id: check_issues
+        if: steps.check_changes.outputs.no_changes == 'false'
+        run: |
+          count=$(gh issue list --state open --json number --jq 'length')
+          echo "open_issue_count=$count" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # Parallel Execution - Group 1: Flows 00-03 (3 parallel)
+      - name: Parallel Flows 00-03
+        if: steps.check_changes.outputs.no_changes == 'false' && steps.check_issues.outputs.open_issue_count == '0'
+        continue-on-error: true
+        strategy:
+          matrix:
+            flow: ["00", "01", "02"]
+          fail-fast: false
+        timeout-minutes: 30
+        run: |
+          if opencode run "$(cat .github/prompt/${{ matrix.flow }}.md)" \
+            --model opencode/glm-4.7-free \
+            --share false; then
+            echo "✓ Flow ${{ matrix.flow }} succeeded"
+          else
+            echo "✗ Flow ${{ matrix.flow }} failed"
+            exit 1
+
+      # Parallel Execution - Group 2: Flows 04-07 (4 parallel)
+      - name: Parallel Flows 04-07
+        if: steps.check_changes.outputs.no_changes == 'false' && steps.check_issues.outputs.open_issue_count == '0'
+        continue-on-error: true
+        strategy:
+          matrix:
+            flow: ["03", "04", "05", "06"]
+          fail-fast: false
+        timeout-minutes: 30
+        run: |
+          if opencode run "$(cat .github/prompt/${{ matrix.flow }}.md)" \
+            --model opencode/glm-4.7-free \
+            --share false; then
+            echo "✓ Flow ${{ matrix.flow }} succeeded"
+          else
+            echo "✗ Flow ${{ matrix.flow }} failed"
+            exit 1
+
+      # Parallel Execution - Group 3: Flows 08-11 (4 parallel)
+      - name: Parallel Flows 08-11
+        if: steps.check_changes.outputs.no_changes == 'false' && steps.check_issues.outputs.open_issue_count == '0'
+        continue-on-error: true
+        strategy:
+          matrix:
+            flow: ["07", "08", "09", "10"]
+          fail-fast: false
+        timeout-minutes: 30
+        run: |
+          if opencode run "$(cat .github/prompt/${{ matrix.flow }}.md)" \
+            --model opencode/glm-4.7-free \
+            --share false; then
+            echo "✓ Flow ${{ matrix.flow }} succeeded"
+          else
+            echo "✗ Flow ${{ matrix.flow }} failed"
+            exit 1
+
+      # Main autonomous phase
+      - name: on-push (Main Analysis)
+        if: steps.check_issues.outputs.open_issue_count == '0'
+        timeout-minutes: 45
+        run: |
+          opencode run "$(cat .github/prompt/00.md)" \
+            --model opencode/glm-4.7-free \
+            --share false
