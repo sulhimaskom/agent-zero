@@ -98,8 +98,11 @@ class StreamCoordinator(IStreamHandler):
                     text=stream,
                     parsed=response,
                 )
-        except Exception:
-            pass
+        except Exception as e:
+            from python.helpers.print_style import PrintStyle
+            PrintStyle(font_color="yellow", padding=False).print(
+                f"Failed to parse response stream (stream may be incomplete): {type(e).__name__}"
+            )
 
     async def finalize_streams(self, loop_data: Any):
         """Finalize stream processing after LLM call completes"""
