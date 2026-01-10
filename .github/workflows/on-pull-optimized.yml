@@ -40,13 +40,6 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        continue-on-error: true
-        with:
-          node-version: 20
-          cache: 'npm'
-
       - name: Configure Git
         run: |
           git config --global user.name "${{ github.actor }}"
@@ -68,36 +61,19 @@ jobs:
           curl -fsSL https://opencode.ai/install | bash
           echo "$HOME/.opencode/bin" >> $GITHUB_PATH
 
-      - name: Check Open PRs (MUST CHECK FIRST)
-        id: check_prs
-        run: |
-          count=$(gh pr list --state open --json number --jq 'length')
-          echo "open_pr_count=$count" >> $GITHUB_OUTPUT
-          if [ "$count" -gt 0 ]; then
-            echo "::notice::Found $count open PR(s)"
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Skip if Open PRs Exist (ENTER PR HANDLER MODE)
-        if: steps.check_prs.outputs.open_pr_count != '0'
-        run: |
-          echo "Open PRs detected - entering PR Handler mode"
-          echo "Skipping analysis - PRs should be processed first"
-          exit 0
-
-      - name: Check Open Issues (CHECK ONLY IF NO OPEN PRs)
+      - name: Check Open Issues (FOR ON-PULL ANALYSIS)
         id: check_issues
-        if: steps.check_prs.outputs.open_pr_count == '0'
         run: |
           count=$(gh issue list --state open --json number --jq 'length')
           echo "open_issue_count=$count" >> $GITHUB_OUTPUT
+          echo "::notice::Found $count open issue(s)"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Run Auto-fix Only If <10 Issues (ENTER ISSUE MANAGER MODE)
-        if: steps.check_prs.outputs.open_pr_count == '0' && steps.check_issues.outputs.open_issue_count != '' && (steps.check_issues.outputs.open_issue_count < 10 || steps.check_issues.outputs.open_issue_count == '')
+      - name: Auto-fix CI Failures (RUN IF <10 ISSUES)
+        if: steps.check_issues.outputs.open_issue_count != '' && (steps.check_issues.outputs.open_issue_count < 10 || steps.check_issues.outputs.open_issue_count == '')
         run: |
+          echo "::notice::Running auto-fix (issues: ${{ steps.check_issues.outputs.open_issue_count }})"
           opencode run "$(cat <<'PROMPT'
           YOU ARE AN AUTONOMOUS SOFTWARE ENGINEERING AGENT.
           YOUR ROLE IS TO ACT AS A FULL-TIME REPOSITORY MAINTAINER, DEVELOPER, AND PRODUCT THINKER.
@@ -114,7 +90,7 @@ jobs:
           2. ABSOLUTE CONSTRAINTS (NON-NEGOTIABLE)
           - Never create duplicate issues.
           - Never create a PR from more than ONE branch.
-          - Never open or update a PR without syncing to DEFAULT_BRANCH first.
+          - Never open or update a PR without syncing to the DEFAULT_BRANCH first.
           - Never merge a PR unless:
             - No merge conflicts
             - All CI checks are green (dont wait for 'on-pull' check, its you)
@@ -220,16 +196,17 @@ jobs:
              Use `gh pr merge --admin` to bypass branch protection when conditions are met.
 
              NEVER delete branch if merge fails.
-          
-           4. After successful merge:
+
+          4. After successful merge:
              - Close linked issues
              - Delete remote branch ONLY after successful merge
              - Log action
-                    
+
+
           ========================
           ISSUE MANAGER MODE
           ========================
-          
+
           GOALS:
           - Normalize all issues
           - Remove duplicates
@@ -239,15 +216,9 @@ jobs:
           - Ensure category label exists
           - Ensure priority label exists
           - If missing → assign using best engineering judgment
-          - Standardize title and description if unclear 
+          - Standardize title and description if unclear
 
-          STEP 2 — DUPLICATE DETECTION
-          - Compare all open issues by semantic similarity
-          - If duplicates found:
-            - Select canonical issue
-            - Close duplicates with reference
-            - Do NOT lose information        
-                    
+
           ========================
           PHASE 1 — DEEP CODE & DOC ANALYSIS
           ========================
@@ -272,11 +243,12 @@ jobs:
             - Exact file locations
             - Severity analysis
             - Suggested fix
-                   
+
+
           ========================
           PHASE 2 — PRODUCT THINKING MODE
           ========================
-              
+
           PRIORITY 1 — FEATURE GAP ANALYSIS
           - Analyze existing features
           - Identify:
@@ -342,7 +314,8 @@ jobs:
           If at ANY POINT you are unsure whether an action is safe:
           - STOP
           - CREATE an issue explaining: uncertainty
-          - DO NOT GUESS        
+          - DO NOT GUESS
+
           END OF PROMPT
           PROMPT
           )" \
