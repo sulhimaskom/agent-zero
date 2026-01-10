@@ -40,6 +40,7 @@ class ToolCoordinator(IToolExecutor):
 
     def __init__(self, agent):
         self.agent = agent
+        self.history_manager = agent.history_coordinator
 
     async def process_tools(self, msg: str) -> str | None:
         """Process tool usage requests in agent message"""
@@ -115,14 +116,14 @@ class ToolCoordinator(IToolExecutor):
                 error_detail = (
                     f"Tool '{raw_tool_name}' not found or could not be initialized."
                 )
-                self.agent.hist_add_warning(error_detail)
+                self.history_manager.add_warning(error_detail)
                 PrintStyle(font_color="red", padding=True).print(error_detail)
                 self.agent.context.log.log(
                     type="error", content=f"{self.agent.agent_name}: {error_detail}"
                 )
         else:
             warning_msg_misformat = self.agent.read_prompt("fw.msg_misformat.md")
-            self.agent.hist_add_warning(warning_msg_misformat)
+            self.history_manager.add_warning(warning_msg_misformat)
             PrintStyle(font_color="red", padding=True).print(warning_msg_misformat)
             self.agent.context.log.log(
                 type="error",

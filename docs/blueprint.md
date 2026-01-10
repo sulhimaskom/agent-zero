@@ -80,12 +80,14 @@ Infrastructure (Docker, LLM providers)
 - Mixes: orchestration, history management, tool execution, streaming
 - Hard to test, hard to extend
 - **Progress**: Tool execution extracted to ToolCoordinator (~2025-01-07)
+- **Progress**: History management extracted to HistoryCoordinator (~2025-01-10)
 
 ### 2. Direct Dependencies Between Layers - PARTIALLY ADDRESSED
 - Agent directly imports tools, helpers, models
 - Tools depend on Agent instance
 - Circular dependency potential
 - **Progress**: Tool operations now use coordinator interface
+- **Progress**: History operations now use coordinator interface
 
 ### 3. Extension System Coupling
 - Extensions receive full Agent instance
@@ -112,10 +114,11 @@ Infrastructure (Docker, LLM providers)
 - MCP integration
 - Tool result processing
 
-#### History Coordinator
+#### History Coordinator - IMPLEMENTED
 - Message history management
 - Summarization
 - Context window management
+- **Status**: Created HistoryCoordinator with IHistoryManager interface (~2025-01-10)
 
 #### Stream Coordinator
 - Stream management
@@ -160,16 +163,16 @@ class Agent:
 ### Phase 1: Extract Interfaces - IN PROGRESS
 - Define contracts for coordinators ✅
 - Extract tool execution to separate module ✅
-- Extract history management to separate module (Pending)
+- Extract history management to separate module ✅
 
 ### Phase 2: Extract Coordinators - IN PROGRESS
 - Create ToolCoordinator ✅
-- Create HistoryCoordinator (Pending)
+- Create HistoryCoordinator ✅
 - Create StreamCoordinator (Pending)
 
 ### Phase 3: Refactor Agent - IN PROGRESS
 - Replace direct tool calls with ToolCoordinator ✅
-- Replace history calls with HistoryCoordinator (Pending)
+- Replace history calls with HistoryCoordinator ✅
 - Replace stream handling with StreamCoordinator (Pending)
 - Reduce Agent to orchestration only (Pending)
 

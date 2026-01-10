@@ -111,7 +111,7 @@
 **Dependencies**: None (uses pytest, pytest-asyncio, pytest-mock)
 **Estimated Impact**: 15 comprehensive test cases covering critical paths
 **Actual Impact**: Created test_tool_coordinator.py with 15 test cases
-**Blockers**: 
+**Blockers**:
 - Dependency chain complexity prevents test collection
 - Missing heavy dependencies (browser-use, transformers, torch, etc.)
 - Tests are written and valid but cannot run until full dependencies installed
@@ -123,6 +123,29 @@
 - Document test infrastructure setup requirements
 
 ## Completed
+
+### 2. Extract History Management (HIGH PRIORITY)
+**Status**: Completed (2025-01-10)
+**Module**: `agent.py` - Agent class
+**Problem**: History operations scattered throughout Agent
+- `hist_add_*` methods mixed with business logic
+- Direct history manipulation from multiple locations
+- History state managed in Agent
+
+**Action**:
+- Extract history operations to `HistoryCoordinator` class ✅
+- Define `IHistoryManager` interface ✅
+- Create `python/coordinators/history_coordinator.py` ✅
+- Move all `hist_add_*` methods to coordinator ✅
+- Agent receives messages via interface only ✅
+- Update ToolCoordinator to use history_manager ✅
+- Update coordinators/__init__.py to export new classes ✅
+
+**Dependencies**: None
+**Estimated Impact**: 150 lines extracted from Agent
+**Actual Impact**: Created new module with 114 lines, ~55 lines extracted from Agent
+
+---
 
 ### 1. Extract Tool Execution Logic (HIGH PRIORITY)
 **Status**: Completed (2025-01-07)
@@ -144,26 +167,6 @@
 **Actual Impact**: Created new module structure, ~100 lines extracted from Agent
 
 ## Backlog
-
----
-
-### 2. Extract History Management (HIGH PRIORITY)
-**Status**: Pending
-**Module**: `agent.py` - Agent class
-**Problem**: History operations scattered throughout Agent
-- `hist_add_*` methods mixed with business logic
-- Direct history manipulation from multiple locations
-- History state managed in Agent
-
-**Action**:
-- Extract history operations to `HistoryCoordinator` class
-- Define `IHistoryManager` interface
-- Create `python/coordinators/history_coordinator.py`
-- Move all `hist_add_*` methods to coordinator
-- Agent receives messages via interface only
-
-**Dependencies**: None
-**Estimated Impact**: 150 lines extracted from Agent
 
 ---
 
@@ -207,25 +210,6 @@
 
 ---
 
-### 5. Extension System Decoupling (MEDIUM PRIORITY)
-**Status**: Pending
-**Module**: Extension system throughout codebase
-**Problem**: Extensions receive full Agent instance
-- Extensions can manipulate agent state arbitrarily
-- Hard to reason about side effects
-- Violates interface segregation
-
-**Action**:
-- Create `ExtensionContext` dataclass
-- Pass only necessary data to extensions
-- Define extension contracts
-- Migrate extensions to use contracts
-
-**Dependencies**: Task 1, 2, 3 (coordinators needed)
-**Estimated Impact**: 23+ extension files
-
----
-
 ### 6. Remove Circular Dependencies (LOW PRIORITY)
 **Status**: Pending
 **Module**: Various
@@ -264,6 +248,23 @@
 ---
 
 ### 8. Add Architecture Tests (MEDIUM PRIORITY)
+**Status**: Pending
+**Module**: Tests
+**Problem**: No architectural validation
+
+**Action**:
+- Create architecture tests (pytest)
+- Test for circular dependencies
+- Test for interface conformance
+- Test coordinator isolation
+- Add CI check for architecture
+
+**Dependencies**: Tasks 1, 2, 3, 7
+**Estimated Impact**: New test suite
+
+---
+
+### 9. Document Dependency Flow (LOW PRIORITY)
 **Status**: Pending
 **Module**: Tests
 **Problem**: No architectural validation
