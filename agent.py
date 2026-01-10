@@ -21,14 +21,13 @@ from langchain_core.prompts import (
 from langchain_core.messages import SystemMessage, BaseMessage
 
 import python.helpers.log as Log
-from python.helpers.dirty_json import DirtyJson
 from python.helpers.defer import DeferredTask
 from typing import Callable
 from python.helpers.localization import Localization
 from python.helpers.extension import call_extensions
 from python.helpers.errors import RepairableException
 from python.helpers.tool import Tool
-from python.coordinators import ToolCoordinator, HistoryCoordinator
+from python.coordinators import ToolCoordinator, HistoryCoordinator, StreamCoordinator
 
 
 class AgentContextType(Enum):
@@ -354,6 +353,7 @@ class Agent:
         self.data: dict[str, Any] = {}  # free data object all the tools can use
         self.tool_coordinator = ToolCoordinator(self)
         self.history_coordinator = HistoryCoordinator(self)
+        self.stream_coordinator = StreamCoordinator(self)
 
         asyncio.run(self.call_extensions("agent_init"))
 
@@ -386,36 +386,9 @@ class Agent:
                         # call before_main_llm_call extensions
                         await self.call_extensions("before_main_llm_call", loop_data=self.loop_data)
 
-                        async def reasoning_callback(chunk: str, full: str):
-                            await self.handle_intervention()
-                            if chunk == full:
-                                printer.print("Reasoning: ")  # start of reasoning
-                            # Pass chunk and full data to extensions for processing
-                            stream_data = {"chunk": chunk, "full": full}
-                            await self.call_extensions(
-                                "reasoning_stream_chunk", loop_data=self.loop_data, stream_data=stream_data
-                            )
-                            # Stream masked chunk after extensions processed it
-                            if stream_data.get("chunk"):
-                                printer.stream(stream_data["chunk"])
-                            # Use the potentially modified full text for downstream processing
-                            await self.handle_reasoning_stream(stream_data["full"])
-
-                        async def stream_callback(chunk: str, full: str):
-                            await self.handle_intervention()
-                            # output the agent response stream
-                            if chunk == full:
-                                printer.print("Response: ")  # start of response
-                            # Pass chunk and full data to extensions for processing
-                            stream_data = {"chunk": chunk, "full": full}
-                            await self.call_extensions(
-                                "response_stream_chunk", loop_data=self.loop_data, stream_data=stream_data
-                            )
-                            # Stream masked chunk after extensions processed it
-                            if stream_data.get("chunk"):
-                                printer.stream(stream_data["chunk"])
-                            # Use the potentially modified full text for downstream processing
-                            await self.handle_response_stream(stream_data["full"])
+                        # create stream callbacks via coordinator
+                        reasoning_callback = self.stream_coordinator.create_reasoning_callback(self.loop_data)
+                        stream_callback = self.stream_coordinator.create_response_callback(self.loop_data)
 
                         # call main LLM
                         agent_response, _reasoning = await self.call_chat_model(
@@ -424,13 +397,8 @@ class Agent:
                             reasoning_callback=reasoning_callback,
                         )
 
-                        # Notify extensions to finalize their stream filters
-                        await self.call_extensions(
-                            "reasoning_stream_end", loop_data=self.loop_data
-                        )
-                        await self.call_extensions(
-                            "response_stream_end", loop_data=self.loop_data
-                        )
+                        # finalize streams via coordinator
+                        await self.stream_coordinator.finalize_streams(self.loop_data)
 
                         await self.handle_intervention(agent_response)
 
@@ -750,29 +718,10 @@ class Agent:
         return await self.tool_coordinator.process_tools(msg)
 
     async def handle_reasoning_stream(self, stream: str):
-        await self.handle_intervention()
-        await self.call_extensions(
-            "reasoning_stream",
-            loop_data=self.loop_data,
-            text=stream,
-        )
+        return await self.stream_coordinator.handle_reasoning_stream(stream)
 
     async def handle_response_stream(self, stream: str):
-        await self.handle_intervention()
-        try:
-            if len(stream) < 25:
-                return  # no reason to try
-            response = DirtyJson.parse_string(stream)
-            if isinstance(response, dict):
-                await self.call_extensions(
-                    "response_stream",
-                    loop_data=self.loop_data,
-                    text=stream,
-                    parsed=response,
-                )
-
-        except Exception as e:
-            pass
+        return await self.stream_coordinator.handle_response_stream(stream)
 
     def get_tool(
         self, name: str, method: str | None, args: dict, message: str, loop_data: LoopData | None, **kwargs

@@ -124,6 +124,30 @@
 
 ## Completed
 
+### 3. Extract Stream Handling (MEDIUM PRIORITY)
+**Status**: Completed (2025-01-10)
+**Module**: `agent.py` - Agent class
+**Problem**: Stream callbacks embedded in Agent.monologue() (lines ~385-429)
+- Stream filtering and output mixed with orchestration
+- Extension calls scattered in callback definitions
+- Hard to test stream behavior independently
+
+**Action**:
+- Extract stream handling to `StreamCoordinator` class ✅
+- Define `IStreamHandler` interface ✅
+- Create `python/coordinators/stream_coordinator.py` ✅
+- Move `reasoning_callback`, `response_callback` to coordinator ✅
+- Move `handle_reasoning_stream`, `handle_response_stream` to coordinator ✅
+- Unify extension calls for streams ✅
+- Agent delegates to coordinator via interface ✅
+- Update coordinators/__init__.py to export new classes ✅
+
+**Dependencies**: None
+**Estimated Impact**: 100 lines extracted from Agent
+**Actual Impact**: Created new module with 106 lines, ~70 lines extracted from Agent
+
+---
+
 ### 2. Extract History Management (HIGH PRIORITY)
 **Status**: Completed (2025-01-10)
 **Module**: `agent.py` - Agent class
@@ -167,26 +191,6 @@
 **Actual Impact**: Created new module structure, ~100 lines extracted from Agent
 
 ## Backlog
-
----
-
-### 3. Extract Stream Handling (MEDIUM PRIORITY)
-**Status**: Pending
-**Module**: `agent.py` - Agent class
-**Problem**: Stream callbacks embedded in Agent.monologue() (lines ~385-429)
-- Stream filtering and output mixed with orchestration
-- Extension calls scattered in callback definitions
-- Hard to test stream behavior independently
-
-**Action**:
-- Extract stream handling to `StreamCoordinator` class
-- Define `IStreamHandler` interface
-- Create `python/coordinators/stream_coordinator.py`
-- Move `reasoning_callback`, `response_callback` to coordinator
-- Unify extension calls for streams
-
-**Dependencies**: None
-**Estimated Impact**: 100 lines extracted from Agent
 
 ---
 
