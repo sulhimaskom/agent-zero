@@ -93,6 +93,7 @@ class Message(Record):
 
     def set_summary(self, summary: str):
         self.summary = summary
+        self._tokens = None
         self.tokens = self.calculate_tokens()
 
     async def compress(self):
@@ -130,18 +131,22 @@ class Topic(Record):
         self.history = history
         self.summary: str = ""
         self.messages: list[Message] = []
+        self._tokens: int | None = None
 
     def get_tokens(self):
-        if self.summary:
-            return tokens.approximate_tokens(self.summary)
-        else:
-            return sum(msg.get_tokens() for msg in self.messages)
+        if self._tokens is None:
+            if self.summary:
+                self._tokens = tokens.approximate_tokens(self.summary)
+            else:
+                self._tokens = sum(msg.get_tokens() for msg in self.messages)
+        return self._tokens
 
     def add_message(
         self, ai: bool, content: MessageContent, tokens: int = 0
     ) -> Message:
         msg = Message(ai=ai, content=content, tokens=tokens)
         self.messages.append(msg)
+        self._tokens = None
         return msg
 
     def output(self) -> list[OutputMessage]:
@@ -153,6 +158,7 @@ class Topic(Record):
 
     async def summarize(self):
         self.summary = await self.summarize_messages(self.messages)
+        self._tokens = None
         return self.summary
 
     async def compress_large_messages(self) -> bool:
@@ -191,6 +197,7 @@ class Topic(Record):
                 )
                 msg.set_summary(_json_dumps(trunc))
 
+            self._tokens = None
             return True
         return False
 
@@ -211,6 +218,7 @@ class Topic(Record):
             )
             sum_msg = Message(False, sum_msg_content)
             self.messages[1 : cnt_to_sum + 1] = [sum_msg]
+            self._tokens = None
             return True
         return False
 
@@ -239,6 +247,7 @@ class Topic(Record):
         topic.messages = [
             Message.from_dict(m, history=history) for m in data.get("messages", [])
         ]
+        topic._tokens = None
         return topic
 
 
@@ -247,12 +256,15 @@ class Bulk(Record):
         self.history = history
         self.summary: str = ""
         self.records: list[Record] = []
+        self._tokens: int | None = None
 
     def get_tokens(self):
-        if self.summary:
-            return tokens.approximate_tokens(self.summary)
-        else:
-            return sum([r.get_tokens() for r in self.records])
+        if self._tokens is None:
+            if self.summary:
+                self._tokens = tokens.approximate_tokens(self.summary)
+            else:
+                self._tokens = sum([r.get_tokens() for r in self.records])
+        return self._tokens
 
     def output(
         self, human_label: str = "user", ai_label: str = "ai"
@@ -273,6 +285,7 @@ class Bulk(Record):
                 "fw.topic_summary.msg.md", content=self.output_text()
             ),
         )
+        self._tokens = None
         return self.summary
 
     def to_dict(self):
@@ -288,6 +301,7 @@ class Bulk(Record):
         bulk.summary = data["summary"]
         cls = data["_cls"]
         bulk.records = [Record.from_dict(r, history=history) for r in data["records"]]
+        bulk._tokens = None
         return bulk
 
 
@@ -300,13 +314,16 @@ class History(Record):
         self.topics: list[Topic] = []
         self.current = Topic(history=self)
         self.agent: Agent = agent
+        self._tokens: int | None = None
 
     def get_tokens(self) -> int:
-        return (
-            self.get_bulks_tokens()
-            + self.get_topics_tokens()
-            + self.get_current_topic_tokens()
-        )
+        if self._tokens is None:
+            self._tokens = (
+                self.get_bulks_tokens()
+                + self.get_topics_tokens()
+                + self.get_current_topic_tokens()
+            )
+        return self._tokens
 
     def is_over_limit(self):
         limit = _get_ctx_size_for_history()
@@ -326,12 +343,14 @@ class History(Record):
         self, ai: bool, content: MessageContent, tokens: int = 0
     ) -> Message:
         self.counter += 1
+        self._tokens = None
         return self.current.add_message(ai, content=content, tokens=tokens)
 
     def new_topic(self):
         if self.current.messages:
             self.topics.append(self.current)
             self.current = Topic(history=self)
+            self._tokens = None
 
     def output(self) -> list[OutputMessage]:
         result: list[OutputMessage] = []
@@ -346,6 +365,7 @@ class History(Record):
         history.bulks = [Bulk.from_dict(b, history=history) for b in data["bulks"]]
         history.topics = [Topic.from_dict(t, history=history) for t in data["topics"]]
         history.current = Topic.from_dict(data["current"], history=history)
+        history._tokens = None
         return history
 
     def to_dict(self):
@@ -400,6 +420,7 @@ class History(Record):
         for topic in self.topics:
             if not topic.summary:
                 await topic.summarize()
+                self._tokens = None
                 return True
 
         # move oldest topic to bulks and summarize
@@ -412,6 +433,7 @@ class History(Record):
                 await bulk.summarize()
             self.bulks.append(bulk)
             self.topics.remove(topic)
+            self._tokens = None
             return True
         return False
 
@@ -421,6 +443,7 @@ class History(Record):
         # remove oldest bulk if necessary
         if not compressed:
             self.bulks.pop(0)
+            self._tokens = None
             return True
         return compressed
 
@@ -436,6 +459,7 @@ class History(Record):
             ]
         )
         self.bulks = bulks
+        self._tokens = None
         return True
 
     async def merge_bulks(self, bulks: list[Bulk]) -> Bulk:

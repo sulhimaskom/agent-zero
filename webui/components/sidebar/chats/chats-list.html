@@ -14,16 +14,16 @@
         <ul class="config-list chats-config-list" x-show="$store.chats.contexts.length > 0">
           <template x-for="context in $store.chats.contexts" :key="context.id">
             <li>
-              <div :class="{'chat-container': true, 'chat-selected': context.id === $store.chats.selected}"
-                @click="$store.chats.selectChat(context.id)">
+              <button :class="{'chat-container': true, 'chat-selected': context.id === $store.chats.selected}"
+                @click="$store.chats.selectChat(context.id)" :aria-label="context.name ? 'Select chat ' + context.name : 'Select chat #' + context.no">
                 <div class="chat-list-button">
                   <span class="project-color-ball"
                     :style="context.project?.color ? { backgroundColor: context.project.color } : { border: '1px solid var(--color-border)' }"></span>
                   <span class="chat-name" :title="context.name ? context.name : 'Chat #' + context.no"
                     x-text="context.name ? context.name : 'Chat #' + context.no"></span>
                 </div>
-                <button class="edit-button" @click.stop="$store.chats.killChat(context.id)">X</button>
-              </div>
+                <button class="edit-button" @click.stop="$store.chats.killChat(context.id)" aria-label="Delete chat">X</button>
+              </button>
             </li>
           </template>
         </ul>
@@ -79,10 +79,18 @@
       transition: background-color 0.2s ease-in-out;
       overflow: hidden;
       cursor: pointer;
+      background: transparent;
+      border: none;
+      padding: 0;
     }
 
     .chat-container:hover {
       background-color: var(--color-background-hover);
+    }
+
+    .chat-container:focus-visible {
+      outline: 2px solid var(--color-highlight);
+      outline-offset: -2px;
     }
 
     .chat-list-button {
@@ -132,6 +140,11 @@
     .edit-button:active {
       background-color: #131a2090;
       color: rgba(253, 253, 253, 0.35);
+    }
+
+    .edit-button:focus-visible {
+      outline: 2px solid var(--color-highlight);
+      outline-offset: 2px;
     }
 
     .empty-list-message {

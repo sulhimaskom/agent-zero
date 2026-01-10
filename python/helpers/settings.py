@@ -1705,9 +1705,9 @@ def get_runtime_config(set: Settings):
     if runtime.is_dockerized():
         return {
             "code_exec_ssh_enabled": set["shell_interface"] == "ssh",
-            "code_exec_ssh_addr": "localhost",
-            "code_exec_ssh_port": 22,
-            "code_exec_ssh_user": "root",
+            "code_exec_ssh_addr": get_dotenv_value("CODE_EXEC_SSH_ADDR", "localhost"),
+            "code_exec_ssh_port": int(get_dotenv_value("CODE_EXEC_SSH_PORT", "22")),
+            "code_exec_ssh_user": get_dotenv_value("CODE_EXEC_SSH_USER", "root"),
         }
     else:
         host = set["rfc_url"]
@@ -1721,7 +1721,7 @@ def get_runtime_config(set: Settings):
             "code_exec_ssh_enabled": set["shell_interface"] == "ssh",
             "code_exec_ssh_addr": host,
             "code_exec_ssh_port": set["rfc_port_ssh"],
-            "code_exec_ssh_user": "root",
+            "code_exec_ssh_user": get_dotenv_value("CODE_EXEC_SSH_USER", "root"),
         }
 
 
