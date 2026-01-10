@@ -18,15 +18,6 @@ jobs:
     runs-on: ubuntu-24.04-arm
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      IFLOW_API_KEY: ${{ secrets.IFLOW_API_KEY }}
-      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
-      VITE_SUPABASE_KEY: ${{ secrets.VITE_SUPABASE_KEY }}
-      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-      API_KEY: ${{ secrets.GEMINI_API_KEY }}
-      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
-      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_KEY }}
 
     steps:
       - name: Wait in Queue
@@ -94,12 +85,9 @@ jobs:
           echo "$HOME/.opencode/bin" >> $GITHUB_PATH
       - name: Run Flow 00
         run: |
-          if opencode run "$(cat .github/prompt/00-strategist.md)" \
+          opencode run "$(cat .github/prompt/00-strategist.md)" \
             --model opencode/glm-4.7-free \
-            --share false; then
-            echo "✓ Flow 00 succeeded"
-          else
-            echo "✗ Flow 00 failed"
+            --share false
 
   flow-01:
     needs: analyze
@@ -120,12 +108,9 @@ jobs:
           echo "$HOME/.opencode/bin" >> $GITHUB_PATH
       - name: Run Flow 01
         run: |
-          if opencode run "$(cat .github/prompt/01-code-review.md)" \
+          opencode run "$(cat .github/prompt/01-code-review.md)" \
             --model opencode/glm-4.7-free \
-            --share false; then
-            echo "✓ Flow 01 succeeded"
-          else
-            echo "✗ Flow 01 failed"
+            --share false
 
   flow-02:
     needs: analyze
@@ -146,12 +131,9 @@ jobs:
           echo "$HOME/.opencode/bin" >> $GITHUB_PATH
       - name: Run Flow 02
         run: |
-          if opencode run "$(cat .github/prompt/02-docs-hygiene.md)" \
+          opencode run "$(cat .github/prompt/02-docs-hygiene.md)" \
             --model opencode/glm-4.7-free \
-            --share false; then
-            echo "✓ Flow 02 succeeded"
-          else
-            echo "✗ Flow 02 failed"
+            --share false
 
   # Parallel Flow Jobs - Group 2
   flow-03:
@@ -173,12 +155,9 @@ jobs:
           echo "$HOME/.opencode/bin" >> $GITHUB_PATH
       - name: Run Flow 03
         run: |
-          if opencode run "$(cat .github/prompt/03-test-coverage.md)" \
+          opencode run "$(cat .github/prompt/03-test-coverage.md)" \
             --model opencode/glm-4.7-free \
-            --share false; then
-            echo "✓ Flow 03 succeeded"
-          else
-            echo "✗ Flow 03 failed"
+            --share false
 
   # Main Analysis Phase (runs after all flows)
   main-analysis:
