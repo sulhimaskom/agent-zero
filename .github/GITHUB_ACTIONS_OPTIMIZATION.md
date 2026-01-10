@@ -72,19 +72,37 @@ git add .github/workflows/on-pull-optimized.yml
 
 ## Optimizations Explained
 
-### 1. Parallel Execution
+### 1. Parallel Execution (Job-Level Strategy)
+
+**Important**: `strategy` cannot be used at step-level in GitHub Actions. Must use separate jobs.
+
 Instead of sequential flows:
 ```
 Flow 00 → Flow 01 → Flow 02 → ... → Flow 11 (18 hours)
 ```
 
-Use matrix strategy:
+Use separate parallel jobs:
 ```
-Group 1: Flows 00-03 (3 parallel, 30 min)
-Group 2: Flows 04-07 (4 parallel, 30 min)
-Group 3: Flows 08-11 (4 parallel, 30 min)
-Main: Flow 11 (45 min)
-Total: ~2 hours
+on-push-optimized.yml structure:
+├── analyze (pre-check: changes detection, issue count)
+├── flow-00 (Strategist) - parallel
+├── flow-01 (Code Review) - parallel
+├── flow-02 (Docs Hygiene) - parallel
+├── flow-03 (Test Coverage) - parallel
+└── main-analysis (runs after all flows)
+
+Total: ~2 hours (4 jobs × 25-30 min + 45 min main)
+
+on-pull-optimized.yml structure:
+├── pre-analysis (pre-check: changes detection)
+├── flow-00 (Strategist) - parallel
+├── flow-01 (Code Review) - parallel
+├── flow-02 (Docs Hygiene) - parallel
+├── flow-03 (Test Coverage) - parallel
+├── flow-04 (API Analysis) - parallel
+└── auto-fix (exponential backoff retry)
+
+Total: ~1.5 hours (5 jobs × 25 min + 45 min auto-fix)
 ```
 
 ### 2. Conditional Execution
