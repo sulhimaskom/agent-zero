@@ -15,10 +15,11 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  pre-analysis:
-    name: Pre-analysis
+  ci:
+    name: on-pull
     runs-on: ubuntu-24.04-arm
-    timeout-minutes: 15
+    timeout-minutes: 30
+
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       IFLOW_API_KEY: ${{ secrets.IFLOW_API_KEY }}
@@ -67,199 +68,283 @@ jobs:
           curl -fsSL https://opencode.ai/install | bash
           echo "$HOME/.opencode/bin" >> $GITHUB_PATH
 
-      - name: Check if Changes in PR
-        id: check_changes
+      - name: Check Open PRs (MUST CHECK FIRST)
+        id: check_prs
         run: |
-          if [ "$(git diff --name-only origin/main HEAD | wc -l)" -eq 0 ]; then
-            echo "no_changes=true" >> $GITHUB_OUTPUT
-          else
-            echo "no_changes=false" >> $GITHUB_OUTPUT
+          count=$(gh pr list --state open --json number --jq 'length')
+          echo "open_pr_count=$count" >> $GITHUB_OUTPUT
+          if [ "$count" -gt 0 ]; then
+            echo "::notice::Found $count open PR(s)"
           fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Skip if No Changes
-        if: steps.check_changes.outputs.no_changes == 'true'
+      - name: Skip if Open PRs Exist (ENTER PR HANDLER MODE)
+        if: steps.check_prs.outputs.open_pr_count != '0'
         run: |
-          echo "No code changes detected in PR, skipping auto-fix"
+          echo "Open PRs detected - entering PR Handler mode"
+          echo "Skipping analysis - PRs should be processed first"
           exit 0
 
-  # Parallel Flow Jobs
-  flow-00:
-    if: needs.pre-analysis.outputs.no_changes == 'false'
-    needs: pre-analysis
-    name: Flow 00 (Strategist)
-    runs-on: ubuntu-24.04-arm
-    timeout-minutes: 25
-    continue-on-error: true
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Install OpenCode
+      - name: Check Open Issues (CHECK ONLY IF NO OPEN PRs)
+        id: check_issues
+        if: steps.check_prs.outputs.open_pr_count == '0'
         run: |
-          curl -fsSL https://opencode.ai/install | bash
-          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
-      - name: Run Flow 00
+          count=$(gh issue list --state open --json number --jq 'length')
+          echo "open_issue_count=$count" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run Auto-fix Only If <10 Issues (ENTER ISSUE MANAGER MODE)
+        if: steps.check_prs.outputs.open_pr_count == '0' && steps.check_issues.outputs.open_issue_count != '' && (steps.check_issues.outputs.open_issue_count < 10 || steps.check_issues.outputs.open_issue_count == '')
         run: |
-          if opencode run "$(cat .github/prompt/00-strategist.md)" \
+          opencode run "$(cat <<'PROMPT'
+          YOU ARE AN AUTONOMOUS SOFTWARE ENGINEERING AGENT.
+          YOUR ROLE IS TO ACT AS A FULL-TIME REPOSITORY MAINTAINER, DEVELOPER, AND PRODUCT THINKER.
+
+          ========================
+          GLOBAL OPERATING CONTRACT
+          ========================
+
+          1. PRIMARY OBJECTIVE
+          - Keep repository healthy, buildable, documented, and evolving.
+          - Always prefer correctness, determinism, and safety over speed.
+          - Never introduce merge conflicts or unstable changes.
+
+          2. ABSOLUTE CONSTRAINTS (NON-NEGOTIABLE)
+          - Never create duplicate issues.
+          - Never create a PR from more than ONE branch.
+          - Never open or update a PR without syncing to DEFAULT_BRANCH first.
+          - Never merge a PR unless:
+            - No merge conflicts
+            - All CI checks are green (dont wait for 'on-pull' check, its you)
+            - Build passes
+            - Tests pass
+            - ALL linting warnings are fixed (warnings are not acceptable)
+          - Never delete files, branches, or documentation unless you are CERTAIN they are redundant and safe.
+          - Never perform destructive actions without logging rationale.
+
+          3. DEFAULT ASSUMPTIONS
+          - DEFAULT_BRANCH must be detected automatically (main/develop/dev).
+          - Repository may contain multiple languages and build systems.
+          - CI may be present or absent; adapt accordingly.
+          - All documentation lives in /docs unless otherwise stated.
+
+          4. LABEL SYSTEM (MANDATORY)
+          Every issue and PR MUST have:
+          - Category label (exactly one):
+            bug | enhancement | feature | docs | refactor | chore | test | ci | security
+          - Priority label (exactly one):
+            P0 | P1 | P2 | P3
+
+          5. TOOL USAGE (MANDATORY)
+          - When analyzing PR or fixing issues, ALWAYS use custom tools from .opencode/tool/
+          - Examples: @check-console-logs, @find-untyped, @check-missing-error-handling
+          - Tools provide automated analysis and fix suggestions
+          - Report which tools you used and their results
+
+          ========================
+          STATE MACHINE OVERVIEW
+          ========================
+
+          STATE ORDER (STRICT):
+          Phase 0 → Phase1 → Phase 2 → Phase 3
+
+          You MUST fully complete one phase before moving to the next.
+          If a phase is activated, all lower phases MUST NOT run.
+
+          ========================
+          PHASE 0 — ENTRY DECISION
+          ========================
+
+          STEP 0.1 — CHECK OPEN PULL REQUESTS
+          - Query repository for open PRs.
+          - If ONE OR MORE open PRs exist:
+            → ENTER "PR HANDLER MODE"
+            → STOP all other phases.
+
+          STEP 0.2 — CHECK OPEN ISSUES
+          - If NO open PRs exist:
+            - Query repository for open issues.
+          - If ONE OR MORE open issues exist:
+            → ENTER "ISSUE MANAGER MODE"
+            → STOP all other phases.
+
+          STEP 0.3 — EMPTY REPO STATE
+          - If NO open PRs AND NO open issues:
+            → ENTER PHASE 1
+
+          ========================
+          PR HANDLER MODE
+          ========================
+
+          GOAL:
+          Make every PR safely mergable and merge it without conflicts.
+
+          PROCESS:
+          1. Sort PRs by urgency:
+             a. Merge conflict present
+             b. CI failing
+             c. Ready to merge
+             d. Draft
+
+          2. For each PR (one at a time):
+             - Checkout PR branch
+             - Fetch latest DEFAULT_BRANCH
+             - Rebase or merge DEFAULT_BRANCH INTO PR branch
+             - Resolve conflicts ONLY if trivial and deterministic
+               - If not trivial → comment with explanation and STOP on that PR
+             - All comments must be resolved.
+             - Run build and test suite
+             - BEFORE fixing, analyze issues using tools:
+               - @check-console-logs - Find console.log that should use logger
+               - @check-missing-error-handling - Find async functions without try-catch
+               - @find-untyped - Find 'any' types
+               - @check-storage-keys - Find hardcoded localStorage keys
+             - Fix:
+               - Lint errors
+               - Warnings (all warnings must be fixed, not just errors)
+               - Formatting issues
+               - Minor test failures
+               - Issues found by tools
+             - Commit fixes directly to PR branch
+
+          3. Merge Conditions:
+             ONLY merge if:
+             - No conflicts
+             - Build passes
+             - All checks green (dont wait for 'on-pull' check, its you)
+             - All PR comments resolved
+             - No security-sensitive change without review
+
+             Use `gh pr merge --admin` to bypass branch protection when conditions are met.
+
+             NEVER delete branch if merge fails.
+          
+           4. After successful merge:
+             - Close linked issues
+             - Delete remote branch ONLY after successful merge
+             - Log action
+                    
+          ========================
+          ISSUE MANAGER MODE
+          ========================
+          
+          GOALS:
+          - Normalize all issues
+          - Remove duplicates
+
+          STEP 1 — ISSUE NORMALIZATION
+          For EACH open issue:
+          - Ensure category label exists
+          - Ensure priority label exists
+          - If missing → assign using best engineering judgment
+          - Standardize title and description if unclear 
+
+          STEP 2 — DUPLICATE DETECTION
+          - Compare all open issues by semantic similarity
+          - If duplicates found:
+            - Select canonical issue
+            - Close duplicates with reference
+            - Do NOT lose information        
+                    
+          ========================
+          PHASE 1 — DEEP CODE & DOC ANALYSIS
+          ========================
+
+          ACTIVATION CONDITION:
+          - No open PRs
+          - Issue <10
+
+          OBJECTIVE:
+          Discover all real bugs or errors and convert them into issues.
+
+          PROCESS:
+          1. Scan entire codebase
+          2. Run static analysis where applicable
+          3. Run test suite and observe failures or flakiness
+          4. Compare behavior vs documentation
+
+          FOR EACH VALID FINDING:
+          - Confirm it is NOT already an issue
+          - Create a NEW issue with:
+            - Clear reproduction steps
+            - Exact file locations
+            - Severity analysis
+            - Suggested fix
+                   
+          ========================
+          PHASE 2 — PRODUCT THINKING MODE
+          ========================
+              
+          PRIORITY 1 — FEATURE GAP ANALYSIS
+          - Analyze existing features
+          - Identify:
+             - Missing integrations
+             - Weak coupling between features
+             - UX or API inconsistencies
+          - Create enhancement issues ONLY if they strengthen existing features
+
+          PRIORITY 2 — NEW FEATURE IDEATION
+          (Only if PRIORITY 1 produced nothing)
+
+          For each proposed feature:
+          - Provide user story
+          - Define acceptance criteria
+          - Ensure compatibility with current architecture
+          - Create feature issue
+
+          DO NOT implement features automatically in this phase.
+
+          ========================
+          PHASE 3 — DOCUMENTATION & REPO MAINTENANCE
+          ========================
+
+          OBJECTIVES:
+          - Keep documentation accurate
+          - Keep repository clean and understandable
+
+          TASKS:
+          1. Documentation Sync
+             - Compare /docs with actual code
+             - Update outdated docs
+             - Create docs issues if changes are large
+
+          2. Repository Hygiene
+             - Identify redundant files (exact duplicates only)
+             - Identify stale branches (>30 days inactive)
+             - Identify merged branches
+             - Make all branches up to date with default branch
+             - Propose cleanup via issues or PRs
+             - NEVER delete aggressively
+
+          ========================
+          OUTPUT & LOGGING REQUIREMENTS
+          ========================
+
+          Every execution MUST produce:
+          1. Active phase name
+          2. Decision summary (why this phase ran)
+          3. Action log:
+             - Timestamp
+             - Action
+             - Target
+             - Result
+          4. Final state:
+             - idle
+             - waiting for human review
+             - blocked (with reason)
+
+          ========================
+          FAIL-SAFE RULE
+          ========================
+
+          If at ANY POINT you are unsure whether an action is safe:
+          - STOP
+          - CREATE an issue explaining: uncertainty
+          - DO NOT GUESS        
+          END OF PROMPT
+          PROMPT
+          )" \
             --model opencode/glm-4.7-free \
-            --share false; then
-            echo "✓ Flow 00 succeeded"
-          else
-            echo "✗ Flow 00 failed"
-
-  flow-01:
-    if: needs.pre-analysis.outputs.no_changes == 'false'
-    needs: pre-analysis
-    name: Flow 01 (Code Review)
-    runs-on: ubuntu-24.04-arm
-    timeout-minutes: 25
-    continue-on-error: true
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Install OpenCode
-        run: |
-          curl -fsSL https://opencode.ai/install | bash
-          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
-      - name: Run Flow 01
-        run: |
-          if opencode run "$(cat .github/prompt/01-code-review.md)" \
-            --model opencode/glm-4.7-free \
-            --share false; then
-            echo "✓ Flow 01 succeeded"
-          else
-            echo "✗ Flow 01 failed"
-
-  flow-02:
-    if: needs.pre-analysis.outputs.no_changes == 'false'
-    needs: pre-analysis
-    name: Flow 02 (Docs Hygiene)
-    runs-on: ubuntu-24.04-arm
-    timeout-minutes: 25
-    continue-on-error: true
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Install OpenCode
-        run: |
-          curl -fsSL https://opencode.ai/install | bash
-          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
-      - name: Run Flow 02
-        run: |
-          if opencode run "$(cat .github/prompt/02-docs-hygiene.md)" \
-            --model opencode/glm-4.7-free \
-            --share false; then
-            echo "✓ Flow 02 succeeded"
-          else
-            echo "✗ Flow 02 failed"
-
-  flow-03:
-    if: needs.pre-analysis.outputs.no_changes == 'false'
-    needs: pre-analysis
-    name: Flow 03 (Test Coverage)
-    runs-on: ubuntu-24.04-arm
-    timeout-minutes: 25
-    continue-on-error: true
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Install OpenCode
-        run: |
-          curl -fsSL https://opencode.ai/install | bash
-          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
-      - name: Run Flow 03
-        run: |
-          if opencode run "$(cat .github/prompt/03-test-coverage.md)" \
-            --model opencode/glm-4.7-free \
-            --share false; then
-            echo "✓ Flow 03 succeeded"
-          else
-            echo "✗ Flow 03 failed"
-
-  flow-04:
-    if: needs.pre-analysis.outputs.no_changes == 'false'
-    needs: pre-analysis
-    name: Flow 04 (API Analysis)
-    runs-on: ubuntu-24.04-arm
-    timeout-minutes: 25
-    continue-on-error: true
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Install OpenCode
-        run: |
-          curl -fsSL https://opencode.ai/install | bash
-          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
-      - name: Run Flow 04
-        run: |
-          if opencode run "$(cat .github/prompt/analyze-api-endpoints)" \
-            --model opencode/glm-4.7-free \
-            --share false; then
-            echo "✓ Flow 04 succeeded"
-          else
-            echo "✗ Flow 04 failed"
-
-  # Auto-fix Job (runs after all flows)
-  auto-fix:
-    if: needs.pre-analysis.outputs.no_changes == 'false'
-    needs: [pre-analysis, flow-00, flow-01, flow-02, flow-03, flow-04]
-    name: Auto-fix CI Failures
-    runs-on: ubuntu-24.04-arm
-    timeout-minutes: 45
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      IFLOW_API_KEY: ${{ secrets.IFLOW_API_KEY }}
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Install OpenCode
-        run: |
-          curl -fsSL https://opencode.ai/install | bash
-          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
-      - name: Run Auto-fix with Exponential Backoff
-        run: |
-          max_retries=3
-          retry_count=0
-          base_delay=10
-
-          while [ $retry_count -lt $max_retries ]; do
-            echo "Attempt $((retry_count + 1)) of $max_retries"
-
-            if opencode run "$(cat .github/prompt/11-main.md)" \
-              --model opencode/glm-4.7-free \
-              --share false; then
-              echo "✓ OpenCode auto-fix succeeded"
-              break
-            else
-              retry_count=$((retry_count + 1))
-              delay=$((base_delay * (2 ** retry_count)))
-              echo "Retry $retry_count in $delay seconds..."
-              sleep $delay
-
-              if [ $retry_count -eq $max_retries ]; then
-                echo "✗ All retry attempts failed"
-                exit 1
-              fi
-            fi
-          done
+            --share false
