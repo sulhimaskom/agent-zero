@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   analyze:
-    name: on-push
+    name: Pre-analysis
     runs-on: ubuntu-24.04-arm
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -89,65 +89,145 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Parallel Execution - Group 1: Flows 00-03 (3 parallel)
-      - name: Parallel Flows 00-03
-        if: steps.check_changes.outputs.no_changes == 'false' && steps.check_issues.outputs.open_issue_count == '0'
-        continue-on-error: true
-        strategy:
-          matrix:
-            flow: ["00", "01", "02"]
-          fail-fast: false
-        timeout-minutes: 30
+  # Parallel Flow Jobs - Group 1
+  flow-00:
+    if: needs.analyze.outputs.no_changes == 'false' && needs.analyze.outputs.open_issue_count == '0'
+    needs: analyze
+    name: Flow 00 (Strategist)
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
+    continue-on-error: true
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install OpenCode
         run: |
-          if opencode run "$(cat .github/prompt/${{ matrix.flow }}.md)" \
+          curl -fsSL https://opencode.ai/install | bash
+          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+      - name: Run Flow 00
+        run: |
+          if opencode run "$(cat .github/prompt/00-strategist.md)" \
             --model opencode/glm-4.7-free \
             --share false; then
-            echo "✓ Flow ${{ matrix.flow }} succeeded"
+            echo "✓ Flow 00 succeeded"
           else
-            echo "✗ Flow ${{ matrix.flow }} failed"
-            exit 1
+            echo "✗ Flow 00 failed"
 
-      # Parallel Execution - Group 2: Flows 04-07 (4 parallel)
-      - name: Parallel Flows 04-07
-        if: steps.check_changes.outputs.no_changes == 'false' && steps.check_issues.outputs.open_issue_count == '0'
-        continue-on-error: true
-        strategy:
-          matrix:
-            flow: ["03", "04", "05", "06"]
-          fail-fast: false
-        timeout-minutes: 30
+  flow-01:
+    if: needs.analyze.outputs.no_changes == 'false' && needs.analyze.outputs.open_issue_count == '0'
+    needs: analyze
+    name: Flow 01 (Code Review)
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
+    continue-on-error: true
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install OpenCode
         run: |
-          if opencode run "$(cat .github/prompt/${{ matrix.flow }}.md)" \
+          curl -fsSL https://opencode.ai/install | bash
+          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+      - name: Run Flow 01
+        run: |
+          if opencode run "$(cat .github/prompt/01-code-review.md)" \
             --model opencode/glm-4.7-free \
             --share false; then
-            echo "✓ Flow ${{ matrix.flow }} succeeded"
+            echo "✓ Flow 01 succeeded"
           else
-            echo "✗ Flow ${{ matrix.flow }} failed"
-            exit 1
+            echo "✗ Flow 01 failed"
 
-      # Parallel Execution - Group 3: Flows 08-11 (4 parallel)
-      - name: Parallel Flows 08-11
-        if: steps.check_changes.outputs.no_changes == 'false' && steps.check_issues.outputs.open_issue_count == '0'
-        continue-on-error: true
-        strategy:
-          matrix:
-            flow: ["07", "08", "09", "10"]
-          fail-fast: false
-        timeout-minutes: 30
+  flow-02:
+    if: needs.analyze.outputs.no_changes == 'false' && needs.analyze.outputs.open_issue_count == '0'
+    needs: analyze
+    name: Flow 02 (Docs Hygiene)
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
+    continue-on-error: true
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install OpenCode
         run: |
-          if opencode run "$(cat .github/prompt/${{ matrix.flow }}.md)" \
+          curl -fsSL https://opencode.ai/install | bash
+          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+      - name: Run Flow 02
+        run: |
+          if opencode run "$(cat .github/prompt/02-docs-hygiene.md)" \
             --model opencode/glm-4.7-free \
             --share false; then
-            echo "✓ Flow ${{ matrix.flow }} succeeded"
+            echo "✓ Flow 02 succeeded"
           else
-            echo "✗ Flow ${{ matrix.flow }} failed"
-            exit 1
+            echo "✗ Flow 02 failed"
 
-      # Main autonomous phase
-      - name: on-push (Main Analysis)
-        if: steps.check_issues.outputs.open_issue_count == '0'
-        timeout-minutes: 45
+  # Parallel Flow Jobs - Group 2
+  flow-03:
+    if: needs.analyze.outputs.no_changes == 'false' && needs.analyze.outputs.open_issue_count == '0'
+    needs: [analyze, flow-00, flow-01, flow-02]
+    name: Flow 03 (Test Coverage)
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
+    continue-on-error: true
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install OpenCode
         run: |
-          opencode run "$(cat .github/prompt/00.md)" \
+          curl -fsSL https://opencode.ai/install | bash
+          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+      - name: Run Flow 03
+        run: |
+          if opencode run "$(cat .github/prompt/03-test-coverage.md)" \
+            --model opencode/glm-4.7-free \
+            --share false; then
+            echo "✓ Flow 03 succeeded"
+          else
+            echo "✗ Flow 03 failed"
+
+  # Main Analysis Phase (runs after all flows)
+  main-analysis:
+    if: needs.analyze.outputs.open_issue_count == '0'
+    needs: [analyze, flow-00, flow-01, flow-02, flow-03]
+    name: Main Analysis
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 45
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      IFLOW_API_KEY: ${{ secrets.IFLOW_API_KEY }}
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_KEY: ${{ secrets.VITE_SUPABASE_KEY }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      API_KEY: ${{ secrets.GEMINI_API_KEY }}
+      SUPABASE_ANON_KEY: ${{ secrets.SUPABASE_ANON_KEY }}
+      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_KEY }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install OpenCode
+        run: |
+          curl -fsSL https://opencode.ai/install | bash
+          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+      - name: Run Main Analysis
+        run: |
+          opencode run "$(cat .github/prompt/11-main.md)" \
             --model opencode/glm-4.7-free \
             --share false
