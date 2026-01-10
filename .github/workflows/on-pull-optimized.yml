@@ -1,0 +1,269 @@
+name: on-pull
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: read
+  repository-projects: write
+
+concurrency:
+  group: oc-agent
+  cancel-in-progress: false
+
+jobs:
+  pre-analysis:
+    name: Pre-analysis
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 15
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      IFLOW_API_KEY: ${{ secrets.IFLOW_API_KEY }}
+
+    steps:
+      - name: Wait in Queue
+        uses: softprops/turnstyle@v2
+        with:
+          poll-interval-seconds: 30
+          same-branch-only: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        continue-on-error: true
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        continue-on-error: true
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+
+      - name: Branch Management
+        run: |
+          git fetch --all
+          if git branch -r | grep "origin/agent-workspace"; then
+            git checkout agent-workspace
+            git pull origin agent-workspace
+          else
+            git checkout -b agent-workspace
+          fi
+          git merge origin/main --no-edit || echo "Merge conflict or already up to date"
+
+      - name: Install Dependencies
+        continue-on-error: true
+        run: npm ci
+
+      - name: Install OpenCode CLI
+        run: |
+          curl -fsSL https://opencode.ai/install | bash
+          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+
+      - name: Check if Changes in PR
+        id: check_changes
+        run: |
+          if [ "$(git diff --name-only origin/main HEAD | wc -l)" -eq 0 ]; then
+            echo "no_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "no_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Skip if No Changes
+        if: steps.check_changes.outputs.no_changes == 'true'
+        run: |
+          echo "No code changes detected in PR, skipping auto-fix"
+          exit 0
+
+  # Parallel Flow Jobs
+  flow-00:
+    if: needs.pre-analysis.outputs.no_changes == 'false'
+    needs: pre-analysis
+    name: Flow 00 (Strategist)
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 25
+    continue-on-error: true
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install OpenCode
+        run: |
+          curl -fsSL https://opencode.ai/install | bash
+          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+      - name: Run Flow 00
+        run: |
+          if opencode run "$(cat .github/prompt/00-strategist.md)" \
+            --model opencode/glm-4.7-free \
+            --share false; then
+            echo "✓ Flow 00 succeeded"
+          else
+            echo "✗ Flow 00 failed"
+
+  flow-01:
+    if: needs.pre-analysis.outputs.no_changes == 'false'
+    needs: pre-analysis
+    name: Flow 01 (Code Review)
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 25
+    continue-on-error: true
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install OpenCode
+        run: |
+          curl -fsSL https://opencode.ai/install | bash
+          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+      - name: Run Flow 01
+        run: |
+          if opencode run "$(cat .github/prompt/01-code-review.md)" \
+            --model opencode/glm-4.7-free \
+            --share false; then
+            echo "✓ Flow 01 succeeded"
+          else
+            echo "✗ Flow 01 failed"
+
+  flow-02:
+    if: needs.pre-analysis.outputs.no_changes == 'false'
+    needs: pre-analysis
+    name: Flow 02 (Docs Hygiene)
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 25
+    continue-on-error: true
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install OpenCode
+        run: |
+          curl -fsSL https://opencode.ai/install | bash
+          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+      - name: Run Flow 02
+        run: |
+          if opencode run "$(cat .github/prompt/02-docs-hygiene.md)" \
+            --model opencode/glm-4.7-free \
+            --share false; then
+            echo "✓ Flow 02 succeeded"
+          else
+            echo "✗ Flow 02 failed"
+
+  flow-03:
+    if: needs.pre-analysis.outputs.no_changes == 'false'
+    needs: pre-analysis
+    name: Flow 03 (Test Coverage)
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 25
+    continue-on-error: true
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install OpenCode
+        run: |
+          curl -fsSL https://opencode.ai/install | bash
+          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+      - name: Run Flow 03
+        run: |
+          if opencode run "$(cat .github/prompt/03-test-coverage.md)" \
+            --model opencode/glm-4.7-free \
+            --share false; then
+            echo "✓ Flow 03 succeeded"
+          else
+            echo "✗ Flow 03 failed"
+
+  flow-04:
+    if: needs.pre-analysis.outputs.no_changes == 'false'
+    needs: pre-analysis
+    name: Flow 04 (API Analysis)
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 25
+    continue-on-error: true
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install OpenCode
+        run: |
+          curl -fsSL https://opencode.ai/install | bash
+          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+      - name: Run Flow 04
+        run: |
+          if opencode run "$(cat .github/prompt/analyze-api-endpoints)" \
+            --model opencode/glm-4.7-free \
+            --share false; then
+            echo "✓ Flow 04 succeeded"
+          else
+            echo "✗ Flow 04 failed"
+
+  # Auto-fix Job (runs after all flows)
+  auto-fix:
+    if: needs.pre-analysis.outputs.no_changes == 'false'
+    needs: [pre-analysis, flow-00, flow-01, flow-02, flow-03, flow-04]
+    name: Auto-fix CI Failures
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 45
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      IFLOW_API_KEY: ${{ secrets.IFLOW_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install OpenCode
+        run: |
+          curl -fsSL https://opencode.ai/install | bash
+          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+      - name: Run Auto-fix with Exponential Backoff
+        run: |
+          max_retries=3
+          retry_count=0
+          base_delay=10
+
+          while [ $retry_count -lt $max_retries ]; do
+            echo "Attempt $((retry_count + 1)) of $max_retries"
+
+            if opencode run "$(cat .github/prompt/11-main.md)" \
+              --model opencode/glm-4.7-free \
+              --share false; then
+              echo "✓ OpenCode auto-fix succeeded"
+              break
+            else
+              retry_count=$((retry_count + 1))
+              delay=$((base_delay * (2 ** retry_count)))
+              echo "Retry $retry_count in $delay seconds..."
+              sleep $delay
+
+              if [ $retry_count -eq $max_retries ]; then
+                echo "✗ All retry attempts failed"
+                exit 1
+              fi
+            fi
+          done

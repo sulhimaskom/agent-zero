@@ -1,0 +1,76 @@
+# Find Large Functions
+
+Scan codebase for functions >100 lines and report refactoring candidates.
+
+## SEARCH PATTERN
+
+Use AST-grep or manual scanning to find:
+- Functions with >100 lines
+- Classes with >15 methods
+- Nested functions >50 lines
+
+## PRIORITY AREAS
+
+**Priority P0 - Core Helpers (>500 lines):**
+- python/helpers/settings.py: convert_out (1134 lines)
+- python/helpers/task_scheduler.py: TaskScheduler class (298 lines)
+- python/helpers/mcp_handler.py: MCPConfig class (407 lines)
+
+**Priority P1 - API Endpoints (>100 lines):**
+- python/api/memory_dashboard.py
+- python/api/backup_create.py
+- python/api/backup_restore.py
+
+**Priority P1 - Tools (>100 lines):**
+- python/tools/scheduler.py (multiple large methods)
+- python/tools/document_query.py
+
+**Priority P2 - Extensions (>50 lines):**
+- python/extensions/system_prompt/_10_system_prompt.py
+- python/extensions/message_loop_prompts_after/_50_recall_memories.py
+
+## OUTPUT FORMAT
+
+```json
+{
+  "large_functions": [
+    {
+      "file": "python/helpers/settings.py",
+      "function": "convert_out",
+      "lines": 1134,
+      "recommendation": "Split into provider_config, model_config, api_config"
+    }
+  ],
+  "large_classes": [
+    {
+      "file": "python/helpers/task_scheduler.py",
+      "class": "TaskScheduler",
+      "methods": 23,
+      "recommendation": "Extract TaskExecutor into separate module"
+    }
+  ],
+  "total_functions_over_100": 0
+}
+```
+
+## REFACTORING STRATEGIES
+
+1. **Single Responsibility Principle**
+   - Each function should do one thing well
+   - Extract configuration logic into dedicated classes
+
+2. **Composition Over Inheritance**
+   - Use composition for configurable behaviors
+   - Extract strategy patterns for different implementations
+
+3. **Dependency Injection**
+   - Pass dependencies as parameters instead of hardcoding
+   - Make functions testable by injecting collaborators
+
+## CHECKLIST
+
+- [ ] Scan python/helpers/ for functions >100 lines
+- [ ] Scan python/api/ for endpoints >100 lines
+- [ ] Scan python/tools/ for tools >100 lines
+- [ ] Scan python/extensions/ for hooks >50 lines
+- [ ] Report all findings with recommendations
