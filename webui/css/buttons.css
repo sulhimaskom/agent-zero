@@ -33,10 +33,22 @@
   filter: brightness(1.05);
 }
 
+.button:focus-visible {
+  outline: 2px solid var(--color-highlight);
+  outline-offset: 2px;
+  transform: scale(1.05);
+  filter: brightness(1.05);
+}
+
 .button.cancel:hover {
   background: var(--color-panel);
   border-color: var(--color-accent);
   color: var(--color-accent);
+}
+
+.button.cancel:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
 }
 
 .buttons-container {
@@ -60,4 +72,10 @@
 .icon-button {
   padding-left: 0.75rem;
   padding-right: 0.75rem;
+}
+
+.icon-button:focus-visible {
+  outline: 2px solid var(--color-highlight);
+  outline-offset: 2px;
+  border-radius: 4px;
 }

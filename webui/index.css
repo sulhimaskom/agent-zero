@@ -947,6 +947,20 @@ a:active {
   color: inherit;
 }
 
+/* Focus styles for accessibility */
+:focus-visible {
+  outline: 2px solid var(--color-highlight);
+  outline-offset: 2px;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--color-highlight);
+  outline-offset: 2px;
+}
+
 
 .light-mode .connected {
   color: #4caf50;
@@ -1497,9 +1511,51 @@ nav ul li a img {
   .scheduler-task-actions {
     flex-wrap: wrap;
   }
+
+  .scheduler-schedule-field {
+    max-width: none;
+  }
 }
 
 @media (max-width: 480px) {
+  .scheduler-schedule-builder {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .scheduler-schedule-field {
+    max-width: none;
+  }
+
+  .scheduler-schedule-field input {
+    font-size: 1rem;
+  }
+
+  .scheduler-form-field {
+    gap: 4px;
+  }
+
+  .scheduler-form-actions {
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .scheduler-form-actions button {
+    width: 100%;
+  }
+
+  .scheduler-task-list {
+    font-size: 0.8rem;
+  }
+
+  .scheduler-task-list th,
+  .scheduler-task-list td {
+    padding: 0.5rem;
+  }
+}
+
+@media (max-width: 320px) {
   nav ul li a {
     flex-direction: row;
     justify-content: flex-start;

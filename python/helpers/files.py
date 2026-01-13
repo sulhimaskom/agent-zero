@@ -333,7 +333,7 @@ def delete_dir(relative_path: str):
         # first try with ignore_errors=True which is the safest option
         shutil.rmtree(abs_path, ignore_errors=True)
 
-        # if directory still exists, try more aggressive methods
+                # if directory still exists, try more aggressive methods
         if os.path.exists(abs_path):
             try:
                 # try to change permissions and delete again
@@ -347,9 +347,11 @@ def delete_dir(relative_path: str):
 
                 # try again after changing permissions
                 shutil.rmtree(abs_path, ignore_errors=True)
-            except:
+            except Exception as e:
                 # suppress all errors - we're ensuring no errors propagate
-                pass
+                # log warning for debugging purposes
+                import warnings
+                warnings.warn(f"Failed to remove directory {abs_path}: {e}")
 
 
 def move_dir(old_path: str, new_path: str):
@@ -360,8 +362,11 @@ def move_dir(old_path: str, new_path: str):
         return  # nothing to rename
     try:
         os.rename(abs_old, abs_new)
-    except Exception:
-        pass  # suppress all errors, keep behavior consistent
+    except Exception as e:
+        # suppress all errors, keep behavior consistent
+        # log warning for debugging purposes
+        import warnings
+        warnings.warn(f"Failed to move directory from {abs_old} to {abs_new}: {e}")
 
 
 # move dir safely, remove with number if needed

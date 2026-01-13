@@ -27,6 +27,8 @@ from typing import Callable
 from python.helpers.localization import Localization
 from python.helpers.extension import call_extensions
 from python.helpers.errors import RepairableException
+from python.helpers.tool import Tool
+from python.coordinators import ToolCoordinator, HistoryCoordinator
 
 
 class AgentContextType(Enum):
@@ -350,6 +352,8 @@ class Agent:
         self.last_user_message: history.Message | None = None
         self.intervention: UserMessage | None = None
         self.data: dict[str, Any] = {}  # free data object all the tools can use
+        self.tool_coordinator = ToolCoordinator(self)
+        self.history_coordinator = HistoryCoordinator(self)
 
         asyncio.run(self.call_extensions("agent_init"))
 
@@ -447,7 +451,7 @@ class Agent:
                             # Append the assistant's response to the history
                             self.hist_add_ai_response(agent_response)
                             # process tools requested in agent message
-                            tools_result = await self.process_tools(agent_response)
+                            tools_result = await self.tool_coordinator.process_tools(agent_response)
                             if tools_result:  # final response of message loop available
                                 return tools_result  # break the execution if the task is done
 
@@ -603,62 +607,24 @@ class Agent:
     def hist_add_message(
         self, ai: bool, content: history.MessageContent, tokens: int = 0
     ):
-        self.last_message = datetime.now(timezone.utc)
-        # Allow extensions to process content before adding to history
-        content_data = {"content": content}
-        asyncio.run(self.call_extensions("hist_add_before", content_data=content_data, ai=ai))
-        return self.history.add_message(ai=ai, content=content_data["content"], tokens=tokens)
+        return self.history_coordinator.hist_add_message(ai, content, tokens)
 
     def hist_add_user_message(self, message: UserMessage, intervention: bool = False):
-        self.history.new_topic()  # user message starts a new topic in history
-
-        # load message template based on intervention
-        if intervention:
-            content = self.parse_prompt(
-                "fw.intervention.md",
-                message=message.message,
-                attachments=message.attachments,
-                system_message=message.system_message,
-            )
-        else:
-            content = self.parse_prompt(
-                "fw.user_message.md",
-                message=message.message,
-                attachments=message.attachments,
-                system_message=message.system_message,
-            )
-
-        # remove empty parts from template
-        if isinstance(content, dict):
-            content = {k: v for k, v in content.items() if v}
-
-        # add to history
-        msg = self.hist_add_message(False, content=content)  # type: ignore
-        self.last_user_message = msg
-        return msg
+        return self.history_coordinator.hist_add_user_message(message, intervention)
 
     def hist_add_ai_response(self, message: str):
-        self.loop_data.last_response = message
-        content = self.parse_prompt("fw.ai_response.md", message=message)
-        return self.hist_add_message(True, content=content)
+        return self.history_coordinator.hist_add_ai_response(message)
 
     def hist_add_warning(self, message: history.MessageContent):
-        content = self.parse_prompt("fw.warning.md", message=message)
-        return self.hist_add_message(False, content=content)
+        return self.history_coordinator.hist_add_warning(message)
 
     def hist_add_tool_result(self, tool_name: str, tool_result: str, **kwargs):
-        data = {
-            "tool_name": tool_name,
-            "tool_result": tool_result,
-            **kwargs,
-        }
-        asyncio.run(self.call_extensions("hist_add_tool_result", data=data))
-        return self.hist_add_message(False, content=data)
+        return self.history_coordinator.hist_add_tool_result(tool_name, tool_result, **kwargs)
 
     def concat_messages(
         self, messages
     ):  # TODO add param for message range, topic, history
-        return self.history.output_text(human_label="user", ai_label="assistant")
+        return self.history_coordinator.concat_messages(messages)
 
     def get_chat_model(self):
         return models.get_chat_model(
@@ -779,89 +745,9 @@ class Agent:
         while self.context.paused:
             await asyncio.sleep(0.1)
 
-    async def process_tools(self, msg: str):
-        # search for tool usage requests in agent message
-        tool_request = extract_tools.json_parse_dirty(msg)
-
-        if tool_request is not None:
-            raw_tool_name = tool_request.get("tool_name", "")  # Get the raw tool name
-            tool_args = tool_request.get("tool_args", {})
-
-            tool_name = raw_tool_name  # Initialize tool_name with raw_tool_name
-            tool_method = None  # Initialize tool_method
-
-            # Split raw_tool_name into tool_name and tool_method if applicable
-            if ":" in raw_tool_name:
-                tool_name, tool_method = raw_tool_name.split(":", 1)
-
-            tool = None  # Initialize tool to None
-
-            # Try getting tool from MCP first
-            try:
-                import python.helpers.mcp_handler as mcp_helper
-
-                mcp_tool_candidate = mcp_helper.MCPConfig.get_instance().get_tool(
-                    self, tool_name
-                )
-                if mcp_tool_candidate:
-                    tool = mcp_tool_candidate
-            except ImportError:
-                PrintStyle(
-                    background_color="black", font_color="yellow", padding=True
-                ).print("MCP helper module not found. Skipping MCP tool lookup.")
-            except Exception as e:
-                PrintStyle(
-                    background_color="black", font_color="red", padding=True
-                ).print(f"Failed to get MCP tool '{tool_name}': {e}")
-
-            # Fallback to local get_tool if MCP tool was not found or MCP lookup failed
-            if not tool:
-                tool = self.get_tool(
-                    name=tool_name, method=tool_method, args=tool_args, message=msg, loop_data=self.loop_data
-                )
-
-            if tool:
-                self.loop_data.current_tool = tool # type: ignore
-                try:
-                    await self.handle_intervention()
-
-                    # Call tool hooks for compatibility
-                    await tool.before_execution(**tool_args)
-                    await self.handle_intervention()
-
-                    # Allow extensions to preprocess tool arguments
-                    await self.call_extensions("tool_execute_before", tool_args=tool_args or {}, tool_name=tool_name)
-
-                    response = await tool.execute(**tool_args)
-                    await self.handle_intervention()
-
-                    # Allow extensions to postprocess tool response
-                    await self.call_extensions("tool_execute_after", response=response, tool_name=tool_name)
-                    
-                    await tool.after_execution(response)
-                    await self.handle_intervention()
-
-                    if response.break_loop:
-                        return response.message
-                finally:
-                    self.loop_data.current_tool = None
-            else:
-                error_detail = (
-                    f"Tool '{raw_tool_name}' not found or could not be initialized."
-                )
-                self.hist_add_warning(error_detail)
-                PrintStyle(font_color="red", padding=True).print(error_detail)
-                self.context.log.log(
-                    type="error", content=f"{self.agent_name}: {error_detail}"
-                )
-        else:
-            warning_msg_misformat = self.read_prompt("fw.msg_misformat.md")
-            self.hist_add_warning(warning_msg_misformat)
-            PrintStyle(font_color="red", padding=True).print(warning_msg_misformat)
-            self.context.log.log(
-                type="error",
-                content=f"{self.agent_name}: Message misformat, no valid tool request found.",
-            )
+    async def process_tools(self, msg: str) -> str | None:
+        """Process tool usage requests in agent message"""
+        return await self.tool_coordinator.process_tools(msg)
 
     async def handle_reasoning_stream(self, stream: str):
         await self.handle_intervention()
@@ -890,32 +776,15 @@ class Agent:
 
     def get_tool(
         self, name: str, method: str | None, args: dict, message: str, loop_data: LoopData | None, **kwargs
-    ):
-        from python.tools.unknown import Unknown
-        from python.helpers.tool import Tool
-
-        classes = []
-
-        # try agent tools first
-        if self.config.profile:
-            try:
-                classes = extract_tools.load_classes_from_file(
-                    "agents/" + self.config.profile + "/tools/" + name + ".py", Tool  # type: ignore[arg-type]
-                )
-            except Exception:
-                pass
-
-        # try default tools
-        if not classes:
-            try:
-                classes = extract_tools.load_classes_from_file(
-                    "python/tools/" + name + ".py", Tool  # type: ignore[arg-type]
-                )
-            except Exception as e:
-                pass
-        tool_class = classes[0] if classes else Unknown
-        return tool_class(
-            agent=self, name=name, method=method, args=args, message=message, loop_data=loop_data, **kwargs
+    ) -> Tool:
+        """Get tool instance by name"""
+        return self.tool_coordinator.get_tool(
+            name=name,
+            method=method,
+            args=args,
+            message=message,
+            loop_data=loop_data,
+            **kwargs,
         )
 
     async def call_extensions(self, extension_point: str, **kwargs) -> Any:
