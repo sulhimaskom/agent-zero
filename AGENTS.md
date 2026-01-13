@@ -1,7 +1,7 @@
 # AGENT ZERO PROJECT KNOWLEDGE BASE
 
-**Generated:** 2026-01-10
-**Commit:** ee31349
+**Generated:** 2026-01-13
+**Commit:** a99361d
 **Branch:** custom
 
 ## OVERVIEW
@@ -11,15 +11,15 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 ```
 ./
 ├── agents/              # Agent profiles (agent0, developer, hacker, researcher) with custom prompts/tools/extensions
-├── prompts/             # 90+ system prompts defining framework behavior (fw.* = framework, agent.system.* = agent behavior)
+├── prompts/             # 95+ system prompts defining framework behavior (fw.* = framework, agent.system.* = agent behavior)
 ├── python/
 │   ├── api/            # 61 Flask API endpoints (auto-registered via ApiHandler base class)
 │   ├── helpers/        # 70+ utility modules (memory, history, settings, mcp, scheduler)
 │   ├── tools/          # 18 default tools (code_execution, browser_agent, memory_*, call_subordinate)
 │   └── extensions/     # 23 lifecycle hook points (message_loop_*, response_stream*, system_prompt)
-├── webui/              # Frontend (Alpine.js stores, modular components)
+├── webui/              # Frontend (Alpine.js stores, modular components, 96 code files)
 │   ├── components/     # chat/, settings/, sidebar/, modals/, projects/, notifications/
-│   ├── js/            # ES modules, stores
+│   ├── js/            # ES modules, stores (scheduler.js 1835 lines, messages.js 1009 lines)
 │   └── css/           # Styling
 ├── conf/               # model_providers.yaml (15+ LLM providers), projects.default.gitignore
 ├── docker/             # base/ (Kali Linux, Python 3.13+3.12) + run/ (runtime container)
@@ -39,7 +39,7 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 | API endpoints | `/python/api/` | Classes inheriting `ApiHandler` auto-register as Flask routes |
 | Memory management | `/python/helpers/memory.py` | FAISS vector DB, semantic search, AI filtering |
 | History & context | `/python/helpers/history.py` | Message summarization, context management |
-| Settings | `/python/helpers/settings.py` | 1758 lines - needs refactoring to background tasks |
+| Settings | `/python/helpers/settings.py` | 1758 lines - complexity hotspot, needs refactoring to background tasks |
 | MCP integration | `/python/helpers/mcp_handler.py` | Server + client for Model Context Protocol |
 | Scheduler | `/python/helpers/task_scheduler.py` | Crontab-based scheduled tasks |
 | Agent profiles | `/agents/{profile}/` | Each has prompts/, tools/, extensions/ subdirs |
@@ -47,6 +47,8 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 | Docker build | `/docker/` | Two-stage: base (Kali) → runtime (Agent Zero) |
 | LLM abstraction | `/models.py` | LiteLLM wrappers for chat/embedding/browser models |
 | Core agent loop | `/agent.py` | Agent class, AgentContext, AgentConfig |
+| Frontend stores | `/webui/components/{feature}/*-store.js` | Alpine.js component stores |
+| Frontend API | `/webui/js/api.js` | Centralized fetch wrapper with CSRF |
 
 ## CONVENTIONS
 
@@ -75,6 +77,12 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 - ES modules in `/webui/js/`
 - Alpine.js stores in `/webui/components/{feature}/*-store.js`
 - Path mapping: `jsconfig.json` maps `*` to `webui/*`
+- No bundler (direct ES module loading)
+
+### Frontend Stores
+- Alpine.js Proxy-based reactivity (see `/webui/js/AlpineStore.js`)
+- Modular: each feature has its own `-store.js` file
+- Centralized API calls via `/webui/js/api.js`
 
 ## ANTI-PATTERNS (THIS PROJECT)
 
@@ -84,15 +92,28 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 - **NEVER use eval/exec** - safe `simple_eval()` only in controlled contexts
 
 ### Code Smells (TODOs to address)
-- `/python/helpers/settings.py` - Multiple TODOs about replacing with background tasks (lines 1558, 1616, 1621, 1631, 1643)
-- `/python/helpers/vector_db.py`, `/python/helpers/memory.py` - FAISS patch for Python 3.12 ARM (remove when fixed upstream)
+- `/python/helpers/settings.py` - Multiple TODOs about replacing with background tasks (lines 1558, 1616, 1621, 1631, 1643) - CRITICAL complexity hotspot
+- `/python/helpers/task_scheduler.py` - 1154 lines, consider splitting task types from scheduler logic
+- `/python/helpers/mcp_handler.py` - 1115 lines, TODO about inline prompts (lines 742-744)
 - `/python/helpers/history.py:218` - FIXME: vision bytes sent to utility LLM (inefficiency)
+- `/python/helpers/vector_db.py`, `/python/helpers/memory.py` - FAISS patch for Python 3.12 ARM (remove when fixed upstream)
+- `/python/helpers/job_loop.py:34` - TODO: lowering SLEEP_TIME below 1min causes job duplication
+- 184 `# type: ignore` comments across 47 files - type suppression issues
+- 228 `except Exception as e:` handlers - broad exception catching
+- 313 print statements across 39 files - should use proper logging
 
 ### Testing
 - No pytest.ini, conftest.py, or fixtures - default pytest only
 - Tests not run in CI (GitHub workflows use OpenCode AI agent only)
 - Mixed naming: `test_*.py` and `*_test.py` both used
 - Coverage tool not configured
+
+### Build/CI Non-Standard Patterns
+- **AI-powered CI**: GitHub workflows use OpenCode AI agent (opencode.ai) instead of traditional pytest/linting
+- **Kali Linux base**: `kalilinux/kali-rolling` (unusual for web services)
+- **Dual Python**: 3.13 system-wide + 3.12.4 via pyenv at `/opt/venv-a0`
+- **No pyproject.toml**: Uses requirements.txt only (not installable as package)
+- **No frontend bundler**: Direct ES module loading, no webpack/vite
 
 ## UNIQUE STYLES
 
@@ -129,6 +150,12 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 - Isolated workspaces with own prompts, files, memory, secrets
 - `.a0proj/` directory (gitignored via projects.default.gitignore)
 
+### Frontend Architecture
+- Alpine.js with Proxy-based reactivity for pre-init stores
+- Modular component stores (no monolithic state)
+- Direct ES module loading (no bundler)
+- Centralized API layer with CSRF management
+
 ## COMMANDS
 ```bash
 # Run locally (development)
@@ -148,7 +175,9 @@ docker run -p 50001:80 agent0ai/agent-zero
 - **No LSP servers installed** - relies on VS Code Python extension for type checking
 - **CI is AI-powered** - GitHub workflows use OpenCode agent, not traditional pytest/linting
 - **Settings module** (1758 lines) identified as complexity hotspot needing refactoring
-- **Large files**: `agent.py` (923 lines), `models.py` (920 lines), `settings.py` (1758 lines)
+- **Large files**: `agent.py` (922 lines), `models.py` (919 lines), `settings.py` (1758 lines), `task_scheduler.py` (1154 lines), `mcp_handler.py` (1115 lines)
+- **Large frontend files**: `webui/js/scheduler.js` (1835 lines), `webui/js/messages.js` (1009 lines), `webui/components/chat/speech/speech-store.js` (967 lines)
 - **FAISS patch required** for Python 3.12 ARM - temporary workaround
 - **56 bare `pass` statements** - mostly in base classes/abstract methods (acceptable)
 - **No traditional testing** - CI uses AI code analysis instead of pytest runs
+- **Automatic SSH password generation** - `prepare.py` generates random root password (security concern for production)
