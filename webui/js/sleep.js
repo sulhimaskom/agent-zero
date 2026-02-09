@@ -1,3 +1,5 @@
+import { TIMING } from './constants.js';
+
 /** Async function that waits for specified number of time units. */
 export async function sleep(miliseconds = 0, seconds = 0, minutes = 0, hours = 0, days = 0) {
   hours += days * 24;
@@ -5,8 +7,8 @@ export async function sleep(miliseconds = 0, seconds = 0, minutes = 0, hours = 0
   seconds += minutes * 60;
   miliseconds += seconds * 1000;
   
-  // Maximum safe timeout is 1 hour (in milliseconds)
-  const MAX_TIMEOUT = 60 * 60 * 1000;
+  // Maximum safe timeout from constants
+  const MAX_TIMEOUT = TIMING.SLEEP_MAX_TIMEOUT;
   
   // if miliseconds is 0, wait at least one frame
   if (miliseconds === 0) {

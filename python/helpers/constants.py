@@ -47,6 +47,18 @@ class Timeouts:
     # Input timeouts
     INPUT_DEFAULT_TIMEOUT: Final[int] = 10
     
+    # MCP server apply delay
+    MCP_SERVER_APPLY_DELAY: Final[int] = 1
+    
+    # Tunnel check delay
+    TUNNEL_CHECK_DELAY: Final[int] = 2
+    
+    # HTTP cache duration (1 day in seconds)
+    HTTP_CACHE_MAX_AGE: Final[int] = 86400
+    
+    # Notification default lifetime (hours)
+    NOTIFICATION_LIFETIME_HOURS: Final[int] = 24
+    
     # MCP timeouts
     MCP_CLIENT_INIT_TIMEOUT: Final[int] = 10
     MCP_CLIENT_TOOL_TIMEOUT: Final[int] = 120
@@ -173,6 +185,20 @@ class Limits:
     # Notification limits
     NOTIFICATION_MAX_COUNT: Final[int] = 100
     NOTIFICATION_DISPLAY_TIME: Final[int] = 3
+    
+    # Fullscreen input modal stack limit
+    MODAL_MAX_STACK_SIZE: Final[int] = 100
+    
+    # Memory dashboard items per page
+    MEMORY_DASHBOARD_ITEMS_PER_PAGE: Final[int] = 10
+    
+    # QR Code dimensions
+    QR_CODE_WIDTH: Final[int] = 128
+    QR_CODE_HEIGHT: Final[int] = 128
+    
+    # Sidebar chat retry configuration
+    CHAT_MAX_RETRIES: Final[int] = 240
+    CHAT_RETRY_INTERVAL_MS: Final[int] = 250
     
     # RFC ports
     RFC_PORT_HTTP: Final[int] = 55080
@@ -469,3 +495,12 @@ class Config:
     # Paths (can be overridden via env vars)
     PROJECTS_DIR = get_env_str("A0_PROJECTS_DIR", Paths.PROJECTS_PARENT_DIR)
     MEMORY_PATH = get_env_str("A0_MEMORY_PATH", Paths.MEMORY_DIR)
+    
+    # Notification settings
+    NOTIFICATION_LIFETIME_HOURS = get_env_int("A0_NOTIFICATION_LIFETIME_HOURS", Timeouts.NOTIFICATION_LIFETIME_HOURS)
+    
+    # MCP settings
+    MCP_SERVER_APPLY_DELAY = get_env_int("A0_MCP_SERVER_APPLY_DELAY", Timeouts.MCP_SERVER_APPLY_DELAY)
+    
+    # Tunnel settings
+    TUNNEL_CHECK_DELAY = get_env_int("A0_TUNNEL_CHECK_DELAY", Timeouts.TUNNEL_CHECK_DELAY)

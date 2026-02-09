@@ -2,6 +2,7 @@ import base64
 import os
 from python.helpers.api import ApiHandler, Request, Response, send_file
 from python.helpers import files, runtime
+from python.helpers.constants import Timeouts
 import io
 from mimetypes import guess_type
 
@@ -67,7 +68,7 @@ class ImageGet(ApiHandler):
                     response = _send_fallback_icon("image")
 
             # Add cache headers for better device sync performance
-            response.headers["Cache-Control"] = "public, max-age=3600"
+            response.headers["Cache-Control"] = f"public, max-age={Timeouts.HTTP_CACHE_MAX_AGE}"
             response.headers["X-File-Type"] = "image"
             response.headers["X-File-Name"] = filename
             return response
@@ -124,9 +125,9 @@ def _send_file_type_icon(file_ext, filename=None):
 
     # Add headers for device sync
     if hasattr(response, "headers"):
-        response.headers["Cache-Control"] = (
-            "public, max-age=86400"  # Cache icons for 24 hours
-        )
+            response.headers["Cache-Control"] = (
+                f"public, max-age={Timeouts.HTTP_CACHE_MAX_AGE}"  # Cache icons for 24 hours from constants
+            )
         response.headers["X-File-Type"] = "icon"
         response.headers["X-Icon-Type"] = icon_name
         if filename:

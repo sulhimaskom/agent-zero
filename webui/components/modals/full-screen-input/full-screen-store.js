@@ -1,4 +1,5 @@
 import { createStore } from "/js/AlpineStore.js";
+import { LIMITS, TIMING } from "/js/constants.js";
 
 // Store model for the Full-Screen Input Modal
 const model = {
@@ -8,7 +9,7 @@ const model = {
   wordWrap: true,
   undoStack: [],
   redoStack: [],
-  maxStackSize: 100,
+  maxStackSize: LIMITS.MODAL_MAX_STACK_SIZE,
   lastSavedState: "",
 
   // Lifecycle
@@ -29,7 +30,7 @@ const model = {
     setTimeout(() => {
       const fullScreenInput = document.getElementById("full-screen-input");
       if (fullScreenInput) fullScreenInput.focus();
-    }, 50);
+    }, TIMING.WELCOME_ANIMATION_DELAY);
   },
 
   // Close modal and write value back into main chat input
