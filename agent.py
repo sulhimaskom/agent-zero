@@ -593,7 +593,7 @@ class Agent:
     def concat_messages(
         self, messages
     ):  # TODO add param for message range, topic, history
-        return self.history_coordinator.concat_messages(messages)
+        return self.history.output_text(human_label="user", ai_label="assistant")
 
     def get_chat_model(self):
         return models.get_chat_model(
