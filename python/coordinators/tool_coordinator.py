@@ -44,7 +44,6 @@ class ToolCoordinator(IToolExecutor):
 
     async def process_tools(self, msg: str) -> str | None:
         """Process tool usage requests in agent message"""
-        from agent import LoopData
 
         tool_request = extract_tools.json_parse_dirty(msg)
 
@@ -158,7 +157,7 @@ class ToolCoordinator(IToolExecutor):
                 classes = extract_tools.load_classes_from_file(
                     "python/tools/" + name + ".py", Tool
                 )
-            except Exception as e:
+            except Exception:
                 pass
 
         tool_class = classes[0] if classes else Unknown

@@ -1,14 +1,12 @@
 from abc import abstractmethod
 import asyncio
-from collections import OrderedDict
 from collections.abc import Mapping
 import json
 import math
-from typing import Coroutine, Literal, TypedDict, cast, Union, Dict, List, Any
-from python.helpers import messages, tokens, settings, call_llm
+from typing import TypedDict, cast, Union, Dict, List
+from python.helpers import messages, tokens, settings
 from python.helpers.constants import Limits
-from enum import Enum
-from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage, AIMessage
+from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 
 BULK_MERGE_COUNT = Limits.HISTORY_BULK_MERGE_COUNT
 TOPICS_KEEP_COUNT = Limits.HISTORY_TOPICS_KEEP_COUNT
@@ -302,7 +300,6 @@ class Bulk(Record):
     def from_dict(data: dict, history: "History"):
         bulk = Bulk(history=history)
         bulk.summary = data["summary"]
-        cls = data["_cls"]
         bulk.records = [Record.from_dict(r, history=history) for r in data["records"]]
         bulk._tokens = None
         return bulk

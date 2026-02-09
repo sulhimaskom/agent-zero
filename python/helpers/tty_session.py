@@ -1,10 +1,13 @@
-import asyncio, os, sys, platform, errno
+import asyncio
+import os
+import sys
+import platform
+import errno
 from python.helpers.constants import Limits, Shell, Timeouts
 
 _IS_WIN = platform.system() == "Windows"
 if _IS_WIN:
     import winpty  # pip install pywinpty # type: ignore
-    import msvcrt
 
 
 #  Make stdin / stdout tolerant to broken UTF-8 so input() never aborts
@@ -150,7 +153,10 @@ class TTYSession:
 
 
 async def _spawn_posix_pty(cmd, cwd, env, echo):
-    import pty, asyncio, os, termios
+    import pty
+    import asyncio
+    import os
+    import termios
 
     master, slave = pty.openpty()
 

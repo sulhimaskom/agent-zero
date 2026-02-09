@@ -75,7 +75,7 @@ class Message(ApiHandler):
         # Print to console and log
         PrintStyle(
             background_color=Colors.AGENT_PURPLE, font_color=Colors.BG_WHITE, bold=True, padding=True
-        ).print(f"User message:")
+        ).print("User message:")
         PrintStyle(font_color="white", padding=False).print(f"> {message}")
         if attachment_filenames:
             PrintStyle(font_color="white", padding=False).print("Attachments:")
