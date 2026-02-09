@@ -1,0 +1,60 @@
+{
+  "agents": {
+    "Sisyphus": {
+      "model": "opencode/kimi-k2.5-free",
+      "temperature": 0.7
+    },
+    "Hephaestus": {
+      "model": "opencode/big-pickle",
+      "temperature": 0.5
+    },
+    "Oracle": {
+      "model": "opencode/minimax-m2.1-free",
+      "temperature": 0.3
+    },
+    "Librarian": {
+      "model": "opencode/kimi-k2.5-free",
+      "temperature": 0.2
+    },
+    "Explore": {
+      "model": "opencode/kimi-k2.5-free",
+      "temperature": 0.1
+    },
+    "Frontend": {
+      "model": "opencode/kimi-k2.5-free",
+      "temperature": 0.4
+    }
+  },
+  "mcpServers": {
+    "enabled": true,
+    "servers": [
+      "exa",
+      "context7",
+      "grep_app"
+    ]
+  },
+  "hooks": {
+    "enabled": [
+      "preToolUse",
+      "postToolUse",
+      "userPromptSubmit",
+      "stop"
+    ]
+  },
+  "features": {
+    "lsp": true,
+    "astGrep": true,
+    "todoEnforcer": true,
+    "commentChecker": true,
+    "backgroundAgents": true,
+    "claudeCodeCompatibility": true
+  },
+  "backgroundTasks": {
+    "maxConcurrency": 5,
+    "providers": {
+      "opencode": {
+        "maxConcurrent": 3
+      }
+    }
+  }
+}
