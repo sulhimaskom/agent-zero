@@ -256,13 +256,12 @@ class AgentContext:
     # this wrapper ensures that superior agents are called back if the chat was loaded from file and original callstack is gone
     async def _process_chain(self, agent: "Agent", msg: "UserMessage|str", user=True):
         try:
-            msg_template = (
+            if user:
                 agent.hist_add_user_message(msg)  # type: ignore
-                if user
-                else agent.hist_add_tool_result(
+            else:
+                agent.hist_add_tool_result(
                     tool_name="call_subordinate", tool_result=msg  # type: ignore
                 )
-            )
             response = await agent.monologue()  # type: ignore
             superior = agent.data.get(Agent.DATA_NAME_SUPERIOR, None)
             if superior:
@@ -366,8 +365,6 @@ class Agent:
                 self.loop_data = LoopData(user_message=self.last_user_message)
                 # call monologue_start extensions
                 await self.call_extensions("monologue_start", loop_data=self.loop_data)
-
-                printer = PrintStyle(italic=True, font_color="#b3ffd9", padding=False)
 
                 # let the agent run message loop until he stops it with a response tool
                 while True:

@@ -5,10 +5,6 @@ from python.helpers import settings, whisper
 class Transcribe(ApiHandler):
     async def process(self, input: dict, request: Request) -> dict | Response:
         audio = input.get("audio")
-        ctxid = input.get("ctxid", "")
-
-        if ctxid:
-            context = self.use_context(ctxid)
 
         # if not await whisper.is_downloaded():
         #     context.log.log(type="info", content="Whisper STT model is currently being initialized, please wait...")
