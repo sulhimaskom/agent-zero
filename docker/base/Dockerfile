@@ -1,5 +1,5 @@
-# Use the latest slim version of Kali Linux
-FROM kalilinux/kali-rolling
+# Use Debian 13 slim
+FROM debian:13-slim
 
 
 # Set locale to en_US.UTF-8 and timezone to UTC
