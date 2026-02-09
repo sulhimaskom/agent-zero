@@ -6,9 +6,40 @@ const model = {
   paused: false,
   isSending: false,
 
+  // Rotating placeholder hints for better UX
+  placeholderHints: [
+    "Type a message...",
+    "Press Enter to send",
+    "Shift+Enter for new line",
+    "Attach files with the paperclip",
+  ],
+  currentHintIndex: 0,
+  hintRotationInterval: null,
+
   init() {
     console.log("Input store initialized");
     // Event listeners are now handled via Alpine directives in the component
+    this.startHintRotation();
+  },
+
+  startHintRotation() {
+    // Rotate hints every 5 seconds when input is empty
+    this.hintRotationInterval = setInterval(() => {
+      const chatInput = document.getElementById("chat-input");
+      if (chatInput && !chatInput.value.trim()) {
+        this.currentHintIndex = (this.currentHintIndex + 1) % this.placeholderHints.length;
+      }
+    }, 5000);
+  },
+
+  getPlaceholder() {
+    if (this.paused) {
+      return "⏸️  Agent is paused. Click 'Resume Agent' to continue...";
+    }
+    if (this.isSending) {
+      return "Sending message...";
+    }
+    return this.placeholderHints[this.currentHintIndex];
   },
 
   async sendMessage() {
