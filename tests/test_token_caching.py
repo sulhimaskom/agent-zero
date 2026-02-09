@@ -98,7 +98,9 @@ class TestTokenCaching:
             assert mock_count.call_count == 1
             
             mock_count.reset_mock()
-            with patch.object(bulk, 'summarize', return_value=asyncio.coroutine(lambda: "Summary")()):
+            async def mock_summarize():
+                return "Summary"
+            with patch.object(bulk, 'summarize', side_effect=mock_summarize):
                 await bulk.summarize()
                 bulk.get_tokens()
                 
