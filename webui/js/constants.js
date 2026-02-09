@@ -64,12 +64,6 @@ export const TIMING = {
   UI_DELAY: 300,
   CHECK_DELAY: 100,
   IMAGE_REFRESH_INTERVAL: 1000,
-
-  // Extended timeouts
-  SLEEP_MAX_TIMEOUT: 3600000, // 1 hour in milliseconds
-  TUNNEL_STATUS_TIMEOUT: 5000,
-  MEMORY_DASHBOARD_POLL_INTERVAL: 2000,
-  WELCOME_ANIMATION_DELAY: 50,
 };
 
 // =============================================================================
@@ -89,12 +83,6 @@ export const SPEECH = {
   // Model settings
   DEFAULT_MODEL_SIZE: 'tiny',
   DEFAULT_LANGUAGE: 'en',
-
-  // Audio processing (for browser speech visualization)
-  FFT_SIZE: 2048,
-  MIN_DECIBELS: -90,
-  MAX_DECIBELS: -10,
-  SMOOTHING_TIME_CONSTANT: 0.85,
 };
 
 // =============================================================================
@@ -105,24 +93,6 @@ export const UI = {
   BASE_Z_INDEX: 3000,
   Z_INDEX_STEP: 20,
   BACKDROP_OFFSET: 10,
-};
-
-// =============================================================================
-// RETRY CONFIGURATION
-// =============================================================================
-
-export const RETRY = {
-  MAX_RETRIES: 240,
-  INTERVAL_MS: 250,
-};
-
-// =============================================================================
-// QR CODE DIMENSIONS
-// =============================================================================
-
-export const QR_CODE = {
-  WIDTH: 128,
-  HEIGHT: 128,
 };
 
 // =============================================================================
@@ -149,12 +119,6 @@ export const LIMITS = {
 
   // Recorder chunk size
   RECORDER_CHUNK_SIZE: 1000,
-
-  // Modal limits
-  MODAL_MAX_STACK_SIZE: 100,
-
-  // Memory dashboard
-  MEMORY_DASHBOARD_ITEMS_PER_PAGE: 10,
 };
 
 // =============================================================================
