@@ -13,7 +13,6 @@ from python.helpers.secrets import get_secrets_manager
 from python.extensions.message_loop_start._10_iteration_no import get_iter_no
 from python.helpers.constants import Timeouts, Limits, Shell
 from pydantic import BaseModel
-import uuid
 from python.helpers.dirty_json import DirtyJson
 
 
@@ -396,7 +395,7 @@ class BrowserAgent(Tool):
     def _mask(self, text: str) -> str:
         try:
             return get_secrets_manager(self.agent.context).mask_values(text or "")
-        except Exception as e:
+        except Exception:
             return text or ""
 
     # def __del__(self):

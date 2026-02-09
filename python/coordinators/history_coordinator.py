@@ -1,12 +1,8 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from typing import Any
 from datetime import datetime, timezone
 import asyncio
 
 from python.helpers import history
-from python.helpers.localization import Localization
-from python.helpers.extension import call_extensions
 from models import UserMessage
 
 

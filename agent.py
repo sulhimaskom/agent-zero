@@ -1,4 +1,6 @@
-import asyncio, random, string
+import asyncio
+import random
+import string
 import nest_asyncio
 
 nest_asyncio.apply()
@@ -6,13 +8,12 @@ nest_asyncio.apply()
 from collections import OrderedDict
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
-from typing import Any, Awaitable, Coroutine, Dict, Literal
+from typing import Any, Awaitable, Coroutine, Dict
 from enum import Enum
-import uuid
 import os
 import models
 
-from python.helpers import extract_tools, files, errors, history, tokens, context as context_helper
+from python.helpers import files, errors, history, tokens, context as context_helper
 from python.helpers import dirty_json
 from python.helpers.print_style import PrintStyle
 
@@ -425,7 +426,7 @@ class Agent:
                                 return tools_result  # break the execution if the task is done
 
                     # exceptions inside message loop:
-                    except InterventionException as e:
+                    except InterventionException:
                         pass  # intervention message has been handled in handle_intervention(), proceed with conversation loop
                     except RepairableException as e:
                         # Forward repairable errors to the LLM, maybe it can fix them
@@ -445,7 +446,7 @@ class Agent:
                         )
 
             # exceptions outside message loop:
-            except InterventionException as e:
+            except InterventionException:
                 pass  # just start over
             except Exception as e:
                 self.handle_critical_exception(e)
