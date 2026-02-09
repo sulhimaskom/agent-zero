@@ -24,7 +24,7 @@ jobs:
   # ------------------------------------------------------------------
   architect:
     name: "Architect: Strategy & Triage"
-    runs-on: self-hosted
+    runs-on: ubuntu-24.04-arm
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       IFLOW_API_KEY: ${{ secrets.IFLOW_API_KEY }}    
@@ -89,7 +89,7 @@ jobs:
           done
   bugfix:
     name: "BugFixer"
-    runs-on: self-hosted
+    runs-on: ubuntu-24.04-arm
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       IFLOW_API_KEY: ${{ secrets.IFLOW_API_KEY }}    
@@ -155,7 +155,7 @@ jobs:
 
   Palette:
     name: "Palette"
-    runs-on: self-hosted
+    runs-on: ubuntu-24.04-arm
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       IFLOW_API_KEY: ${{ secrets.IFLOW_API_KEY }}    
@@ -221,7 +221,7 @@ jobs:
 
   Flexy:
     name: "Flexy"
-    runs-on: self-hosted
+    runs-on: ubuntu-24.04-arm
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       IFLOW_API_KEY: ${{ secrets.IFLOW_API_KEY }}    
@@ -287,7 +287,7 @@ jobs:
 
   Brocula:
     name: "Brocula"
-    runs-on: self-hosted
+    runs-on: ubuntu-24.04-arm
     env:
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       IFLOW_API_KEY: ${{ secrets.IFLOW_API_KEY }}    
