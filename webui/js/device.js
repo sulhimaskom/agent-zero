@@ -1,3 +1,5 @@
+import { TIMING } from './constants.js';
+
 /**
  * Detects the input type: 'pointer' (e.g., mouse, supports hover) or 'touch' (e.g., finger, no reliable hover).
  * On hybrids, resolves based on first user interaction (mouse vs. touch).
@@ -65,7 +67,7 @@ export function determineInputType() {
       document.addEventListener("mousemove", onMouse, { passive: true });
       document.addEventListener("mouseenter", onMouse, { passive: true });
       // Optional: Timeout fallback (e.g., after 10s, assume pointer for hybrids)
-      setTimeout(() => resolveType("pointer"), 10000);
+      setTimeout(() => resolveType("pointer"), TIMING.INPUT_DETECT_TIMEOUT);
     } else {
       // Rare fallback: No touch or pointer detected (assume pointer)
       resolveType("pointer");

@@ -7,6 +7,7 @@ import { formatDateTime, getUserTimezone } from './time-utils.js';
 import { store as chatsStore } from "/components/sidebar/chats/chats-store.js"
 import { store as  notificationsStore } from "/components/notifications/notification-store.js"
 import { store as projectsStore } from "/components/projects/projects-store.js"
+import { TIMING } from './constants.js';
 
 // Ensure the showToast function is available
 // if (typeof window.showToast !== 'function') {
@@ -149,7 +150,7 @@ const fullComponentImplementation = function() {
                 if (clickedTab && clickedTab.getAttribute('data-tab') === 'scheduler') {
                     setTimeout(() => {
                         this.fetchTasks();
-                    }, 100);
+                    }, TIMING.SETUP_DELAY);
                 }
             });
 
@@ -205,7 +206,7 @@ const fullComponentImplementation = function() {
                     } else if (this.isEditing) {
                         this.initFlatpickr('edit');
                     }
-                }, 100);
+                }, TIMING.SETUP_DELAY);
             });
 
             // Cleanup on component destruction
@@ -243,7 +244,7 @@ const fullComponentImplementation = function() {
                 if (this.pollingActive) {
                     this.fetchTasks();
                 }
-            }, 2000); // Poll every 2 seconds as requested
+            }, TIMING.SCHEDULER_POLL_INTERVAL); // Poll every 2 seconds as requested
         },
 
         // Stop polling when tab is inactive
@@ -1751,7 +1752,7 @@ if (!window.schedulerSettings) {
                 } else {
                     console.error('fetchTasks still not available after enhancement');
                 }
-            }, 100);
+            }, TIMING.SETUP_DELAY);
 
             console.log('Enhanced init complete');
         };
@@ -1780,7 +1781,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const setupSchedulerTab = () => {
         const settingsModal = document.getElementById('settingsModal');
         if (!settingsModal) {
-            setTimeout(setupSchedulerTab, 100);
+            setTimeout(setupSchedulerTab, TIMING.SETUP_DELAY);
             return;
         }
 
@@ -1823,7 +1824,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     } else {
                         console.error('Could not find scheduler component element');
                     }
-                }, 100);
+                }, TIMING.SETUP_DELAY);
             } catch (err) {
                 console.error('Error handling scheduler tab click:', err);
             }

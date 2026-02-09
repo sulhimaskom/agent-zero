@@ -1,3 +1,5 @@
+import { TIMING } from './constants.js';
+
 const settingsModalProxy = {
     isOpen: false,
     settings: {},
@@ -185,7 +187,7 @@ const settingsModalProxy = {
                 modalAD.$watch('activeTab', checkSchedulerEditingState);
 
                 // Initial check
-                setTimeout(checkSchedulerEditingState, 100);
+                setTimeout(checkSchedulerEditingState, TIMING.CHECK_DELAY);
             }
 
             return new Promise(resolve => {

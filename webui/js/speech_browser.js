@@ -1,5 +1,6 @@
 import { pipeline, read_audio } from './transformers@3.0.2.js';
 import { updateChatInput, sendMessage } from '../index.js';
+import { TIMING, SPEECH } from './constants.js';
 
 const microphoneButton = document.getElementById('microphone-button');
 let microphoneInput = null;
@@ -36,12 +37,12 @@ class MicrophoneInput {
         this.analysisFrame = null;
 
         this.options = {
-            modelSize: 'tiny',
-            language: 'en',
-            silenceThreshold: 0.15,
-            silenceDuration: 1000,
-            waitingTimeout: 2000,
-            minSpeechDuration: 500,
+            modelSize: SPEECH.DEFAULT_MODEL_SIZE,
+            language: SPEECH.DEFAULT_LANGUAGE,
+            silenceThreshold: SPEECH.SILENCE_THRESHOLD,
+            silenceDuration: SPEECH.SILENCE_DURATION,
+            waitingTimeout: SPEECH.WAITING_TIMEOUT,
+            minSpeechDuration: SPEECH.MIN_SPEECH_DURATION,
             ...options
         };
     }
@@ -112,7 +113,7 @@ class MicrophoneInput {
     handleRecordingState() {
         if (!this.hasStartedRecording && this.mediaRecorder.state !== 'recording') {
             this.hasStartedRecording = true;
-            this.mediaRecorder.start(1000);
+            this.mediaRecorder.start(SPEECH.RECORDER_CHUNK_SIZE);
             console.log('Speech started');
         }
         if (this.waitingTimer) {
@@ -306,10 +307,10 @@ async function initializeMicrophoneInput() {
             }
         },
         {
-            modelSize: 'tiny',
-            language: 'en',
+            modelSize: SPEECH.DEFAULT_MODEL_SIZE,
+            language: SPEECH.DEFAULT_LANGUAGE,
             silenceThreshold: 0.07,
-            silenceDuration: 1000,
+            silenceDuration: SPEECH.SILENCE_DURATION,
             waitingTimeout: 1500
         }
     );
@@ -336,7 +337,7 @@ microphoneButton.addEventListener('click', async () => {
     } finally {
         setTimeout(() => {
             isProcessingClick = false;
-        }, 300);
+        }, TIMING.UI_DELAY);
     }
 });
 

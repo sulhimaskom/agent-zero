@@ -6,6 +6,7 @@ from typing import Dict, List, Optional, Tuple
 from werkzeug.utils import secure_filename
 
 from python.helpers.print_style import PrintStyle
+from python.helpers.constants import Limits
 
 class AttachmentManager:
   ALLOWED_EXTENSIONS = {
@@ -71,19 +72,19 @@ class AttachmentManager:
           PrintStyle.error(f"Error saving file {filename}: {e}")
           return None, {} # type: ignore
 
-  def generate_image_preview(self, image_path: str, max_size: int = 800) -> Optional[str]:
+  def generate_image_preview(self, image_path: str, max_size: int = Limits.IMAGE_PREVIEW_MAX_SIZE) -> Optional[str]:
       try:
           with Image.open(image_path) as img:
               # Convert image if needed
               if img.mode in ('RGBA', 'P'):
                   img = img.convert('RGB')
-              
+
               # Resize for preview
               img.thumbnail((max_size, max_size))
-              
+
               # Save to buffer
               buffer = io.BytesIO()
-              img.save(buffer, format="JPEG", quality=70, optimize=True)
+              img.save(buffer, format="JPEG", quality=Limits.IMAGE_PREVIEW_QUALITY, optimize=True)
               
               # Convert to base64
               return base64.b64encode(buffer.getvalue()).decode('utf-8')
