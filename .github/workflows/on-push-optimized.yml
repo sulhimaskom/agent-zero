@@ -86,7 +86,7 @@ jobs:
       - name: Run Flow 00
         run: |
           opencode run "$(cat .github/prompt/00-strategist.md)" \
-            --model opencode/glm-4.7-free \
+            --model opencode/kimi-k2.5-free \
             --share false
 
   flow-01:
@@ -109,7 +109,7 @@ jobs:
       - name: Run Flow 01
         run: |
           opencode run "$(cat .github/prompt/01-code-review.md)" \
-            --model opencode/glm-4.7-free \
+            --model opencode/kimi-k2.5-free \
             --share false
 
   flow-02:
@@ -132,7 +132,7 @@ jobs:
       - name: Run Flow 02
         run: |
           opencode run "$(cat .github/prompt/02-docs-hygiene.md)" \
-            --model opencode/glm-4.7-free \
+            --model opencode/kimi-k2.5-free \
             --share false
 
   # Parallel Flow Jobs - Group 2
@@ -156,7 +156,7 @@ jobs:
       - name: Run Flow 03
         run: |
           opencode run "$(cat .github/prompt/03-test-coverage.md)" \
-            --model opencode/glm-4.7-free \
+            --model opencode/kimi-k2.5-free \
             --share false
 
   # Main Analysis Phase (runs after all flows)
@@ -179,5 +179,5 @@ jobs:
       - name: Run Main Analysis
         run: |
           opencode run "$(cat .github/prompt/11-main.md)" \
-            --model opencode/glm-4.7-free \
+            --model opencode/kimi-k2.5-free \
             --share false
