@@ -110,7 +110,7 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 
 ### Build/CI Non-Standard Patterns
 - **AI-powered CI**: GitHub workflows use OpenCode AI agent (opencode.ai) instead of traditional pytest/linting
-- **Kali Linux base**: `kalilinux/kali-rolling` (unusual for web services)
+- **Debian base**: `debian:13-slim` (minimal, secure base image)
 - **Dual Python**: 3.13 system-wide + 3.12.4 via pyenv at `/opt/venv-a0`
 - **No pyproject.toml**: Uses requirements.txt only (not installable as package)
 - **No frontend bundler**: Direct ES module loading, no webpack/vite
