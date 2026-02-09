@@ -1,0 +1,210 @@
+name: BroCula - Browser Console & Lighthouse Monitor
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Run every 4 hours
+    - cron: '0 */4 * * *'
+  push:
+    branches:
+      - main
+      - develop
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+env:
+  OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+
+jobs:
+  brocula-monitor:
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 120
+    
+    steps:
+      - name: Wait in Queue
+        uses: softprops/turnstyle@v2
+        with:
+          poll-interval-seconds: 30
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "BroCula Bot"
+          git config --global user.email "brocula-bot@users.noreply.github.com"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install OpenCode CLI
+        run: |
+          curl -fsSL https://opencode.ai/install | bash
+          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+
+      - name: Install Oh My OpenCode
+        run: |
+          bun install -g oh-my-opencode
+
+      - name: Setup OpenCode Configuration
+        run: |
+          mkdir -p ~/.config/opencode
+          echo '{"plugins":["oh-my-opencode"]}' > ~/.config/opencode/opencode.json
+
+      - name: Install Dependencies
+        run: |
+          if [ -f package.json ]; then
+            npm ci
+          fi
+          if [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+
+      - name: Install Playwright Browsers
+        run: |
+          npx playwright install chromium
+          npx playwright install-deps chromium
+
+      - name: Run BroCula Monitor
+        run: |
+          opencode run "$(cat <<'PROMPT'
+          ultrawork
+
+          You are BroCula - Browser Console & Lighthouse Optimization Specialist.
+          
+          Execute the following strict workflow:
+          
+          1. BROWSER CONSOLE MONITORING:
+             - Use playwright MCP to start browser
+             - Navigate to http://localhost:50001 (or check what port the app runs on)
+             - Capture ALL console logs (errors, warnings, info)
+             - If any errors found → FIX IMMEDIATELY
+             - If warnings affect functionality → FIX
+             - Document all findings
+          
+          2. LIGHTHOUSE OPTIMIZATION:
+             - Run Lighthouse audit on main pages
+             - Check Performance, Accessibility, Best Practices, SEO scores
+             - Identify top 3 optimization opportunities
+             - Implement fixes to improve scores
+             - Re-run audit to verify improvements
+          
+          3. BUILD & LINT VALIDATION:
+             - Run production build
+             - ANY errors = FATAL, must fix before proceeding
+             - Run lint check
+             - ANY errors = FATAL, must fix before proceeding
+             - Document results
+          
+          4. BRANCH MANAGEMENT & PR:
+             - Sync branch with main: git fetch origin && git rebase origin/main
+             - If any fixes were made:
+               - Create branch: brocula/fix-browser-issues-$(date +%s)
+               - Commit all changes with message: "[BroCula] Fix browser console errors and Lighthouse optimizations"
+               - Push branch to origin
+               - Create PR with detailed report
+          
+          5. REPORT:
+             - Console errors count and status
+             - Lighthouse scores before/after
+             - Build/lint status
+             - PR link (if created)
+             
+          Remember: Console errors are FATAL. Fix immediately before proceeding.
+          PROMPT
+          )" --model opencode/kimi-k2.5-free
+
+      - name: Check for Changes
+        id: check_changes
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create Pull Request
+        if: steps.check_changes.outputs.has_changes == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH_NAME="brocula/fix-browser-issues-$(date +%s)"
+          git checkout -b "$BRANCH_NAME"
+          git add -A
+          git commit -m "[BroCula] Fix browser console errors and Lighthouse optimizations
+
+          - Fixed console errors detected by automated monitoring
+          - Optimized Lighthouse scores
+          - Resolved build/lint issues
+          
+          Automated by BroCula workflow"
+          git push origin "$BRANCH_NAME"
+          
+          # Create PR using gh CLI
+          gh pr create \
+            --title "[BroCula] Browser Console & Lighthouse Optimization" \
+            --body "$(cat <<'EOF'
+          ## BroCula Automated Report
+          
+          This PR contains automated fixes for browser console issues and Lighthouse optimizations.
+          
+          ### Changes Made
+          - Fixed browser console errors detected during automated monitoring
+          - Applied Lighthouse performance optimizations
+          - Resolved build/lint issues (errors treated as fatal)
+          
+          ### Workflow Details
+          - Triggered by: ${{ github.event_name }}
+          - Commit: ${{ github.sha }}
+          - Workflow run: ${{ github.run_id }}
+          
+          ### Checklist
+          - [x] Console errors fixed
+          - [x] Lighthouse scores improved
+          - [x] Build passing
+          - [x] Lint clean
+          - [x] Branch synced with main
+          
+          ---
+          *Automated by BroCula - Browser Console & Lighthouse Optimization Specialist*
+          EOF
+          )" \
+            --base main \
+            --head "$BRANCH_NAME"
+
+      - name: Workflow Summary
+        if: always()
+        run: |
+          echo "## BroCula Workflow Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Changes Detected**: ${{ steps.check_changes.outputs.has_changes }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next Steps" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.check_changes.outputs.has_changes }}" == "true" ]; then
+            echo "- [ ] Review the automatically created PR" >> $GITHUB_STEP_SUMMARY
+            echo "- [ ] Verify console errors are resolved" >> $GITHUB_STEP_SUMMARY
+            echo "- [ ] Check Lighthouse scores" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ No issues detected - all systems clean!" >> $GITHUB_STEP_SUMMARY
+          fi

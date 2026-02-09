@@ -1,0 +1,46 @@
+{
+  "mcp_servers": [
+    {
+      "name": "playwright",
+      "description": "Playwright browser automation MCP server for console monitoring and testing",
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "--yes",
+        "--package",
+        "@anthropic-ai/playwright-mcp",
+        "playwright-mcp"
+      ],
+      "env": {
+        "PLAYWRIGHT_BROWSERS_PATH": "0"
+      },
+      "disabled": false
+    },
+    {
+      "name": "chrome-devtools",
+      "description": "Chrome DevTools MCP server for performance analysis and debugging",
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "--yes",
+        "--package",
+        "@chrome-ai/devtools-mcp",
+        "devtools-mcp"
+      ],
+      "disabled": false
+    },
+    {
+      "name": "lighthouse",
+      "description": "Lighthouse CI MCP server for performance auditing",
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "--yes",
+        "--package",
+        "@modelcontextprotocol/server-lighthouse",
+        "lighthouse-mcp"
+      ],
+      "disabled": false
+    }
+  ]
+}
