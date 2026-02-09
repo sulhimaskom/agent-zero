@@ -125,7 +125,7 @@ class NotificationManager:
             # Adjust updates list
             self.updates = [no - to_remove for no in self.updates if no >= to_remove]
 
-    def get_recent_notifications(self, seconds: int = 30) -> list[NotificationItem]:
+    def get_recent_notifications(self, seconds: int = Limits.NOTIFICATION_RECENT_SECONDS) -> list[NotificationItem]:
         cutoff = datetime.now(timezone.utc) - timedelta(seconds=seconds)
         return [n for n in self.notifications if n.timestamp >= cutoff]
 

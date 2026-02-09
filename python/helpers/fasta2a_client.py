@@ -1,6 +1,7 @@
 import uuid
 from typing import Any, Dict, List, Optional
 from python.helpers.print_style import PrintStyle
+from python.helpers.constants import Timeouts
 
 try:
     from fasta2a.client import A2AClient  # type: ignore
@@ -16,7 +17,7 @@ _PRINTER = PrintStyle(italic=True, font_color="cyan", padding=False)
 class AgentConnection:
     """Helper class for connecting to and communicating with other Agent Zero instances via FastA2A."""
 
-    def __init__(self, agent_url: str, timeout: int = 30, token: Optional[str] = None):
+    def __init__(self, agent_url: str, timeout: int = int(Timeouts.HTTP_CLIENT_DEFAULT_TIMEOUT), token: Optional[str] = None):
         """Initialize connection to an agent.
 
         Args:
@@ -142,7 +143,7 @@ class AgentConnection:
             _PRINTER.print(f"Failed to get task {task_id}: {e}")
             raise RuntimeError(f"Failed to get task: {e}")
 
-    async def wait_for_completion(self, task_id: str, poll_interval: int = 2, max_wait: int = 300) -> Dict[str, Any]:
+    async def wait_for_completion(self, task_id: str, poll_interval: int = Timeouts.DOCUMENT_POLL_INTERVAL, max_wait: int = Timeouts.DOCUMENT_MAX_WAIT) -> Dict[str, Any]:
         """Wait for a task to complete and return the final result.
 
         Args:
@@ -188,7 +189,7 @@ class AgentConnection:
         await self.close()
 
 
-async def connect_to_agent(agent_url: str, timeout: int = 30) -> AgentConnection:
+async def connect_to_agent(agent_url: str, timeout: int = int(Timeouts.HTTP_CLIENT_DEFAULT_TIMEOUT)) -> AgentConnection:
     """Create a connection to a remote agent.
 
     Args:
