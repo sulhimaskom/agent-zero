@@ -3,7 +3,6 @@ from datetime import datetime, timezone
 import asyncio
 
 from python.helpers import history
-from models import UserMessage
 from python.helpers.localization import Localization
 from python.helpers.extension import call_extensions
 
