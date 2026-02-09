@@ -4,6 +4,8 @@ import asyncio
 
 from python.helpers import history
 from models import UserMessage
+from python.helpers.localization import Localization
+from python.helpers.extension import call_extensions
 
 
 class IHistoryManager(ABC):
@@ -17,7 +19,7 @@ class IHistoryManager(ABC):
         pass
 
     @abstractmethod
-    def add_user_message(self, message: UserMessage, intervention: bool = False) -> history.Message:
+    def add_user_message(self, message: "UserMessage", intervention: bool = False) -> history.Message:
         """Add a user message to history, starting a new topic"""
         pass
 
@@ -52,7 +54,7 @@ class HistoryCoordinator(IHistoryManager):
         asyncio.run(self.agent.call_extensions("hist_add_before", content_data=content_data, ai=ai))
         return self.agent.history.add_message(ai=ai, content=content_data["content"], tokens=tokens)
 
-    def add_user_message(self, message: UserMessage, intervention: bool = False) -> history.Message:
+    def add_user_message(self, message: "UserMessage", intervention: bool = False) -> history.Message:
         """Add a user message to history, starting a new topic"""
         self.agent.history.new_topic()
 
