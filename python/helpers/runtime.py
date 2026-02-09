@@ -4,6 +4,7 @@ import secrets
 from pathlib import Path
 from typing import TypeVar, Callable, Awaitable, Union, overload, cast
 from python.helpers import dotenv, rfc, settings, files
+from python.helpers.constants import Network, Timeouts, Shell
 import asyncio
 import threading
 import queue
@@ -64,7 +65,7 @@ def is_development() -> bool:
 def get_local_url():
     if is_dockerized():
         return "host.docker.internal"
-    return "127.0.0.1"
+    return Network.DEFAULT_LOCALHOST
 
 
 def get_runtime_id() -> str:
@@ -154,10 +155,10 @@ def call_development_function_sync(
 
     thread = threading.Thread(target=run_in_thread)
     thread.start()
-    thread.join(timeout=30)  # wait for thread with timeout
+    thread.join(timeout=Timeouts.RFC_FUNCTION_TIMEOUT)  # wait for thread with timeout
 
     if thread.is_alive():
-        raise TimeoutError("Function call timed out after 30 seconds")
+        raise TimeoutError(f"Function call timed out after {Timeouts.RFC_FUNCTION_TIMEOUT} seconds")
 
     result = result_queue.get_nowait()
     return cast(T, result)
@@ -165,7 +166,7 @@ def call_development_function_sync(
 
 def get_web_ui_port():
     web_ui_port = (
-        get_arg("port") or int(dotenv.get_dotenv_value("WEB_UI_PORT", 0)) or 5000
+        get_arg("port") or int(dotenv.get_dotenv_value("WEB_UI_PORT", 0)) or Network.WEB_UI_PORT_DEFAULT
     )
     return web_ui_port
 
@@ -174,7 +175,7 @@ def get_tunnel_api_port():
     tunnel_api_port = (
         get_arg("tunnel_api_port")
         or int(dotenv.get_dotenv_value("TUNNEL_API_PORT", 0))
-        or 55520
+        or Network.TUNNEL_API_PORT_DEFAULT
     )
     return tunnel_api_port
 
@@ -189,6 +190,6 @@ def is_windows():
 
 def get_terminal_executable():
     if is_windows():
-        return "powershell.exe"
+        return Shell.SHELL_POWERSHELL
     else:
-        return "/bin/bash"
+        return Shell.SHELL_BASH

@@ -10,22 +10,23 @@ from python.helpers.shell_ssh import SSHInteractiveSession
 from python.helpers.docker import DockerContainerManager
 from python.helpers.strings import truncate_text as truncate_text_string
 from python.helpers.messages import truncate_text as truncate_text_agent
+from python.helpers.constants import Timeouts
 import re
 
 # Timeouts for python, nodejs, and terminal runtimes.
 CODE_EXEC_TIMEOUTS: dict[str, int] = {
-    "first_output_timeout": 30,
-    "between_output_timeout": 15,
-    "max_exec_timeout": 180,
-    "dialog_timeout": 5,
+    "first_output_timeout": Timeouts.CODE_EXEC_FIRST_OUTPUT,
+    "between_output_timeout": Timeouts.CODE_EXEC_BETWEEN_OUTPUT,
+    "max_exec_timeout": Timeouts.CODE_EXEC_MAX,
+    "dialog_timeout": Timeouts.CODE_EXEC_DIALOG,
 }
 
 # Timeouts for output runtime.
 OUTPUT_TIMEOUTS: dict[str, int] = {
-    "first_output_timeout": 90,
-    "between_output_timeout": 45,
-    "max_exec_timeout": 300,
-    "dialog_timeout": 5,
+    "first_output_timeout": Timeouts.OUTPUT_FIRST_TIMEOUT,
+    "between_output_timeout": Timeouts.OUTPUT_BETWEEN_TIMEOUT,
+    "max_exec_timeout": Timeouts.OUTPUT_MAX_TIMEOUT,
+    "dialog_timeout": Timeouts.CODE_EXEC_DIALOG,
 }
 
 @dataclass

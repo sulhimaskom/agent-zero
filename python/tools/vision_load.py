@@ -4,11 +4,12 @@ from python.helpers.tool import Tool, Response
 from python.helpers import runtime, files, images
 from mimetypes import guess_type
 from python.helpers import history
+from python.helpers.constants import Limits
 
 # image optimization and token estimation for context window
-MAX_PIXELS = 768_000
-QUALITY = 75
-TOKENS_ESTIMATE = 1500
+MAX_PIXELS = Limits.VISION_MAX_PIXELS
+QUALITY = Limits.VISION_QUALITY
+TOKENS_ESTIMATE = Limits.VISION_TOKENS_ESTIMATE
 
 
 class VisionLoad(Tool):

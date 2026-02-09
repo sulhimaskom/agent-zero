@@ -3,6 +3,7 @@ from python.helpers import settings
 from python.helpers.extension import Extension
 from python.helpers.memory import Memory
 from python.helpers.dirty_json import DirtyJson
+from python.helpers.constants import Limits
 from agent import LoopData
 from python.helpers.log import LogItem
 from python.tools.memory_load import DEFAULT_THRESHOLD as DEFAULT_MEMORY_THRESHOLD
@@ -112,8 +113,8 @@ class MemorizeSolutions(Extension):
                     consolidator = create_memory_consolidator(
                         self.agent,
                         similarity_threshold=DEFAULT_MEMORY_THRESHOLD,  # More permissive for discovery
-                        max_similar_memories=6,    # Fewer for solutions (more complex)
-                        max_llm_context_memories=3
+                        max_similar_memories=Limits.MEMORY_SOL_MAX_SIMILAR_MEMORIES,    # Fewer for solutions (more complex)
+                        max_llm_context_memories=Limits.MEMORY_SOL_MAX_LLM_CONTEXT_MEMORIES
                     )
 
                     # Create solution-specific log for detailed tracking

@@ -27,6 +27,7 @@ from . import files
 from langchain_core.documents import Document
 from python.helpers import knowledge_import
 from python.helpers.log import Log, LogItem
+from python.helpers.constants import Limits, Paths
 from enum import Enum
 from agent import Agent, AgentContext
 import models
@@ -139,7 +140,7 @@ class Memory:
             log_item.stream(progress="\nInitializing VectorDB")
 
         em_dir = files.get_abs_path(
-            "memory/embeddings"
+            Paths.MEMORY_EMBEDDINGS_DIR
         )  # just caching, no need to parameterize
         db_dir = abs_db_dir(memory_subdir)
 
@@ -354,7 +355,7 @@ class Memory:
     async def delete_documents_by_query(
         self, query: str, threshold: float, filter: str = ""
     ):
-        k = 100
+        k = Limits.MEMORY_SEARCH_K
         tot = 0
         removed = []
 

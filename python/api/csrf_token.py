@@ -9,6 +9,7 @@ from python.helpers.api import (
     session,
 )
 from python.helpers import runtime, dotenv, login
+from python.helpers.constants import Network
 import fnmatch
 
 
@@ -109,4 +110,4 @@ class GetCsrfToken(ApiHandler):
         return allowed_origins
 
     def get_default_allowed_origins(self) -> list[str]:
-        return ["*://localhost:*", "*://127.0.0.1:*", "*://0.0.0.0:*"]
+        return Network.DEV_CORS_ORIGINS

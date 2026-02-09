@@ -3,16 +3,17 @@ from typing import Literal, TypedDict, TYPE_CHECKING
 
 from python.helpers import files, dirty_json, persist_chat, file_tree
 from python.helpers.print_style import PrintStyle
+from python.helpers.constants import Paths, Limits
 
 
 if TYPE_CHECKING:
     from agent import AgentContext
 
-PROJECTS_PARENT_DIR = "usr/projects"
-PROJECT_META_DIR = ".a0proj"
-PROJECT_INSTRUCTIONS_DIR = "instructions"
-PROJECT_KNOWLEDGE_DIR = "knowledge"
-PROJECT_HEADER_FILE = "project.json"
+PROJECTS_PARENT_DIR = Paths.PROJECTS_PARENT_DIR
+PROJECT_META_DIR = Paths.PROJECT_META_DIR
+PROJECT_INSTRUCTIONS_DIR = Paths.PROJECT_INSTRUCTIONS_DIR
+PROJECT_KNOWLEDGE_DIR = Paths.PROJECT_KNOWLEDGE_DIR
+PROJECT_HEADER_FILE = Paths.PROJECT_HEADER_FILE
 
 CONTEXT_DATA_KEY_PROJECT = "project"
 
@@ -90,10 +91,10 @@ def _default_file_structure_settings():
         gitignore = ""
     return FileStructureInjectionSettings(
         enabled=True,
-        max_depth=5,
-        max_files=20,
-        max_folders=20,
-        max_lines=250,
+        max_depth=Limits.PROJECT_MAX_DEPTH,
+        max_files=Limits.PROJECT_MAX_FILES,
+        max_folders=Limits.PROJECT_MAX_FOLDERS,
+        max_lines=Limits.PROJECT_MAX_LINES,
         gitignore=gitignore,
     )
 

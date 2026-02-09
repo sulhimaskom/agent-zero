@@ -1,8 +1,9 @@
 from typing import Literal
 import tiktoken
+from python.helpers.constants import Limits
 
-APPROX_BUFFER = 1.1
-TRIM_BUFFER = 0.8
+APPROX_BUFFER = Limits.TOKEN_APPROX_BUFFER
+TRIM_BUFFER = Limits.TOKEN_TRIM_BUFFER
 
 
 def count_tokens(text: str, encoding_name="cl100k_base") -> int:

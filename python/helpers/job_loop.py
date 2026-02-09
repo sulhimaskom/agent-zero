@@ -5,9 +5,10 @@ from python.helpers.task_scheduler import TaskScheduler
 from python.helpers.print_style import PrintStyle
 from python.helpers import errors
 from python.helpers import runtime
+from python.helpers.constants import Limits
 
 
-SLEEP_TIME = 60
+SLEEP_TIME = Limits.JOB_LOOP_SLEEP_TIME
 
 keep_running = True
 pause_time = 0

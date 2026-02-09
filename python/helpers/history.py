@@ -6,17 +6,18 @@ import json
 import math
 from typing import Coroutine, Literal, TypedDict, cast, Union, Dict, List, Any
 from python.helpers import messages, tokens, settings, call_llm
+from python.helpers.constants import Limits
 from enum import Enum
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage, AIMessage
 
-BULK_MERGE_COUNT = 3
-TOPICS_KEEP_COUNT = 3
-CURRENT_TOPIC_RATIO = 0.5
-HISTORY_TOPIC_RATIO = 0.3
-HISTORY_BULK_RATIO = 0.2
-TOPIC_COMPRESS_RATIO = 0.65
-LARGE_MESSAGE_TO_TOPIC_RATIO = 0.25
-RAW_MESSAGE_OUTPUT_TEXT_TRIM = 100
+BULK_MERGE_COUNT = Limits.HISTORY_BULK_MERGE_COUNT
+TOPICS_KEEP_COUNT = Limits.HISTORY_TOPICS_KEEP_COUNT
+CURRENT_TOPIC_RATIO = Limits.HISTORY_CURRENT_TOPIC_RATIO
+HISTORY_TOPIC_RATIO = Limits.HISTORY_TOPIC_RATIO
+HISTORY_BULK_RATIO = Limits.HISTORY_BULK_RATIO
+TOPIC_COMPRESS_RATIO = Limits.HISTORY_TOPIC_COMPRESS_RATIO
+LARGE_MESSAGE_TO_TOPIC_RATIO = Limits.HISTORY_LARGE_MESSAGE_RATIO
+RAW_MESSAGE_OUTPUT_TEXT_TRIM = Limits.HISTORY_RAW_MESSAGE_TRIM
 
 
 class RawMessage(TypedDict):

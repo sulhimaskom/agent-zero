@@ -2,6 +2,7 @@ from dataclasses import dataclass
 import uuid
 from datetime import datetime, timezone, timedelta
 from enum import Enum
+from python.helpers.constants import Limits
 
 
 class NotificationType(Enum):
@@ -26,7 +27,7 @@ class NotificationItem:
     message: str
     detail: str  # HTML content for expandable details
     timestamp: datetime
-    display_time: int = 3  # Display duration in seconds, default 3 seconds
+    display_time: int = Limits.NOTIFICATION_DISPLAY_TIME  # Display duration in seconds, default 3 seconds
     read: bool = False
     id: str = ""
     group: str = ""  # Group identifier for grouping related notifications
@@ -59,7 +60,7 @@ class NotificationItem:
 
 
 class NotificationManager:
-    def __init__(self, max_notifications: int = 100):
+    def __init__(self, max_notifications: int = Limits.NOTIFICATION_MAX_COUNT):
         self.guid: str = str(uuid.uuid4())
         self.updates: list[int] = []
         self.notifications: list[NotificationItem] = []
@@ -72,7 +73,7 @@ class NotificationManager:
         message: str,
         title: str = "",
         detail: str = "",
-        display_time: int = 3,
+        display_time: int = Limits.NOTIFICATION_DISPLAY_TIME,
         group: str = "",
     ) -> NotificationItem:
         from agent import AgentContext
