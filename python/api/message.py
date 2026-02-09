@@ -6,7 +6,7 @@ import os
 from werkzeug.utils import secure_filename
 from python.helpers.defer import DeferredTask
 from python.helpers.print_style import PrintStyle
-from python.helpers.constants import Colors
+from python.helpers.constants import Colors, Paths
 
 
 class Message(ApiHandler):
@@ -30,7 +30,7 @@ class Message(ApiHandler):
             attachments = request.files.getlist("attachments")
             attachment_paths = []
 
-            upload_folder_int = "/a0/tmp/uploads"
+            upload_folder_int = Paths.UPLOAD_FOLDER
             upload_folder_ext = files.get_abs_path("tmp/uploads") # for development environment
 
             if attachments:

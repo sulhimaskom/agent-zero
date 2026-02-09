@@ -71,6 +71,16 @@ class Timeouts:
     # SSH shell delays
     SSH_SHELL_DELAY: Final[float] = 0.1
     SSH_CONNECTION_DELAY: Final[int] = 5
+    
+    # Model loading delays
+    MODEL_UPDATE_CHECK_DELAY: Final[float] = 0.1
+    
+    # Wait function delays
+    WAIT_PAUSE_THRESHOLD: Final[float] = 1.5
+    WAIT_SLEEP_INTERVAL: Final[float] = 1.0
+    
+    # HTTP client timeouts
+    HTTP_CLIENT_DEFAULT_TIMEOUT: Final[float] = 30.0
 
 
 # =============================================================================
@@ -99,12 +109,18 @@ class Limits:
     MEMORY_CONTENT_PREVIEW_TRUNCATION: Final[int] = 200
     MEMORY_CONTENT_PREVIEW_LIMIT: Final[int] = 100
     MEMORY_SEARCH_K: Final[int] = 100
+    MEMORY_SIMILARITY_SINGLE_DOC: Final[float] = 1.0
+    MEMORY_SIMILARITY_SAFETY_THRESHOLD: Final[float] = 0.9
+    MEMORY_SIMILARITY_DEFAULT_ESTIMATE: Final[float] = 0.7
     
     # Memory extension limits
     MEMORY_EXT_MAX_SIMILAR_MEMORIES: Final[int] = 8
     MEMORY_EXT_MAX_LLM_CONTEXT_MEMORIES: Final[int] = 4
     MEMORY_SOL_MAX_SIMILAR_MEMORIES: Final[int] = 6
     MEMORY_SOL_MAX_LLM_CONTEXT_MEMORIES: Final[int] = 3
+    
+    # Default timestamp for sorting
+    DEFAULT_TIMESTAMP: Final[str] = "0000-00-00 00:00:00"
     
     # Document query
     DOCUMENT_DEFAULT_THRESHOLD: Final[float] = 0.5
@@ -140,6 +156,10 @@ class Limits:
     TOKEN_APPROX_BUFFER: Final[float] = 1.1
     TOKEN_TRIM_BUFFER: Final[float] = 0.8
     
+    # Message truncation ratios (history compression)
+    MESSAGE_TRIM_RATIO_UPPER: Final[float] = 1.15
+    MESSAGE_TRIM_RATIO_LOWER: Final[float] = 0.85
+    
     # Backup limits
     BACKUP_MAX_FILES_FULL: Final[int] = 50000
     BACKUP_MAX_FILES_PARTIAL: Final[int] = 10000
@@ -160,6 +180,7 @@ class Limits:
     
     # STT settings
     STT_SILENCE_DURATION: Final[int] = 1000
+    STT_SILENCE_THRESHOLD: Final[float] = 0.3
     STT_WAITING_TIMEOUT: Final[int] = 2000
     
     # Command truncation
@@ -199,6 +220,8 @@ class Limits:
     
     # Audio
     TTS_SAMPLE_RATE: Final[int] = 24000
+    TTS_DEFAULT_SPEED: Final[float] = 1.1
+    TTS_DEFAULT_VOICE: Final[str] = "am_puck,am_onyx"
     
     # Job loop
     JOB_LOOP_SLEEP_TIME: Final[int] = 60
@@ -241,6 +264,11 @@ class Network:
         "*://127.0.0.1:*",
         "*://0.0.0.0:*"
     ]
+    
+    # External API endpoints
+    UPDATE_CHECK_URL: Final[str] = "https://api.agent-zero.ai/a0-update-check"
+    PERPLEXITY_API_BASE_URL: Final[str] = "https://api.perplexity.ai"
+    PERPLEXITY_DEFAULT_MODEL: Final[str] = "llama-3.1-sonar-large-128k-online"
 
 
 # =============================================================================
@@ -280,6 +308,10 @@ class Paths:
     UPLOAD_FOLDER: Final[str] = "/a0/tmp/uploads"
     WORK_DIR: Final[str] = "/a0"
     ROOT_DIR: Final[str] = "/root"
+    
+    # Code execution paths
+    NODE_EVAL_SCRIPT: Final[str] = "/exe/node_eval.js"
+    EMAIL_INBOX_PATH: Final[str] = "tmp/email/inbox"
     
     # MCP paths
     MCP_SSE_PATH_PATTERN: Final[str] = "/t-{token}/sse"
@@ -386,6 +418,7 @@ class UITiming:
     ANIMATION_SHORT: Final[int] = 200
     ANIMATION_MEDIUM: Final[int] = 500
     ANIMATION_LONG: Final[int] = 1000
+    ANIMATION_STEP: Final[float] = 0.01  # For string matching animation
 
 
 # =============================================================================

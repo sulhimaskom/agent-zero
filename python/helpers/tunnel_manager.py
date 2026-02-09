@@ -1,5 +1,6 @@
 from flaredantic import FlareTunnel, FlareConfig, ServeoConfig, ServeoTunnel
 import threading
+from python.helpers.constants import Timeouts
 
 
 # Singleton to manage the tunnel instance
@@ -48,13 +49,13 @@ class TunnelManager:
             tunnel_thread.daemon = True
             tunnel_thread.start()
 
-            # Wait for tunnel to start (max 15 seconds instead of 5)
-            for _ in range(150):  # Increased from 50 to 150 iterations
+            # Wait for tunnel to start (max 15 seconds)
+            for _ in range(Timeouts.TUNNEL_STARTUP_ITERATIONS):
                 if self.tunnel_url:
                     break
                 import time
 
-                time.sleep(0.1)
+                time.sleep(Timeouts.TUNNEL_STARTUP_DELAY)
 
             return self.tunnel_url
         except Exception as e:

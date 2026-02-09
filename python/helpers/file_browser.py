@@ -9,6 +9,7 @@ from datetime import datetime
 
 from python.helpers import files
 from python.helpers.print_style import PrintStyle
+from python.helpers.constants import Timeouts
 
 
 class FileBrowser:
@@ -133,7 +134,7 @@ class FileBrowser:
                 ['ls', '-la', str(full_path)],
                 capture_output=True,
                 text=True,
-                timeout=30
+                timeout=Timeouts.FILE_BROWSER_TIMEOUT
             )
 
             if result.returncode != 0:

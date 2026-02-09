@@ -6,6 +6,7 @@ import asyncio
 from python.helpers import runtime, rfc, settings, files
 from python.helpers.print_style import PrintStyle
 from python.helpers.notification import NotificationManager, NotificationType, NotificationPriority
+from python.helpers.constants import Paths
 
 # Suppress FutureWarning from torch.load
 warnings.filterwarnings("ignore", category=FutureWarning)
@@ -26,7 +27,7 @@ async def _preload(model_name:str):
     global _model, _model_name, is_updating_model
 
     while is_updating_model:
-        await asyncio.sleep(0.1)
+        await asyncio.sleep(Timeouts.MODEL_UPDATE_CHECK_DELAY)
 
     try:
         is_updating_model = True
@@ -38,7 +39,7 @@ async def _preload(model_name:str):
                 display_time=99,
                 group="whisper-preload")
             PrintStyle.standard(f"Loading Whisper model: {model_name}")
-            _model = whisper.load_model(name=model_name, download_root=files.get_abs_path("/tmp/models/whisper")) # type: ignore
+            _model = whisper.load_model(name=model_name, download_root=files.get_abs_path(Paths.WHISPER_MODEL_ROOT)) # type: ignore
             _model_name = model_name
             NotificationManager.send_notification(
                 NotificationType.INFO,
