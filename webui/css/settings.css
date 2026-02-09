@@ -92,8 +92,18 @@ textarea:focus {
 
 .toggle input {
   opacity: 0;
-  width: 0;
-  height: 0;
+  position: absolute;
+  width: 60px;
+  height: 34px;
+  cursor: pointer;
+  z-index: 1;
+}
+
+/* Focus indicator for keyboard accessibility */
+.toggle input:focus-visible + .toggler {
+  outline: 2px solid var(--color-highlight, #2196f3);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.3);
 }
 
 .toggler {
