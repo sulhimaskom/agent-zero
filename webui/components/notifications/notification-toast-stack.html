@@ -16,6 +16,9 @@
                 <div class="toast-item"
                      :class="$store.notificationStore.getNotificationClass(toast.type)"
                      @click="$store.notificationStore.handleToastClick(toast.toastId)"
+                     x-data="{ isPaused: false }"
+                     @mouseenter="isPaused = true"
+                     @mouseleave="isPaused = false"
                      x-transition:enter="toast-enter"
                      x-transition:leave="toast-leave">
 
@@ -44,6 +47,14 @@
                             title="Dismiss">
                         <span class="material-symbols-outlined">close</span>
                     </button>
+
+                    <!-- Progress Bar -->
+                    <div class="toast-progress-container">
+                        <div class="toast-progress-bar"
+                             :class="'toast-progress-' + toast.type"
+                             :style="`animation-duration: ${toast.display_time}s; animation-play-state: ${isPaused ? 'paused' : 'running'}`">
+                        </div>
+                    </div>
                 </div>
             </template>
           </div>
@@ -208,6 +219,55 @@
             }
         }
 
+        /* Toast Progress Bar */
+        .toast-progress-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+            overflow: hidden;
+        }
+
+        .toast-progress-bar {
+            height: 100%;
+            width: 100%;
+            animation: toast-progress linear forwards;
+            transform-origin: left;
+        }
+
+        .toast-progress-info {
+            background: linear-gradient(90deg, #2196F3, #64B5F6);
+        }
+
+        .toast-progress-success {
+            background: linear-gradient(90deg, #4CAF50, #81C784);
+        }
+
+        .toast-progress-warning {
+            background: linear-gradient(90deg, #FF9800, #FFB74D);
+        }
+
+        .toast-progress-error {
+            background: linear-gradient(90deg, #F44336, #E57373);
+        }
+
+        .toast-progress-progress {
+            background: linear-gradient(90deg, #9C27B0, #BA68C8);
+        }
+
+        @keyframes toast-progress {
+            from {
+                transform: scaleX(1);
+            }
+            to {
+                transform: scaleX(0);
+            }
+        }
+
         /* Accessibility */
         @media (prefers-reduced-motion: reduce) {
             .toast-enter,
@@ -217,6 +277,11 @@
 
             .toast-item:hover {
                 transform: none;
+            }
+
+            .toast-progress-bar {
+                animation: none;
+                display: none;
             }
         }
     </style>
