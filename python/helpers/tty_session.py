@@ -1,4 +1,5 @@
 import asyncio, os, sys, platform, errno
+from python.helpers.constants import Limits
 
 _IS_WIN = platform.system() == "Windows"
 if _IS_WIN:
@@ -209,7 +210,7 @@ async def _spawn_winpty(cmd, cwd, env, echo):
         if "-nolog" not in cmd.lower():
             cmd = cmd.replace("powershell.exe", "powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass", 1)
 
-    cols, rows = 80, 25
+    cols, rows = Limits.TTY_DEFAULT_COLS, Limits.TTY_DEFAULT_ROWS
     child = winpty.PtyProcess.spawn(cmd, dimensions=(rows, cols), cwd=cwd or os.getcwd(), env=env) # type: ignore
 
     loop = asyncio.get_running_loop()

@@ -1,5 +1,6 @@
 // Import the component loader and page utilities
 import { importComponent } from "/js/components.js";
+import { UI } from './constants.js';
 
 // Modal functionality
 const modalStack = [];
@@ -14,14 +15,14 @@ document.body.appendChild(backdrop);
 // Function to update z-index for all modals and backdrop
 function updateModalZIndexes() {
   // Base z-index for modals
-  const baseZIndex = 3000;
+  const baseZIndex = UI.BASE_Z_INDEX;
 
   // Update z-index for all modals
   modalStack.forEach((modal, index) => {
     // For first modal, z-index is baseZIndex
-    // For second modal, z-index is baseZIndex + 20
+    // For second modal, z-index is baseZIndex + Z_INDEX_STEP
     // This leaves room for the backdrop between them
-    modal.element.style.zIndex = baseZIndex + index * 20;
+    modal.element.style.zIndex = baseZIndex + index * UI.Z_INDEX_STEP;
   });
 
   // Always show backdrop
@@ -30,8 +31,8 @@ function updateModalZIndexes() {
   if (modalStack.length > 1) {
     // For multiple modals, position backdrop between the top two
     const topModalIndex = modalStack.length - 1;
-    const previousModalZIndex = baseZIndex + (topModalIndex - 1) * 20;
-    backdrop.style.zIndex = previousModalZIndex + 10;
+    const previousModalZIndex = baseZIndex + (topModalIndex - 1) * UI.Z_INDEX_STEP;
+    backdrop.style.zIndex = previousModalZIndex + UI.BACKDROP_OFFSET;
   } else if (modalStack.length === 1) {
     // For single modal, position backdrop below it
     backdrop.style.zIndex = baseZIndex - 1;

@@ -40,24 +40,59 @@ export const TIMING = {
   NOTIFICATION_DISPLAY: 3000,
   TOAST_DISPLAY: 5000,
   SPEECH_DISPLAY: 5000,
-  
+
   // Animation delays
   ANIMATION_SHORT: 200,
   ANIMATION_MEDIUM: 500,
   ANIMATION_LONG: 1000,
-  
+
   // Polling intervals
   POLL_INTERVAL: 1000,
   POLL_INTERVAL_FAST: 500,
-  
+  SCHEDULER_POLL_INTERVAL: 2000,
+
   // Debounce delays
   DEBOUNCE_INPUT: 300,
   DEBOUNCE_SEARCH: 500,
   DEBOUNCE_RESIZE: 250,
-  
+
   // Timeouts
   API_TIMEOUT: 30000,
   STREAM_TIMEOUT: 300000,
+  INPUT_DETECT_TIMEOUT: 10000,
+  SETUP_DELAY: 100,
+  UI_DELAY: 300,
+  CHECK_DELAY: 100,
+  IMAGE_REFRESH_INTERVAL: 1000,
+};
+
+// =============================================================================
+// SPEECH CONSTANTS
+// =============================================================================
+
+export const SPEECH = {
+  // Silence detection
+  SILENCE_DURATION: 1000,
+  WAITING_TIMEOUT: 2000,
+  SILENCE_THRESHOLD: 0.15,
+  MIN_SPEECH_DURATION: 500,
+
+  // Recorder settings
+  RECORDER_CHUNK_SIZE: 1000,
+
+  // Model settings
+  DEFAULT_MODEL_SIZE: 'tiny',
+  DEFAULT_LANGUAGE: 'en',
+};
+
+// =============================================================================
+// UI Z-INDEX CONSTANTS
+// =============================================================================
+
+export const UI = {
+  BASE_Z_INDEX: 3000,
+  Z_INDEX_STEP: 20,
+  BACKDROP_OFFSET: 10,
 };
 
 // =============================================================================
@@ -69,14 +104,21 @@ export const LIMITS = {
   MAX_MESSAGE_LENGTH: 10000,
   MAX_ATTACHMENT_SIZE: 10 * 1024 * 1024, // 10MB
   MAX_FILE_SIZE: 100 * 1024 * 1024, // 100MB
-  
+
   // Display limits
   MAX_VISIBLE_MESSAGES: 100,
   MAX_NOTIFICATIONS: 100,
-  
+
   // Memory limits
   MAX_MEMORY_RESULTS: 10,
   MAX_SEARCH_RESULTS: 50,
+
+  // Image/Preview limits
+  IMAGE_MODAL_SIZE: 1000,
+  IMAGE_PREVIEW_MAX_SIZE: 800,
+
+  // Recorder chunk size
+  RECORDER_CHUNK_SIZE: 1000,
 };
 
 // =============================================================================

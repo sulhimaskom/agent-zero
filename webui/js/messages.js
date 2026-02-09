@@ -4,6 +4,7 @@ import { marked } from "../vendor/marked/marked.esm.js";
 import { store as _messageResizeStore } from "/components/messages/resize/message-resize-store.js"; // keep here, required in html
 import { store as attachmentsStore } from "/components/chat/attachments/attachmentsStore.js";
 import { addActionButtonsToElement } from "/components/messages/action-buttons/simple-action-buttons.js";
+import { LIMITS } from './constants.js';
 
 const chatHistory = document.getElementById("chat-history");
 
@@ -737,7 +738,7 @@ function drawKvps(container, kvps, latex) {
           // Add click handler and cursor change
           imgElement.style.cursor = "pointer";
           imgElement.addEventListener("click", () => {
-            openImageModal(imgElement.src, 1000);
+            openImageModal(imgElement.src, LIMITS.IMAGE_MODAL_SIZE);
           });
         } else {
           const pre = document.createElement("pre");

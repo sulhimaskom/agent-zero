@@ -9,6 +9,7 @@ from python.helpers.strings import truncate_text_by_ratio
 import copy
 from typing import TypeVar
 from python.helpers.secrets import get_secrets_manager
+from python.helpers.constants import Limits
 
 
 if TYPE_CHECKING:
@@ -35,12 +36,12 @@ Type = Literal[
 ProgressUpdate = Literal["persistent", "temporary", "none"]
 
 
-HEADING_MAX_LEN: int = 120
-CONTENT_MAX_LEN: int = 15_000
-RESPONSE_CONTENT_MAX_LEN: int = 250_000
-KEY_MAX_LEN: int = 60
-VALUE_MAX_LEN: int = 5000
-PROGRESS_MAX_LEN: int = 120
+HEADING_MAX_LEN: int = Limits.HEADING_MAX_LEN
+CONTENT_MAX_LEN: int = Limits.CONTENT_MAX_LEN
+RESPONSE_CONTENT_MAX_LEN: int = Limits.RESPONSE_CONTENT_MAX_LEN
+KEY_MAX_LEN: int = Limits.KEY_MAX_LEN
+VALUE_MAX_LEN: int = Limits.LOG_VALUE_MAX_LEN
+PROGRESS_MAX_LEN: int = Limits.PROGRESS_MAX_LEN
 
 
 def _truncate_heading(text: str | None) -> str:

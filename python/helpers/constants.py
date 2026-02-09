@@ -186,6 +186,8 @@ class Limits:
     
     # TTY settings
     TTY_BUFFER_SIZE: Final[int] = 4096
+    TTY_DEFAULT_COLS: Final[int] = 80
+    TTY_DEFAULT_ROWS: Final[int] = 25
     
     # Scheduler token generation
     SCHEDULER_TOKEN_MIN: Final[int] = 10**17  # 18 digits
@@ -203,6 +205,18 @@ class Limits:
     
     # Agent ID generation
     AGENT_ID_LENGTH: Final[int] = 8
+
+    # Logging limits
+    LOG_VALUE_MAX_LEN: Final[int] = 5000
+    HEADING_MAX_LEN: Final[int] = 120
+    CONTENT_MAX_LEN: Final[int] = 15000
+    RESPONSE_CONTENT_MAX_LEN: Final[int] = 250000
+    KEY_MAX_LEN: Final[int] = 60
+    PROGRESS_MAX_LEN: Final[int] = 120
+
+    # Image/Attachment limits
+    IMAGE_PREVIEW_MAX_SIZE: Final[int] = 800
+    IMAGE_PREVIEW_QUALITY: Final[int] = 70
 
 
 # =============================================================================
