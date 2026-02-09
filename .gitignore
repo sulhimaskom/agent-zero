@@ -49,6 +49,5 @@ agent_history.gif
 # Opencode AI agent
 .opencode/
 
-
 # Worktrees directory for isolated development
 .worktrees/
