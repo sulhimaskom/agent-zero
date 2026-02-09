@@ -125,9 +125,9 @@ def _send_file_type_icon(file_ext, filename=None):
 
     # Add headers for device sync
     if hasattr(response, "headers"):
-            response.headers["Cache-Control"] = (
-                f"public, max-age={Timeouts.HTTP_CACHE_MAX_AGE}"  # Cache icons for 24 hours from constants
-            )
+        response.headers["Cache-Control"] = (
+            f"public, max-age={Timeouts.HTTP_CACHE_MAX_AGE}"  # Cache icons for 24 hours from constants
+        )
         response.headers["X-File-Type"] = "icon"
         response.headers["X-Icon-Type"] = icon_name
         if filename:
