@@ -1,8 +1,12 @@
+from __future__ import annotations
+
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
-from agent import Agent, LoopData
+if TYPE_CHECKING:
+    from agent import Agent, LoopData
+
 from python.helpers.print_style import PrintStyle
 from python.helpers.strings import sanitize_string
 
@@ -15,7 +19,7 @@ class Response:
 
 class Tool:
 
-    def __init__(self, agent: Agent, name: str, method: str | None, args: dict[str,str], message: str, loop_data: LoopData | None, **kwargs) -> None:
+    def __init__(self, agent: "Agent", name: str, method: str | None, args: dict[str, str], message: str, loop_data: "LoopData | None", **kwargs) -> None:
         self.agent = agent
         self.name = name
         self.method = method
