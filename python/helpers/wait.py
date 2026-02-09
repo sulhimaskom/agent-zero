@@ -2,6 +2,7 @@ import asyncio
 from datetime import datetime, timezone
 
 from python.helpers.print_style import PrintStyle
+from python.helpers.constants import Timeouts
 
 
 def format_remaining_time(total_seconds: float) -> str:
@@ -48,7 +49,7 @@ async def managed_wait(agent, target_time, is_duration_wait, log, get_heading_ca
 
         if is_duration_wait:
             pause_duration = after_intervention - before_intervention
-            if pause_duration.total_seconds() > 1.5:  # Adjust for pauses longer than the sleep cycle
+            if pause_duration.total_seconds() > Timeouts.WAIT_PAUSE_THRESHOLD:  # Adjust for pauses longer than the sleep cycle
                 target_time += pause_duration
                 PrintStyle.info(
                     f"Wait extended by {pause_duration.total_seconds():.1f}s to {target_time.isoformat()}...",
@@ -61,7 +62,7 @@ async def managed_wait(agent, target_time, is_duration_wait, log, get_heading_ca
         remaining_seconds = (target_time - current_time).total_seconds()
         if log:
             log.update(heading=get_heading_callback(format_remaining_time(remaining_seconds)))
-        sleep_duration = min(1.0, remaining_seconds)
+        sleep_duration = min(Timeouts.WAIT_SLEEP_INTERVAL, remaining_seconds)
         
         await asyncio.sleep(sleep_duration)
     

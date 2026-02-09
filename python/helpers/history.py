@@ -18,6 +18,8 @@ HISTORY_BULK_RATIO = Limits.HISTORY_BULK_RATIO
 TOPIC_COMPRESS_RATIO = Limits.HISTORY_TOPIC_COMPRESS_RATIO
 LARGE_MESSAGE_TO_TOPIC_RATIO = Limits.HISTORY_LARGE_MESSAGE_RATIO
 RAW_MESSAGE_OUTPUT_TEXT_TRIM = Limits.HISTORY_RAW_MESSAGE_TRIM
+MESSAGE_TRIM_RATIO_UPPER = Limits.MESSAGE_TRIM_RATIO_UPPER
+MESSAGE_TRIM_RATIO_LOWER = Limits.MESSAGE_TRIM_RATIO_LOWER
 
 
 class RawMessage(TypedDict):
@@ -193,8 +195,8 @@ class Topic(Record):
                 trunc = messages.truncate_dict_by_ratio(
                     self.history.agent,
                     out[0]["content"],
-                    trim_to_chars * 1.15,
-                    trim_to_chars * 0.85,
+                    trim_to_chars * MESSAGE_TRIM_RATIO_UPPER,
+                    trim_to_chars * MESSAGE_TRIM_RATIO_LOWER,
                 )
                 msg.set_summary(_json_dumps(trunc))
 

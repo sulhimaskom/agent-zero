@@ -1,8 +1,9 @@
 
 from openai import OpenAI
 import models
+from python.helpers.constants import Network
 
-def perplexity_search(query:str, model_name="llama-3.1-sonar-large-128k-online",api_key=None,base_url="https://api.perplexity.ai"):    
+def perplexity_search(query:str, model_name=Network.PERPLEXITY_DEFAULT_MODEL, api_key=None, base_url=Network.PERPLEXITY_API_BASE_URL):    
     api_key = api_key or models.get_api_key("perplexity")
 
     client = OpenAI(api_key=api_key, base_url=base_url)
