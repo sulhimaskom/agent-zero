@@ -2,6 +2,7 @@ from python.helpers import notification
 from python.helpers.extension import Extension
 from agent import LoopData
 from python.helpers import settings, update_check
+from python.helpers.constants import Timeouts
 import datetime
 
 
@@ -11,10 +12,10 @@ import datetime
 # do not notify too often unless there's a different notification
 
 last_check = datetime.datetime.fromtimestamp(0)
-check_cooldown_seconds = 60
+check_cooldown_seconds = 60  # 1 minute cooldown between checks
 last_notification_id = ""
 last_notification_time = datetime.datetime.fromtimestamp(0)
-notification_cooldown_seconds = 60 * 60 * 24
+notification_cooldown_seconds = 86400  # 24 hours between same notification
 
 class UpdateCheck(Extension):
 

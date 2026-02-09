@@ -1,10 +1,11 @@
 import asyncio
 import time
 from typing import Callable, Awaitable
+from python.helpers.constants import Timeouts
 
 
 class RateLimiter:
-    def __init__(self, seconds: int = 60, **limits: int):
+    def __init__(self, seconds: int = Timeouts.RATE_LIMITER_DEFAULT_TIMEFRAME, **limits: int):
         self.timeframe = seconds
         self.limits = {key: value if isinstance(value, (int, float)) else 0 for key, value in (limits or {}).items()}
         self.values = {key: [] for key in self.limits.keys()}
