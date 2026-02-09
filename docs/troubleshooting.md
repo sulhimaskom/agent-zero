@@ -14,20 +14,20 @@ Refer to the [Choosing your LLMs](installation.md#installing-and-using-ollama-lo
 > [!TIP]
 > Some LLM providers offer free usage of their APIs, for example Groq, Mistral, SambaNova or CometAPI.
 
-**6. How can I make Agent Zero retain memory between sessions?**
+**4. How can I make Agent Zero retain memory between sessions?**
 Refer to the [How to update Agent Zero](installation.md#how-to-update-agent-zero) section of the documentation for instructions on how to update Agent Zero while retaining memory and data.
 
-**7. Where can I find more documentation or tutorials?**
+**5. Where can I find more documentation or tutorials?**
 -   Join the Agent Zero [Skool](https://www.skool.com/agent-zero) or [Discord](https://discord.gg/B8KZKNsPpj) community for support and discussions.
 
-**8. How do I adjust API rate limits?**
+**6. How do I adjust API rate limits?**
 Modify the `rate_limit_seconds` and `rate_limit_requests` parameters in the `AgentConfig` class within `initialize.py`.
 
-**9. My code_execution_tool doesn't work, what's wrong?**
+**7. My code_execution_tool doesn't work, what's wrong?**
 -   Ensure you have Docker installed and running.  If using Docker Desktop on macOS, grant it access to your project files in Docker Desktop's settings.  Check the [Installation guide](installation.md#4-install-docker-docker-desktop-application) for more details.
 -   Verify that the Docker image is updated.
 
-**10. Can Agent Zero interact with external APIs or services (e.g., WhatsApp)?**
+**8. Can Agent Zero interact with external APIs or services (e.g., WhatsApp)?**
 Extending Agent Zero to interact with external APIs is possible by creating custom tools or solutions. Refer to the documentation on creating them. 
 
 ## Troubleshooting

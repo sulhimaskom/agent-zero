@@ -10,7 +10,7 @@ Agent Zero is undergoing continuous architectural improvements to enhance mainta
 **Key Changes**:
 - **Tool Execution**: Extracted to `ToolCoordinator` with `IToolExecutor` interface (completed)
 - **History Management**: Extracted to `HistoryCoordinator` with `IHistoryManager` interface (completed)
-- **Stream Handling**: Planned extraction to `StreamCoordinator` with `IStreamHandler` interface
+- **Stream Handling**: Extracted to `StreamCoordinator` with `IStreamHandler` interface
 
 These changes are designed to:
 - Reduce the Agent class from ~600 lines to under 300 lines
@@ -81,13 +81,12 @@ This architecture ensures:
 | --- | --- |
 | `.env` | Environment configuration |
 | `agent.py` | Core agent implementation |
-| `example.env` | Configuration template |
+| `.env.example` | Configuration template |
 | `initialize.py` | Framework initialization |
 | `models.py` | Model providers and configs |
 | `preload.py` | Pre-initialization routines |
 | `prepare.py` | Environment preparation |
 | `requirements.txt` | Python dependencies |
-| `run_cli.py` | CLI launcher |
 | `run_ui.py` | Web UI launcher |
 
 > [!NOTE]
@@ -246,7 +245,7 @@ def process_message(self, msg: str):
 - Centralized extension integration for history events
 - Easier testing with mockable interfaces
 
-**Current State**: ToolCoordinator and HistoryCoordinator are implemented and fully integrated. StreamCoordinator is planned (see [docs/blueprint.md](./blueprint.md) for details).
+**Current State**: ToolCoordinator, HistoryCoordinator, and StreamCoordinator are implemented and fully integrated.
 
 ### 3. Memory System
 The memory system is a critical component of Agent Zero, enabling the agent to learn and adapt from past interactions. It operates on a hybrid model where part of the memory is managed automatically by the framework while users can also manually input and extract information.

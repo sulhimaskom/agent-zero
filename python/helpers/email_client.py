@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from email.header import decode_header
 from email.message import Message as EmailMessage
 from fnmatch import fnmatch
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 import html2text
 from bs4 import BeautifulSoup
@@ -16,7 +16,6 @@ from imapclient import IMAPClient
 from python.helpers import files
 from python.helpers.errors import RepairableException, format_error
 from python.helpers.print_style import PrintStyle
-from python.helpers.constants import Limits, Paths
 
 
 @dataclass
