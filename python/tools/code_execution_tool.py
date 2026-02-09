@@ -10,22 +10,23 @@ from python.helpers.shell_ssh import SSHInteractiveSession
 from python.helpers.docker import DockerContainerManager
 from python.helpers.strings import truncate_text as truncate_text_string
 from python.helpers.messages import truncate_text as truncate_text_agent
+from python.helpers.constants import Timeouts, Colors
 import re
 
 # Timeouts for python, nodejs, and terminal runtimes.
 CODE_EXEC_TIMEOUTS: dict[str, int] = {
-    "first_output_timeout": 30,
-    "between_output_timeout": 15,
-    "max_exec_timeout": 180,
-    "dialog_timeout": 5,
+    "first_output_timeout": Timeouts.CODE_EXEC_FIRST_OUTPUT,
+    "between_output_timeout": Timeouts.CODE_EXEC_BETWEEN_OUTPUT,
+    "max_exec_timeout": Timeouts.CODE_EXEC_MAX,
+    "dialog_timeout": Timeouts.CODE_EXEC_DIALOG,
 }
 
 # Timeouts for output runtime.
 OUTPUT_TIMEOUTS: dict[str, int] = {
-    "first_output_timeout": 90,
-    "between_output_timeout": 45,
-    "max_exec_timeout": 300,
-    "dialog_timeout": 5,
+    "first_output_timeout": Timeouts.OUTPUT_FIRST_TIMEOUT,
+    "between_output_timeout": Timeouts.OUTPUT_BETWEEN_TIMEOUT,
+    "max_exec_timeout": Timeouts.OUTPUT_MAX_TIMEOUT,
+    "dialog_timeout": Timeouts.CODE_EXEC_DIALOG,
 }
 
 @dataclass
@@ -207,7 +208,7 @@ class CodeExecution(Tool):
                 )
 
                 PrintStyle(
-                    background_color="white", font_color="#1B4F72", bold=True
+                    background_color=Colors.BG_WHITE, font_color=Colors.PRIMARY_BLUE, bold=True
                 ).print(f"{self.agent.agent_name} code execution output{locl}")
                 return await self.get_terminal_output(session=session, prefix=prefix, timeouts=(timeouts or CODE_EXEC_TIMEOUTS))
 
@@ -275,7 +276,7 @@ class CodeExecution(Tool):
 
             now = time.time()
             if partial_output:
-                PrintStyle(font_color="#85C1E9").stream(partial_output)
+                PrintStyle(font_color=Colors.PRIMARY_LIGHT_BLUE).stream(partial_output)
                 # full_output += partial_output # Append new output
                 truncated_output = self.fix_full_output(full_output)
                 self.set_progress(truncated_output)
@@ -418,7 +419,7 @@ class CodeExecution(Tool):
         response = self.agent.read_prompt("fw.code.info.md", info=sys_info)
         if truncated_output:
             response = truncated_output + "\n\n" + response
-        PrintStyle(font_color="#FFA500", bold=True).print(response)
+        PrintStyle(font_color=Colors.WARNING, bold=True).print(response)
         self.log.update(content=prefix + response, heading=heading)
         return response
     
@@ -430,11 +431,11 @@ class CodeExecution(Tool):
     async def reset_terminal(self, session=0, reason: str | None = None):
         # Print the reason for the reset to the console if provided
         if reason:
-            PrintStyle(font_color="#FFA500", bold=True).print(
+            PrintStyle(font_color=Colors.WARNING, bold=True).print(
                 f"Resetting terminal session {session}... Reason: {reason}"
             )
         else:
-            PrintStyle(font_color="#FFA500", bold=True).print(
+            PrintStyle(font_color=Colors.WARNING, bold=True).print(
                 f"Resetting terminal session {session}..."
             )
 

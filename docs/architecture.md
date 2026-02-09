@@ -4,6 +4,22 @@ Agent Zero is built on a flexible and modular architecture designed for extensib
 ## System Architecture
 This simplified diagram illustrates the hierarchical relationship between agents and their interaction with tools, extensions, instruments, prompts, memory and knowledge base.
 
+### Architectural Evolution
+Agent Zero is undergoing continuous architectural improvements to enhance maintainability and extensibility. The current focus is on implementing a coordinator-based architecture that separates concerns within the Agent class.
+
+**Key Changes**:
+- **Tool Execution**: Extracted to `ToolCoordinator` with `IToolExecutor` interface (completed)
+- **History Management**: Extracted to `HistoryCoordinator` with `IHistoryManager` interface (completed)
+- **Stream Handling**: Planned extraction to `StreamCoordinator` with `IStreamHandler` interface
+
+These changes are designed to:
+- Reduce the Agent class from ~600 lines to under 300 lines
+- Improve testability through dependency injection
+- Enable independent development and testing of components
+- Facilitate extension of functionality without modifying core logic
+
+For detailed migration plans and progress tracking, see [docs/blueprint.md](./blueprint.md).
+
 ![Agent Zero Architecture](res/arch-01.svg)
 
 The user or Agent 0 is at the top of the hierarchy, delegating tasks to subordinate agents, which can further delegate to other agents. Each agent can utilize tools and access the shared assets (prompts, memory, knowledge, extensions and instruments) to perform its tasks.
@@ -47,8 +63,9 @@ This architecture ensures:
 | `/logs` | HTML CLI-style chat logs |
 | `/memory` | Persistent agent memory storage |
 | `/prompts` | System and tool prompts |
-| `/python` | Core Python codebase: |
+ | `/python` | Core Python codebase: |
 | `/api` | API endpoints and interfaces |
+| `/coordinators` | Coordination layer for separating concerns |
 | `/extensions` | Modular extensions |
 | `/helpers` | Utility functions |
 | `/tools` | Tool implementations |
@@ -151,6 +168,85 @@ Users can create custom tools to extend Agent Zero's capabilities. Custom tools 
 > Tools are always present in system prompt, so you should keep them to minimum. 
 > To save yourself some tokens, use the [Instruments module](#adding-instruments) 
 > to call custom scripts or functions.
+
+#### Coordinator System
+Agent Zero implements a coordinator-based architecture to separate concerns and improve maintainability. Coordinators are specialized components that manage specific aspects of agent behavior through well-defined interfaces.
+
+**Purpose**: Reduce complexity in the Agent class by extracting distinct responsibilities into dedicated coordinators with clear interfaces.
+
+##### ToolCoordinator
+The `ToolCoordinator` manages tool discovery, initialization, and execution lifecycle:
+
+**Responsibilities**:
+- Dynamic tool discovery from profile and default directories
+- Tool instantiation with proper arguments and context
+- Execution lifecycle management (before, execute, after hooks)
+- MCP (Model Context Protocol) tool integration
+- Extension coordination for tool execution events
+
+**Interface**: Implements `IToolExecutor` with methods:
+- `process_tools(msg: str) -> str | None` - Parse and execute tool requests
+- `get_tool(name, method, args, message, loop_data) -> Tool` - Retrieve tool instance
+
+**Usage Example**:
+```python
+from python.coordinators import ToolCoordinator, IToolExecutor
+
+# Agent receives coordinator via dependency injection
+class Agent:
+    def __init__(self, tool_executor: IToolExecutor):
+        self.tool_executor = tool_executor
+
+# Tool execution is delegated to coordinator
+async def monologue(self, msg: str):
+    result = await self.tool_executor.process_tools(msg)
+```
+
+**Benefits**:
+- Clear separation between orchestration and tool logic
+- Easier testing with mockable interfaces
+- Consistent tool handling across all agents
+- Simplified addition of new tool sources
+
+##### HistoryCoordinator
+The `HistoryCoordinator` manages message history operations:
+
+**Responsibilities**:
+- Adding messages to history (user, AI, warnings, tool results)
+- History state management (timestamps, last message tracking)
+- Content processing and formatting
+- Extension coordination for history events
+- Topic management (user messages start new topics)
+
+**Interface**: Implements `IHistoryManager` with methods:
+- `hist_add_message(ai: bool, content: MessageContent, tokens: int = 0)` - Add message to history
+- `hist_add_user_message(message, intervention: bool = False)` - Add user message
+- `hist_add_ai_response(message: str)` - Add AI response
+- `hist_add_warning(message: MessageContent)` - Add warning message
+- `hist_add_tool_result(tool_name: str, tool_result: str, **kwargs)` - Add tool result
+- `concat_messages(messages)` - Concatenate messages for display
+
+**Usage Example**:
+```python
+from python.coordinators import HistoryCoordinator, IHistoryManager
+
+# Agent receives coordinator via dependency injection
+class Agent:
+    def __init__(self, history_manager: IHistoryManager):
+        self.history_manager = history_manager
+
+# History operations are delegated to coordinator
+def process_message(self, msg: str):
+    self.history_manager.hist_add_ai_response(msg)
+```
+
+**Benefits**:
+- Separation of history management from orchestration logic
+- Consistent message formatting across all agents
+- Centralized extension integration for history events
+- Easier testing with mockable interfaces
+
+**Current State**: ToolCoordinator and HistoryCoordinator are implemented and fully integrated. StreamCoordinator is planned (see [docs/blueprint.md](./blueprint.md) for details).
 
 ### 3. Memory System
 The memory system is a critical component of Agent Zero, enabling the agent to learn and adapt from past interactions. It operates on a hybrid model where part of the memory is managed automatically by the framework while users can also manually input and extract information.

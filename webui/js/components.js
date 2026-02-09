@@ -26,8 +26,11 @@ export async function importComponent(path, targetElement) {
       throw new Error("Target element is required");
     }
 
-    // Show loading indicator
-    targetElement.innerHTML = '<div class="loading"></div>';
+    // Show loading indicator (safe DOM creation)
+    targetElement.textContent = '';
+    const loadingDiv = document.createElement('div');
+    loadingDiv.className = 'loading';
+    targetElement.appendChild(loadingDiv);
 
     // full component url
     const trimmedPath = path.replace(/^\/+/, "");

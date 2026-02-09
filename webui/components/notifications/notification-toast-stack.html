@@ -41,8 +41,9 @@
                     <!-- Toast Dismiss -->
                     <button class="toast-dismiss"
                             @click.stop="$store.notificationStore.dismissToast(toast.toastId)"
-                            title="Dismiss">
-                        <span class="material-symbols-outlined">close</span>
+                            title="Dismiss"
+                            aria-label="Dismiss notification">
+                        <span class="material-symbols-outlined" aria-hidden="true">close</span>
                     </button>
                 </div>
             </template>
@@ -167,6 +168,13 @@
         }
 
         .toast-dismiss:hover {
+            background: var(--color-panel);
+            color: var(--color-primary);
+        }
+
+        .toast-dismiss:focus-visible {
+            outline: 2px solid var(--color-highlight);
+            outline-offset: 2px;
             background: var(--color-panel);
             color: var(--color-primary);
         }

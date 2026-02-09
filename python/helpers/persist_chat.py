@@ -4,14 +4,15 @@ from typing import Any
 import uuid
 from agent import Agent, AgentConfig, AgentContext, AgentContextType
 from python.helpers import files, history
+from python.helpers.constants import Paths
 import json
 from initialize import initialize_agent
 
 from python.helpers.log import Log, LogItem
 
 CHATS_FOLDER = "tmp/chats"
-LOG_SIZE = 1000
-CHAT_FILE_NAME = "chat.json"
+LOG_SIZE = Paths.CHAT_LOG_SIZE
+CHAT_FILE_NAME = Paths.CHAT_FILE_NAME
 
 
 def get_chat_folder_path(ctxid: str):

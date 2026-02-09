@@ -3,6 +3,7 @@ import os
 from python.helpers.api import ApiHandler, Request, Response
 from python.helpers import files
 from python.helpers.print_style import PrintStyle
+from python.helpers.constants import Colors
 import json
 
 
@@ -81,7 +82,7 @@ class ApiFilesGet(ApiHandler):
 
             # Log the retrieval
             PrintStyle(
-                background_color="#2ECC71", font_color="white", bold=True, padding=True
+                background_color=Colors.FILES_GREEN, font_color=Colors.BG_WHITE, bold=True, padding=True
             ).print(f"API Files retrieved: {len(result)} files")
 
             return result

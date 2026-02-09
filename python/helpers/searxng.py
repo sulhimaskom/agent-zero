@@ -1,9 +1,10 @@
 import aiohttp
 from python.helpers import runtime
 from python.helpers import dotenv
+from python.helpers.constants import Network
 
-SEARXNG_PORT = int(dotenv.get_dotenv_value("SEARXNG_PORT", 0)) or 55510
-SEARXNG_HOST = dotenv.get_dotenv_value("SEARXNG_HOST", "localhost") or "localhost"
+SEARXNG_PORT = int(dotenv.get_dotenv_value("SEARXNG_PORT", 0)) or Network.SEARXNG_PORT_DEFAULT
+SEARXNG_HOST = dotenv.get_dotenv_value("SEARXNG_HOST", Network.DEFAULT_HOSTNAME) or Network.DEFAULT_HOSTNAME
 URL = f"http://{SEARXNG_HOST}:{SEARXNG_PORT}/search"
 
 async def search(query:str):

@@ -3,6 +3,7 @@ from typing import Any, Callable
 
 from python.helpers.print_style import PrintStyle
 from python.helpers.dirty_json import DirtyJson
+from python.helpers.constants import Colors
 
 
 class IStreamHandler(ABC):
@@ -39,7 +40,7 @@ class StreamCoordinator(IStreamHandler):
 
     def __init__(self, agent):
         self.agent = agent
-        self.printer = PrintStyle(italic=True, font_color="#b3ffd9", padding=False)
+        self.printer = PrintStyle(italic=True, font_color=Colors.STREAM_MINT, padding=False)
 
     def create_reasoning_callback(self, loop_data: Any) -> Callable[[str, str], Any]:
         """Create callback for handling reasoning stream chunks"""

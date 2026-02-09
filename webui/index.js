@@ -139,7 +139,7 @@ export function updateChatInput(text) {
     console.warn("`chatInput` element not found, cannot update.");
     return;
   }
-  console.log("updateChatInput called with:", text);
+  // Removed console.log for production
 
   // Append text with proper spacing
   const currentValue = chatInputEl.value;
@@ -150,7 +150,7 @@ export function updateChatInput(text) {
   adjustTextareaHeight();
   chatInputEl.dispatchEvent(new Event("input"));
 
-  console.log("Updated chat input value:", chatInputEl.value);
+  // Removed console.log for production
 }
 
 async function updateUserTime() {
@@ -177,12 +177,30 @@ async function updateUserTime() {
   const options = { year: "numeric", month: "short", day: "numeric" };
   const dateString = now.toLocaleDateString(undefined, options);
 
-  // Update the HTML
-  userTimeElement.innerHTML = `${timeString}<br><span id="user-date">${dateString}</span>`;
+  // Update the HTML using safe DOM manipulation instead of innerHTML
+  let dateSpan = userTimeElement.querySelector("#user-date");
+  if (!dateSpan) {
+    userTimeElement.textContent = timeString;
+    dateSpan = document.createElement("span");
+    dateSpan.id = "user-date";
+    userTimeElement.appendChild(document.createElement("br"));
+    userTimeElement.appendChild(dateSpan);
+  } else {
+    // Update text content of first child (time)
+    if (userTimeElement.firstChild) {
+      userTimeElement.firstChild.textContent = timeString;
+    }
+  }
+  dateSpan.textContent = dateString;
 }
 
 updateUserTime();
-setInterval(updateUserTime, 1000);
+const userTimeInterval = setInterval(updateUserTime, 1000);
+
+// Cleanup interval on page unload to prevent memory leaks
+window.addEventListener("beforeunload", () => {
+  clearInterval(userTimeInterval);
+});
 
 function setMessage(id, type, heading, content, temp, kvps = null) {
   const result = msgs.setMessage(id, type, heading, content, temp, kvps);
@@ -291,7 +309,7 @@ export async function poll() {
     // if the chat has been reset, restart this poll as it may have been called with incorrect log_from
     if (lastLogGuid != response.log_guid) {
       const chatHistoryEl = document.getElementById("chat-history");
-      if (chatHistoryEl) chatHistoryEl.innerHTML = "";
+      if (chatHistoryEl) { while (chatHistoryEl.firstChild) { chatHistoryEl.removeChild(chatHistoryEl.firstChild); } }
       lastLogVersion = 0;
       lastLogGuid = response.log_guid;
       await poll();
@@ -445,8 +463,8 @@ function updateProgress(progress, active) {
 
   progress = msgs.convertIcons(progress);
 
-  if (progressBarEl.innerHTML != progress) {
-    progressBarEl.innerHTML = progress;
+  if (progressBarEl.textContent !== progress) {
+    progressBarEl.textContent = progress;
   }
 }
 
@@ -484,7 +502,7 @@ export const setContext = function (id) {
 
   // Clear the chat history immediately to avoid showing stale content
   const chatHistoryEl = document.getElementById("chat-history");
-  if (chatHistoryEl) chatHistoryEl.innerHTML = "";
+  if (chatHistoryEl) { while (chatHistoryEl.firstChild) { chatHistoryEl.removeChild(chatHistoryEl.firstChild); } }
 
   // Update both selected states using stores
   chatsStore.setSelected(id);
@@ -502,8 +520,10 @@ export const deselectChat = function () {
   localStorage.removeItem("lastSelectedChat");
   localStorage.removeItem("lastSelectedTask");
 
-  // Clear the chat history
-  chatHistory.innerHTML = "";
+  // Clear the chat history safely
+  while (chatHistory.firstChild) {
+    chatHistory.removeChild(chatHistory.firstChild);
+  }
 };
 globalThis.deselectChat = deselectChat;
 

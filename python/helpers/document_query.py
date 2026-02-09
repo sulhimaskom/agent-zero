@@ -24,12 +24,13 @@ from langchain.schema import SystemMessage, HumanMessage
 
 from python.helpers.print_style import PrintStyle
 from python.helpers import files, errors
+from python.helpers.constants import Limits
 from agent import Agent
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
 
-DEFAULT_SEARCH_THRESHOLD = 0.5
+DEFAULT_SEARCH_THRESHOLD = Limits.DOCUMENT_DEFAULT_THRESHOLD
 
 
 class DocumentQueryStore:
@@ -39,8 +40,8 @@ class DocumentQueryStore:
     """
 
     # Default chunking parameters
-    DEFAULT_CHUNK_SIZE = 1000
-    DEFAULT_CHUNK_OVERLAP = 100
+    DEFAULT_CHUNK_SIZE = Limits.DOCUMENT_DEFAULT_CHUNK_SIZE
+    DEFAULT_CHUNK_OVERLAP = Limits.DOCUMENT_DEFAULT_CHUNK_OVERLAP
 
     # Cache for initialized stores
     _stores: dict[str, "DocumentQueryStore"] = {}

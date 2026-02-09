@@ -11,6 +11,7 @@ from python.helpers.print_style import PrintStyle
 from python.helpers.playwright import ensure_playwright_binary
 from python.helpers.secrets import get_secrets_manager
 from python.extensions.message_loop_start._10_iteration_no import get_iter_no
+from python.helpers.constants import Timeouts, Limits, Shell
 from pydantic import BaseModel
 import uuid
 from python.helpers.dirty_json import DirtyJson
@@ -60,14 +61,14 @@ class State:
                 allowed_domains=["*", "http://*", "https://*"],
                 executable_path=pw_binary,
                 keep_alive=True,
-                minimum_wait_page_load_time=1.0,
-                wait_for_network_idle_page_load_time=2.0,
-                maximum_wait_page_load_time=10.0,
-                window_size={"width": 1024, "height": 2048},
-                screen={"width": 1024, "height": 2048},
-                viewport={"width": 1024, "height": 2048},
+                minimum_wait_page_load_time=Limits.BROWSER_PAGE_LOAD_MIN,
+                wait_for_network_idle_page_load_time=Limits.BROWSER_PAGE_LOAD_MED,
+                maximum_wait_page_load_time=Limits.BROWSER_PAGE_LOAD_MAX,
+                window_size={"width": Limits.BROWSER_VIEWPORT_WIDTH, "height": Limits.BROWSER_VIEWPORT_HEIGHT},
+                screen={"width": Limits.BROWSER_VIEWPORT_WIDTH, "height": Limits.BROWSER_VIEWPORT_HEIGHT},
+                viewport={"width": Limits.BROWSER_VIEWPORT_WIDTH, "height": Limits.BROWSER_VIEWPORT_HEIGHT},
                 no_viewport=False,
-                args=["--headless=new"],
+                args=[Shell.BROWSER_HEADLESS_ARG],
                 # Use a unique user data directory to avoid conflicts
                 user_data_dir=self.get_user_data_dir(),
                 extra_http_headers=self.agent.config.browser_http_headers or {},
@@ -88,7 +89,7 @@ class State:
             try:
                 page = await self.browser_session.get_current_page()
                 if page:
-                    await page.set_viewport_size({"width": 1024, "height": 2048})
+                    await page.set_viewport_size({"width": Limits.BROWSER_VIEWPORT_WIDTH, "height": Limits.BROWSER_VIEWPORT_HEIGHT})
             except Exception as e:
                 PrintStyle().warning(f"Could not force set viewport size: {e}")
 
@@ -166,7 +167,7 @@ class State:
                 ),
                 controller=controller,
                 enable_memory=False,  # Disable memory to avoid state conflicts
-                llm_timeout=3000,
+                llm_timeout=Timeouts.BROWSER_LLM_TIMEOUT,
                 sensitive_data=cast(dict[str, str | dict[str, str]] | None, secrets_dict or {}),  # Pass secrets
             )
         except Exception as e:
@@ -185,7 +186,7 @@ class State:
         result = None
         if self.use_agent:
             result = await self.use_agent.run(
-                max_steps=50, on_step_start=hook, on_step_end=hook
+                max_steps=Timeouts.BROWSER_MAX_STEPS, on_step_start=hook, on_step_end=hook
             )
         return result
 
@@ -220,7 +221,7 @@ class BrowserAgent(Tool):
         task = self.state.start_task(message) if self.state else None
 
         # wait for browser agent to finish and update progress with timeout
-        timeout_seconds = 300  # 5 minute timeout
+        timeout_seconds = Timeouts.BROWSER_OPERATION_TIMEOUT  # 5 minute timeout
         start_time = time.time()
 
         fail_counter = 0
@@ -233,12 +234,12 @@ class BrowserAgent(Tool):
                 break
 
             await self.agent.handle_intervention()
-            await asyncio.sleep(1)
+            await asyncio.sleep(Timeouts.TUNNEL_STARTUP_DELAY)
             try:
                 if task and task.is_ready():  # otherwise get_update hangs
                     break
                 try:
-                    update = await asyncio.wait_for(self.get_update(), timeout=10)
+                    update = await asyncio.wait_for(self.get_update(), timeout=Timeouts.BROWSER_ASYNC_TIMEOUT)
                     fail_counter = 0  # reset on success
                 except asyncio.TimeoutError:
                     fail_counter += 1
@@ -363,7 +364,7 @@ class BrowserAgent(Tool):
                         f"{self.guid}.png",
                     )
                     files.make_dirs(path)
-                    await page.screenshot(path=path, full_page=False, timeout=3000)
+                    await page.screenshot(path=path, full_page=False, timeout=Timeouts.BROWSER_SCREENSHOT_TIMEOUT)
                     result["screenshot"] = f"img://{path}&t={str(time.time())}"
 
                 if self.state and self.state.task and not self.state.task.is_ready():

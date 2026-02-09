@@ -11,6 +11,7 @@ from python.helpers.memory import Memory
 from python.helpers.dirty_json import DirtyJson
 from python.helpers.log import LogItem
 from python.helpers.print_style import PrintStyle
+from python.helpers.constants import Limits
 from python.tools.memory_load import DEFAULT_THRESHOLD as DEFAULT_MEMORY_THRESHOLD
 from agent import Agent
 
@@ -28,15 +29,15 @@ class ConsolidationAction(Enum):
 class ConsolidationConfig:
     """Configuration for memory consolidation behavior."""
     similarity_threshold: float = DEFAULT_MEMORY_THRESHOLD
-    max_similar_memories: int = 10
+    max_similar_memories: int = Limits.MEMORY_MAX_SIMILAR
     consolidation_sys_prompt: str = "memory.consolidation.sys.md"
     consolidation_msg_prompt: str = "memory.consolidation.msg.md"
-    max_llm_context_memories: int = 5
+    max_llm_context_memories: int = Limits.MEMORY_MAX_LLM_CONTEXT
     keyword_extraction_sys_prompt: str = "memory.keyword_extraction.sys.md"
     keyword_extraction_msg_prompt: str = "memory.keyword_extraction.msg.md"
-    processing_timeout_seconds: int = 60
+    processing_timeout_seconds: int = Limits.MEMORY_PROCESSING_TIMEOUT
     # Add safety threshold for REPLACE actions
-    replace_similarity_threshold: float = 0.9  # Higher threshold for replacement safety
+    replace_similarity_threshold: float = Limits.MEMORY_REPLACE_SIMILARITY_THRESHOLD  # Higher threshold for replacement safety
 
 
 @dataclass
