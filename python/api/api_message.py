@@ -5,6 +5,7 @@ from agent import AgentContext, UserMessage, AgentContextType
 from python.helpers.api import ApiHandler, Request, Response
 from python.helpers import files
 from python.helpers.print_style import PrintStyle
+from python.helpers.constants import Colors
 from werkzeug.utils import secure_filename
 from initialize import initialize_agent
 import threading
@@ -87,9 +88,9 @@ class ApiMessage(ApiHandler):
             attachment_filenames = [os.path.basename(path) for path in attachment_paths] if attachment_paths else []
 
             PrintStyle(
-                background_color="#6C3483", font_color="white", bold=True, padding=True
+                background_color=Colors.AGENT_PURPLE, font_color=Colors.BG_WHITE, bold=True, padding=True
             ).print("External API message:")
-            PrintStyle(font_color="white", padding=False).print(f"> {message}")
+            PrintStyle(font_color=Colors.BG_WHITE, padding=False).print(f"> {message}")
             if attachment_filenames:
                 PrintStyle(font_color="white", padding=False).print("Attachments:")
                 for filename in attachment_filenames:

@@ -13,6 +13,7 @@ from python.helpers.print_style import PrintStyle
 from python.helpers.providers import get_providers
 from python.helpers.secrets import get_default_secrets_manager
 from python.helpers import dirty_json
+from python.helpers.constants import Limits, Network, Timeouts, Colors
 
 
 class Settings(TypedDict):
@@ -1460,7 +1461,7 @@ def get_default_settings() -> Settings:
         chat_model_name="openai/gpt-4.1",
         chat_model_api_base="",
         chat_model_kwargs={"temperature": "0"},
-        chat_model_ctx_length=100000,
+        chat_model_ctx_length=Limits.DEFAULT_CHAT_MODEL_CTX_LENGTH,
         chat_model_ctx_history=0.7,
         chat_model_vision=True,
         chat_model_rl_requests=0,
@@ -1469,7 +1470,7 @@ def get_default_settings() -> Settings:
         util_model_provider="openrouter",
         util_model_name="openai/gpt-4.1-mini",
         util_model_api_base="",
-        util_model_ctx_length=100000,
+        util_model_ctx_length=Limits.DEFAULT_UTIL_MODEL_CTX_LENGTH,
         util_model_ctx_input=0.7,
         util_model_kwargs={"temperature": "0"},
         util_model_rl_requests=0,
@@ -1493,17 +1494,17 @@ def get_default_settings() -> Settings:
         memory_recall_enabled=True,
         memory_recall_delayed=False,
         memory_recall_interval=3,
-        memory_recall_history_len=10000,
-        memory_recall_memories_max_search=12,
-        memory_recall_solutions_max_search=8,
-        memory_recall_memories_max_result=5,
-        memory_recall_solutions_max_result=3,
+        memory_recall_history_len=Limits.MEMORY_RECALL_HISTORY_LENGTH,
+        memory_recall_memories_max_search=Limits.MEMORY_RECALL_MAX_SEARCH_MEMORIES,
+        memory_recall_solutions_max_search=Limits.MEMORY_RECALL_MAX_SEARCH_SOLUTIONS,
+        memory_recall_memories_max_result=Limits.MEMORY_RECALL_MAX_RESULT_MEMORIES,
+        memory_recall_solutions_max_result=Limits.MEMORY_RECALL_MAX_RESULT_SOLUTIONS,
         memory_recall_similarity_threshold=0.7,
         memory_recall_query_prep=True,
         memory_recall_post_filter=True,
         memory_memorize_enabled=True,
         memory_memorize_consolidation=True,
-        memory_memorize_replace_threshold=0.9,
+        memory_memorize_replace_threshold=Limits.MEMORY_REPLACE_SIMILARITY_THRESHOLD,
         api_keys={},
         auth_login="",
         auth_password="",
@@ -1512,20 +1513,20 @@ def get_default_settings() -> Settings:
         agent_memory_subdir="default",
         agent_knowledge_subdir="custom",
         rfc_auto_docker=True,
-        rfc_url="localhost",
+        rfc_url=Network.DEFAULT_HOSTNAME,
         rfc_password="",
-        rfc_port_http=55080,
-        rfc_port_ssh=55022,
+        rfc_port_http=Limits.RFC_PORT_HTTP,
+        rfc_port_ssh=Limits.RFC_PORT_SSH,
         shell_interface="local" if runtime.is_dockerized() else "ssh",
         stt_model_size="base",
         stt_language="en",
         stt_silence_threshold=0.3,
-        stt_silence_duration=1000,
-        stt_waiting_timeout=2000,
+        stt_silence_duration=Limits.STT_SILENCE_DURATION,
+        stt_waiting_timeout=Limits.STT_WAITING_TIMEOUT,
         tts_kokoro=True,
         mcp_servers='{\n    "mcpServers": {}\n}',
-        mcp_client_init_timeout=10,
-        mcp_client_tool_timeout=120,
+        mcp_client_init_timeout=Timeouts.MCP_CLIENT_INIT_TIMEOUT,
+        mcp_client_tool_timeout=Timeouts.MCP_CLIENT_TOOL_TIMEOUT,
         mcp_server_enabled=False,
         mcp_server_token=create_auth_token(),
         a2a_server_enabled=False,
@@ -1600,11 +1601,11 @@ def _apply_settings(previous: Settings | None):
                     )
 
                 PrintStyle(
-                    background_color="#6734C3", font_color="white", padding=True
+                    background_color=Colors.SETTINGS_PURPLE, font_color=Colors.BG_WHITE, padding=True
                 ).print("Parsed MCP config:")
                 (
                     PrintStyle(
-                        background_color="#334455", font_color="white", padding=False
+                        background_color=Colors.SETTINGS_DARK, font_color=Colors.BG_WHITE, padding=False
                     ).print(mcp_config.model_dump_json())
                 )
                 AgentContext.log_to_all(
@@ -1705,9 +1706,9 @@ def get_runtime_config(set: Settings):
     if runtime.is_dockerized():
         return {
             "code_exec_ssh_enabled": set["shell_interface"] == "ssh",
-            "code_exec_ssh_addr": get_dotenv_value("CODE_EXEC_SSH_ADDR", "localhost"),
-            "code_exec_ssh_port": int(get_dotenv_value("CODE_EXEC_SSH_PORT", "22")),
-            "code_exec_ssh_user": get_dotenv_value("CODE_EXEC_SSH_USER", "root"),
+            "code_exec_ssh_addr": dotenv.get_dotenv_value("CODE_EXEC_SSH_ADDR", "localhost"),
+            "code_exec_ssh_port": int(dotenv.get_dotenv_value("CODE_EXEC_SSH_PORT", "22")),
+            "code_exec_ssh_user": dotenv.get_dotenv_value("CODE_EXEC_SSH_USER", "root"),
         }
     else:
         host = set["rfc_url"]
@@ -1721,7 +1722,7 @@ def get_runtime_config(set: Settings):
             "code_exec_ssh_enabled": set["shell_interface"] == "ssh",
             "code_exec_ssh_addr": host,
             "code_exec_ssh_port": set["rfc_port_ssh"],
-            "code_exec_ssh_user": get_dotenv_value("CODE_EXEC_SSH_USER", "root"),
+            "code_exec_ssh_user": dotenv.get_dotenv_value("CODE_EXEC_SSH_USER", "root"),
         }
 
 

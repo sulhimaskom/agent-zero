@@ -61,19 +61,40 @@ function createModalElement(path) {
   });
 
 
-  // Create modal structure
-  newModal.innerHTML = `
-    <div class="modal-inner">
-      <div class="modal-header">
-        <h2 class="modal-title"></h2>
-        <button class="modal-close">&times;</button>
-      </div>
-      <div class="modal-scroll">
-        <div class="modal-bd"></div>
-      </div>
-      <div class="modal-footer-slot" style="display: none;"></div>
-    </div>
-  `;
+  // Create modal structure using safe DOM manipulation
+  const modalInner = document.createElement('div');
+  modalInner.className = 'modal-inner';
+  
+  const modalHeader = document.createElement('div');
+  modalHeader.className = 'modal-header';
+  
+  const modalTitle = document.createElement('h2');
+  modalTitle.className = 'modal-title';
+  
+  const closeButton = document.createElement('button');
+  closeButton.className = 'modal-close';
+  closeButton.innerHTML = '&times;'; // Static HTML entity, safe
+  
+  modalHeader.appendChild(modalTitle);
+  modalHeader.appendChild(closeButton);
+  
+  const modalScroll = document.createElement('div');
+  modalScroll.className = 'modal-scroll';
+  
+  const modalBody = document.createElement('div');
+  modalBody.className = 'modal-bd';
+  
+  modalScroll.appendChild(modalBody);
+  
+  const modalFooter = document.createElement('div');
+  modalFooter.className = 'modal-footer-slot';
+  modalFooter.style.display = 'none';
+  
+  modalInner.appendChild(modalHeader);
+  modalInner.appendChild(modalScroll);
+  modalInner.appendChild(modalFooter);
+  
+  newModal.appendChild(modalInner);
 
   // Setup close button handler for this specific modal
   const close_button = newModal.querySelector(".modal-close");
@@ -114,8 +135,12 @@ export function openModal(modalPath) {
           !document.contains(modal.element) && (o.disconnect(), resolve())
       ).observe(document.body, { childList: true, subtree: true });
 
-      // Set a loading state
-      modal.body.innerHTML = '<div class="loading">Loading...</div>';
+      // Set a loading state using safe DOM manipulation
+      modal.body.textContent = '';
+      const loadingDiv = document.createElement('div');
+      loadingDiv.className = 'loading';
+      loadingDiv.textContent = 'Loading...';
+      modal.body.appendChild(loadingDiv);
 
       // Already added to stack above
 
@@ -127,8 +152,8 @@ export function openModal(modalPath) {
       // Use importComponent which now returns the parsed document
       importComponent(componentPath, modal.body)
         .then((doc) => {
-          // Set the title from the document
-          modal.title.innerHTML = doc.title || modalPath;
+          // Set the title from the document using textContent for safety
+          modal.title.textContent = doc.title || modalPath;
           if (doc.html && doc.html.classList) {
             const inner = modal.element.querySelector(".modal-inner");
             if (inner) inner.classList.add(...doc.html.classList);
@@ -151,7 +176,11 @@ export function openModal(modalPath) {
         })
         .catch((error) => {
           console.error("Error loading modal content:", error);
-          modal.body.innerHTML = `<div class="error">Failed to load modal content: ${error.message}</div>`;
+          modal.body.textContent = '';
+          const errorDiv = document.createElement('div');
+          errorDiv.className = 'error';
+          errorDiv.textContent = 'Failed to load modal content: ' + error.message;
+          modal.body.appendChild(errorDiv);
         });
 
       // Add modal to stack and show it

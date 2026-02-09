@@ -1,0 +1,63 @@
+# Analyze API Endpoints
+
+Check python/api/ directory for consistency with ApiHandler pattern and identify issues.
+
+## ANALYSIS AREAS
+
+### 1. ApiHandler Pattern Compliance
+Every file in python/api/ should:
+- Inherit from `python.helpers.api.ApiHandler`
+- Implement `process()` async method
+- Override auth methods correctly
+
+### 2. Auth Implementation Check
+Check each endpoint for proper auth method overrides:
+- `requires_auth()` - Web auth
+- `requires_api_key()` - API key auth
+- `requires_csrf()` - CSRF protection
+- `requires_loopback()` - Localhost restriction
+- `get_methods()` - HTTP method allowlist
+
+### 3. Endpoint Organization
+Group endpoints by functionality:
+- Chat & Messages: message.py, message_async.py, chat_*.py, poll.py
+- Settings: settings_get.py, settings_set.py
+- Memory & Knowledge: memory_dashboard.py, knowledge_*.py
+- Projects: projects.py
+- Scheduler: scheduler_task_*.py (7 endpoints)
+- MCP: mcp_*.py
+- Backup: backup_*.py
+- Notifications: notification_*.py
+- Files: file_*.py
+- Tunnel: tunnel.py, tunnel_proxy.py
+- Utilities: health.py, pause.py, restart.py, transcribe.py, synthesize.py, image_get.py
+
+### 4. Common Issues
+
+Check for:
+- Missing docstrings
+- Inconsistent error handling
+- Missing type hints
+- No input validation
+- Inconsistent return types
+
+## OUTPUT FORMAT
+
+```json
+{
+  "api_endpoints_total": 61,
+  "auth_pattern_compliance": [],
+  "missing_auth_methods": [],
+  "endpoints_without_docstrings": [],
+  "inconsistent_error_handling": [],
+  "recommendations": []
+}
+```
+
+## CHECKLIST
+
+- [ ] Verify all files inherit from ApiHandler
+- [ ] Check auth method implementation consistency
+- [ ] Verify context management usage (`self.use_context()`)
+- [ ] Check for hardcoded secrets
+- [ ] Verify CSRF protection on mutating endpoints

@@ -41,6 +41,7 @@ from pydantic import BaseModel, Field, Discriminator, Tag, PrivateAttr
 from python.helpers import dirty_json
 from python.helpers.print_style import PrintStyle
 from python.helpers.tool import Tool, Response
+from python.helpers.constants import Colors
 
 
 def normalize_name(name: str) -> str:
@@ -118,10 +119,10 @@ class MCPTool(Tool):
 
         if error:
             PrintStyle(
-                background_color="#CC34C3", font_color="white", bold=True, padding=True
+                background_color=Colors.MCP_MAGENTA, font_color=Colors.BG_WHITE, bold=True, padding=True
             ).print(f"MCPTool::Failed to call mcp tool {self.name}:")
             PrintStyle(
-                background_color="#AA4455", font_color="white", padding=False
+                background_color=Colors.MCP_ERROR_RED, font_color=Colors.BG_WHITE, padding=False
             ).print(error)
 
             self.agent.context.log.log(
@@ -134,17 +135,17 @@ class MCPTool(Tool):
     async def before_execution(self, **kwargs: Any):
         (
             PrintStyle(
-                font_color="#1B4F72", padding=True, background_color="white", bold=True
+                font_color=Colors.PRIMARY_BLUE, padding=True, background_color=Colors.BG_WHITE, bold=True
             ).print(f"{self.agent.agent_name}: Using tool '{self.name}'")
         )
         self.log = self.get_log_object()
 
         for key, value in self.args.items():
-            PrintStyle(font_color="#85C1E9", bold=True).stream(
+            PrintStyle(font_color=Colors.PRIMARY_LIGHT_BLUE, bold=True).stream(
                 self.nice_key(key) + ": "
             )
             PrintStyle(
-                font_color="#85C1E9", padding=isinstance(value, str) and "\n" in value
+                font_color=Colors.PRIMARY_LIGHT_BLUE, padding=isinstance(value, str) and "\n" in value
             ).stream(value)
             PrintStyle().print()
 
@@ -193,13 +194,13 @@ class MCPTool(Tool):
         self.agent.hist_add_tool_result(self.name, final_text_for_agent)
         (
             PrintStyle(
-                font_color="#1B4F72", background_color="white", padding=True, bold=True
+                font_color=Colors.PRIMARY_BLUE, background_color=Colors.BG_WHITE, padding=True, bold=True
             ).print(
                 f"{self.agent.agent_name}: Response from tool '{self.name}' (plus context added)"
             )
         )
         # Print only the raw response to console for brevity, agent gets the full context.
-        PrintStyle(font_color="#85C1E9").print(
+        PrintStyle(font_color=Colors.PRIMARY_LIGHT_BLUE).print(
             raw_tool_response
             if raw_tool_response
             else "[No direct textual output from tool]"
@@ -855,7 +856,7 @@ class MCPClientBase(ABC):
                 e = original_exception
             # We have the original exception stored
             PrintStyle(
-                background_color="#AA4455", font_color="white", padding=False
+                background_color=Colors.MCP_ERROR_RED, font_color=Colors.BG_WHITE, padding=False
             ).print(
                 f"MCPClientBase ({self.server.name} - {operation_name}): Error during operation: {type(e).__name__}: {e}"
             )
@@ -900,7 +901,7 @@ class MCPClientBase(ABC):
             error_text = errors.format_error(e, 0, 0)
             # Error already logged by _execute_with_session, this is for specific handling if needed
             PrintStyle(
-                background_color="#CC34C3", font_color="white", bold=True, padding=True
+                background_color=Colors.MCP_MAGENTA, font_color=Colors.BG_WHITE, bold=True, padding=True
             ).print(
                 f"MCPClientBase ({self.server.name}): 'update_tools' operation failed: {error_text}"
             )
@@ -958,7 +959,7 @@ class MCPClientBase(ABC):
         except Exception as e:
             # Error logged by _execute_with_session. Re-raise a specific error for the caller.
             PrintStyle(
-                background_color="#AA4455", font_color="white", padding=True
+                background_color=Colors.MCP_ERROR_RED, font_color=Colors.BG_WHITE, padding=True
             ).print(
                 f"MCPClientBase ({self.server.name}): 'call_tool' operation for '{tool_name}' failed: {type(e).__name__}: {e}"
             )

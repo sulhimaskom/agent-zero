@@ -1,9 +1,10 @@
 # from . import files
 
 import json
+from python.helpers.constants import Limits
 
 
-def truncate_text(agent, output, threshold=1000):
+def truncate_text(agent, output, threshold=Limits.MESSAGE_TRUNCATE_THRESHOLD):
     threshold = int(threshold)
     if not threshold or len(output) <= threshold:
         return output

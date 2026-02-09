@@ -6,6 +6,7 @@ import os
 from werkzeug.utils import secure_filename
 from python.helpers.defer import DeferredTask
 from python.helpers.print_style import PrintStyle
+from python.helpers.constants import Colors
 
 
 class Message(ApiHandler):
@@ -73,7 +74,7 @@ class Message(ApiHandler):
 
         # Print to console and log
         PrintStyle(
-            background_color="#6C3483", font_color="white", bold=True, padding=True
+            background_color=Colors.AGENT_PURPLE, font_color=Colors.BG_WHITE, bold=True, padding=True
         ).print(f"User message:")
         PrintStyle(font_color="white", padding=False).print(f"> {message}")
         if attachment_filenames:

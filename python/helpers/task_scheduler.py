@@ -23,10 +23,12 @@ from python.helpers.defer import DeferredTask
 from python.helpers.files import get_abs_path, make_dirs, read_file, write_file
 from python.helpers.localization import Localization
 from python.helpers import projects
+from python.helpers.constants import Limits, Paths, Timeouts
 import pytz
 from typing import Annotated
 
-SCHEDULER_FOLDER = "tmp/scheduler"
+SCHEDULER_FOLDER = Paths.SCHEDULER_FOLDER
+DEFAULT_WAIT_TIMEOUT = Timeouts.SCHEDULER_DEFAULT_WAIT
 
 # ----------------------
 # Task Models
@@ -239,7 +241,7 @@ class BaseTask(BaseModel):
 
 class AdHocTask(BaseTask):
     type: Literal[TaskType.AD_HOC] = TaskType.AD_HOC
-    token: str = Field(default_factory=lambda: str(random.randint(1000000000000000000, 9999999999999999999)))
+    token: str = Field(default_factory=lambda: str(random.randint(Limits.SCHEDULER_TOKEN_MIN, Limits.SCHEDULER_TOKEN_MAX)))
 
     @classmethod
     def create(
@@ -508,7 +510,7 @@ class SchedulerTaskList(BaseModel):
                             f"WARNING: AdHocTask {task.name} ({task.uuid}) has a null or empty token before saving: '{task.token}'"
                         )
                         # Generate a new token to prevent errors
-                        task.token = str(random.randint(1000000000000000000, 9999999999999999999))
+                        task.token = str(random.randint(Limits.SCHEDULER_TOKEN_MIN, Limits.SCHEDULER_TOKEN_MAX))
                         PrintStyle(italic=True, font_color="red", padding=False).print(
                             f"Fixed: Generated new token '{task.token}' for task {task.name}"
                         )
@@ -1113,7 +1115,7 @@ def deserialize_task(task_data: Dict[str, Any], task_class: Optional[Type[T]] = 
             determined_class = cast(Type[T], AdHocTask)
             # Ensure token is a valid non-empty string
             if not task_data.get('token'):
-                task_data['token'] = str(random.randint(1000000000000000000, 9999999999999999999))
+                task_data['token'] = str(random.randint(Limits.SCHEDULER_TOKEN_MIN, Limits.SCHEDULER_TOKEN_MAX))
         elif task_type_str == 'planned':
             determined_class = cast(Type[T], PlannedTask)
         else:
