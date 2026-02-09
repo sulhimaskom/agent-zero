@@ -89,55 +89,6 @@
 **Dependencies**: None
 **Impact**: 7 packages updated, 12 CVEs patched, 0 remaining vulnerabilities
 
----
-
-## DevOps / CI/CD (In Progress 2026-01-07)
-
-### 13. Fix CI/CD Pipeline Failures (P0 - CRITICAL)
-**Status**: In Progress (2026-01-07)
-**Module**: `.github/workflows/on-push.yml`, `.github/workflows/on-pull.yml`
-**Problem**: CI/CD pipelines failing with "Input required and not supplied: token" error
-- Error occurs in `actions/checkout@v5` step
-- Redundant `GITHUB_TOKEN` configuration causing conflicts
-- GITHUB_TOKEN is automatically provided by GitHub Actions, shouldn't be explicitly configured
-
-**Impact**:
-- CI builds failing intermittently
-- Cannot merge PRs until CI passes
-- Blocks all development work
-
-**Action**:
-- Identified root cause: redundant GITHUB_TOKEN configuration ✅
-- Prepared fix locally (commit `d83156b`) ✅
-- Remove `GITHUB_TOKEN` from job-level env in both workflows ✅
-- Remove explicit `token` parameter from checkout actions ✅
-- Remove `GITHUB_TOKEN` from turnstyle action env ✅
-- Added comment to PR #67 documenting fix ✅
-- **Awaiting**: Maintainer with `workflows` permission to apply fix
-
-**Changes Required**:
-1. `.github/workflows/on-push.yml`:
-   - Line 19: Remove `GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}`
-   - Line 43: Remove `token: ${{ secrets.GITHUB_TOKEN }}`
-   - Line 36: Remove `GITHUB_TOKEN` from turnstyle env
-2. `.github/workflows/on-pull.yml`:
-   - Line 24: Remove `GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}`
-   - Line 40: Remove `token: ${{ secrets.GITHUB_TOKEN }}`
-   - Line 34: Remove `GITHUB_TOKEN` from turnstyle env
-
-**Dependencies**: None (requires GitHub App permissions)
-**Estimated Impact**: CI/CD pipelines will pass reliably
-**Actual Impact**: Fix prepared, awaiting permission to apply
-**Blockers**: GitHub App lacks `workflows` permission to modify workflow files
-
-**Success Criteria**:
-- [ ] Redundant GITHUB_TOKEN configuration removed
-- [ ] CI/CD pipelines passing reliably
-- [ ] No more "Input required and not supplied: token" errors
-- [ ] Workflow run times reasonable (<60 minutes)
-
----
-
 ## In Progress
 
 ### 10. Add Comprehensive Unit Tests for ToolCoordinator (HIGH PRIORITY)
@@ -160,7 +111,7 @@
 **Dependencies**: None (uses pytest, pytest-asyncio, pytest-mock)
 **Estimated Impact**: 15 comprehensive test cases covering critical paths
 **Actual Impact**: Created test_tool_coordinator.py with 15 test cases
-**Blockers**: 
+**Blockers**:
 - Dependency chain complexity prevents test collection
 - Missing heavy dependencies (browser-use, transformers, torch, etc.)
 - Tests are written and valid but cannot run until full dependencies installed
@@ -172,6 +123,53 @@
 - Document test infrastructure setup requirements
 
 ## Completed
+
+### 3. Extract Stream Handling (MEDIUM PRIORITY)
+**Status**: Completed (2025-01-10)
+**Module**: `agent.py` - Agent class
+**Problem**: Stream callbacks embedded in Agent.monologue() (lines ~385-429)
+- Stream filtering and output mixed with orchestration
+- Extension calls scattered in callback definitions
+- Hard to test stream behavior independently
+
+**Action**:
+- Extract stream handling to `StreamCoordinator` class ✅
+- Define `IStreamHandler` interface ✅
+- Create `python/coordinators/stream_coordinator.py` ✅
+- Move `reasoning_callback`, `response_callback` to coordinator ✅
+- Move `handle_reasoning_stream`, `handle_response_stream` to coordinator ✅
+- Unify extension calls for streams ✅
+- Agent delegates to coordinator via interface ✅
+- Update coordinators/__init__.py to export new classes ✅
+
+**Dependencies**: None
+**Estimated Impact**: 100 lines extracted from Agent
+**Actual Impact**: Created new module with 106 lines, ~70 lines extracted from Agent
+
+---
+
+### 2. Extract History Management (HIGH PRIORITY)
+**Status**: Completed (2025-01-10)
+**Module**: `agent.py` - Agent class
+**Problem**: History operations scattered throughout Agent
+- `hist_add_*` methods mixed with business logic
+- Direct history manipulation from multiple locations
+- History state managed in Agent
+
+**Action**:
+- Extract history operations to `HistoryCoordinator` class ✅
+- Define `IHistoryManager` interface ✅
+- Create `python/coordinators/history_coordinator.py` ✅
+- Move all `hist_add_*` methods to coordinator ✅
+- Agent receives messages via interface only ✅
+- Update ToolCoordinator to use history_manager ✅
+- Update coordinators/__init__.py to export new classes ✅
+
+**Dependencies**: None
+**Estimated Impact**: 150 lines extracted from Agent
+**Actual Impact**: Created new module with 114 lines, ~55 lines extracted from Agent
+
+---
 
 ### 1. Extract Tool Execution Logic (HIGH PRIORITY)
 **Status**: Completed (2025-01-07)
@@ -196,47 +194,6 @@
 
 ---
 
-### 2. Extract History Management (HIGH PRIORITY)
-**Status**: Completed (2026-01-07)
-**Module**: `agent.py` - Agent class
-**Problem**: History operations scattered throughout Agent
-- `hist_add_*` methods mixed with business logic
-- Direct history manipulation from multiple locations
-- History state managed in Agent
-
-**Action**:
-- Extract history operations to `HistoryCoordinator` class ✅
-- Define `IHistoryManager` interface ✅
-- Create `python/coordinators/history_coordinator.py` ✅
-- Move all `hist_add_*` methods to coordinator ✅
-- Agent receives messages via interface only ✅
-
-**Dependencies**: None
-**Estimated Impact**: 150 lines extracted from Agent
-**Actual Impact**: ~38 lines extracted from Agent, interface pattern established
-
----
-
-### 3. Extract Stream Handling (MEDIUM PRIORITY)
-**Status**: Pending
-**Module**: `agent.py` - Agent class
-**Problem**: Stream callbacks embedded in Agent.monologue() (lines ~385-429)
-- Stream filtering and output mixed with orchestration
-- Extension calls scattered in callback definitions
-- Hard to test stream behavior independently
-
-**Action**:
-- Extract stream handling to `StreamCoordinator` class
-- Define `IStreamHandler` interface
-- Create `python/coordinators/stream_coordinator.py`
-- Move `reasoning_callback`, `response_callback` to coordinator
-- Unify extension calls for streams
-
-**Dependencies**: None
-**Estimated Impact**: 100 lines extracted from Agent
-
----
-
 ### 4. Centralize Configuration (MEDIUM PRIORITY)
 **Status**: Pending
 **Module**: Configuration scattered across multiple files
@@ -254,25 +211,6 @@
 
 **Dependencies**: None
 **Estimated Impact**: 3 files consolidated
-
----
-
-### 5. Extension System Decoupling (MEDIUM PRIORITY)
-**Status**: Pending
-**Module**: Extension system throughout codebase
-**Problem**: Extensions receive full Agent instance
-- Extensions can manipulate agent state arbitrarily
-- Hard to reason about side effects
-- Violates interface segregation
-
-**Action**:
-- Create `ExtensionContext` dataclass
-- Pass only necessary data to extensions
-- Define extension contracts
-- Migrate extensions to use contracts
-
-**Dependencies**: Task 1, 2, 3 (coordinators needed)
-**Estimated Impact**: 23+ extension files
 
 ---
 
@@ -314,6 +252,23 @@
 ---
 
 ### 8. Add Architecture Tests (MEDIUM PRIORITY)
+**Status**: Pending
+**Module**: Tests
+**Problem**: No architectural validation
+
+**Action**:
+- Create architecture tests (pytest)
+- Test for circular dependencies
+- Test for interface conformance
+- Test coordinator isolation
+- Add CI check for architecture
+
+**Dependencies**: Tasks 1, 2, 3, 7
+**Estimated Impact**: New test suite
+
+---
+
+### 9. Document Dependency Flow (LOW PRIORITY)
 **Status**: Pending
 **Module**: Tests
 **Problem**: No architectural validation
