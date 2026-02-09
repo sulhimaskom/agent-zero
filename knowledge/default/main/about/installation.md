@@ -58,7 +58,7 @@ The following user guide provides instructions for installing and running Agent 
 
 2. **Run Agent Zero:**
 
-- Note: Agent Zero also offers a Hacking Edition based on Kali linux with modified prompts for cybersecurity tasks. The setup is the same as the regular version, just use the agent0ai/agent-zero:hacking image instead of agent0ai/agent-zero.
+- Note: Agent Zero is now based on Debian 13 slim for improved security and smaller image size. The Hacking Edition with Kali Linux and cybersecurity tools is available as a separate image - use agent0ai/agent-zero:hacking if you need those tools.
 
 2.1. Pull the Agent Zero Docker image:
 - Search for `agent0ai/agent-zero` in Docker Desktop

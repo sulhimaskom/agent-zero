@@ -9,6 +9,7 @@ from datetime import datetime, timezone
 from typing import Any, Awaitable, Coroutine, Dict, Literal
 from enum import Enum
 import uuid
+import os
 import models
 
 from python.helpers import extract_tools, files, errors, history, tokens, context as context_helper
@@ -21,14 +22,13 @@ from langchain_core.prompts import (
 from langchain_core.messages import SystemMessage, BaseMessage
 
 import python.helpers.log as Log
-from python.helpers.dirty_json import DirtyJson
 from python.helpers.defer import DeferredTask
 from typing import Callable
 from python.helpers.localization import Localization
 from python.helpers.extension import call_extensions
 from python.helpers.errors import RepairableException
 from python.helpers.tool import Tool
-from python.coordinators import ToolCoordinator, HistoryCoordinator
+from python.coordinators import ToolCoordinator, HistoryCoordinator, StreamCoordinator
 
 
 class AgentContextType(Enum):
@@ -284,10 +284,10 @@ class AgentConfig:
     knowledge_subdirs: list[str] = field(default_factory=lambda: ["default", "custom"])
     browser_http_headers: dict[str, str] = field(default_factory=dict)  # Custom HTTP headers for browser requests
     code_exec_ssh_enabled: bool = True
-    code_exec_ssh_addr: str = "localhost"
-    code_exec_ssh_port: int = 55022
-    code_exec_ssh_user: str = "root"
-    code_exec_ssh_pass: str = ""
+    code_exec_ssh_addr: str = field(default_factory=lambda: os.getenv("CODE_EXEC_SSH_ADDR", "localhost"))
+    code_exec_ssh_port: int = field(default_factory=lambda: int(os.getenv("CODE_EXEC_SSH_PORT", "55022")))
+    code_exec_ssh_user: str = field(default_factory=lambda: os.getenv("CODE_EXEC_SSH_USER", "root"))
+    code_exec_ssh_pass: str = field(default_factory=lambda: os.getenv("CODE_EXEC_SSH_PASS", ""))
     additional: Dict[str, Any] = field(default_factory=dict)
 
 
@@ -354,6 +354,7 @@ class Agent:
         self.data: dict[str, Any] = {}  # free data object all the tools can use
         self.tool_coordinator = ToolCoordinator(self)
         self.history_coordinator = HistoryCoordinator(self)
+        self.stream_coordinator = StreamCoordinator(self)
 
         asyncio.run(self.call_extensions("agent_init"))
 
@@ -386,36 +387,9 @@ class Agent:
                         # call before_main_llm_call extensions
                         await self.call_extensions("before_main_llm_call", loop_data=self.loop_data)
 
-                        async def reasoning_callback(chunk: str, full: str):
-                            await self.handle_intervention()
-                            if chunk == full:
-                                printer.print("Reasoning: ")  # start of reasoning
-                            # Pass chunk and full data to extensions for processing
-                            stream_data = {"chunk": chunk, "full": full}
-                            await self.call_extensions(
-                                "reasoning_stream_chunk", loop_data=self.loop_data, stream_data=stream_data
-                            )
-                            # Stream masked chunk after extensions processed it
-                            if stream_data.get("chunk"):
-                                printer.stream(stream_data["chunk"])
-                            # Use the potentially modified full text for downstream processing
-                            await self.handle_reasoning_stream(stream_data["full"])
-
-                        async def stream_callback(chunk: str, full: str):
-                            await self.handle_intervention()
-                            # output the agent response stream
-                            if chunk == full:
-                                printer.print("Response: ")  # start of response
-                            # Pass chunk and full data to extensions for processing
-                            stream_data = {"chunk": chunk, "full": full}
-                            await self.call_extensions(
-                                "response_stream_chunk", loop_data=self.loop_data, stream_data=stream_data
-                            )
-                            # Stream masked chunk after extensions processed it
-                            if stream_data.get("chunk"):
-                                printer.stream(stream_data["chunk"])
-                            # Use the potentially modified full text for downstream processing
-                            await self.handle_response_stream(stream_data["full"])
+                        # create stream callbacks via coordinator
+                        reasoning_callback = self.stream_coordinator.create_reasoning_callback(self.loop_data)
+                        stream_callback = self.stream_coordinator.create_response_callback(self.loop_data)
 
                         # call main LLM
                         agent_response, _reasoning = await self.call_chat_model(
@@ -424,13 +398,8 @@ class Agent:
                             reasoning_callback=reasoning_callback,
                         )
 
-                        # Notify extensions to finalize their stream filters
-                        await self.call_extensions(
-                            "reasoning_stream_end", loop_data=self.loop_data
-                        )
-                        await self.call_extensions(
-                            "response_stream_end", loop_data=self.loop_data
-                        )
+                        # finalize streams via coordinator
+                        await self.stream_coordinator.finalize_streams(self.loop_data)
 
                         await self.handle_intervention(agent_response)
 
@@ -607,19 +576,19 @@ class Agent:
     def hist_add_message(
         self, ai: bool, content: history.MessageContent, tokens: int = 0
     ):
-        return self.history_coordinator.hist_add_message(ai, content, tokens)
+        return self.history_coordinator.add_message(ai=ai, content=content, tokens=tokens)
 
     def hist_add_user_message(self, message: UserMessage, intervention: bool = False):
-        return self.history_coordinator.hist_add_user_message(message, intervention)
+        return self.history_coordinator.add_user_message(message, intervention)
 
     def hist_add_ai_response(self, message: str):
-        return self.history_coordinator.hist_add_ai_response(message)
+        return self.history_coordinator.add_ai_response(message)
 
     def hist_add_warning(self, message: history.MessageContent):
-        return self.history_coordinator.hist_add_warning(message)
+        return self.history_coordinator.add_warning(message)
 
     def hist_add_tool_result(self, tool_name: str, tool_result: str, **kwargs):
-        return self.history_coordinator.hist_add_tool_result(tool_name, tool_result, **kwargs)
+        return self.history_coordinator.add_tool_result(tool_name, tool_result, **kwargs)
 
     def concat_messages(
         self, messages
@@ -750,29 +719,10 @@ class Agent:
         return await self.tool_coordinator.process_tools(msg)
 
     async def handle_reasoning_stream(self, stream: str):
-        await self.handle_intervention()
-        await self.call_extensions(
-            "reasoning_stream",
-            loop_data=self.loop_data,
-            text=stream,
-        )
+        return await self.stream_coordinator.handle_reasoning_stream(stream)
 
     async def handle_response_stream(self, stream: str):
-        await self.handle_intervention()
-        try:
-            if len(stream) < 25:
-                return  # no reason to try
-            response = DirtyJson.parse_string(stream)
-            if isinstance(response, dict):
-                await self.call_extensions(
-                    "response_stream",
-                    loop_data=self.loop_data,
-                    text=stream,
-                    parsed=response,
-                )
-
-        except Exception as e:
-            pass
+        return await self.stream_coordinator.handle_response_stream(stream)
 
     def get_tool(
         self, name: str, method: str | None, args: dict, message: str, loop_data: LoopData | None, **kwargs
