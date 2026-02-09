@@ -283,10 +283,13 @@
                                                 <!-- Switch field -->
                                                 <template x-if="field.type === 'switch'">
                                                     <label class="toggle">
-                                                        <input type="checkbox" :checked="field.value"
+                                                        <input type="checkbox"
+                                                            role="switch"
+                                                            :aria-checked="field.value ? 'true' : 'false'"
+                                                            :checked="field.value"
                                                             :disabled="field.readonly === true"
                                                             @change="field.value = $event.target.checked">
-                                                        <span class="toggler"></span>
+                                                        <span class="toggler" aria-hidden="true"></span>
                                                     </label>
                                                 </template>
 
