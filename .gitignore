@@ -46,7 +46,6 @@ instruments/**
 # for browser-use
 agent_history.gif
 
-# OpenCode configuration
-.opencode/node_modules/
-.opencode/package-lock.json
+# Opencode AI agent
+.opencode/
 
