@@ -23,6 +23,7 @@ from datetime import timedelta
 import json
 from python.helpers import errors
 from python.helpers import settings
+from python.helpers.constants import Timeouts
 
 import httpx
 
@@ -1041,7 +1042,7 @@ class CustomHTTPClientFactory(ABC):
 
         # Handle timeout
         if timeout is None:
-            kwargs["timeout"] = httpx.Timeout(30.0)
+            kwargs["timeout"] = httpx.Timeout(Timeouts.HTTP_CLIENT_DEFAULT_TIMEOUT)
         else:
             kwargs["timeout"] = timeout
 

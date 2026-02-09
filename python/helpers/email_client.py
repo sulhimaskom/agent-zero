@@ -16,6 +16,7 @@ from imapclient import IMAPClient
 from python.helpers import files
 from python.helpers.errors import RepairableException, format_error
 from python.helpers.print_style import PrintStyle
+from python.helpers.constants import Limits, Paths
 
 
 @dataclass
@@ -563,10 +564,10 @@ async def read_messages(
         from python.helpers.email_client import read_messages
         messages = await read_messages(
             server="imap.gmail.com",
-            port=993,
+            port=Limits.IMAP_DEFAULT_PORT,
             username=secrets.get("EMAIL_USER"),
             password=secrets.get("EMAIL_PASSWORD"),
-            download_folder="tmp/email/inbox",
+            download_folder=Paths.EMAIL_INBOX_PATH,
             filter={"unread": True, "sender": "*@company.com"}
         )
     """

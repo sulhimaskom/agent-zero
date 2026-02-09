@@ -1,6 +1,7 @@
 from python.helpers.api import ApiHandler, Request, Response
 from python.helpers.memory import Memory, get_existing_memory_subdirs, get_context_memory_subdir
 from python.helpers import files
+from python.helpers.constants import Limits
 from models import ModelConfig, ModelType
 from langchain_core.documents import Document
 from agent import AgentContext
@@ -173,7 +174,7 @@ class MemoryDashboard(ApiHandler):
 
                 # sort by timestamp
                 def get_sort_key(m):
-                    timestamp = m.metadata.get("timestamp", "0000-00-00 00:00:00")
+                    timestamp = m.metadata.get("timestamp", Limits.DEFAULT_TIMESTAMP)
                     return timestamp
 
                 memories.sort(key=get_sort_key, reverse=True)

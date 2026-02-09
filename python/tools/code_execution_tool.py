@@ -10,7 +10,7 @@ from python.helpers.shell_ssh import SSHInteractiveSession
 from python.helpers.docker import DockerContainerManager
 from python.helpers.strings import truncate_text as truncate_text_string
 from python.helpers.messages import truncate_text as truncate_text_agent
-from python.helpers.constants import Timeouts, Colors
+from python.helpers.constants import Timeouts, Colors, Paths
 import re
 
 # Timeouts for python, nodejs, and terminal runtimes.
@@ -167,7 +167,7 @@ class CodeExecution(Tool):
 
     async def execute_nodejs_code(self, session: int, code: str, reset: bool = False):
         escaped_code = shlex.quote(code)
-        command = f"node /exe/node_eval.js {escaped_code}"
+        command = f"node {Paths.NODE_EVAL_SCRIPT} {escaped_code}"
         prefix = "node> " + self.format_command_for_output(code) + "\n\n"
         return await self.terminal_session(session, command, reset, prefix)
 

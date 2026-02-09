@@ -24,7 +24,7 @@ from langchain.schema import SystemMessage, HumanMessage
 
 from python.helpers.print_style import PrintStyle
 from python.helpers import files, errors
-from python.helpers.constants import Limits
+from python.helpers.constants import Limits, Timeouts
 from agent import Agent
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -277,7 +277,7 @@ class DocumentQueryStore:
         return False
 
     async def search_documents(
-        self, query: str, limit: int = 10, threshold: float = 0.5, filter: str = ""
+        self, query: str, limit: int = Limits.DOCUMENT_MAX_LIMIT, threshold: float = Limits.DOCUMENT_DEFAULT_THRESHOLD, filter: str = ""
     ) -> List[Document]:
         """
         Search for documents similar to the query across the entire store.
@@ -605,7 +605,7 @@ class DocumentQueryHelper:
             import tempfile
 
             with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
-                response = requests.get(document, timeout=10.0)
+                response = requests.get(document, timeout=Timeouts.DOCUMENT_DOWNLOAD_TIMEOUT)
                 if response.status_code != 200:
                     raise ValueError(
                         f"DocumentQueryHelper::handle_pdf_document: Failed to download PDF from {document}: {response.status_code}"

@@ -8,13 +8,14 @@ import soundfile as sf
 from python.helpers import runtime
 from python.helpers.print_style import PrintStyle
 from python.helpers.notification import NotificationManager, NotificationType, NotificationPriority
+from python.helpers.constants import Limits, Timeouts
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 warnings.filterwarnings("ignore", category=UserWarning)
 
 _pipeline = None
-_voice = "am_puck,am_onyx"
-_speed = 1.1
+_voice = Limits.TTS_DEFAULT_VOICE
+_speed = Limits.TTS_DEFAULT_SPEED
 is_updating_model = False
 
 
@@ -34,7 +35,7 @@ async def _preload():
     global _pipeline, is_updating_model
 
     while is_updating_model:
-        await asyncio.sleep(0.1)
+        await asyncio.sleep(Timeouts.MODEL_UPDATE_CHECK_DELAY)
 
     try:
         is_updating_model = True
@@ -116,7 +117,7 @@ async def _synthesize_sentences(sentences: list[str]):
 
         # Convert combined audio to bytes
         buffer = io.BytesIO()
-        sf.write(buffer, combined_audio, 24000, format="WAV")
+        sf.write(buffer, combined_audio, Limits.TTS_SAMPLE_RATE, format="WAV")
         audio_bytes = buffer.getvalue()
 
         # Return base64 encoded audio

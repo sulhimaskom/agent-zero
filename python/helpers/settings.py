@@ -1520,7 +1520,7 @@ def get_default_settings() -> Settings:
         shell_interface="local" if runtime.is_dockerized() else "ssh",
         stt_model_size="base",
         stt_language="en",
-        stt_silence_threshold=0.3,
+        stt_silence_threshold=Limits.STT_SILENCE_THRESHOLD,
         stt_silence_duration=Limits.STT_SILENCE_DURATION,
         stt_waiting_timeout=Limits.STT_WAITING_TIMEOUT,
         tts_kokoro=True,
