@@ -44,10 +44,18 @@
 
         <div id="chat-buttons-wrapper">
             <!-- Send button -->
-            <button class="chat-button" id="send-button" aria-label="Send message"
+            <button class="chat-button" id="send-button" 
+                    :aria-label="$store.chatInput.isSending ? 'Sending message...' : 'Send message'"
+                    :disabled="$store.chatInput.isSending"
                     @click="$store.chatInput.sendMessage()">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                <!-- Send Icon -->
+                <svg x-show="!$store.chatInput.isSending" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
                     <path d="M25 20 L75 50 L25 80" fill="none" stroke="currentColor" stroke-width="15"></path>
+                </svg>
+                <!-- Loading Spinner -->
+                <svg x-show="$store.chatInput.isSending" class="spinner" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.25" stroke-width="4"></circle>
+                    <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="4" stroke-linecap="round"></path>
                 </svg>
             </button>
 
@@ -126,6 +134,9 @@
     #send-button { background-color: #4248f1; }
     #send-button:hover { -webkit-transform: scale(1.05); transform: scale(1.05); transform-origin: center; background-color: #353bc5; }
     #send-button:active { -webkit-transform: scale(1); transform: scale(1); transform-origin: center; background-color: #2b309c; }
+    #send-button:disabled { opacity: 0.7; cursor: not-allowed; transform: none !important; }
+    #send-button .spinner { animation: spin 1s linear infinite; }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     .chat-button svg { width: 1.5rem; height: 1.5rem; }
     /* Microphone button */
     .chat-button.mic-inactive svg { /* Add specific styles if needed */ }

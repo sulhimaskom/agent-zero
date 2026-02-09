@@ -4,6 +4,7 @@ import { store as fileBrowserStore } from "/components/modals/file-browser/file-
 
 const model = {
   paused: false,
+  isSending: false,
 
   init() {
     console.log("Input store initialized");
@@ -11,9 +12,15 @@ const model = {
   },
 
   async sendMessage() {
-    // Delegate to the global function
-    if (globalThis.sendMessage) {
-      await globalThis.sendMessage();
+    if (this.isSending) return;
+    this.isSending = true;
+    try {
+      // Delegate to the global function
+      if (globalThis.sendMessage) {
+        await globalThis.sendMessage();
+      }
+    } finally {
+      this.isSending = false;
     }
   },
 
