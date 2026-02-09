@@ -3,6 +3,7 @@ import { updateChatInput, sendMessage } from "/index.js";
 import { sleep } from "/js/sleep.js";
 import { store as microphoneSettingStore } from "/components/settings/speech/microphone-setting-store.js";
 import * as shortcuts from "/js/shortcuts.js";
+import { TIMING } from "/js/constants.js";
 
 const Status = {
   INACTIVE: "inactive",
@@ -374,7 +375,7 @@ const model = {
     shortcuts.frontendNotification({
       type: "info",
       message: "Click anywhere to enable audio playback",
-      displayTime: 5000,
+      displayTime: TIMING.TOAST_DISPLAY,
       frontendOnly: true,
     });
     console.log("Please click anywhere on the page to enable audio playback");

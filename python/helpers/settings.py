@@ -13,7 +13,7 @@ from python.helpers.print_style import PrintStyle
 from python.helpers.providers import get_providers
 from python.helpers.secrets import get_default_secrets_manager
 from python.helpers import dirty_json
-from python.helpers.constants import Limits, Network, Timeouts
+from python.helpers.constants import Limits, Network, Timeouts, Colors
 
 
 class Settings(TypedDict):
@@ -1601,11 +1601,11 @@ def _apply_settings(previous: Settings | None):
                     )
 
                 PrintStyle(
-                    background_color="#6734C3", font_color="white", padding=True
+                    background_color=Colors.SETTINGS_PURPLE, font_color=Colors.BG_WHITE, padding=True
                 ).print("Parsed MCP config:")
                 (
                     PrintStyle(
-                        background_color="#334455", font_color="white", padding=False
+                        background_color=Colors.SETTINGS_DARK, font_color=Colors.BG_WHITE, padding=False
                     ).print(mcp_config.model_dump_json())
                 )
                 AgentContext.log_to_all(

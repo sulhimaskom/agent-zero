@@ -4,7 +4,7 @@ from python.helpers.tool import Tool, Response
 from python.helpers import runtime, files, images
 from mimetypes import guess_type
 from python.helpers import history
-from python.helpers.constants import Limits
+from python.helpers.constants import Limits, Colors
 
 # image optimization and token estimation for context window
 MAX_PIXELS = Limits.VISION_MAX_PIXELS
@@ -87,7 +87,7 @@ class VisionLoad(Tool):
             else f"{len(self.images_dict)} images processed"
         )
         PrintStyle(
-            font_color="#1B4F72", background_color="white", padding=True, bold=True
+            font_color=Colors.PRIMARY_BLUE, background_color=Colors.BG_WHITE, padding=True, bold=True
         ).print(f"{self.agent.agent_name}: Response from tool '{self.name}'")
-        PrintStyle(font_color="#85C1E9").print(message)
+        PrintStyle(font_color=Colors.PRIMARY_LIGHT_BLUE).print(message)
         self.log.update(result=message)

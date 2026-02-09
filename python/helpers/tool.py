@@ -9,6 +9,7 @@ if TYPE_CHECKING:
 
 from python.helpers.print_style import PrintStyle
 from python.helpers.strings import sanitize_string
+from python.helpers.constants import Colors
 
 
 @dataclass
@@ -41,19 +42,19 @@ class Tool:
         self.progress += content
 
     async def before_execution(self, **kwargs):
-        PrintStyle(font_color="#1B4F72", padding=True, background_color="white", bold=True).print(f"{self.agent.agent_name}: Using tool '{self.name}'")
+        PrintStyle(font_color=Colors.PRIMARY_BLUE, padding=True, background_color=Colors.BG_WHITE, bold=True).print(f"{self.agent.agent_name}: Using tool '{self.name}'")
         self.log = self.get_log_object()
         if self.args and isinstance(self.args, dict):
             for key, value in self.args.items():
-                PrintStyle(font_color="#85C1E9", bold=True).stream(self.nice_key(key)+": ")
-                PrintStyle(font_color="#85C1E9", padding=isinstance(value,str) and "\n" in value).stream(value)
+                PrintStyle(font_color=Colors.PRIMARY_LIGHT_BLUE, bold=True).stream(self.nice_key(key)+": ")
+                PrintStyle(font_color=Colors.PRIMARY_LIGHT_BLUE, padding=isinstance(value,str) and "\n" in value).stream(value)
                 PrintStyle().print()
 
     async def after_execution(self, response: Response, **kwargs):
         text = sanitize_string(response.message.strip())
         self.agent.hist_add_tool_result(self.name, text, **(response.additional or {}))
-        PrintStyle(font_color="#1B4F72", background_color="white", padding=True, bold=True).print(f"{self.agent.agent_name}: Response from tool '{self.name}'")
-        PrintStyle(font_color="#85C1E9").print(text)
+        PrintStyle(font_color=Colors.PRIMARY_BLUE, background_color=Colors.BG_WHITE, padding=True, bold=True).print(f"{self.agent.agent_name}: Response from tool '{self.name}'")
+        PrintStyle(font_color=Colors.PRIMARY_LIGHT_BLUE).print(text)
         self.log.update(content=text)
 
     def get_log_object(self):

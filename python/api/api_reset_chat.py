@@ -1,6 +1,7 @@
 from agent import AgentContext
 from python.helpers.api import ApiHandler, Request, Response
 from python.helpers.print_style import PrintStyle
+from python.helpers.constants import Colors
 from python.helpers import persist_chat
 import json
 
@@ -50,7 +51,7 @@ class ApiResetChat(ApiHandler):
 
             # Log the reset
             PrintStyle(
-                background_color="#3498DB", font_color="white", bold=True, padding=True
+                background_color=Colors.API_RESET_BLUE, font_color=Colors.BG_WHITE, bold=True, padding=True
             ).print(f"API Chat reset: {context_id}")
 
             # Return success response

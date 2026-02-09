@@ -2,6 +2,7 @@ import os, webcolors, html
 import sys
 from datetime import datetime
 from . import files
+from .constants import Colors
 
 class PrintStyle:
     last_endline = True
@@ -134,23 +135,23 @@ class PrintStyle:
 
     @staticmethod
     def hint(text: str):
-        PrintStyle(font_color="#6C3483", padding=True).print("Hint: "+text)
+        PrintStyle(font_color=Colors.HINT, padding=True).print("Hint: "+text)
 
     @staticmethod
     def info(text: str):
-        PrintStyle(font_color="#0000FF", padding=True).print("Info: "+text)
+        PrintStyle(font_color=Colors.INFO, padding=True).print("Info: "+text)
 
     @staticmethod
     def success(text: str):
-        PrintStyle(font_color="#008000", padding=True).print("Success: "+text)
+        PrintStyle(font_color=Colors.SUCCESS, padding=True).print("Success: "+text)
 
     @staticmethod
     def warning(text: str):
-        PrintStyle(font_color="#FFA500", padding=True).print("Warning: "+text)
+        PrintStyle(font_color=Colors.WARNING, padding=True).print("Warning: "+text)
 
     @staticmethod
     def debug(text: str):
-        PrintStyle(font_color="#808080", padding=True).print("Debug: "+text)
+        PrintStyle(font_color=Colors.DEBUG, padding=True).print("Debug: "+text)
 
     @staticmethod
     def error(text: str):

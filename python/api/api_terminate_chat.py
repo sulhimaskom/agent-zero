@@ -2,6 +2,7 @@ from agent import AgentContext
 from python.helpers.api import ApiHandler, Request, Response
 from python.helpers.persist_chat import remove_chat
 from python.helpers.print_style import PrintStyle
+from python.helpers.constants import Colors
 import json
 
 
@@ -49,7 +50,7 @@ class ApiTerminateChat(ApiHandler):
 
             # Log the deletion
             PrintStyle(
-                background_color="#E74C3C", font_color="white", bold=True, padding=True
+                background_color=Colors.ERROR, font_color=Colors.BG_WHITE, bold=True, padding=True
             ).print(f"API Chat deleted: {context_id}")
 
             # Return success response
