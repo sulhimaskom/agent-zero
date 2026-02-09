@@ -2,6 +2,7 @@ import re
 import sys
 import time
 from python.helpers import files
+from python.helpers.constants import UITiming
 
 def sanitize_string(s: str, encoding: str = "utf-8") -> str:
     # Replace surrogates and invalid unicode with replacement character
@@ -91,7 +92,7 @@ def calculate_valid_match_lengths(first: bytes | str, second: bytes | str,
             )
             sys.stdout.write("\r" + output)
             sys.stdout.flush()
-            time.sleep(0.01)  # Add a short delay for readability (optional)
+            time.sleep(UITiming.ANIMATION_STEP)  # Add a short delay for readability (optional)
 
     # Return the last matched positions instead of the current indices
     return last_matched_i, last_matched_j

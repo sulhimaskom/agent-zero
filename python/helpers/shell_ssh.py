@@ -5,6 +5,7 @@ import re
 from typing import Tuple
 from python.helpers.log import Log
 from python.helpers.print_style import PrintStyle
+from python.helpers.constants import Shell, Timeouts
 # from python.helpers.strings import calculate_valid_match_lengths
 
 
@@ -63,7 +64,7 @@ class SSHInteractiveSession:
                 self.shell = self.client.invoke_shell(width=100, height=50)
 
                 # disable systemd/OSC prompt metadata and disable local echo
-                initial_command = "unset PROMPT_COMMAND PS0; stty -echo"
+                initial_command = Shell.SSH_INIT_COMMAND
                 if self.cwd:
                     initial_command = f"cd {self.cwd}; {initial_command}"
                 self.shell.send(f"{initial_command}\n".encode())
@@ -73,7 +74,7 @@ class SSHInteractiveSession:
                     full, part = await self.read_output()
                     if full and not part:
                         return
-                    time.sleep(0.1)
+                    time.sleep(Timeouts.SSH_SHELL_DELAY)
 
             except Exception as e:
                 errors += 1
@@ -84,7 +85,7 @@ class SSHInteractiveSession:
                         content=f"SSH Connection attempt {errors}...",
                         temp=True,
                     )
-                    time.sleep(5)
+                    time.sleep(Timeouts.SSH_CONNECTION_DELAY)
                 else:
                     raise e
 

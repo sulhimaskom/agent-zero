@@ -387,7 +387,7 @@ class MemoryConsolidator:
             if doc_id:
                 # Convert ranking to similarity score with conservative distribution
                 if total_docs == 1:
-                    ranking_similarity = 1.0  # Single document gets perfect score
+                    ranking_similarity = Limits.MEMORY_SIMILARITY_SINGLE_DOC  # Single document gets perfect score
                 else:
                     # Use conservative scoring: distribute between safety_threshold and 1.0
                     # This ensures all scores are suitable for consolidation
@@ -404,7 +404,7 @@ class MemoryConsolidator:
         # Step 6: Add similarity score to document metadata for LLM analysis
         for doc in unique_similar:
             doc_id = doc.metadata.get('id')
-            estimated_similarity = similarity_scores.get(doc_id, 0.7)
+            estimated_similarity = similarity_scores.get(doc_id, Limits.MEMORY_SIMILARITY_DEFAULT_ESTIMATE)
             # Store for later validation
             doc.metadata['_consolidation_similarity'] = estimated_similarity
 
@@ -652,7 +652,7 @@ class MemoryConsolidator:
 
             unsafe_replacements = []
             for memory in memories_to_check:
-                similarity = memory.metadata.get('_consolidation_similarity', 0.7)
+                similarity = memory.metadata.get('_consolidation_similarity', Limits.MEMORY_SIMILARITY_DEFAULT_ESTIMATE)
                 if similarity < self.config.replace_similarity_threshold:
                     unsafe_replacements.append({
                         'id': memory.metadata.get('id'),
