@@ -95,7 +95,7 @@ class EmailClient:
             client = IMAPClient(self.server, port=self.port, ssl=self.ssl, timeout=self.timeout)
             # Increase line length limit to handle large emails (default is 10000)
             # This fixes "line too long" errors for emails with large headers or embedded content
-            client._imap._maxline = 100000
+            client._imap._maxline = Limits.IMAP_MAX_LINE_LENGTH
             client.login(self.username, self.password)
             return client
 

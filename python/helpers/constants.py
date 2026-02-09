@@ -43,6 +43,7 @@ class Timeouts:
     
     # Scheduler timeouts
     SCHEDULER_DEFAULT_WAIT: Final[int] = 300
+    SCHEDULER_CHECK_FREQUENCY: Final[float] = 60.0
     
     # Input timeouts
     INPUT_DEFAULT_TIMEOUT: Final[int] = 10
@@ -81,6 +82,9 @@ class Timeouts:
     
     # HTTP client timeouts
     HTTP_CLIENT_DEFAULT_TIMEOUT: Final[float] = 30.0
+
+    # Rate limiter timeframe
+    RATE_LIMITER_DEFAULT_TIMEFRAME: Final[int] = 60
 
 
 # =============================================================================
@@ -173,7 +177,8 @@ class Limits:
     # Notification limits
     NOTIFICATION_MAX_COUNT: Final[int] = 100
     NOTIFICATION_DISPLAY_TIME: Final[int] = 3
-    
+    NOTIFICATION_RECENT_SECONDS: Final[int] = 30
+
     # RFC ports
     RFC_PORT_HTTP: Final[int] = 55080
     RFC_PORT_SSH: Final[int] = 55022
@@ -203,7 +208,7 @@ class Limits:
     
     # IMAP settings
     IMAP_DEFAULT_PORT: Final[int] = 993
-    IMAP_MAX_LINE_LENGTH: Final[int] = 100000
+    IMAP_MAX_LINE_LENGTH: Final[int] = 100000  # Increased from default 10000 to handle large emails
     
     # TTY settings
     TTY_BUFFER_SIZE: Final[int] = 4096

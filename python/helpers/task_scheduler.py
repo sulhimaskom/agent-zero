@@ -180,7 +180,7 @@ class BaseTask(BaseModel):
                     setattr(self, key, value)
                     self.updated_at = datetime.now(timezone.utc)
 
-    def check_schedule(self, frequency_seconds: float = 60.0) -> bool:
+    def check_schedule(self, frequency_seconds: float = Timeouts.SCHEDULER_CHECK_FREQUENCY) -> bool:
         return False
 
     def get_next_run(self) -> datetime | None:
@@ -341,7 +341,7 @@ class ScheduledTask(BaseTask):
                        schedule=schedule,
                        **kwargs)
 
-    def check_schedule(self, frequency_seconds: float = 60.0) -> bool:
+    def check_schedule(self, frequency_seconds: float = Timeouts.SCHEDULER_CHECK_FREQUENCY) -> bool:
         with self._lock:
             crontab = CronTab(crontab=self.schedule.to_crontab())  # type: ignore
 
@@ -416,7 +416,7 @@ class PlannedTask(BaseTask):
                        plan=plan,
                        **kwargs)
 
-    def check_schedule(self, frequency_seconds: float = 60.0) -> bool:
+    def check_schedule(self, frequency_seconds: float = Timeouts.SCHEDULER_CHECK_FREQUENCY) -> bool:
         with self._lock:
             return self.plan.should_launch() is not None
 

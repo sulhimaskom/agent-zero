@@ -11,8 +11,7 @@ from python.helpers.task_scheduler import (
 from agent import AgentContext
 from python.helpers import persist_chat
 from python.helpers.projects import get_context_project_name, load_basic_project_data
-
-DEFAULT_WAIT_TIMEOUT = 300
+from python.helpers.constants import Timeouts
 
 
 class SchedulerTool(Tool):
@@ -269,8 +268,8 @@ class SchedulerTool(Tool):
             if task.state == TaskState.RUNNING:
                 await asyncio.sleep(1)
                 elapsed += 1
-                if elapsed > DEFAULT_WAIT_TIMEOUT:
-                    return Response(message=f"Task wait timeout ({DEFAULT_WAIT_TIMEOUT} seconds): {task_uuid}", break_loop=False)
+                if elapsed > Timeouts.SCHEDULER_DEFAULT_WAIT:
+                    return Response(message=f"Task wait timeout ({Timeouts.SCHEDULER_DEFAULT_WAIT} seconds): {task_uuid}", break_loop=False)
             else:
                 done = True
 
