@@ -1,8 +1,8 @@
 # AGENT ZERO PROJECT KNOWLEDGE BASE
 
-**Generated:** 2026-01-13
-**Commit:** a99361d
-**Branch:** custom
+**Generated:** 2026-02-09
+**Commit:** 9c84ffa
+**Branch:** repokeeper/cleanup-maintenance
 
 ## OVERVIEW
 Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpine.js). Prompt-driven behavior - everything controlled by `/prompts/` markdown files. Grows organically through memory, tools, extensions, and agent profiles.
@@ -39,7 +39,7 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 | API endpoints | `/python/api/` | Classes inheriting `ApiHandler` auto-register as Flask routes |
 | Memory management | `/python/helpers/memory.py` | FAISS vector DB, semantic search, AI filtering |
 | History & context | `/python/helpers/history.py` | Message summarization, context management |
-| Settings | `/python/helpers/settings.py` | 1758 lines - complexity hotspot, needs refactoring to background tasks |
+| Settings | `/python/helpers/settings.py` | 1741 lines - complexity hotspot, needs refactoring to background tasks |
 | MCP integration | `/python/helpers/mcp_handler.py` | Server + client for Model Context Protocol |
 | Scheduler | `/python/helpers/task_scheduler.py` | Crontab-based scheduled tasks |
 | Agent profiles | `/agents/{profile}/` | Each has prompts/, tools/, extensions/ subdirs |
@@ -93,14 +93,14 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 
 ### Code Smells (TODOs to address)
 - `/python/helpers/settings.py` - Multiple TODOs about replacing with background tasks (lines 1558, 1616, 1621, 1631, 1643) - CRITICAL complexity hotspot
-- `/python/helpers/task_scheduler.py` - 1154 lines, consider splitting task types from scheduler logic
-- `/python/helpers/mcp_handler.py` - 1115 lines, TODO about inline prompts (lines 742-744)
+- `/python/helpers/task_scheduler.py` - 1156 lines, consider splitting task types from scheduler logic
+- `/python/helpers/mcp_handler.py` - 1116 lines, TODO about inline prompts (lines 742-744)
 - `/python/helpers/history.py:218` - FIXME: vision bytes sent to utility LLM (inefficiency)
 - `/python/helpers/vector_db.py`, `/python/helpers/memory.py` - FAISS patch for Python 3.12 ARM (remove when fixed upstream)
 - `/python/helpers/job_loop.py:34` - TODO: lowering SLEEP_TIME below 1min causes job duplication
-- 184 `# type: ignore` comments across 47 files - type suppression issues
-- 228 `except Exception as e:` handlers - broad exception catching
-- 313 print statements across 39 files - should use proper logging
+- 177 `# type: ignore` comments across 47 files - type suppression issues
+- 189 `except Exception as e:` handlers - broad exception catching
+- 302 print statements across 39 files - should use proper logging
 
 ### Testing
 - No pytest.ini, conftest.py, or fixtures - default pytest only
@@ -174,8 +174,8 @@ docker run -p 50001:80 agent0ai/agent-zero
 ## NOTES
 - **No LSP servers installed** - relies on VS Code Python extension for type checking
 - **CI is AI-powered** - GitHub workflows use OpenCode agent, not traditional pytest/linting
-- **Settings module** (1758 lines) identified as complexity hotspot needing refactoring
-- **Large files**: `agent.py` (922 lines), `models.py` (919 lines), `settings.py` (1758 lines), `task_scheduler.py` (1154 lines), `mcp_handler.py` (1115 lines)
+- **Settings module** (1741 lines) identified as complexity hotspot needing refactoring
+- **Large files**: `agent.py` (741 lines), `models.py` (919 lines), `settings.py` (1741 lines), `task_scheduler.py` (1156 lines), `mcp_handler.py` (1116 lines)
 - **Large frontend files**: `webui/js/scheduler.js` (1835 lines), `webui/js/messages.js` (1009 lines), `webui/components/chat/speech/speech-store.js` (967 lines)
 - **FAISS patch required** for Python 3.12 ARM - temporary workaround
 - **56 bare `pass` statements** - mostly in base classes/abstract methods (acceptable)
