@@ -237,14 +237,18 @@ def _is_transient_litellm_error(exc: Exception) -> bool:
         return False
 
     # Fallback to exception classes mapped by LiteLLM/OpenAI
-    transient_types = (
-        getattr(openai, "APITimeoutError", Exception),
-        getattr(openai, "APIConnectionError", Exception),
-        getattr(openai, "RateLimitError", Exception),
-        getattr(openai, "APIError", Exception),
-        getattr(openai, "InternalServerError", Exception),
-        # Some providers map overloads to ServiceUnavailable-like errors
-        getattr(openai, "APIStatusError", Exception),
+    transient_types = tuple(
+        t
+        for t in [
+            getattr(openai, "APITimeoutError", Exception),
+            getattr(openai, "APIConnectionError", Exception),
+            getattr(openai, "RateLimitError", Exception),
+            getattr(openai, "APIError", Exception),
+            getattr(openai, "InternalServerError", Exception),
+            # Some providers map overloads to ServiceUnavailable-like errors
+            getattr(openai, "APIStatusError", Exception),
+        ]
+        if isinstance(t, type)
     )
     return isinstance(exc, transient_types)
 
