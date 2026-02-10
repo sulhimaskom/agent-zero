@@ -45,12 +45,10 @@ def initialize():
 
 
 def get_arg(name: str):
-    global args
     return args.get(name, None)
 
 
 def has_arg(name: str):
-    global args
     return name in args
 
 
@@ -86,11 +84,13 @@ def get_persistent_id() -> str:
 @overload
 async def call_development_function(
     func: Callable[..., Awaitable[T]], *args, **kwargs
-) -> T: ...
+) -> T:
+    ...
 
 
 @overload
-async def call_development_function(func: Callable[..., T], *args, **kwargs) -> T: ...
+async def call_development_function(func: Callable[..., T], *args, **kwargs) -> T:
+    ...
 
 
 async def call_development_function(

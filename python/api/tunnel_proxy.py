@@ -8,6 +8,7 @@ class TunnelProxy(ApiHandler):
     async def process(self, input: dict, request: Request) -> dict | Response:
         return await process(input)
 
+
 async def process(input: dict) -> dict | Response:
     # Get configuration from environment
     tunnel_api_port = (
