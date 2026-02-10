@@ -57,7 +57,7 @@ create_mock_module('docker')
 create_mock_module('psutil')
 create_mock_module('aiohttp')
 create_mock_module('fastmcp')
-create_mock_module('mcp')
+# Do not mock mcp - we need the real package for imports
 create_mock_module('fasta2a')
 create_mock_module('croniter')
 create_mock_module('imapclient')
@@ -149,13 +149,13 @@ flask_mock.send_from_directory = MagicMock()
 flask_mock.make_response = MagicMock()
 flask_mock.Response = MagicMock
 
-# Mock pydantic
-pydantic_mock = create_mock_module('pydantic')
-pydantic_mock.BaseModel = MagicMock
-pydantic_mock.Field = MagicMock()
-pydantic_mock.ConfigDict = MagicMock()
-pydantic_mock.validator = MagicMock()
-pydantic_mock.ValidationError = Exception
+# Do not mock pydantic - it's needed for real functionality
+# pydantic_mock = create_mock_module('pydantic')
+# pydantic_mock.BaseModel = MagicMock
+# pydantic_mock.Field = MagicMock()
+# pydantic_mock.ConfigDict = MagicMock()
+# pydantic_mock.validator = MagicMock()
+# pydantic_mock.ValidationError = Exception
 
 # Mock dotenv (python-dotenv package)
 dotenv_mock = create_mock_module('dotenv')

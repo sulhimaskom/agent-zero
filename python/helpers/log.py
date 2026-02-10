@@ -1,13 +1,10 @@
 from dataclasses import dataclass
 import json
 from typing import Literal, Optional, TypeVar, TYPE_CHECKING
-
-T = TypeVar("T")
 import uuid
 from collections import OrderedDict  # Import OrderedDict
-from python.helpers.strings import truncate_text_by_ratio
 import copy
-from typing import TypeVar
+from python.helpers.strings import truncate_text_by_ratio
 from python.helpers.secrets import get_secrets_manager
 from python.helpers.constants import Limits
 

@@ -2,6 +2,7 @@ import os
 import webcolors
 import html
 import sys
+import atexit
 from datetime import datetime
 from . import files
 from .constants import Colors
@@ -160,5 +161,4 @@ class PrintStyle:
         PrintStyle(font_color="red", padding=True).print("Error: "+text)
 
 # Ensure HTML file is closed properly when the program exits
-import atexit
 atexit.register(PrintStyle._close_html_log)

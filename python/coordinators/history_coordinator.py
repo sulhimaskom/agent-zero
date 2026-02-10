@@ -1,10 +1,12 @@
 from abc import ABC, abstractmethod
 from datetime import datetime, timezone
 import asyncio
+from typing import TYPE_CHECKING
 
 from python.helpers import history
-from python.helpers.localization import Localization
-from python.helpers.extension import call_extensions
+
+if TYPE_CHECKING:
+    from agent import UserMessage
 
 
 class IHistoryManager(ABC):

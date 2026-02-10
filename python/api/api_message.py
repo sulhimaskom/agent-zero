@@ -5,7 +5,7 @@ from agent import AgentContext, UserMessage, AgentContextType
 from python.helpers.api import ApiHandler, Request, Response
 from python.helpers import files
 from python.helpers.print_style import PrintStyle
-from python.helpers.constants import Colors, Paths
+from python.helpers.constants import Colors, Paths, Timeouts
 from werkzeug.utils import secure_filename
 from initialize import initialize_agent
 import threading
@@ -33,7 +33,7 @@ class ApiMessage(ApiHandler):
         context_id = input.get("context_id", "")
         message = input.get("message", "")
         attachments = input.get("attachments", [])
-        lifetime_hours = input.get("lifetime_hours", 24)  # Default 24 hours
+        lifetime_hours = input.get("lifetime_hours", Timeouts.NOTIFICATION_LIFETIME_HOURS)  # Default from constants
 
         if not message:
             return Response('{"error": "Message is required"}', status=400, mimetype="application/json")

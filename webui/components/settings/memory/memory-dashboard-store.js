@@ -3,6 +3,7 @@ import { getContext } from "/index.js";
 import * as API from "/js/api.js";
 import { openModal, closeModal } from "/js/modals.js";
 import { store as notificationStore } from "/components/notifications/notification-store.js";
+import { LIMITS } from "/js/constants.js";
 
 // Helper function for toasts
 function justToast(text, type = "info", timeout = 5000) {
@@ -14,7 +15,7 @@ const memoryDashboardStore = {
   // Data
   memories: [],
   currentPage: 1,
-  itemsPerPage: 10,
+  itemsPerPage: LIMITS.MEMORY_DASHBOARD_ITEMS_PER_PAGE,
 
   // State
   loading: false,
@@ -645,7 +646,7 @@ ${memory.content_full}
     this.pollingInterval = setInterval(async () => {
       // Silently refresh using existing search logic
       await this.searchMemories(true); // silent = true
-    }, 2000); // Poll every 3 seconds - reasonable for active user interactions
+    }, TIMING.MEMORY_DASHBOARD_POLL_INTERVAL); // Use timing constant from configuration
   },
 
   stopPolling() {

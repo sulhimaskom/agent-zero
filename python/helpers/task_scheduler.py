@@ -10,11 +10,8 @@ from os.path import exists
 from typing import Any, Callable, Dict, Literal, Optional, Type, TypeVar, Union, cast, ClassVar
 
 import nest_asyncio
-nest_asyncio.apply()
-
 from crontab import CronTab
 from pydantic import BaseModel, Field, PrivateAttr
-
 from agent import AgentContext, UserMessage
 from initialize import initialize_agent
 from python.helpers.persist_chat import save_tmp_chat
@@ -26,6 +23,8 @@ from python.helpers import projects
 from python.helpers.constants import Limits, Paths, Timeouts
 import pytz
 from typing import Annotated
+
+nest_asyncio.apply()
 
 SCHEDULER_FOLDER = Paths.SCHEDULER_FOLDER
 DEFAULT_WAIT_TIMEOUT = Timeouts.SCHEDULER_DEFAULT_WAIT
@@ -646,7 +645,7 @@ class TaskScheduler:
 
     async def add_task(self, task: Union[ScheduledTask, AdHocTask, PlannedTask]) -> "TaskScheduler":
         await self._tasks.add_task(task)
-        ctx = await self._get_chat_context(task)  # invoke context creation
+        _ = await self._get_chat_context(task)  # invoke context creation
         return self
 
     async def remove_task_by_uuid(self, task_uuid: str) -> "TaskScheduler":

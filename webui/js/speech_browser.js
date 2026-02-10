@@ -188,10 +188,10 @@ class MicrophoneInput {
         this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
         this.mediaStreamSource = this.audioContext.createMediaStreamSource(stream);
         this.analyserNode = this.audioContext.createAnalyser();
-        this.analyserNode.fftSize = 2048;
-        this.analyserNode.minDecibels = -90;
-        this.analyserNode.maxDecibels = -10;
-        this.analyserNode.smoothingTimeConstant = 0.85;
+        this.analyserNode.fftSize = SPEECH.FFT_SIZE;
+        this.analyserNode.minDecibels = SPEECH.MIN_DECIBELS;
+        this.analyserNode.maxDecibels = SPEECH.MAX_DECIBELS;
+        this.analyserNode.smoothingTimeConstant = SPEECH.SMOOTHING_TIME_CONSTANT;
         this.mediaStreamSource.connect(this.analyserNode);
     }
 
