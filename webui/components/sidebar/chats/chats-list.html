@@ -22,7 +22,18 @@
                   <span class="chat-name" :title="context.name ? context.name : 'Chat #' + context.no"
                     x-text="context.name ? context.name : 'Chat #' + context.no"></span>
                 </div>
-                <button class="edit-button" @click.stop="$store.chats.killChat(context.id)" aria-label="Delete chat">X</button>
+                <div class="delete-wrapper" x-data="{ confirmDelete: false }" @click.outside="confirmDelete = false">
+                  <button 
+                    :class="{'edit-button': true, 'confirm-delete': confirmDelete}"
+                    @click.stop="if (confirmDelete) { $store.chats.killChat(context.id); confirmDelete = false; } else { confirmDelete = true; }"
+                    :aria-label="confirmDelete ? 'Click again to confirm delete' : 'Delete chat'">
+                    <span x-show="!confirmDelete">X</span>
+                    <span x-show="confirmDelete" class="confirm-icon">✓</span>
+                  </button>
+                  <div x-show="confirmDelete" x-transition class="delete-confirm-tooltip">
+                    Click again to confirm
+                  </div>
+                </div>
               </button>
             </li>
           </template>
@@ -160,6 +171,104 @@
 
     .light-mode .empty-list-message {
       color: var(--color-secondary-light);
+    }
+
+    /* Delete confirmation styles */
+    .delete-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .edit-button.confirm-delete {
+      background-color: var(--color-accent);
+      border-color: var(--color-accent);
+      color: white;
+      animation: pulse-warning 1.5s ease-in-out infinite;
+    }
+
+    .edit-button.confirm-delete:hover {
+      background-color: #c53929;
+      border-color: #c53929;
+    }
+
+    .confirm-icon {
+      font-weight: bold;
+      font-size: 1.1em;
+    }
+
+    .delete-confirm-tooltip {
+      position: absolute;
+      right: calc(100% + 8px);
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: var(--color-accent);
+      color: white;
+      padding: 6px 10px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      z-index: 100;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      animation: slide-in 0.2s ease-out;
+    }
+
+    .delete-confirm-tooltip::after {
+      content: '';
+      position: absolute;
+      left: 100%;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 6px solid transparent;
+      border-left-color: var(--color-accent);
+    }
+
+    @keyframes pulse-warning {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(207, 102, 121, 0.4);
+      }
+      50% {
+        box-shadow: 0 0 0 4px rgba(207, 102, 121, 0);
+      }
+    }
+
+    @keyframes slide-in {
+      from {
+        opacity: 0;
+        transform: translateY(-50%) translateX(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(-50%) translateX(0);
+      }
+    }
+
+    /* Light mode adjustments */
+    .light-mode .edit-button.confirm-delete {
+      background-color: #d32f2f;
+      border-color: #d32f2f;
+    }
+
+    .light-mode .edit-button.confirm-delete:hover {
+      background-color: #b71c1c;
+      border-color: #b71c1c;
+    }
+
+    .light-mode .delete-confirm-tooltip {
+      background-color: #d32f2f;
+    }
+
+    .light-mode .delete-confirm-tooltip::after {
+      border-left-color: #d32f2f;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .edit-button.confirm-delete {
+        animation: none;
+      }
+      .delete-confirm-tooltip {
+        animation: none;
+      }
     }
 
     /* Selected chat accent */
