@@ -17,6 +17,7 @@ const model = {
   contexts: [],
   selected: "",
   selectedContext: null,
+  isLoading: true,
 
   // for convenience
   getSelectedChatId() {
@@ -42,6 +43,7 @@ const model = {
     this.contexts = contextsList.sort(
       (a, b) => (b.created_at || 0) - (a.created_at || 0)
     );
+    this.isLoading = false;
   },
 
   // Select a chat
