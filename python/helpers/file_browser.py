@@ -9,7 +9,7 @@ from datetime import datetime
 
 from python.helpers import files
 from python.helpers.print_style import PrintStyle
-from python.helpers.constants import Timeouts
+from python.helpers.constants import Timeouts, Limits
 
 
 class FileBrowser:
@@ -19,7 +19,7 @@ class FileBrowser:
         'document': {'md', 'pdf', 'txt', 'csv', 'json'}
     }
 
-    MAX_FILE_SIZE = 100 * 1024 * 1024  # 100MB
+    MAX_FILE_SIZE = Limits.FILE_BROWSER_MAX_FILE_SIZE  # 100MB
 
     def __init__(self):
         # if runtime.is_development():

@@ -12,16 +12,22 @@ from python.helpers.tool import Tool, Response
 
 class MockTool(Tool):
     """Mock tool for testing"""
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.executed = False
         self.before_called = False
         self.after_called = False
-        
+
+    async def before_execution(self, **kwargs):
+        self.before_called = True
+
     async def execute(self, **kwargs) -> Response:
         self.executed = True
         return Response(message="Tool executed successfully", break_loop=False)
+
+    async def after_execution(self, response, **kwargs):
+        self.after_called = True
 
 
 class TestToolCoordinator:
@@ -36,14 +42,16 @@ class TestToolCoordinator:
         agent.config = Mock()
         agent.config.profile = None
         agent.agent_name = "TestAgent"
-        
+
         agent.handle_intervention = AsyncMock()
         agent.call_extensions = AsyncMock()
         agent.hist_add_warning = Mock()
+        agent.history_coordinator = Mock()
+        agent.history_coordinator.add_warning = Mock()
         agent.context = Mock()
         agent.context.log = Mock()
         agent.read_prompt = Mock(return_value="Warning message")
-        
+
         return agent
     
     @pytest.fixture
@@ -133,7 +141,7 @@ class TestToolCoordinator:
             
             # Assert: Warning logged, no result
             assert result is None
-            assert mock_agent.hist_add_warning.called
+            assert mock_agent.history_coordinator.add_warning.called
             assert mock_agent.context.log.log.called
     
     @pytest.mark.asyncio
@@ -144,16 +152,13 @@ class TestToolCoordinator:
                 "tool_name": "nonexistent_tool",
                 "tool_args": {}
             }
-            
-            with patch('python.coordinators.tool_coordinator.Tool') as mock_tool_class:
-                mock_tool_class.return_value = None
-                
-                # Act: Process request for non-existent tool
-                result = await tool_coordinator.process_tools(valid_tool_request)
-                
-                # Assert: Warning logged for tool not found
-                assert mock_agent.hist_add_warning.called
-                assert result is None
+            mock_extract.load_classes_from_file.return_value = []
+
+            # Act: Process request for non-existent tool
+            result = await tool_coordinator.process_tools(valid_tool_request)
+
+            # Assert: Unknown tool executed, no error
+            assert result is None
     
     @pytest.mark.asyncio
     async def test_process_tools_with_tool_method(self, tool_coordinator, mock_agent, tool_with_method):

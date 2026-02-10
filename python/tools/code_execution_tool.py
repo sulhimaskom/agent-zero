@@ -267,7 +267,7 @@ class CodeExecution(Tool):
         while True:
             await asyncio.sleep(sleep_time)
             full_output, partial_output = await self.state.shells[session].session.read_output(
-                timeout=1, reset_full_output=reset_full_output
+                timeout=Timeouts.TTY_READ_TIMEOUT, reset_full_output=reset_full_output
             )
             reset_full_output = False  # only reset once
 
@@ -382,7 +382,7 @@ class CodeExecution(Tool):
             return None
         
         full_output, _ = await self.state.shells[session].session.read_output(
-            timeout=1, reset_full_output=reset_full_output
+            timeout=Timeouts.TTY_READ_TIMEOUT, reset_full_output=reset_full_output
         )
         truncated_output = self.fix_full_output(full_output)
         self.set_progress(truncated_output)
