@@ -6,9 +6,93 @@ const model = {
   paused: false,
   isSending: false,
 
+  // Dynamic placeholder system
+  placeholderIndex: 0,
+  placeholderText: "Type your message here...",
+  placeholderTyping: false,
+  placeholderInterval: null,
+
+  // Rotating placeholder messages - mix of helpful hints and personality
+  placeholderMessages: [
+    "Type your message here...",
+    "Ask me anything...",
+    "What would you like to explore?",
+    "Press Ctrl+Shift+F for fullscreen input ✨",
+    "Drop files or click the paperclip to attach 📎",
+    "Press Enter to send, Shift+Enter for new line",
+    "How can I help you today?",
+    "Try asking about code, analysis, or creative tasks...",
+  ],
+
   init() {
     console.log("Input store initialized");
     // Event listeners are now handled via Alpine directives in the component
+    this.startPlaceholderRotation();
+  },
+
+  // Start the placeholder rotation cycle
+  startPlaceholderRotation() {
+    // Rotate every 6 seconds
+    this.placeholderInterval = setInterval(() => {
+      this.cyclePlaceholder();
+    }, 6000);
+  },
+
+  // Stop the placeholder rotation (cleanup)
+  stopPlaceholderRotation() {
+    if (this.placeholderInterval) {
+      clearInterval(this.placeholderInterval);
+      this.placeholderInterval = null;
+    }
+  },
+
+  // Cycle to the next placeholder with typing animation effect
+  async cyclePlaceholder() {
+    // Don't cycle if user is typing or input has content
+    const chatInput = document.getElementById("chat-input");
+    if (chatInput && chatInput.value.trim().length > 0) {
+      return;
+    }
+
+    this.placeholderTyping = true;
+
+    // Fade out effect
+    await this.animatePlaceholderChange();
+
+    // Move to next message
+    this.placeholderIndex = (this.placeholderIndex + 1) % this.placeholderMessages.length;
+    this.placeholderText = this.placeholderMessages[this.placeholderIndex];
+
+    this.placeholderTyping = false;
+  },
+
+  // Animate placeholder change with typewriter effect
+  animatePlaceholderChange() {
+    return new Promise((resolve) => {
+      const chatInput = document.getElementById("chat-input");
+      if (!chatInput) {
+        resolve();
+        return;
+      }
+
+      // Check for reduced motion preference
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      if (prefersReducedMotion) {
+        // Instant change for accessibility
+        resolve();
+        return;
+      }
+
+      // Subtle fade transition
+      chatInput.style.transition = 'opacity 0.2s ease';
+      chatInput.style.opacity = '0.7';
+
+      setTimeout(() => {
+        chatInput.style.opacity = '1';
+        setTimeout(resolve, 200);
+      }, 200);
+    });
   },
 
   async sendMessage() {

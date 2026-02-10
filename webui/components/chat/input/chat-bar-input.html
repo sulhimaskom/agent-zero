@@ -32,9 +32,14 @@
 
         <!-- Container for textarea and expand button -->
         <div id="chat-input-container" style="position: relative;" x-data="{ showExpandTooltip: false }">
-            <textarea id="chat-input" placeholder="Type your message here..." rows="1"
-+                     @keydown.enter="if (!$event.shiftKey && !$event.isComposing && $event.keyCode !== 229) { $event.preventDefault(); $store.chatInput.sendMessage(); }"
-                      @input="$store.chatInput.adjustTextareaHeight()"></textarea>
+            <textarea id="chat-input" 
+                      :placeholder="$store.chatInput.placeholderText"
+                      :class="{ 'placeholder-typing': $store.chatInput.placeholderTyping }"
+                      rows="1"
+                      @keydown.enter="if (!$event.shiftKey && !$event.isComposing && $event.keyCode !== 229) { $event.preventDefault(); $store.chatInput.sendMessage(); }"
+                      @input="$store.chatInput.adjustTextareaHeight()"
+                      @focus="$store.chatInput.stopPlaceholderRotation()"
+                      @blur="$store.chatInput.startPlaceholderRotation()"></textarea>
             <button id="expand-button" 
                     @click="$store.fullScreenInputModal.openModal()" 
                     aria-label="Expand input for easier editing (Ctrl+Shift+F)"
@@ -154,7 +159,14 @@
     #chat-input::-webkit-scrollbar-thumb { background-color: rgba(155,155,155,0.5); border-radius: 6px; -webkit-transition: background-color 0.2s ease; transition: background-color 0.2s ease; }
     #chat-input::-webkit-scrollbar-thumb:hover { background-color: rgba(155,155,155,0.7); }
     #chat-input:focus { outline: 0.05rem solid rgba(155,155,155,0.5); font-size: 0.955rem; padding-top: 0.45rem; background-color: var(--color-input-focus); }
-    #chat-input::placeholder { color: var(--color-text-muted); opacity: 0.7; }
+    #chat-input::placeholder { 
+      color: var(--color-text-muted); 
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+    }
+    #chat-input.placeholder-typing::placeholder {
+      opacity: 0.4;
+    }
 
     #expand-button { position: absolute; top: 12px; right: 10px; background: transparent; border: none; cursor: pointer; font-size: 1.2rem; color: var(--color-text); opacity: 0.4; transition: opacity 0.2s; }
     #expand-button:hover { opacity: 0.7; }
