@@ -1,13 +1,10 @@
-import asyncio
-import os
-import sys
-import platform
-import errno
-from python.helpers.constants import Limits, Shell, Timeouts
+import asyncio, os, sys, platform, errno
+from python.helpers.constants import Limits
 
 _IS_WIN = platform.system() == "Windows"
 if _IS_WIN:
     import winpty  # pip install pywinpty # type: ignore
+    import msvcrt
 
 
 #  Make stdin / stdout tolerant to broken UTF-8 so input() never aborts
@@ -153,10 +150,7 @@ class TTYSession:
 
 
 async def _spawn_posix_pty(cmd, cwd, env, echo):
-    import pty
-    import asyncio
-    import os
-    import termios
+    import pty, asyncio, os, termios
 
     master, slave = pty.openpty()
 
@@ -279,13 +273,13 @@ async def _spawn_winpty(cmd, cwd, env, echo):
 if __name__ == "__main__":
 
     async def interactive_shell():
-        shell_cmd, prompt_hint = (Shell.SHELL_POWERSHELL, ">") if _IS_WIN else (Shell.SHELL_BASH, "$")
+        shell_cmd, prompt_hint = ("powershell.exe", ">") if _IS_WIN else ("/bin/bash", "$")
 
         # echo=False → suppress the shell’s own echo of commands
         term = TTYSession(shell_cmd)
         await term.start()
 
-        timeout = Timeouts.TTY_READ_TIMEOUT
+        timeout = 1.0
 
         print(f"Connected to {shell_cmd}.")
         print("Type commands for the shell.")

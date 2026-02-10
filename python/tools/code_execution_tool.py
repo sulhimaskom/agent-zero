@@ -9,7 +9,7 @@ from python.helpers.shell_local import LocalInteractiveSession
 from python.helpers.shell_ssh import SSHInteractiveSession
 from python.helpers.strings import truncate_text as truncate_text_string
 from python.helpers.messages import truncate_text as truncate_text_agent
-from python.helpers.constants import Timeouts, Colors, Paths
+from python.helpers.constants import Timeouts, Colors, Paths, Limits
 import re
 
 # Timeouts for python, nodejs, and terminal runtimes.
@@ -235,10 +235,10 @@ class CodeExecution(Tool):
         self,
         session=0,
         reset_full_output=True,
-        first_output_timeout=30,  # Wait up to x seconds for first output
-        between_output_timeout=15,  # Wait up to x seconds between outputs
-        dialog_timeout=5,  # potential dialog detection timeout
-        max_exec_timeout=180,  # hard cap on total runtime
+        first_output_timeout=Timeouts.CODE_EXEC_FIRST_OUTPUT,  # Wait up to x seconds for first output
+        between_output_timeout=Timeouts.CODE_EXEC_BETWEEN_OUTPUT,  # Wait up to x seconds between outputs
+        dialog_timeout=Timeouts.CODE_EXEC_DIALOG,  # potential dialog detection timeout
+        max_exec_timeout=Timeouts.CODE_EXEC_MAX,  # hard cap on total runtime
         sleep_time=0.1,
         prefix="",
         timeouts: dict | None = None,
@@ -468,7 +468,7 @@ class CodeExecution(Tool):
         output = re.sub(r"(?<!\\)\\x[0-9A-Fa-f]{2}", "", output)
         # Strip every line of output before truncation
         # output = "\n".join(line.strip() for line in output.splitlines())
-        output = truncate_text_agent(agent=self.agent, output=output, threshold=1000000) # ~1MB, larger outputs should be dumped to file, not read from terminal
+        output = truncate_text_agent(agent=self.agent, output=output, threshold=Limits.OUTPUT_TRUNCATION_THRESHOLD) # ~1MB, larger outputs should be dumped to file, not read from terminal
         return output
 
     def get_cwd(self):
