@@ -1,5 +1,6 @@
 from python.helpers.api import ApiHandler, Request, Response
 from python.helpers import dotenv, runtime
+from python.helpers.constants import Network, Timeouts
 import requests
 
 
@@ -12,13 +13,17 @@ async def process(input: dict) -> dict | Response:
     tunnel_api_port = (
         runtime.get_arg("tunnel_api_port")
         or int(dotenv.get_dotenv_value("TUNNEL_API_PORT", 0))
-        or 55520
+        or Network.TUNNEL_API_PORT_FALLBACK
     )
 
     # first verify the service is running:
     service_ok = False
     try:
-        response = requests.post(f"http://localhost:{tunnel_api_port}/", json={"action": "health"})
+        response = requests.post(
+            f"http://{Network.DEFAULT_HOSTNAME}:{tunnel_api_port}/",
+            json={"action": "health"},
+            timeout=Timeouts.HTTP_CLIENT_DEFAULT_TIMEOUT
+        )
         if response.status_code == 200:
             service_ok = True
     except Exception:
@@ -27,7 +32,11 @@ async def process(input: dict) -> dict | Response:
     # forward this request to the tunnel service if OK
     if service_ok:
         try:
-            response = requests.post(f"http://localhost:{tunnel_api_port}/", json=input)
+            response = requests.post(
+                f"http://{Network.DEFAULT_HOSTNAME}:{tunnel_api_port}/",
+                json=input,
+                timeout=Timeouts.HTTP_CLIENT_DEFAULT_TIMEOUT
+            )
             return response.json()
         except Exception as e:
             return {"error": str(e)}

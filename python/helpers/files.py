@@ -11,6 +11,7 @@ import zipfile
 import glob
 import mimetypes
 from python.helpers.strings import sanitize_string
+from python.helpers.constants import Limits
 
 
 class VariablesPlugin(ABC):
@@ -506,7 +507,7 @@ def safe_file_name(filename: str) -> str:
 
 
 def read_text_files_in_dir(
-    dir_path: str, max_size: int = 1024 * 1024
+    dir_path: str, max_size: int = Limits.FILE_READ_MAX_SIZE
 ) -> dict[str, str]:
 
     abs_path = get_abs_path(dir_path)

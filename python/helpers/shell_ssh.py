@@ -5,7 +5,7 @@ import re
 from typing import Tuple
 from python.helpers.log import Log
 from python.helpers.print_style import PrintStyle
-from python.helpers.constants import Shell, Timeouts
+from python.helpers.constants import Shell, Timeouts, Limits
 # from python.helpers.strings import calculate_valid_match_lengths
 
 
@@ -61,7 +61,7 @@ class SSHInteractiveSession:
                 # ----------------------------------------------------------------
 
                 # invoke interactive shell
-                self.shell = self.client.invoke_shell(width=100, height=50)
+                self.shell = self.client.invoke_shell(width=Limits.SSH_SHELL_WIDTH, height=Limits.SSH_SHELL_HEIGHT)
 
                 # disable systemd/OSC prompt metadata and disable local echo
                 initial_command = Shell.SSH_INIT_COMMAND

@@ -5,6 +5,7 @@ import aiohttp
 import json
 
 from python.helpers.vector_db import VectorDB
+from python.helpers.constants import Limits
 
 os.environ["USER_AGENT"] = "@mixedbread-ai/unstructured"  # noqa E402
 from langchain_unstructured import UnstructuredLoader  # noqa E402
@@ -23,7 +24,7 @@ from langchain.schema import SystemMessage, HumanMessage
 
 from python.helpers.print_style import PrintStyle
 from python.helpers import files, errors
-from python.helpers.constants import Limits, Timeouts
+from python.helpers.constants import Timeouts
 from agent import Agent
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -398,7 +399,7 @@ class DocumentQueryHelper:
 
             chunks = await self.store.search_documents(
                 query=optimized_query,
-                limit=100,
+                limit=Limits.DOCUMENT_MAX_LIMIT,
                 threshold=DEFAULT_SEARCH_THRESHOLD,
                 filter=doc_filter,
             )
