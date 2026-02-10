@@ -19,8 +19,9 @@ search:
     # - html
 
 server:
-  # Is overwritten by ${SEARXNG_SECRET}
-  secret_key: "dummy"
+  # IMPORTANT: Set SEARXNG_SECRET environment variable in production
+  # This default is for development only and should NEVER be used in production
+  secret_key: "${SEARXNG_SECRET:-CHANGE_ME_IN_PRODUCTION}"
   port: 55510
   limiter: false
   image_proxy: false

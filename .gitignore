@@ -1,19 +1,32 @@
 # Ignore common unwanted files globally
 **/.DS_Store
 **/.env
+**/.env.*
 **/__pycache__/
 *.py[cod]
 **/.conda/
+*.bak
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
 
 #Ignore IDE files
 .cursor/
 .windsurf/
+.vscode/
+.idea/
+*.sublime-*
 
 # ignore test files in root dir
 /*.test.py
 
 # Ignore all contents of the virtual environment directory
 .venv/
+venv/
+env/
+ENV/
 
 # Handle memory directory
 memory/**
@@ -52,3 +65,23 @@ agent_history.gif
 # Worktrees directory for isolated development
 .worktrees/
 brocula_check_*.py
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Docker
+.dockerignore
