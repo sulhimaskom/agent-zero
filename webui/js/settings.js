@@ -591,3 +591,6 @@ function showToast(message, type = 'info') {
         return null;
     }
 }
+
+// Export to global scope for Alpine.js x-data access
+globalThis.settingsModalProxy = settingsModalProxy;

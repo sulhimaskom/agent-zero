@@ -22,7 +22,23 @@
              x-effect="(() => { const c = bootstrap.Collapse.getOrCreateInstance($el, { toggle: false }); $store.sidebar.isSectionOpen('tasks') ? c.show() : c.hide(); })()">
           <div class="tasks-list-body">
           <div class="tasks-list-container" x-data>
-            <ul class="config-list tasks-config-list" x-show="$store.tasks.tasks.length > 0">
+            <!-- Skeleton Loading State -->
+            <div class="skeleton-container" x-show="$store.tasks.isLoading">
+              <div class="skeleton-item task-skeleton">
+                <div class="skeleton-ball"></div>
+                <div class="skeleton-text"></div>
+              </div>
+              <div class="skeleton-item task-skeleton">
+                <div class="skeleton-ball"></div>
+                <div class="skeleton-text"></div>
+              </div>
+              <div class="skeleton-item task-skeleton">
+                <div class="skeleton-ball"></div>
+                <div class="skeleton-text"></div>
+              </div>
+            </div>
+
+            <ul class="config-list tasks-config-list" x-show="!$store.tasks.isLoading && $store.tasks.tasks.length > 0">
               <template x-for="task in $store.tasks.tasks" :key="task.id">
                 <li>
                   <button class="task-container" :class="{'task-selected': task.id === $store.tasks.selected}" :aria-label="(task.task_name || `Task #${task.no}`) + ', State: ' + (task.state || 'idle')" @click="$store.tasks.selectTask(task.id)">
@@ -62,7 +78,7 @@
                 </li>
               </template>
             </ul>
-            <div class="empty-list-message" x-show="$store.tasks.tasks.length === 0">
+            <div class="empty-list-message" x-show="!$store.tasks.isLoading && $store.tasks.tasks.length === 0">
               <p><i>No tasks to list.</i></p>
             </div>
           </div>
@@ -196,6 +212,77 @@
   
     .empty-list-message { display: flex; justify-content: center; align-items: center; height: 100px; color: var(--color-secondary); text-align: center; opacity: 0.7; font-style: italic; }
     .light-mode .empty-list-message { color: var(--color-secondary-light); }
+
+    /* Skeleton Loading Styles */
+    .skeleton-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 8px;
+    }
+
+    .skeleton-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5em;
+      padding: 8px;
+      min-height: 40px;
+    }
+
+    .skeleton-item.task-skeleton {
+      min-height: 50px;
+    }
+
+    .skeleton-ball {
+      width: 0.6em;
+      height: 0.6em;
+      border-radius: 50%;
+      background: linear-gradient(90deg, var(--color-border) 25%, var(--color-background-hover) 50%, var(--color-border) 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s infinite;
+      flex-shrink: 0;
+    }
+
+    .skeleton-text {
+      height: 0.9rem;
+      border-radius: 4px;
+      background: linear-gradient(90deg, var(--color-border) 25%, var(--color-background-hover) 50%, var(--color-border) 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s infinite;
+      flex-grow: 1;
+      max-width: 80%;
+    }
+
+    @keyframes skeleton-shimmer {
+      0% {
+        background-position: 200% 0;
+      }
+      100% {
+        background-position: -200% 0;
+      }
+    }
+
+    /* Stagger skeleton animations for visual interest */
+    .skeleton-item:nth-child(1) .skeleton-ball,
+    .skeleton-item:nth-child(1) .skeleton-text {
+      animation-delay: 0s;
+    }
+    .skeleton-item:nth-child(2) .skeleton-ball,
+    .skeleton-item:nth-child(2) .skeleton-text {
+      animation-delay: 0.1s;
+    }
+    .skeleton-item:nth-child(3) .skeleton-ball,
+    .skeleton-item:nth-child(3) .skeleton-text {
+      animation-delay: 0.2s;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .skeleton-ball,
+      .skeleton-text {
+        animation: none;
+        background: var(--color-border);
+      }
+    }
   </style>
 </body>
 </html>
