@@ -1,8 +1,8 @@
 # AGENT ZERO PROJECT KNOWLEDGE BASE
 
 **Generated:** 2026-02-10
-**Commit:** 2a65199
 **Branch:** custom
+**Commit:** 2a65199
 
 ## OVERVIEW
 Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpine.js). Prompt-driven behavior - everything controlled by `/prompts/` markdown files. Grows organically through memory, tools, extensions, and agent profiles.
