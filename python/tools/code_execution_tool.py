@@ -9,7 +9,7 @@ from python.helpers.shell_local import LocalInteractiveSession
 from python.helpers.shell_ssh import SSHInteractiveSession
 from python.helpers.strings import truncate_text as truncate_text_string
 from python.helpers.messages import truncate_text as truncate_text_agent
-from python.helpers.constants import Timeouts, Colors, Paths, Shell
+from python.helpers.constants import Timeouts, Colors, Paths
 import re
 
 # Timeouts for python, nodejs, and terminal runtimes.

@@ -24,7 +24,7 @@ from langchain.schema import SystemMessage, HumanMessage
 
 from python.helpers.print_style import PrintStyle
 from python.helpers import files, errors
-from python.helpers.constants import Limits, Timeouts
+from python.helpers.constants import Timeouts
 from agent import Agent
 
 from langchain.text_splitter import RecursiveCharacterTextSplitter
