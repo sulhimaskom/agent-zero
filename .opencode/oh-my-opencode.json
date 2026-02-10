@@ -49,7 +49,6 @@
     "debugging": {
       "model": "opencode/minimax-m2.1-free",
       "description": "Debugging and problem-solving tasks"
->>>>>>> main
     }
   },
   "mcpServers": {
