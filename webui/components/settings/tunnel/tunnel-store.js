@@ -42,6 +42,12 @@ const model = {
   },
 
   async checkTunnelStatus() {
+    // Skip if fetchApi is not available yet (index.js not loaded)
+    if (typeof fetchApi === 'undefined') {
+      console.log('fetchApi not available yet, skipping tunnel status check');
+      return;
+    }
+    
     try {
       const response = await fetchApi("/tunnel_proxy", {
         method: "POST",

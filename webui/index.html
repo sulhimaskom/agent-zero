@@ -71,6 +71,18 @@
                 selectedTaskForDetail: null,
                 attachmentsText: '',
                 filteredTasks: [],
+                // Helper methods to prevent errors during initialization
+                formatProjectName(project) {
+                    return project || 'No project';
+                },
+                formatProjectLabel(project) {
+                    return `Project: ${this.formatProjectName(project)}`;
+                },
+                extractTaskProject(task) {
+                    if (!task) return null;
+                    const slug = task.project_name || null;
+                    return slug;
+                },
                 // Minimal init to avoid errors
                 init() {
                     console.log('Basic schedulerSettings initialized');
@@ -127,7 +139,7 @@
     <link rel="manifest" href="js/manifest.json">
 
     <!-- Non-module scripts after Alpine.js -->
-    <script type="text/javascript" src="js/settings.js"></script>
+    <script type="module" src="js/settings.js"></script>
     <script>
         // Expose git info for sidebar component
         globalThis.gitinfo = { version: "{{version_no}}", commit_time: "{{version_time}}" };
