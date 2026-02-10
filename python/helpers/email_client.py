@@ -38,7 +38,7 @@ class EmailClient:
         self,
         account_type: str = "imap",
         server: str = "",
-        port: int = 993,
+        port: int = Limits.IMAP_DEFAULT_PORT,
         username: str = "",
         password: str = "",
         options: Optional[Dict[str, Any]] = None,
@@ -535,7 +535,7 @@ class EmailClient:
 async def read_messages(
     account_type: str = "imap",
     server: str = "",
-    port: int = 993,
+    port: int = Limits.IMAP_DEFAULT_PORT,
     username: str = "",
     password: str = "",
     download_folder: str = "tmp/email",

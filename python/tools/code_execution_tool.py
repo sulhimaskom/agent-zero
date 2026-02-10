@@ -9,7 +9,7 @@ from python.helpers.shell_local import LocalInteractiveSession
 from python.helpers.shell_ssh import SSHInteractiveSession
 from python.helpers.strings import truncate_text as truncate_text_string
 from python.helpers.messages import truncate_text as truncate_text_agent
-from python.helpers.constants import Timeouts, Colors, Paths
+from python.helpers.constants import Timeouts, Colors, Paths, Shell
 import re
 
 # Timeouts for python, nodejs, and terminal runtimes.
@@ -267,7 +267,7 @@ class CodeExecution(Tool):
         while True:
             await asyncio.sleep(sleep_time)
             full_output, partial_output = await self.state.shells[session].session.read_output(
-                timeout=1, reset_full_output=reset_full_output
+                timeout=Timeouts.TTY_READ_TIMEOUT, reset_full_output=reset_full_output
             )
             reset_full_output = False  # only reset once
 
@@ -382,7 +382,7 @@ class CodeExecution(Tool):
             return None
         
         full_output, _ = await self.state.shells[session].session.read_output(
-            timeout=1, reset_full_output=reset_full_output
+            timeout=Timeouts.TTY_READ_TIMEOUT, reset_full_output=reset_full_output
         )
         truncated_output = self.fix_full_output(full_output)
         self.set_progress(truncated_output)

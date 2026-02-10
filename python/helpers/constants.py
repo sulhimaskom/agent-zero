@@ -191,6 +191,7 @@ class Limits:
     
     # File browser limits
     FILE_BROWSER_MAX_FILE_SIZE: Final[int] = 100 * 1024 * 1024  # 100MB
+    FILE_READ_MAX_SIZE: Final[int] = 1024 * 1024  # 1MB
     
     # Project file structure limits
     PROJECT_MAX_DEPTH: Final[int] = 5
@@ -300,6 +301,7 @@ class Network:
     TUNNEL_API_PORT_DEFAULT: Final[int] = 55520
     TUNNEL_API_PORT_FALLBACK: Final[int] = 55520
     SEARXNG_PORT_DEFAULT: Final[int] = 55510
+    TUNNEL_DEFAULT_PORT: Final[int] = 80
     
     # CORS allowed origins (development)
     DEV_CORS_ORIGINS: Final[list[str]] = [
