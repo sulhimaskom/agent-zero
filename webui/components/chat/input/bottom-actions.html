@@ -12,7 +12,8 @@
       <div class="text-buttons-row">
         <!-- Pause/Resume Agent button with tooltip -->
         <div class="button-wrapper" x-data="{ showTooltip: false }">
-            <button class="text-button" 
+            <button class="text-button"
+                    data-keyboard-shortcut="ctrl+space"
                     @click="$store.chatInput.pauseAgent(!$store.chatInput.paused)"
                     @mouseover="showTooltip = true"
                     @mouseleave="showTooltip = false"
@@ -30,12 +31,16 @@
                 </template>
                 <span x-text="$store.chatInput.paused ? 'Resume Agent' : 'Pause Agent'"></span>
             </button>
-            <div x-show="showTooltip" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-1" class="tooltip" x-text="$store.chatInput.paused ? 'Resume the agent to continue processing' : 'Pause the agent to stop processing'"></div>
+            <div x-show="showTooltip" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-1" class="tooltip">
+                <span x-text="$store.chatInput.paused ? 'Resume the agent to continue processing' : 'Pause the agent to stop processing'"></span>
+                <span class="tooltip-shortcut">Ctrl+Space</span>
+            </div>
         </div>
 
         <!-- Import Knowledge button with tooltip -->
         <div class="button-wrapper" x-data="{ showTooltip: false }">
-            <button class="text-button" 
+            <button class="text-button"
+                    data-keyboard-shortcut="ctrl+k"
                     @click="$store.chatInput.loadKnowledge()"
                     @mouseover="showTooltip = true"
                     @mouseleave="showTooltip = false"
@@ -46,12 +51,16 @@
                 </svg>
                 <p>Import knowledge</p>
             </button>
-            <div x-show="showTooltip" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-1" class="tooltip">Import documents into the knowledge base</div>
+            <div x-show="showTooltip" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-1" class="tooltip">
+                <span>Import documents into the knowledge base</span>
+                <span class="tooltip-shortcut">Ctrl+K</span>
+            </div>
         </div>
 
         <!-- Files button with tooltip -->
         <div class="button-wrapper" x-data="{ showTooltip: false }">
-            <button class="text-button" id="work_dir_browser" 
+            <button class="text-button" id="work_dir_browser"
+                    data-keyboard-shortcut="ctrl+o"
                     @click="$store.chatInput.browseFiles()"
                     @mouseover="showTooltip = true"
                     @mouseleave="showTooltip = false"
@@ -63,12 +72,16 @@
                 </svg>
                 <p>Files</p>
             </button>
-            <div x-show="showTooltip" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-1" class="tooltip">Browse and manage files in the workspace</div>
+            <div x-show="showTooltip" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-1" class="tooltip">
+                <span>Browse and manage files in the workspace</span>
+                <span class="tooltip-shortcut">Ctrl+O</span>
+            </div>
         </div>
 
         <!-- History button with tooltip -->
         <div class="button-wrapper" x-data="{ showTooltip: false }">
-            <button class="text-button" id="history_inspect" 
+            <button class="text-button" id="history_inspect"
+                    data-keyboard-shortcut="ctrl+h"
                     @click="$store.history.open()"
                     @mouseover="showTooltip = true"
                     @mouseleave="showTooltip = false"
@@ -79,12 +92,16 @@
                 </svg>
                 <p>History</p>
             </button>
-            <div x-show="showTooltip" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-1" class="tooltip">View conversation history and past messages</div>
+            <div x-show="showTooltip" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-1" class="tooltip">
+                <span>View conversation history and past messages</span>
+                <span class="tooltip-shortcut">Ctrl+H</span>
+            </div>
         </div>
 
         <!-- Context button with tooltip -->
         <div class="button-wrapper" x-data="{ showTooltip: false }">
-            <button class="text-button" id="ctx_window" 
+            <button class="text-button" id="ctx_window"
+                    data-keyboard-shortcut="ctrl+shift+c"
                     @click="$store.context.open()"
                     @mouseover="showTooltip = true"
                     @mouseleave="showTooltip = false"
@@ -97,12 +114,16 @@
                 </svg>
                 <p>Context</p>
             </button>
-            <div x-show="showTooltip" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-1" class="tooltip">Manage conversation context and settings</div>
+            <div x-show="showTooltip" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-1" class="tooltip">
+                <span>Manage conversation context and settings</span>
+                <span class="tooltip-shortcut">Ctrl+Shift+C</span>
+            </div>
         </div>
 
         <!-- Nudge button with tooltip -->
         <div class="button-wrapper" x-data="{ showTooltip: false }">
-            <button class="text-button" id="nudges_window" 
+            <button class="text-button" id="nudges_window"
+                    data-keyboard-shortcut="ctrl+n"
                     @click="$store.chatInput.nudge()"
                     @mouseover="showTooltip = true"
                     @mouseleave="showTooltip = false"
@@ -114,7 +135,10 @@
                 </svg>
                 <p>Nudge</p>
             </button>
-            <div x-show="showTooltip" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-1" class="tooltip">Send a nudge to get the agent's attention</div>
+            <div x-show="showTooltip" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-1" class="tooltip">
+                <span>Send a nudge to get the agent's attention</span>
+                <span class="tooltip-shortcut">Ctrl+N</span>
+            </div>
         </div>
       </div>
     </template>
@@ -133,30 +157,49 @@
         .text-button p { margin-block: 0; }
         
         /* Tooltip styles */
-        .button-wrapper .tooltip { 
-            position: absolute; 
-            bottom: 100%; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            padding: 8px 12px; 
-            background-color: var(--color-secondary); 
-            color: var(--color-text); 
-            border-radius: 6px; 
-            font-size: 12px; 
-            white-space: nowrap; 
-            z-index: 1002; 
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); 
-            margin-bottom: 8px; 
-            pointer-events: none; 
+        .button-wrapper .tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 8px 12px;
+            background-color: var(--color-secondary);
+            color: var(--color-text);
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 1002;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            margin-bottom: 8px;
+            pointer-events: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
-        .button-wrapper .tooltip::after { 
-            content: ''; 
-            position: absolute; 
-            top: 100%; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            border: 6px solid transparent; 
-            border-top-color: var(--color-secondary); 
+        .button-wrapper .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: var(--color-secondary);
+        }
+
+        /* Keyboard shortcut badge in tooltip */
+        .tooltip-shortcut {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 6px;
+            background-color: var(--color-panel);
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            font-size: 10px;
+            font-family: monospace;
+            font-weight: 600;
+            color: var(--color-highlight);
+            letter-spacing: 0.5px;
+            box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
         }
 
         @media (max-width: 768px) { .text-buttons-row { width: 90%; display: flex; padding-top: var(--spacing-xs); gap: var(--spacing-xs); white-space: pre-wrap; } .text-button { font-size: 0.6rem; } .text-button svg { width: 18px; height: 18px; flex-shrink: 0; } }
