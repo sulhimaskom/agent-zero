@@ -14,7 +14,7 @@ from bs4 import BeautifulSoup
 from imapclient import IMAPClient
 
 from python.helpers import files
-from python.helpers.constants import Limits
+from python.helpers.constants import Limits, Timeouts
 from python.helpers.errors import RepairableException, format_error
 from python.helpers.print_style import PrintStyle
 
@@ -38,7 +38,7 @@ class EmailClient:
         self,
         account_type: str = "imap",
         server: str = "",
-        port: int = 993,
+        port: int = Limits.IMAP_DEFAULT_PORT,
         username: str = "",
         password: str = "",
         options: Optional[Dict[str, Any]] = None,
@@ -65,7 +65,7 @@ class EmailClient:
 
         # Default options
         self.ssl = self.options.get("ssl", True)
-        self.timeout = self.options.get("timeout", 30)
+        self.timeout = self.options.get("timeout", Timeouts.EMAIL_CONNECTION_TIMEOUT)
 
         self.client: Optional[IMAPClient] = None
         self.exchange_account = None
@@ -535,7 +535,7 @@ class EmailClient:
 async def read_messages(
     account_type: str = "imap",
     server: str = "",
-    port: int = 993,
+    port: int = Limits.IMAP_DEFAULT_PORT,
     username: str = "",
     password: str = "",
     download_folder: str = "tmp/email",
