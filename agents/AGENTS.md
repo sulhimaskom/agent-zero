@@ -14,6 +14,10 @@ agents/
 │   ├── prompts/          # Override framework prompts
 │   ├── tools/            # Override default tools
 │   └── extensions/       # Override lifecycle extensions
+├── brocula/             # Browser console & Lighthouse specialist
+│   ├── prompts/          # BroCula system prompts
+│   ├── tools/            # Browser monitoring tools
+│   └── mcp-servers.json  # MCP server configuration
 ├── developer/           # Developer personality
 │   ├── prompts/
 │   ├── tools/

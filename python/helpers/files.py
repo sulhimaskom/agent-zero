@@ -10,6 +10,7 @@ from typing import Any
 import zipfile
 import glob
 import mimetypes
+from python.helpers.strings import sanitize_string
 
 
 class VariablesPlugin(ABC):
@@ -70,9 +71,6 @@ def load_plugin_variables(
         #     if cls[1] is not VariablesPlugin and issubclass(cls[1], VariablesPlugin):
         #         return cls[1]().get_variables()  # type: ignore
     return {}
-
-
-from python.helpers.strings import sanitize_string
 
 
 def parse_file(

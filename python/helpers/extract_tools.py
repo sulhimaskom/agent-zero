@@ -18,7 +18,8 @@ def json_parse_dirty(json:str) -> dict[str,Any] | None:
     if ext_json:
         try:
             data = DirtyJson.parse_string(ext_json)
-            if isinstance(data,dict): return data
+            if isinstance(data,dict):
+                return data
         except Exception:
             # If parsing fails, return None instead of crashing
             return None

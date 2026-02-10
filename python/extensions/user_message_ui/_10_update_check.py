@@ -2,7 +2,6 @@ from python.helpers import notification
 from python.helpers.extension import Extension
 from agent import LoopData
 from python.helpers import settings, update_check
-from python.helpers.constants import Timeouts
 import datetime
 
 

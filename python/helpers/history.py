@@ -162,6 +162,11 @@ class Topic(Record):
         self._tokens = None
         return self.summary
 
+    def set_summary(self, summary: str):
+        """Set the summary and invalidate the token cache."""
+        self.summary = summary
+        self._tokens = None
+
     async def compress_large_messages(self) -> bool:
         set = settings.get_settings()
         msg_max_size = (
@@ -288,6 +293,11 @@ class Bulk(Record):
         )
         self._tokens = None
         return self.summary
+
+    def set_summary(self, summary: str):
+        """Set the summary and invalidate the token cache."""
+        self.summary = summary
+        self._tokens = None
 
     def to_dict(self):
         return {

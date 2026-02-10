@@ -23,6 +23,11 @@
     "Frontend": {
       "model": "opencode/kimi-k2.5-free",
       "temperature": 0.4
+    },
+    "BroCula": {
+      "model": "opencode/kimi-k2.5-free",
+      "temperature": 0.2,
+      "description": "Browser console monitoring and Lighthouse optimization specialist"
     }
   },
   "mcpServers": {
@@ -30,7 +35,9 @@
     "servers": [
       "exa",
       "context7",
-      "grep_app"
+      "grep_app",
+      "playwright",
+      "chrome-devtools"
     ]
   },
   "hooks": {
