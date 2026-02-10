@@ -46,8 +46,11 @@ instruments/**
 # for browser-use
 agent_history.gif
 
-# Opencode AI agent
-.opencode/
+# Opencode AI agent - Ignore generated files only
+.opencode/node_modules/
+.opencode/bun.lock
+.opencode/package.json
+.opencode/.gitignore
 
 # Worktrees directory for isolated development
 .worktrees/
