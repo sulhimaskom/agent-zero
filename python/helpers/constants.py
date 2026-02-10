@@ -60,6 +60,10 @@ class Timeouts:
     # Notification default lifetime (hours)
     NOTIFICATION_LIFETIME_HOURS: Final[int] = 24
     
+    # Update check cooldowns
+    UPDATE_CHECK_COOLDOWN_SECONDS: Final[int] = 60
+    UPDATE_NOTIFICATION_COOLDOWN_SECONDS: Final[int] = 86400  # 24 hours
+    
     # MCP timeouts
     MCP_CLIENT_INIT_TIMEOUT: Final[int] = 10
     MCP_CLIENT_TOOL_TIMEOUT: Final[int] = 120
@@ -71,6 +75,10 @@ class Timeouts:
     
     # File browser timeout
     FILE_BROWSER_TIMEOUT: Final[int] = 30
+    
+    # Notification default timeouts
+    NOTIFICATION_DEFAULT_TIMEOUT: Final[int] = 30
+    NOTIFICATION_AGENT_TIMEOUT: Final[int] = 30
     
     # Docker operation delays
     DOCKER_INIT_DELAY: Final[int] = 5
@@ -179,6 +187,10 @@ class Limits:
     # Backup limits
     BACKUP_MAX_FILES_FULL: Final[int] = 50000
     BACKUP_MAX_FILES_PARTIAL: Final[int] = 10000
+    BACKUP_MAX_FILES_TEST: Final[int] = 1000
+    
+    # File browser limits
+    FILE_BROWSER_MAX_FILE_SIZE: Final[int] = 100 * 1024 * 1024  # 100MB
     
     # Project file structure limits
     PROJECT_MAX_DEPTH: Final[int] = 5
@@ -286,6 +298,7 @@ class Network:
     # Default ports
     WEB_UI_PORT_DEFAULT: Final[int] = 5000
     TUNNEL_API_PORT_DEFAULT: Final[int] = 55520
+    TUNNEL_API_PORT_FALLBACK: Final[int] = 55520
     SEARXNG_PORT_DEFAULT: Final[int] = 55510
     
     # CORS allowed origins (development)
