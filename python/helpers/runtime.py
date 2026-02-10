@@ -4,7 +4,7 @@ import secrets
 from pathlib import Path
 from typing import TypeVar, Callable, Awaitable, Union, overload, cast
 from python.helpers import dotenv, rfc, settings, files
-from python.helpers.constants import Network, Timeouts, Shell
+from python.helpers.constants import Network, Timeouts, Shell, Protocols
 import asyncio
 import threading
 import queue
@@ -135,7 +135,7 @@ def _get_rfc_url() -> str:
     set = settings.get_settings()
     url = set["rfc_url"]
     if "://" not in url:
-        url = "http://" + url
+        url = Protocols.HTTP + url
     if url.endswith("/"):
         url = url[:-1]
     url = url + ":" + str(set["rfc_port_http"])

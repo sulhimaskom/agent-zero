@@ -492,6 +492,54 @@ def get_env_str(key: str, default: str) -> str:
 
 
 # =============================================================================
+# PROTOCOL CONSTANTS
+# =============================================================================
+
+class Protocols:
+    """Protocol strings for URL construction"""
+    
+    HTTP: Final[str] = "http://"
+    HTTPS: Final[str] = "https://"
+
+
+# =============================================================================
+# TEMPORARY PATH PATTERNS (for backup and file operations)
+# =============================================================================
+
+class TmpPaths:
+    """Temporary path patterns used throughout the system"""
+    
+    # Individual files
+    SETTINGS_JSON: Final[str] = "tmp/settings.json"
+    SECRETS_ENV: Final[str] = "tmp/secrets.env"
+    
+    # Directory patterns (for glob matching)
+    CHATS_GLOB: Final[str] = "tmp/chats/**"
+    SCHEDULER_GLOB: Final[str] = "tmp/scheduler/**"
+    UPLOADS_GLOB: Final[str] = "tmp/uploads/**"
+
+
+# =============================================================================
+# INTERNAL PATH PREFIXES
+# =============================================================================
+
+class InternalPaths:
+    """Internal path prefixes for file mapping"""
+    
+    A0_TMP_UPLOADS: Final[str] = "/a0/tmp/uploads/"
+
+
+# =============================================================================
+# EXTERNAL URLS
+# =============================================================================
+
+class ExternalUrls:
+    """External URLs used in the application"""
+    
+    AGENT_ZERO_REPO: Final[str] = "https://github.com/frdel/agent-zero"
+
+
+# =============================================================================
 # ENVIRONMENT OVERRIDES
 # Allow overriding constants via environment variables
 # =============================================================================

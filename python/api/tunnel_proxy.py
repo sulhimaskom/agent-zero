@@ -1,6 +1,6 @@
 from python.helpers.api import ApiHandler, Request, Response
 from python.helpers import dotenv, runtime
-from python.helpers.constants import Network, Timeouts
+from python.helpers.constants import Network, Timeouts, Protocols
 import requests
 
 
@@ -20,7 +20,7 @@ async def process(input: dict) -> dict | Response:
     service_ok = False
     try:
         response = requests.post(
-            f"http://{Network.DEFAULT_HOSTNAME}:{tunnel_api_port}/",
+            f"{Protocols.HTTP}{Network.DEFAULT_HOSTNAME}:{tunnel_api_port}/",
             json={"action": "health"},
             timeout=Timeouts.HTTP_CLIENT_DEFAULT_TIMEOUT
         )
@@ -33,7 +33,7 @@ async def process(input: dict) -> dict | Response:
     if service_ok:
         try:
             response = requests.post(
-                f"http://{Network.DEFAULT_HOSTNAME}:{tunnel_api_port}/",
+                f"{Protocols.HTTP}{Network.DEFAULT_HOSTNAME}:{tunnel_api_port}/",
                 json=input,
                 timeout=Timeouts.HTTP_CLIENT_DEFAULT_TIMEOUT
             )

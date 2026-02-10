@@ -7,6 +7,7 @@ import contextlib
 import threading
 
 from python.helpers import settings
+from python.helpers.constants import ExternalUrls
 from starlette.requests import Request
 
 # Local imports
@@ -231,7 +232,7 @@ class DynamicA2AProxy:
 
             provider: AgentProvider = {  # type: ignore
                 "organization": "Agent Zero",
-                "url": "https://github.com/frdel/agent-zero"
+                "url": ExternalUrls.AGENT_ZERO_REPO
             }
 
             # Create new FastA2A app with proper thread safety

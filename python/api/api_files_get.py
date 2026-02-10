@@ -3,7 +3,7 @@ import os
 from python.helpers.api import ApiHandler, Request, Response
 from python.helpers import files
 from python.helpers.print_style import PrintStyle
-from python.helpers.constants import Colors
+from python.helpers.constants import Colors, InternalPaths
 import json
 
 
@@ -48,9 +48,9 @@ class ApiFilesGet(ApiHandler):
             for path in paths:
                 try:
                     # Convert internal paths to external paths
-                    if path.startswith("/a0/tmp/uploads/"):
+                    if path.startswith(InternalPaths.A0_TMP_UPLOADS):
                         # Internal path - convert to external
-                        filename = path.replace("/a0/tmp/uploads/", "")
+                        filename = path.replace(InternalPaths.A0_TMP_UPLOADS, "")
                         external_path = files.get_abs_path("tmp/uploads", filename)
                         filename = os.path.basename(external_path)
                     elif path.startswith("/a0/"):

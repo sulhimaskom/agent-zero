@@ -219,3 +219,14 @@ export const CONTENT_TYPES = {
   TEXT: "text/plain",
   HTML: "text/html",
 };
+
+// =============================================================================
+// API ENDPOINTS
+// =============================================================================
+
+export const API_ENDPOINTS = {
+  // Settings endpoints
+  SETTINGS_GET: "/api/settings_get",
+  SETTINGS_SAVE: "/api/settings_save",
+  TEST_CONNECTION: "/api/test_connection",
+};
