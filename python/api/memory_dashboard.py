@@ -146,7 +146,7 @@ class MemoryDashboard(ApiHandler):
             memory_subdir = input.get("memory_subdir", "default")
             area_filter = input.get("area", "")  # Filter by memory area
             search_query = input.get("search", "")  # Full-text search query
-            limit = input.get("limit", 100)  # Number of results to return
+            limit = input.get("limit", Limits.DOCUMENT_MAX_LIMIT)  # Number of results to return from constants
             threshold = input.get("threshold", 0.6)  # Similarity threshold
 
             memory = await Memory.get_by_subdir(memory_subdir, preload_knowledge=False)

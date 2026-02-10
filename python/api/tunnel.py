@@ -1,6 +1,7 @@
 from python.helpers.api import ApiHandler, Request, Response
 from python.helpers import runtime
 from python.helpers.tunnel_manager import TunnelManager
+from python.helpers.constants import Timeouts
 
 class Tunnel(ApiHandler):
     async def process(self, input: dict, request: Request) -> dict | Response:
@@ -21,7 +22,7 @@ async def process(input: dict) -> dict | Response:
         if tunnel_url is None:
             # Add a little delay and check again - tunnel might be starting
             import time
-            time.sleep(2)
+            time.sleep(Timeouts.TUNNEL_CHECK_DELAY)
             tunnel_url = tunnel_manager.get_tunnel_url()
         
         return {

@@ -14,6 +14,7 @@ from bs4 import BeautifulSoup
 from imapclient import IMAPClient
 
 from python.helpers import files
+from python.helpers.constants import Limits
 from python.helpers.errors import RepairableException, format_error
 from python.helpers.print_style import PrintStyle
 

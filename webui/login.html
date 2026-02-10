@@ -9,22 +9,70 @@
 </head>
 <body>
     <div class="login-container">
-        <form class="login-form" method="POST" action="/login">
+        <form class="login-form" method="POST" action="/login" id="login-form">
             <img src="/public/splash.jpg" alt="Agent Zero Logo" class="logo">
             <h2>Agent Zero</h2>
             <div class="input-group">
                 <label for="username">Username</label>
-                <input type="text" id="username" name="username" required>
+                <input type="text" id="username" name="username" required autocomplete="username">
             </div>
             <div class="input-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
+                <input type="password" id="password" name="password" required autocomplete="current-password">
             </div>
-            <button type="submit">Login</button>
+            <button type="submit" id="login-button">
+                <span class="button-text">Login</span>
+                <span class="button-loader" aria-hidden="true">
+                    <svg class="spinner" viewBox="0 0 50 50" width="16" height="16">
+                        <circle class="spinner-track" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+                        <circle class="spinner-indicator" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+                    </svg>
+                </span>
+            </button>
             {% if error %}
-                <p class="error">{{ error }}</p>
+                <p class="error" role="alert">{{ error }}</p>
             {% endif %}
         </form>
     </div>
+
+    <script>
+        (function() {
+            const form = document.getElementById('login-form');
+            const button = document.getElementById('login-button');
+            const buttonText = button.querySelector('.button-text');
+
+            form.addEventListener('submit', function(e) {
+                // Prevent double submission
+                if (button.disabled) {
+                    e.preventDefault();
+                    return;
+                }
+
+                // Show loading state
+                button.disabled = true;
+                button.classList.add('loading');
+                buttonText.textContent = 'Logging in...';
+
+                // Disable inputs during submission
+                const inputs = form.querySelectorAll('input');
+                inputs.forEach(function(input) {
+                    input.disabled = true;
+                });
+            });
+
+            // Re-enable form if page is restored from bfcache
+            window.addEventListener('pageshow', function(e) {
+                if (e.persisted) {
+                    button.disabled = false;
+                    button.classList.remove('loading');
+                    buttonText.textContent = 'Login';
+                    const inputs = form.querySelectorAll('input');
+                    inputs.forEach(function(input) {
+                        input.disabled = false;
+                    });
+                }
+            });
+        })();
+    </script>
 </body>
 </html>

@@ -301,20 +301,22 @@ const model = {
       // Show restarting message
       await notificationStore.frontendInfo("Restarting...", "System Restart", 9999, "restart");
 
+      import { RETRY } from '../../../js/constants.js';
+
       let retries = 0;
-      const maxRetries = 240; // 60 seconds with 250ms interval
+      const maxRetries = RETRY.MAX_RETRIES; // From constants
 
       while (retries < maxRetries) {
         try {
           const resp = await sendJsonData("/health", {});
           // Server is back up
-          await new Promise((resolve) => setTimeout(resolve, 250));
+          await new Promise((resolve) => setTimeout(resolve, RETRY.INTERVAL_MS));
           await notificationStore.frontendSuccess("Restarted", "System Restart", 5, "restart");
           return;
         } catch (e) {
           // Server still down, keep waiting
           retries++;
-          await new Promise((resolve) => setTimeout(resolve, 250));
+          await new Promise((resolve) => setTimeout(resolve, RETRY.INTERVAL_MS));
         }
       }
 

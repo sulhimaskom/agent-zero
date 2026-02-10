@@ -1,5 +1,6 @@
 import { createStore } from "/js/AlpineStore.js";
 import * as Sleep from "/js/sleep.js";
+import { QR_CODE, TIMING } from "/js/constants.js";
 
 // define the model object holding data and functions
 const model = {
@@ -27,8 +28,8 @@ const model = {
       // Generate new QR code
       this.qrCodeInstance = new QRCode(qrContainer, {
         text: this.tunnelLink,
-        width: 128,
-        height: 128,
+        width: QR_CODE.WIDTH,
+        height: QR_CODE.HEIGHT,
         colorDark: "#000000",
         colorLight: "#ffffff",
         correctLevel: QRCode.CorrectLevel.M,
@@ -252,8 +253,8 @@ const model = {
         // The tunnel might still be starting up, check again after a delay
         this.loadingText = "Tunnel creation taking longer than expected...";
 
-        // Wait for 5 seconds and check if the tunnel is running
-        await new Promise((resolve) => setTimeout(resolve, 5000));
+        // Wait configured timeout and check if the tunnel is running
+        await new Promise((resolve) => setTimeout(resolve, TIMING.TUNNEL_STATUS_TIMEOUT));
 
         // Check if tunnel is running now
         try {

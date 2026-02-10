@@ -27,5 +27,6 @@ async def run():
     print("Reasoning: ", reasoning)
 
 
-import asyncio
-asyncio.run(run())
+if __name__ == "__main__":
+    import asyncio
+    asyncio.run(run())

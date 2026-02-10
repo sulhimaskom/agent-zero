@@ -30,6 +30,11 @@
       "model": "opencode/kimi-k2.5-free",
       "temperature": 0.4,
       "description": "UI/UX development specialist"
+    },
+    "BroCula": {
+      "model": "opencode/kimi-k2.5-free",
+      "temperature": 0.2,
+      "description": "Browser console monitoring and Lighthouse optimization specialist"
     }
   },
   "categories": {
@@ -44,6 +49,7 @@
     "debugging": {
       "model": "opencode/minimax-m2.1-free",
       "description": "Debugging and problem-solving tasks"
+>>>>>>> main
     }
   },
   "mcpServers": {
@@ -51,7 +57,9 @@
     "servers": [
       "exa",
       "context7",
-      "grep_app"
+      "grep_app",
+      "playwright",
+      "chrome-devtools"
     ]
   },
   "hooks": {
