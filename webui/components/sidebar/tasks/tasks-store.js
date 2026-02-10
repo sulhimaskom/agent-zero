@@ -5,6 +5,7 @@ import { store as chatsStore } from "/components/sidebar/chats/chats-store.js";
 const model = {
   tasks: [],
   selected: "",
+  isLoading: true,
 
   init() {
     // No-op: data is driven by poll() in index.js; this store provides a stable target
@@ -21,9 +22,11 @@ const model = {
       if (this.selected && !this.contains(this.selected)) {
         this.setSelected("");
       }
+      this.isLoading = false;
     } catch (e) {
       console.error("tasks-store.applyTasks failed", e);
       this.tasks = [];
+      this.isLoading = false;
     }
   },
 

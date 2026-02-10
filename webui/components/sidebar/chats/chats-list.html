@@ -11,7 +11,27 @@
     <template x-if="$store.chats">
       <div class="chats-list-container" x-data>
         <h3 class="section-header">Chats</h3>
-        <ul class="config-list chats-config-list" x-show="$store.chats.contexts.length > 0">
+        <!-- Skeleton Loading State -->
+        <div class="skeleton-container" x-show="$store.chats.isLoading">
+          <div class="skeleton-item">
+            <div class="skeleton-ball"></div>
+            <div class="skeleton-text"></div>
+          </div>
+          <div class="skeleton-item">
+            <div class="skeleton-ball"></div>
+            <div class="skeleton-text"></div>
+          </div>
+          <div class="skeleton-item">
+            <div class="skeleton-ball"></div>
+            <div class="skeleton-text"></div>
+          </div>
+          <div class="skeleton-item">
+            <div class="skeleton-ball"></div>
+            <div class="skeleton-text"></div>
+          </div>
+        </div>
+
+        <ul class="config-list chats-config-list" x-show="!$store.chats.isLoading && $store.chats.contexts.length > 0">
           <template x-for="context in $store.chats.contexts" :key="context.id">
             <li>
               <button :class="{'chat-container': true, 'chat-selected': context.id === $store.chats.selected}"
@@ -38,7 +58,7 @@
             </li>
           </template>
         </ul>
-        <div class="empty-list-message" x-show="$store.chats.contexts.length === 0">
+        <div class="empty-list-message" x-show="!$store.chats.isLoading && $store.chats.contexts.length === 0">
           <p><i>No chats to list.</i></p>
         </div>
       </div>
@@ -285,6 +305,77 @@
     /* .chat-list-button.font-bold::before { content: ""; position: absolute; left: 0; top: 0; height: 100%; width: 3px; background-color: var(--color-border); border-top-left-radius: 3px; border-bottom-left-radius: 3px; } */
     /* .light-mode .chat-list-button.font-bold { background-color: var(--color-border) 0.05; } */
     /* .light-mode .chat-list-button.font-bold::before { background-color: var(--color-border); } */
+
+    /* Skeleton Loading Styles */
+    .skeleton-container {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 8px;
+    }
+
+    .skeleton-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5em;
+      padding: 8px;
+      min-height: 40px;
+    }
+
+    .skeleton-ball {
+      width: 0.6em;
+      height: 0.6em;
+      border-radius: 50%;
+      background: linear-gradient(90deg, var(--color-border) 25%, var(--color-background-hover) 50%, var(--color-border) 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s infinite;
+      flex-shrink: 0;
+    }
+
+    .skeleton-text {
+      height: 0.9rem;
+      border-radius: 4px;
+      background: linear-gradient(90deg, var(--color-border) 25%, var(--color-background-hover) 50%, var(--color-border) 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s infinite;
+      flex-grow: 1;
+      max-width: 80%;
+    }
+
+    @keyframes skeleton-shimmer {
+      0% {
+        background-position: 200% 0;
+      }
+      100% {
+        background-position: -200% 0;
+      }
+    }
+
+    /* Stagger skeleton animations for visual interest */
+    .skeleton-item:nth-child(1) .skeleton-ball,
+    .skeleton-item:nth-child(1) .skeleton-text {
+      animation-delay: 0s;
+    }
+    .skeleton-item:nth-child(2) .skeleton-ball,
+    .skeleton-item:nth-child(2) .skeleton-text {
+      animation-delay: 0.1s;
+    }
+    .skeleton-item:nth-child(3) .skeleton-ball,
+    .skeleton-item:nth-child(3) .skeleton-text {
+      animation-delay: 0.2s;
+    }
+    .skeleton-item:nth-child(4) .skeleton-ball,
+    .skeleton-item:nth-child(4) .skeleton-text {
+      animation-delay: 0.3s;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .skeleton-ball,
+      .skeleton-text {
+        animation: none;
+        background: var(--color-border);
+      }
+    }
   </style>
 </body>
 
