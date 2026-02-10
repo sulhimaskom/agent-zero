@@ -165,25 +165,25 @@ def main():
             ret, stdout, stderr = run_command(lint_cmd)
             if ret != 0:
                 fatal_errors.append(f"Lint failed: {stderr or stdout}")
-                print(f"   ❌ Lint failed")
+                print("   ❌ Lint failed")
             else:
-                print(f"   ✅ Lint passed")
+                print("   ✅ Lint passed")
         
         if build_cmd:
             ret, stdout, stderr = run_command(build_cmd)
             if ret != 0:
                 fatal_errors.append(f"Build failed: {stderr or stdout}")
-                print(f"   ❌ Build failed")
+                print("   ❌ Build failed")
             else:
-                print(f"   ✅ Build passed")
+                print("   ✅ Build passed")
         
         if test_cmd:
             ret, stdout, stderr = run_command(test_cmd)
             if ret != 0:
                 fatal_errors.append(f"Tests failed: {stderr or stdout}")
-                print(f"   ❌ Tests failed")
+                print("   ❌ Tests failed")
             else:
-                print(f"   ✅ Tests passed")
+                print("   ✅ Tests passed")
         
         if fatal_errors:
             print("\n🚨 FATAL ERRORS FOUND:")

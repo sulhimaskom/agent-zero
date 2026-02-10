@@ -1,11 +1,7 @@
 import asyncio
-import json
-import subprocess
-from typing import Optional
 from python.helpers.tool import Tool, Response
-from python.helpers.print_style import PrintStyle
 from python.helpers.playwright import ensure_playwright_binary
-from playwright.async_api import async_playwright, Page
+from playwright.async_api import async_playwright
 
 class State:
     @staticmethod
