@@ -5,31 +5,31 @@ import nest_asyncio
 
 nest_asyncio.apply()
 
-from collections import OrderedDict
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Any, Awaitable, Coroutine, Dict
-from enum import Enum
-import os
-import models
+from collections import OrderedDict  # noqa: E402
+from dataclasses import dataclass, field  # noqa: E402
+from datetime import datetime, timezone  # noqa: E402
+from typing import Any, Awaitable, Coroutine, Dict  # noqa: E402
+from enum import Enum  # noqa: E402
+import os  # noqa: E402
+import models  # noqa: E402
 
-from python.helpers import files, errors, history, tokens, context as context_helper
-from python.helpers import dirty_json
-from python.helpers.print_style import PrintStyle
+from python.helpers import files, errors, history, tokens, context as context_helper  # noqa: E402
+from python.helpers import dirty_json  # noqa: E402
+from python.helpers.print_style import PrintStyle  # noqa: E402
 
-from langchain_core.prompts import (
+from langchain_core.prompts import (  # noqa: E402
     ChatPromptTemplate,
 )
-from langchain_core.messages import SystemMessage, BaseMessage
+from langchain_core.messages import SystemMessage, BaseMessage  # noqa: E402
 
-import python.helpers.log as Log
-from python.helpers.defer import DeferredTask
-from typing import Callable
-from python.helpers.localization import Localization
-from python.helpers.extension import call_extensions
-from python.helpers.errors import RepairableException
-from python.helpers.tool import Tool
-from python.coordinators import ToolCoordinator, HistoryCoordinator, StreamCoordinator
+import python.helpers.log as Log  # noqa: E402
+from python.helpers.defer import DeferredTask  # noqa: E402
+from typing import Callable  # noqa: E402
+from python.helpers.localization import Localization  # noqa: E402
+from python.helpers.extension import call_extensions  # noqa: E402
+from python.helpers.errors import RepairableException  # noqa: E402
+from python.helpers.tool import Tool  # noqa: E402
+from python.coordinators import ToolCoordinator, HistoryCoordinator, StreamCoordinator  # noqa: E402
 
 
 class AgentContextType(Enum):

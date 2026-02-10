@@ -5,8 +5,8 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import pytest
-from unittest.mock import Mock, AsyncMock, MagicMock, patch
-from python.coordinators.tool_coordinator import ToolCoordinator, IToolExecutor, ToolResult
+from unittest.mock import Mock, AsyncMock, patch
+from python.coordinators.tool_coordinator import ToolCoordinator, IToolExecutor
 from python.helpers.tool import Tool, Response
 
 
@@ -175,7 +175,7 @@ class TestToolCoordinator:
                 }
                 
                 # Act: Process tool with method
-                result = await tool_coordinator.process_tools(tool_with_method)
+                _ = await tool_coordinator.process_tools(tool_with_method)
                 
                 # Assert: Tool executed with method
                 assert mock_tool.method == "custom_method"
@@ -345,7 +345,7 @@ class TestToolCoordinator:
             mock_extract.load_classes_from_file.return_value = [mock_tool_class]
             
             # Act: Get tool with all parameters
-            result = tool_coordinator.get_tool(
+            _ = tool_coordinator.get_tool(
                 name="test_tool",
                 method="custom_method",
                 args={"param1": "value1"},

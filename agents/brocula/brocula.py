@@ -6,7 +6,6 @@ Local execution script for manual runs
 
 import subprocess
 import sys
-import os
 import json
 from datetime import datetime
 from pathlib import Path

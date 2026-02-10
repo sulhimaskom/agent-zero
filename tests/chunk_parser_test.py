@@ -1,4 +1,5 @@
-import sys, os
+import sys
+import os
 
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import models
@@ -7,7 +8,7 @@ ex1 = "<think>reasoning goes here</think>response goes here"
 ex2 = "<think>reasoning goes here</thi"
 
 
-import pytest
+import pytest  # noqa: E402
 
 
 @pytest.mark.parametrize("example", [ex1, ex2])
