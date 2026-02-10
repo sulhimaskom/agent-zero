@@ -1,5 +1,4 @@
 import pytest
-import asyncio
 from unittest.mock import MagicMock, patch
 from python.helpers.history import History, Topic, Bulk, Message
 

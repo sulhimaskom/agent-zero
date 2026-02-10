@@ -582,7 +582,7 @@ class AsyncAIChatReplacement:
         self.chat = AsyncAIChatReplacement._Chat(wrapper)
 
 
-from browser_use.llm import ChatOpenRouter, ChatGoogle
+from browser_use.llm import ChatOpenRouter, ChatGoogle  # noqa: E402
 
 class BrowserCompatibleChatWrapper(ChatOpenRouter):
     """
