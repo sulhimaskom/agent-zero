@@ -23,7 +23,13 @@
 
                 <!-- Action Cards -->
                 <div class="welcome-actions">
-                    <div class="welcome-action-card" @click="executeAction('new-chat')">
+                    <div class="welcome-action-card" 
+                         @click="executeAction('new-chat')"
+                         @keydown.enter.prevent="executeAction('new-chat')"
+                         @keydown.space.prevent="executeAction('new-chat')"
+                         tabindex="0"
+                         role="button"
+                         aria-label="Start a new chat conversation">
                         <span class="material-symbols-outlined welcome-action-icon">add_circle</span>
                         <h3 class="welcome-action-title">New Chat</h3>
                         <p class="welcome-action-description">
@@ -31,35 +37,65 @@
                         </p>
                     </div>
 
-                    <div class="welcome-action-card" @click="executeAction('projects')">
+                    <div class="welcome-action-card" 
+                         @click="executeAction('projects')"
+                         @keydown.enter.prevent="executeAction('projects')"
+                         @keydown.space.prevent="executeAction('projects')"
+                         tabindex="0"
+                         role="button"
+                         aria-label="Manage your projects">
                         <span class="material-symbols-outlined welcome-action-icon">folder</span>
                         <h3 class="welcome-action-title">Projects</h3>
                         <p class="welcome-action-description">
                             Manage your projects
                         </p>
                     </div>
-                    <div class="welcome-action-card" @click="executeAction('memory')">
+                    <div class="welcome-action-card" 
+                         @click="executeAction('memory')"
+                         @keydown.enter.prevent="executeAction('memory')"
+                         @keydown.space.prevent="executeAction('memory')"
+                         tabindex="0"
+                         role="button"
+                         aria-label="Open Memory Dashboard">
                         <span class="material-symbols-outlined welcome-action-icon">memory</span>
                         <h3 class="welcome-action-title">Memory</h3>
                         <p class="welcome-action-description">
                             Open Memory Dashboard
                         </p>
                     </div>
-                    <div class="welcome-action-card" @click="executeAction('settings')">
+                    <div class="welcome-action-card" 
+                         @click="executeAction('settings')"
+                         @keydown.enter.prevent="executeAction('settings')"
+                         @keydown.space.prevent="executeAction('settings')"
+                         tabindex="0"
+                         role="button"
+                         aria-label="Configure Agent Zero settings">
                         <span class="material-symbols-outlined welcome-action-icon">settings</span>
                         <h3 class="welcome-action-title">Settings</h3>
                         <p class="welcome-action-description">
                             Configure Agent Zero
                         </p>
                     </div>
-                    <div class="welcome-action-card" @click="executeAction('website')">
+                    <div class="welcome-action-card" 
+                         @click="executeAction('website')"
+                         @keydown.enter.prevent="executeAction('website')"
+                         @keydown.space.prevent="executeAction('website')"
+                         tabindex="0"
+                         role="button"
+                         aria-label="Visit Agent Zero website">
                         <span class="material-symbols-outlined welcome-action-icon">language</span>
                         <h3 class="welcome-action-title">Visit Website</h3>
-                        <p class="welcome-action-description">
+                         <p class="welcome-action-description">
                             Learn more about Agent Zero
                         </p>
                     </div>
-                    <div class="welcome-action-card" @click="executeAction('github')">
+                    <div class="welcome-action-card" 
+                         @click="executeAction('github')"
+                         @keydown.enter.prevent="executeAction('github')"
+                         @keydown.space.prevent="executeAction('github')"
+                         tabindex="0"
+                         role="button"
+                         aria-label="View source code on GitHub">
                         <span class="material-symbols-outlined welcome-action-icon">code</span>
                         <h3 class="welcome-action-title">Visit GitHub</h3>
                         <p class="welcome-action-description">
@@ -154,6 +190,17 @@
         .welcome-action-card:hover {
             border-color: var(--color-primary);
             background: var(--color-message-bg);
+        }
+
+        .welcome-action-card:focus-visible {
+            outline: 2px solid var(--color-highlight);
+            outline-offset: 2px;
+            border-color: var(--color-primary);
+            background: var(--color-message-bg);
+        }
+
+        .welcome-action-card:active {
+            transform: scale(0.98);
         }
 
         .welcome-action-icon {

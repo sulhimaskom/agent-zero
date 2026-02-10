@@ -51,4 +51,4 @@ agent_history.gif
 
 # Worktrees directory for isolated development
 .worktrees/
-.worktrees/
+brocula_check_*.py
