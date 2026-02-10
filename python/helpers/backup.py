@@ -11,6 +11,7 @@ from pathspec.patterns.gitwildmatch import GitWildMatchPattern
 
 from python.helpers import files, runtime, git
 from python.helpers.print_style import PrintStyle
+from python.helpers.constants import Limits
 
 
 class BackupService:
@@ -259,7 +260,7 @@ class BackupService:
 
         return translated_patterns
 
-    async def test_patterns(self, metadata: Dict[str, Any], max_files: int = 1000) -> List[Dict[str, Any]]:
+    async def test_patterns(self, metadata: Dict[str, Any], max_files: int = Limits.BACKUP_MAX_FILES_TEST) -> List[Dict[str, Any]]:
         """Test backup patterns and return list of matched files"""
         include_patterns = metadata.get("include_patterns", [])
         exclude_patterns = metadata.get("exclude_patterns", [])
@@ -361,7 +362,7 @@ class BackupService:
         }
 
         # Get matched files
-        matched_files = await self.test_patterns(metadata, max_files=50000)
+        matched_files = await self.test_patterns(metadata, max_files=Limits.BACKUP_MAX_FILES_FULL)
 
         if not matched_files:
             raise Exception("No files matched the backup patterns")
@@ -842,7 +843,7 @@ class BackupService:
 
         # Find existing files that match the translated user-edited patterns
         try:
-            existing_files = await self.test_patterns(metadata, max_files=10000)
+            existing_files = await self.test_patterns(metadata, max_files=Limits.BACKUP_MAX_FILES_PARTIAL)
 
             # Convert to delete operations format
             files_to_delete = []
