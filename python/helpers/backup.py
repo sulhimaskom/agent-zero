@@ -11,7 +11,7 @@ from pathspec.patterns.gitwildmatch import GitWildMatchPattern
 
 from python.helpers import files, runtime, git
 from python.helpers.print_style import PrintStyle
-from python.helpers.constants import Limits
+from python.helpers.constants import Limits, TmpPaths
 
 
 class BackupService:
@@ -75,11 +75,11 @@ class BackupService:
 
 # Configuration and Settings (CRITICAL)
 {agent_root}/.env
-{agent_root}/tmp/settings.json
-{agent_root}/tmp/secrets.env
-{agent_root}/tmp/chats/**
-{agent_root}/tmp/scheduler/**
-{agent_root}/tmp/uploads/**
+{agent_root}/{TmpPaths.SETTINGS_JSON}
+{agent_root}/{TmpPaths.SECRETS_ENV}
+{agent_root}/{TmpPaths.CHATS_GLOB}
+{agent_root}/{TmpPaths.SCHEDULER_GLOB}
+{agent_root}/{TmpPaths.UPLOADS_GLOB}
 
 # User data
 {agent_root}/usr/**

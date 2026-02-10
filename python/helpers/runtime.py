@@ -4,7 +4,7 @@ import secrets
 from pathlib import Path
 from typing import TypeVar, Callable, Awaitable, Union, overload, cast
 from python.helpers import dotenv, rfc, settings, files
-from python.helpers.constants import Network, Timeouts, Shell
+from python.helpers.constants import Network, Timeouts, Shell, Protocols
 import asyncio
 import threading
 import queue
@@ -45,12 +45,10 @@ def initialize():
 
 
 def get_arg(name: str):
-    global args
     return args.get(name, None)
 
 
 def has_arg(name: str):
-    global args
     return name in args
 
 
@@ -86,11 +84,13 @@ def get_persistent_id() -> str:
 @overload
 async def call_development_function(
     func: Callable[..., Awaitable[T]], *args, **kwargs
-) -> T: ...
+) -> T:
+    ...
 
 
 @overload
-async def call_development_function(func: Callable[..., T], *args, **kwargs) -> T: ...
+async def call_development_function(func: Callable[..., T], *args, **kwargs) -> T:
+    ...
 
 
 async def call_development_function(
@@ -135,7 +135,7 @@ def _get_rfc_url() -> str:
     set = settings.get_settings()
     url = set["rfc_url"]
     if "://" not in url:
-        url = "http://" + url
+        url = Protocols.HTTP + url
     if url.endswith("/"):
         url = url[:-1]
     url = url + ":" + str(set["rfc_port_http"])

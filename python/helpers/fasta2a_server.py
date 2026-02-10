@@ -7,6 +7,7 @@ import contextlib
 import threading
 
 from python.helpers import settings
+from python.helpers.constants import ExternalUrls
 from starlette.requests import Request
 
 # Local imports
@@ -231,7 +232,7 @@ class DynamicA2AProxy:
 
             provider: AgentProvider = {  # type: ignore
                 "organization": "Agent Zero",
-                "url": "https://github.com/frdel/agent-zero"
+                "url": ExternalUrls.AGENT_ZERO_REPO
             }
 
             # Create new FastA2A app with proper thread safety
@@ -466,10 +467,7 @@ class DynamicA2AProxy:
                 auth_header = request.headers.get("Authorization", "")
                 api_key = request.headers.get("X-API-KEY") or request.query_params.get("api_key")
 
-                is_authorized = (
-                    (auth_header.startswith("Bearer ") and auth_header.split(" ", 1)[1] == expected) or
-                    (api_key == expected)
-                )
+                is_authorized = (auth_header.startswith("Bearer ") and auth_header.split(" ", 1)[1] == expected) or (api_key == expected)
 
                 if not is_authorized:
                     # No valid auth, return 401

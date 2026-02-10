@@ -1,4 +1,4 @@
-import { TIMING } from './constants.js';
+import { TIMING, API_ENDPOINTS } from './constants.js';
 
 const settingsModalProxy = {
     isOpen: false,
@@ -357,7 +357,7 @@ document.addEventListener('alpine:init', function () {
             async fetchSettings() {
                 try {
                     this.isLoading = true;
-                    const response = await fetchApi('/api/settings_get', {
+                    const response = await fetchApi(API_ENDPOINTS.SETTINGS_GET, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -430,7 +430,7 @@ document.addEventListener('alpine:init', function () {
                     }
 
                     // Send request
-                    const response = await fetchApi('/api/settings_save', {
+                    const response = await fetchApi(API_ENDPOINTS.SETTINGS_SAVE, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -487,7 +487,7 @@ document.addEventListener('alpine:init', function () {
                     }
 
                     // Send test request
-                    const response = await fetchApi('/api/test_connection', {
+                    const response = await fetchApi(API_ENDPOINTS.TEST_CONNECTION, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'

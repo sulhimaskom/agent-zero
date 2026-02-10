@@ -12,6 +12,7 @@ import {
 } from "/index.js";
 import { store as notificationStore } from "/components/notifications/notification-store.js";
 import { store as tasksStore } from "/components/sidebar/tasks/tasks-store.js";
+import { RETRY } from '/js/constants.js';
 
 const model = {
   contexts: [],
@@ -302,8 +303,6 @@ const model = {
     } catch (e) {
       // Show restarting message
       await notificationStore.frontendInfo("Restarting...", "System Restart", 9999, "restart");
-
-      import { RETRY } from '../../../js/constants.js';
 
       let retries = 0;
       const maxRetries = RETRY.MAX_RETRIES; // From constants
