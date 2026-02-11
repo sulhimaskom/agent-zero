@@ -1,6 +1,5 @@
 import { createStore } from "/js/AlpineStore.js";
 
-// Sidebar Bottom store manages version info display
 const model = {
   versionNo: "",
   commitTime: "",
@@ -12,11 +11,21 @@ const model = {
   },
 
   init() {
-    // Load version info from global scope (exposed in index.html)
     const gi = globalThis.gitinfo;
     if (gi && gi.version && gi.commit_time) {
       this.versionNo = gi.version;
       this.commitTime = gi.commit_time;
+    }
+  },
+
+  async copyVersion() {
+    const textToCopy = this.versionLabel;
+    if (!textToCopy) return;
+
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+    } catch (err) {
+      console.warn("Failed to copy version:", err);
     }
   },
 };

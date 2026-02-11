@@ -12,8 +12,42 @@
         <x-component path="sidebar/bottom/preferences/preferences-panel.html"></x-component>
         
         <!-- Version Info -->
-        <div class="version-info">
-          <span id="a0version" x-text="$store.sidebarBottom.versionLabel"></span>
+        <div class="version-info" x-data="{ showTooltip: false, copied: false }">
+          <button 
+            id="a0version" 
+            class="version-label-button"
+            @click="$store.sidebarBottom.copyVersion(); copied = true; setTimeout(() => copied = false, 2000)"
+            @mouseover="showTooltip = true"
+            @mouseleave="showTooltip = false"
+            @focus="showTooltip = true"
+            @blur="showTooltip = false"
+            :class="{ 'copied': copied }"
+            :aria-label="'Version ' + $store.sidebarBottom.versionNo + '. Click to copy to clipboard'">
+            <span class="version-text" x-text="$store.sidebarBottom.versionLabel"></span>
+            <span class="version-icon" x-show="!copied">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+            </span>
+            <span class="version-icon success-icon" x-show="copied">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+            </span>
+          </button>
+          <div 
+            x-show="showTooltip" 
+            x-transition:enter="transition ease-out duration-200" 
+            x-transition:enter-start="opacity-0 translate-y-1" 
+            x-transition:enter-end="opacity-100 translate-y-0" 
+            x-transition:leave="transition ease-in duration-150" 
+            x-transition:leave-start="opacity-100 translate-y-0" 
+            x-transition:leave-end="opacity-0 translate-y-1" 
+            class="version-tooltip">
+            <span x-show="!copied">Click to copy version info</span>
+            <span x-show="copied" class="copied-text">Copied!</span>
+          </div>
         </div>
       </div>
     </template>
@@ -37,11 +71,123 @@
       border-top: 1px solid var(--color-border);
     }
 
-    #a0version {
+    /* Version label button */
+    .version-label-button {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: 4px;
+      padding: 4px 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .version-label-button:hover {
+      background-color: var(--color-background-hover);
+      border-color: var(--color-border);
+    }
+
+    .version-label-button:focus-visible {
+      outline: 2px solid var(--color-highlight);
+      outline-offset: 2px;
+    }
+
+    .version-label-button.copied {
+      background-color: rgba(76, 175, 80, 0.15);
+      border-color: rgba(76, 175, 80, 0.4);
+    }
+
+    .version-text {
       color: var(--color-text);
       opacity: 0.7;
       font-size: 0.7rem;
       user-select: all;
+    }
+
+    .version-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 12px;
+      height: 12px;
+      color: var(--color-text);
+      opacity: 0.5;
+      transition: all 0.2s ease;
+    }
+
+    .version-label-button:hover .version-icon {
+      opacity: 0.9;
+    }
+
+    .version-icon svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    .success-icon {
+      color: #4CAF50;
+      opacity: 1;
+      animation: checkmark-pop 0.3s ease;
+    }
+
+    @keyframes checkmark-pop {
+      0% {
+        transform: scale(0);
+      }
+      50% {
+        transform: scale(1.2);
+      }
+      100% {
+        transform: scale(1);
+      }
+    }
+
+    /* Tooltip */
+    .version-tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 0;
+      transform: translateY(-4px);
+      padding: 6px 10px;
+      background-color: var(--color-secondary);
+      color: var(--color-text);
+      border-radius: 6px;
+      font-size: 11px;
+      white-space: nowrap;
+      z-index: 1002;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      pointer-events: none;
+    }
+
+    .version-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 20px;
+      transform: translateX(-50%);
+      border: 5px solid transparent;
+      border-top-color: var(--color-secondary);
+    }
+
+    .copied-text {
+      color: #4CAF50;
+      font-weight: 600;
+    }
+
+    /* Accessibility: respect reduced motion preferences */
+    @media (prefers-reduced-motion: reduce) {
+      .version-label-button {
+        transition: none;
+      }
+      .version-icon {
+        transition: none;
+      }
+      .success-icon {
+        animation: none;
+      }
     }
   </style>
 </body>
