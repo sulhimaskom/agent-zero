@@ -327,10 +327,17 @@ const fullComponentImplementation = function() {
                     this.updateTasksUI();
                 }
             } catch (error) {
-                console.error('Error fetching tasks:', error);
-                // Only show toast for errors on manual refresh, not during polling
-                if (!this.pollingInterval) {
-                    showToast('Failed to fetch tasks: ' + error.message, 'error');
+                // Silently ignore backend unavailable errors - they're expected when server is down
+                const isBackendUnavailable = error.message?.includes('CSRF token unavailable') ||
+                                             error.message?.includes('CSRF token endpoint returned') ||
+                                             error.message?.includes('backend not running') ||
+                                             error.message?.includes('Failed to fetch');
+                if (!isBackendUnavailable) {
+                    console.error('Error fetching tasks:', error);
+                    // Only show toast for errors on manual refresh, not during polling
+                    if (!this.pollingInterval) {
+                        showToast('Failed to fetch tasks: ' + error.message, 'error');
+                    }
                 }
                 // Reset tasks to empty array on error
                 this.tasks = [];

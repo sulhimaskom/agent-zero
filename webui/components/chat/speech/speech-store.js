@@ -125,8 +125,15 @@ const model = {
         });
       }
     } catch (error) {
-      window.toastFetchError("Failed to load speech settings", error);
-      console.error("Failed to load speech settings:", error);
+      // Silently ignore backend unavailable errors - they're expected when server is down
+      const isBackendUnavailable = error.message?.includes('CSRF token unavailable') ||
+                                   error.message?.includes('CSRF token endpoint returned') ||
+                                   error.message?.includes('backend not running') ||
+                                   error.message?.includes('Failed to fetch');
+      if (!isBackendUnavailable) {
+        window.toastFetchError("Failed to load speech settings", error);
+        console.error("Failed to load speech settings:", error);
+      }
     }
   },
 

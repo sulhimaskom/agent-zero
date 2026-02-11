@@ -102,7 +102,14 @@ const model = {
         }
       }
     } catch (error) {
-      console.error("Error checking tunnel status:", error);
+      // Silently ignore backend unavailable errors - they're expected when server is down
+      const isBackendUnavailable = error.message?.includes('CSRF token unavailable') ||
+                                   error.message?.includes('CSRF token endpoint returned') ||
+                                   error.message?.includes('backend not running') ||
+                                   error.message?.includes('Failed to fetch');
+      if (!isBackendUnavailable) {
+        console.error("Error checking tunnel status:", error);
+      }
       this.tunnelLink = "";
       this.linkGenerated = false;
     }
