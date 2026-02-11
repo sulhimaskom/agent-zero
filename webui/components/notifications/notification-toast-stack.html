@@ -16,6 +16,8 @@
                 <div class="toast-item"
                      :class="$store.notificationStore.getNotificationClass(toast.type)"
                      @click="$store.notificationStore.handleToastClick(toast.toastId)"
+                     @mouseenter="$store.notificationStore.pauseToastTimer(toast.toastId)"
+                     @mouseleave="$store.notificationStore.resumeToastTimer(toast.toastId)"
                      x-transition:enter="toast-enter"
                      x-transition:leave="toast-leave">
 
@@ -45,6 +47,13 @@
                             aria-label="Dismiss notification">
                         <span class="material-symbols-outlined" aria-hidden="true">close</span>
                     </button>
+
+                    <div class="toast-progress-container"
+                         :style="{ '--toast-duration': (toast.display_time * 1000) + 'ms' }">
+                        <div class="toast-progress-bar"
+                             :class="{ 'paused': toast.isPaused }">
+                        </div>
+                    </div>
                 </div>
             </template>
           </div>
@@ -216,6 +225,61 @@
             }
         }
 
+        /* Toast Progress Bar */
+        .toast-progress-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: rgba(128, 128, 128, 0.2);
+            border-radius: 0 0 8px 8px;
+            overflow: hidden;
+        }
+
+        .toast-progress-bar {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg, 
+                var(--toast-progress-color, #2196F3) 0%, 
+                color-mix(in srgb, var(--toast-progress-color, #2196F3) 80%, white) 100%);
+            transform-origin: left;
+            animation: toast-progress var(--toast-duration, 3000ms) linear forwards;
+        }
+
+        .toast-progress-bar.paused {
+            animation-play-state: paused;
+        }
+
+        @keyframes toast-progress {
+            0% {
+                transform: scaleX(1);
+            }
+            100% {
+                transform: scaleX(0);
+            }
+        }
+
+        .toast-item.notification-info .toast-progress-bar {
+            --toast-progress-color: #2196F3;
+        }
+
+        .toast-item.notification-success .toast-progress-bar {
+            --toast-progress-color: #4CAF50;
+        }
+
+        .toast-item.notification-warning .toast-progress-bar {
+            --toast-progress-color: #FF9800;
+        }
+
+        .toast-item.notification-error .toast-progress-bar {
+            --toast-progress-color: #F44336;
+        }
+
+        .toast-item.notification-progress .toast-progress-bar {
+            --toast-progress-color: #9C27B0;
+        }
+
         /* Accessibility */
         @media (prefers-reduced-motion: reduce) {
             .toast-enter,
@@ -225,6 +289,11 @@
 
             .toast-item:hover {
                 transform: none;
+            }
+
+            .toast-progress-bar {
+                animation: none;
+                opacity: 0;
             }
         }
     </style>

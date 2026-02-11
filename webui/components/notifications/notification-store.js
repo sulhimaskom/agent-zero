@@ -113,6 +113,9 @@ const model = {
       toastId: `toast-${notification.id}`,
       addedAt: Date.now(),
       autoRemoveTimer: null,
+      isPaused: false,
+      remainingTime: notification.display_time * 1000,
+      pauseStartTime: null,
     };
 
     // Add to bottom of stack (newest at bottom)
@@ -127,7 +130,7 @@ const model = {
     // Set auto-dismiss timer
     toast.autoRemoveTimer = setTimeout(() => {
       this.removeFromToastStack(toast.toastId);
-    }, notification.display_time * 1000);
+    }, toast.remainingTime);
   },
 
   // NEW: Remove toast from stack
@@ -148,6 +151,38 @@ const model = {
   // called by UI
   dismissToast(toastId) {
     this.removeFromToastStack(toastId, true);
+  },
+
+  pauseToastTimer(toastId) {
+    const toast = this.toastStack.find((t) => t.toastId === toastId);
+    if (!toast || toast.isPaused) return;
+
+    toast.isPaused = true;
+    toast.pauseStartTime = Date.now();
+
+    if (toast.autoRemoveTimer) {
+      clearTimeout(toast.autoRemoveTimer);
+      toast.autoRemoveTimer = null;
+    }
+  },
+
+  resumeToastTimer(toastId) {
+    const toast = this.toastStack.find((t) => t.toastId === toastId);
+    if (!toast || !toast.isPaused) return;
+
+    toast.isPaused = false;
+
+    const pausedDuration = Date.now() - toast.pauseStartTime;
+    toast.remainingTime = Math.max(0, toast.remainingTime - pausedDuration);
+    toast.pauseStartTime = null;
+
+    if (toast.remainingTime > 0) {
+      toast.autoRemoveTimer = setTimeout(() => {
+        this.removeFromToastStack(toastId);
+      }, toast.remainingTime);
+    } else {
+      this.removeFromToastStack(toastId);
+    }
   },
 
   async afterToastRemoved(toast, removedByUser = false) {
@@ -587,6 +622,9 @@ const model = {
       toastId: `toast-${notification.id}`,
       addedAt: Date.now(),
       autoRemoveTimer: null,
+      isPaused: false,
+      remainingTime: notification.display_time * 1000,
+      pauseStartTime: null,
     };
 
     // Add to bottom of stack (newest at bottom)
@@ -603,7 +641,7 @@ const model = {
     // Set auto-dismiss timer
     toast.autoRemoveTimer = setTimeout(() => {
       this.removeFromToastStack(toast.toastId);
-    }, notification.display_time * 1000);
+    }, toast.remainingTime);
 
     return notification.id;
   },
