@@ -103,7 +103,9 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 - 302 print statements across 39 files - should use proper logging
 
 ### Testing
-- No pytest.ini, conftest.py, or fixtures - default pytest only
+- pytest.ini exists and configured (asyncio mode, markers, test paths)
+- conftest.py exists with fixtures and mocks
+- All 29 tests passing
 - Tests not run in CI (GitHub workflows use OpenCode AI agent only)
 - Mixed naming: `test_*.py` and `*_test.py` both used
 - Coverage tool not configured
