@@ -130,14 +130,29 @@ body,
 }
 
 img {
-  user-drag: none;      /* Safari & old Chrome */
+  user-drag: none;
   -webkit-user-drag: none;
-  user-select: none;    /* Prevent selection for good measure */
+  user-select: none;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
-  pointer-events: auto; /* Allow clicks, just no drag */
+  pointer-events: auto;
+  max-width: 100%;
+  height: auto;
 }
+
+/* Prevent layout shifts from dynamic content */
+#chat-history {
+  min-height: 200px;
+}
+
+/* Reserve space for components to prevent CLS */
+x-component {
+  display: block;
+  min-height: 20px;
+}
+
+/* Prevent FOIT by using font-display: swap - fonts loaded in HTML */
 
 /* Layout */
 .container {
