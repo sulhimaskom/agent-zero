@@ -1,13 +1,15 @@
 from datetime import datetime
 from typing import Any, List, Sequence
-from langchain.storage import InMemoryByteStore, LocalFileStore
-from langchain.embeddings import CacheBackedEmbeddings
+from langchain_core.stores import InMemoryByteStore
+from langchain_classic.storage import LocalFileStore
+from langchain_classic.embeddings import CacheBackedEmbeddings
 from python.helpers import guids
 
 # from langchain_chroma import Chroma
 from langchain_community.vectorstores import FAISS
 
 # faiss needs to be patched for python 3.12 on arm #TODO remove once not needed
+from python.helpers import faiss_monkey_patch
 import faiss
 
 
