@@ -28,7 +28,7 @@ Agent Zero is a hierarchical AI agent system built on async Python with Docker c
 - Cross-cutting concerns: logging, errors, localization
 
 #### 5. API Layer (`python/api/`)
-- FastAPI endpoints for Web UI
+- Flask endpoints for Web UI
 - State management via AgentContext singleton
 
 #### 6. Presentation Layer (`webui/`, `run_ui.py`)
