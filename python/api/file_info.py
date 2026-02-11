@@ -3,11 +3,13 @@ from python.helpers.api import ApiHandler, Input, Output, Request
 from python.helpers import files, runtime
 from typing import TypedDict
 
+
 class FileInfoApi(ApiHandler):
     async def process(self, input: Input, request: Request) -> Output:
         path = input.get("path", "")
         info = await runtime.call_development_function(get_file_info, path)
         return info
+
 
 class FileInfo(TypedDict):
     input_path: str
@@ -24,6 +26,7 @@ class FileInfo(TypedDict):
     file_name: str
     file_ext: str
     message: str
+
 
 async def get_file_info(path: str) -> FileInfo:
     abs_path = files.get_abs_path(path)

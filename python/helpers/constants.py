@@ -535,9 +535,39 @@ class InternalPaths:
 # =============================================================================
 
 class ExternalUrls:
-    """External URLs used in the application"""
+    """External URLs used in the application - All configurable via environment variables"""
 
+    # Repository URL
     AGENT_ZERO_REPO: Final[str] = "https://github.com/frdel/agent-zero"
+
+    # API Endpoints - Configurable via environment variables
+    UPDATE_CHECK_URL: Final[str] = "https://api.agent-zero.ai/a0-update-check"
+    PERPLEXITY_API_BASE_URL: Final[str] = "https://api.perplexity.ai"
+
+    # Default models - Configurable via environment variables
+    PERPLEXITY_DEFAULT_MODEL: Final[str] = "llama-3.1-sonar-large-128k-online"
+
+    # Venice.ai endpoints - Configurable via environment variables
+    VENICE_API_BASE: Final[str] = "https://api.venice.ai/api/v1"
+    A0_VENICE_API_BASE: Final[str] = "https://api.agent-zero.ai/venice/v1"
+
+    # OpenRouter endpoints - Configurable via environment variables
+    OPENROUTER_API_BASE: Final[str] = "https://openrouter.ai/api/v1"
+
+    # Default HTTP headers - Configurable via environment variables
+    OPENROUTER_HTTP_REFERER: Final[str] = "https://agent-zero.ai/"
+    OPENROUTER_X_TITLE: Final[str] = "Agent Zero"
+
+
+# =============================================================================
+# BROWSER CONFIGURATION
+# =============================================================================
+
+class Browser:
+    """Browser agent configuration - All values configurable via environment variables"""
+
+    # Default allowed domains for browser agent (wildcard allows all)
+    ALLOWED_DOMAINS: Final[list[str]] = ["*", "http://*", "https://*"]
 
 
 # =============================================================================
@@ -572,3 +602,22 @@ class Config:
 
     # Tunnel settings
     TUNNEL_CHECK_DELAY = get_env_int("A0_TUNNEL_CHECK_DELAY", Timeouts.TUNNEL_CHECK_DELAY)
+
+    # External URLs - Fully configurable via environment variables
+    UPDATE_CHECK_URL = get_env_str("A0_UPDATE_CHECK_URL", ExternalUrls.UPDATE_CHECK_URL)
+    PERPLEXITY_API_BASE_URL = get_env_str("A0_PERPLEXITY_API_BASE_URL", ExternalUrls.PERPLEXITY_API_BASE_URL)
+    PERPLEXITY_DEFAULT_MODEL = get_env_str("A0_PERPLEXITY_DEFAULT_MODEL", ExternalUrls.PERPLEXITY_DEFAULT_MODEL)
+    AGENT_ZERO_REPO_URL = get_env_str("A0_AGENT_ZERO_REPO_URL", ExternalUrls.AGENT_ZERO_REPO)
+
+    # Venice.ai configuration
+    VENICE_API_BASE = get_env_str("A0_VENICE_API_BASE", ExternalUrls.VENICE_API_BASE)
+    A0_VENICE_API_BASE = get_env_str("A0_A0_VENICE_API_BASE", ExternalUrls.A0_VENICE_API_BASE)
+
+    # OpenRouter configuration
+    OPENROUTER_API_BASE = get_env_str("A0_OPENROUTER_API_BASE", ExternalUrls.OPENROUTER_API_BASE)
+    OPENROUTER_HTTP_REFERER = get_env_str("A0_OPENROUTER_HTTP_REFERER", ExternalUrls.OPENROUTER_HTTP_REFERER)
+    OPENROUTER_X_TITLE = get_env_str("A0_OPENROUTER_X_TITLE", ExternalUrls.OPENROUTER_X_TITLE)
+
+    # Browser configuration (Note: ALLOWED_DOMAINS uses a different pattern - comma-separated string in env var)
+    # To customize allowed domains, set A0_BROWSER_ALLOWED_DOMAINS as comma-separated list
+    # Example: A0_BROWSER_ALLOWED_DOMAINS="example.com,*.example.com"

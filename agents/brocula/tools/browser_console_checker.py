@@ -2,6 +2,7 @@ import asyncio
 from python.helpers.tool import Tool, Response
 from python.helpers.playwright import ensure_playwright_binary
 from playwright.async_api import async_playwright
+from python.helpers.constants import Network
 
 class State:
     @staticmethod
@@ -21,14 +22,16 @@ class browser_console_checker(Tool):
     Navigates to a URL, captures console output, and reports any errors or warnings.
     """
 
-    async def execute(self, url: str = "http://localhost:50001", wait_time: int = 5, **kwargs) -> Response:
+    async def execute(self, url: str = None, wait_time: int = 5, **kwargs) -> Response:
         """
         Check browser console for errors and warnings.
-        
+
         Args:
             url: The URL to navigate to (default: http://localhost:50001)
             wait_time: Time to wait after page load for console messages (default: 5 seconds)
         """
+        if url is None:
+            url = f"http://{Network.DEFAULT_HOSTNAME}:50001"
         await self.agent.handle_intervention()
         
         state = await self.agent.get_tool_state(self, State)
