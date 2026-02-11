@@ -230,9 +230,10 @@
                                         <td class="actions-cell" @click.stop>
                                             <div class="actions-wrapper">
                                                 <button class="btn btn-action copy"
-                                                    @click="$store.memoryDashboardStore.copyToClipboard($store.memoryDashboardStore.formatMemoryForCopy(memory))"
-                                                    title="Copy Memory">
-                                                    <span class="material-symbols-outlined">content_copy</span>
+                                                    :class="{ 'copied': $store.memoryDashboardStore.recentlyCopied[memory.id] }"
+                                                    @click="$store.memoryDashboardStore.copyToClipboard($store.memoryDashboardStore.formatMemoryForCopy(memory), true, memory.id)"
+                                                    :title="$store.memoryDashboardStore.recentlyCopied[memory.id] ? 'Copied!' : 'Copy Memory'">
+                                                    <span class="material-symbols-outlined" x-text="$store.memoryDashboardStore.recentlyCopied[memory.id] ? 'check' : 'content_copy'"></span>
                                                 </button>
 
                                                 <button class="btn btn-action delete"
@@ -845,6 +846,32 @@
             background: var(--color-panel);
             border-color: var(--color-accent);
             color: var(--color-accent);
+        }
+
+        .btn-action.copy.copied {
+            background: rgba(76, 175, 80, 0.15);
+            border-color: #4CAF50;
+            color: #4CAF50;
+            opacity: 1;
+            animation: copy-feedback-pulse 0.3s ease;
+        }
+
+        .btn-action.copy.copied:hover {
+            background: rgba(76, 175, 80, 0.25);
+            border-color: #4CAF50;
+            color: #4CAF50;
+        }
+
+        @keyframes copy-feedback-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .btn-action.copy.copied {
+                animation: none;
+            }
         }
 
         /* Responsive design */

@@ -42,7 +42,7 @@
                   <template x-for="file in $store.fileBrowser.sortFiles($store.fileBrowser.browser.entries)" :key="file.path">
                     <div class="file-item" :data-is-dir="file.is_dir">
                       <div class="file-name" @click="file.is_dir ? $store.fileBrowser.navigateToFolder(file.path) : $store.fileBrowser.downloadFile(file)">
-                        <img :src="'/public/' + (file.type === 'unknown' ? 'file' : ($store.fileBrowser.isArchive(file.name) ? 'archive' : file.type)) + '.svg'" class="file-icon" :alt="file.type" />
+                        <img :src="'/public/' + (file.type === 'unknown' ? 'file' : ($store.fileBrowser.isArchive(file.name) ? 'archive' : file.type)) + '.svg'" class="file-icon" :alt="file.type + ' file'" width="20" height="20" loading="lazy" />
                         <span x-text="file.name"></span>
                       </div>
                       <div class="file-size" x-text="$store.fileBrowser.formatFileSize(file.size)"></div>
