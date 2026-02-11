@@ -53,6 +53,9 @@ const memoryDashboardStore = {
   pollingInterval: null,
   pollingEnabled: false,
 
+  recentlyCopied: {},
+  copyFeedbackTimers: {},
+
   async openModal() {
     await openModal("settings/memory/memory-dashboard.html");
   },
@@ -517,24 +520,31 @@ ${memory.content_full}
     return colors[area] || "#6c757d";
   },
 
-  copyToClipboard(text, toastSuccess = true) {
+  copyToClipboard(text, toastSuccess = true, memoryId = null) {
+    const doCopy = () => {
+      if (memoryId) {
+        this.showCopyFeedback(memoryId);
+      }
+    };
+
     if (navigator.clipboard && window.isSecureContext) {
       navigator.clipboard
         .writeText(text)
         .then(() => {
+          doCopy();
           if(toastSuccess)
             justToast("Copied to clipboard!", "success");
         })
         .catch((err) => {
           console.error("Clipboard copy failed:", err);
-          this.fallbackCopyToClipboard(text, toastSuccess);
+          this.fallbackCopyToClipboard(text, toastSuccess, memoryId);
         });
     } else {
-      this.fallbackCopyToClipboard(text, toastSuccess);
+      this.fallbackCopyToClipboard(text, toastSuccess, memoryId);
     }
   },
 
-  fallbackCopyToClipboard(text, toastSuccess = true) {
+  fallbackCopyToClipboard(text, toastSuccess = true, memoryId = null) {
     const textArea = document.createElement("textarea");
     textArea.value = text;
     textArea.style.position = "fixed";
@@ -545,6 +555,9 @@ ${memory.content_full}
     textArea.select();
     try {
       document.execCommand("copy");
+      if (memoryId) {
+        this.showCopyFeedback(memoryId);
+      }
       if(toastSuccess)
         justToast("Copied to clipboard!", "success");
     } catch (err) {
@@ -552,6 +565,23 @@ ${memory.content_full}
       justToast("Failed to copy to clipboard", "error");
     }
     document.body.removeChild(textArea);
+  },
+
+  showCopyFeedback(memoryId) {
+    const FEEDBACK_DURATION = 1500;
+
+    if (this.copyFeedbackTimers[memoryId]) {
+      clearTimeout(this.copyFeedbackTimers[memoryId]);
+    }
+
+    this.recentlyCopied[memoryId] = true;
+
+    const timer = setTimeout(() => {
+      delete this.recentlyCopied[memoryId];
+      delete this.copyFeedbackTimers[memoryId];
+    }, FEEDBACK_DURATION);
+
+    this.copyFeedbackTimers[memoryId] = timer;
   },
 
   async deleteMemory(memory) {
