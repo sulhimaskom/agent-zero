@@ -7,12 +7,14 @@ from unittest.mock import MagicMock
 # Add the project root to Python path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+
 # Create mock modules with submodules to avoid import errors
 def create_mock_module(name):
     """Create a mock module that can have attributes assigned to it"""
     module = MagicMock()
     sys.modules[name] = module
     return module
+
 
 # Mock all heavy ML/AI dependencies
 create_mock_module('whisper')
