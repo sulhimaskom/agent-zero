@@ -1,12 +1,7 @@
 import secrets
 from urllib.parse import urlparse
-from python.helpers.api import (
-    ApiHandler,
-    Input,
-    Output,
-    Request,
-    session,
-)
+from python.helpers.api import ApiHandler, Input, Output
+from flask import Request, session
 from python.helpers import runtime, dotenv, login
 from python.helpers.constants import Network
 import fnmatch

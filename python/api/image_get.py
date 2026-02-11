@@ -1,6 +1,7 @@
 import base64
 import os
-from python.helpers.api import ApiHandler, Request, Response, send_file
+from python.helpers.api import ApiHandler
+from flask import Request, Response, send_file
 from python.helpers import files, runtime
 from python.helpers.constants import Timeouts
 import io
