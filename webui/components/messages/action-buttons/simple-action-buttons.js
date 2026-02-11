@@ -41,6 +41,13 @@ export function addActionButtonsToElement(element) {
   copyBtn.innerHTML =
     '<span class="material-symbols-outlined">content_copy</span>';
 
+  const copyTooltip = document.createElement("div");
+  copyTooltip.className = "action-tooltip";
+  copyTooltip.textContent = "Copied!";
+  copyTooltip.setAttribute("role", "status");
+  copyTooltip.setAttribute("aria-live", "polite");
+  copyBtn.appendChild(copyTooltip);
+
   copyBtn.onclick = async (e) => {
     e.stopPropagation();
 
@@ -66,9 +73,14 @@ export function addActionButtonsToElement(element) {
         document.body.removeChild(textarea);
       }
 
-      // Visual feedback
       icon.textContent = "check";
       copyBtn.classList.add("success");
+      copyBtn.classList.add("show-tooltip");
+
+      setTimeout(() => {
+        copyBtn.classList.remove("show-tooltip");
+      }, 1500);
+
       setTimeout(() => {
         icon.textContent = "content_copy";
         copyBtn.classList.remove("success");
@@ -77,9 +89,17 @@ export function addActionButtonsToElement(element) {
       console.error("Copy failed:", err);
       icon.textContent = "error";
       copyBtn.classList.add("error");
+      copyTooltip.textContent = "Failed!";
+      copyBtn.classList.add("show-tooltip");
+
+      setTimeout(() => {
+        copyBtn.classList.remove("show-tooltip");
+      }, 1500);
+
       setTimeout(() => {
         icon.textContent = "content_copy";
         copyBtn.classList.remove("error");
+        copyTooltip.textContent = "Copied!";
       }, 2000);
     }
   };

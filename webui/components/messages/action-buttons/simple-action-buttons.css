@@ -60,26 +60,113 @@
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 20;
 }
 
-/* Success state - same as original */
+/* Success state with enhanced animation */
 .action-buttons .action-button.success {
   background: #4CAF50;
   border-color: #4CAF50;
   color: white;
+  animation: successPulse 0.4s ease-out;
+  box-shadow: 0 0 12px rgba(76, 175, 80, 0.5);
 }
 
 .action-buttons .action-button.success .material-symbols-outlined {
   font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20;
+  animation: iconPop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
-/* Error state - same as original */
+@keyframes successPulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 rgba(76, 175, 80, 0); }
+  50% { transform: scale(1.1); box-shadow: 0 0 20px rgba(76, 175, 80, 0.7); }
+  100% { transform: scale(1); box-shadow: 0 0 12px rgba(76, 175, 80, 0.5); }
+}
+
+@keyframes iconPop {
+  0% { transform: scale(0) rotate(-45deg); }
+  70% { transform: scale(1.2) rotate(5deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+/* Error state with enhanced animation */
 .action-buttons .action-button.error {
   background: var(--color-accent);
   border-color: var(--color-accent);
   color: white;
+  animation: errorShake 0.4s ease-out;
 }
 
 .action-buttons .action-button.error .material-symbols-outlined {
   font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20;
+  animation: iconShake 0.4s ease-out;
+}
+
+@keyframes errorShake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-3px); }
+  40% { transform: translateX(3px); }
+  60% { transform: translateX(-2px); }
+  80% { transform: translateX(2px); }
+}
+
+@keyframes iconShake {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-10deg); }
+  75% { transform: rotate(10deg); }
+}
+
+/* Tooltip for copy feedback */
+.action-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(10px) scale(0.8);
+  background: var(--color-panel);
+  color: var(--color-text);
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  border: 1px solid var(--color-border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+}
+
+.action-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--color-border);
+}
+
+.action-button.show-tooltip .action-tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0) scale(1);
+}
+
+.action-button.success .action-tooltip {
+  background: #4CAF50;
+  color: white;
+  border-color: #4CAF50;
+}
+
+.action-button.success .action-tooltip::after {
+  border-top-color: #4CAF50;
+}
+
+.action-button.error .action-tooltip {
+  background: var(--color-accent);
+  color: white;
+  border-color: var(--color-accent);
+}
+
+.action-button.error .action-tooltip::after {
+  border-top-color: var(--color-accent);
 }
 
 /* Speaking state - same as original */
