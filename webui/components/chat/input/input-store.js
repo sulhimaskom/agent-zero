@@ -103,6 +103,7 @@ const model = {
       if (globalThis.sendMessage) {
         await globalThis.sendMessage();
       }
+      window.dispatchEvent(new CustomEvent('sent-message'));
     } finally {
       this.isSending = false;
     }
