@@ -71,6 +71,8 @@ export async function fetchApi(url, request) {
 
 // csrf token stored locally
 let csrfToken = null;
+let csrfTokenFailed = false;
+let csrfTokenErrorLogged = false;
 
 /**
  * Get the CSRF token for API requests
@@ -79,21 +81,61 @@ let csrfToken = null;
  */
 async function getCsrfToken() {
   if (csrfToken) return csrfToken;
-  const response = await fetch("/csrf_token", {
-    credentials: "same-origin",
-  });
-  if (response.redirected && response.url.endsWith("/login")) {
-    // redirect to login
-    window.location.href = response.url;
-    return;
+  
+  // Prevent repeated failed requests that spam the console
+  if (csrfTokenFailed) {
+    throw new Error("CSRF token unavailable - backend not running");
   }
-  const json = await response.json();
-  if (json.ok) {
-    csrfToken = json.token;
-    document.cookie = `csrf_token_${json.runtime_id}=${csrfToken}; SameSite=Strict; Path=/`;
-    return csrfToken;
-  } else {
-    if (json.error) alert(json.error);
-    throw new Error(json.error || "Failed to get CSRF token");
+  
+  try {
+    const response = await fetch("/csrf_token", {
+      credentials: "same-origin",
+    });
+    
+    if (response.redirected && response.url.endsWith("/login")) {
+      // redirect to login
+      window.location.href = response.url;
+      return;
+    }
+    
+    // Check for 404 or other error status
+    if (!response.ok) {
+      csrfTokenFailed = true;
+      if (!csrfTokenErrorLogged) {
+        console.warn("Backend API not available - CSRF token endpoint returned", response.status);
+        csrfTokenErrorLogged = true;
+      }
+      throw new Error(`CSRF token endpoint returned ${response.status}`);
+    }
+    
+    // Try to parse JSON, but handle non-JSON responses gracefully
+    let json;
+    try {
+      json = await response.json();
+    } catch (parseError) {
+      csrfTokenFailed = true;
+      if (!csrfTokenErrorLogged) {
+        console.warn("Backend API not available - CSRF endpoint returned non-JSON response");
+        csrfTokenErrorLogged = true;
+      }
+      throw new Error("Invalid JSON response from CSRF endpoint");
+    }
+    
+    if (json.ok) {
+      csrfToken = json.token;
+      document.cookie = `csrf_token_${json.runtime_id}=${csrfToken}; SameSite=Strict; Path=/`;
+      return csrfToken;
+    } else {
+      if (json.error) alert(json.error);
+      throw new Error(json.error || "Failed to get CSRF token");
+    }
+  } catch (error) {
+    csrfTokenFailed = true;
+    // Only log the first error to prevent console spam
+    if (!csrfTokenErrorLogged) {
+      console.warn("Backend connection failed - API calls will not work:", error.message);
+      csrfTokenErrorLogged = true;
+    }
+    throw error;
   }
 }

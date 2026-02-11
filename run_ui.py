@@ -201,7 +201,44 @@ async def serve_index():
         version_no=gitinfo["version"],
         version_time=gitinfo["commit_time"]
     )
-    return index
+    response = Response(index, mimetype='text/html')
+    # Don't cache index.html to ensure fresh content on reload
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
+
+# Serve static files with cache headers for better performance
+@webapp.route('/<path:filename>')
+async def serve_static(filename):
+    # Only serve files from webui folder
+    if '..' in filename or filename.startswith('/'):
+        return Response("Invalid path", 403)
+
+    # Determine cache duration based on file type
+    cache_max_age = 3600  # Default 1 hour
+
+    # Long cache for vendor files (they rarely change)
+    if filename.startswith('vendor/'):
+        cache_max_age = 31536000  # 1 year
+    # Medium cache for CSS/JS files
+    elif filename.endswith(('.css', '.js')):
+        cache_max_age = 86400  # 24 hours
+    # Short cache for images and other assets
+    elif filename.endswith(('.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico')):
+        cache_max_age = 604800  # 7 days
+
+    try:
+        file_path = os.path.join(get_abs_path("./webui"), filename)
+        if os.path.exists(file_path) and os.path.isfile(file_path):
+            from flask import send_file
+            response = send_file(file_path)
+            response.headers['Cache-Control'] = f'public, max-age={cache_max_age}'
+            return response
+        else:
+            return Response("File not found", 404)
+    except Exception:
+        return Response("Error serving file", 500)
 
 def run():
     PrintStyle().print("Initializing framework...")
