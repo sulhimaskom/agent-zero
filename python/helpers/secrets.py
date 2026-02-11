@@ -6,6 +6,7 @@ from typing import Dict, Optional, List, Literal, Set, Callable, Tuple, TYPE_CHE
 from dotenv.parser import parse_stream
 from python.helpers.errors import RepairableException
 from python.helpers import files
+from python.helpers.constants import TmpPaths
 
 if TYPE_CHECKING:
     from agent import AgentContext
@@ -13,7 +14,7 @@ if TYPE_CHECKING:
 
 # New alias-based placeholder format §§secret(KEY)
 ALIAS_PATTERN = r"§§secret\(([A-Za-z_][A-Za-z0-9_]*)\)"
-DEFAULT_SECRETS_FILE = "tmp/secrets.env"
+DEFAULT_SECRETS_FILE = TmpPaths.SECRETS_ENV
 
 
 def alias_for_key(key: str, placeholder: str = "§§secret({key})") -> str:

@@ -11,7 +11,7 @@ from python.helpers.print_style import PrintStyle
 from python.helpers.playwright import ensure_playwright_binary
 from python.helpers.secrets import get_secrets_manager
 from python.extensions.message_loop_start._10_iteration_no import get_iter_no
-from python.helpers.constants import Timeouts, Limits, Shell
+from python.helpers.constants import Timeouts, Limits, Shell, Browser
 from pydantic import BaseModel
 from python.helpers.dirty_json import DirtyJson
 
@@ -57,7 +57,7 @@ class State:
                 chromium_sandbox=False,
                 accept_downloads=True,
                 downloads_path=files.get_abs_path("tmp/downloads"),
-                allowed_domains=["*", "http://*", "https://*"],
+                allowed_domains=Browser.ALLOWED_DOMAINS,
                 executable_path=pw_binary,
                 keep_alive=True,
                 minimum_wait_page_load_time=Limits.BROWSER_PAGE_LOAD_MIN,
