@@ -57,7 +57,30 @@ create_mock_module('docker')
 create_mock_module('psutil')
 create_mock_module('aiohttp')
 create_mock_module('fastmcp')
-# Do not mock mcp - we need the real package for imports
+# Mock mcp module with required classes for tests
+mcp_mock = create_mock_module('mcp')
+mcp_mock.ClientSession = MagicMock
+mcp_mock.StdioServerParameters = MagicMock
+
+# Mock mcp.client submodules
+sys.modules['mcp.client'] = MagicMock()
+sys.modules['mcp.client.stdio'] = MagicMock()
+sys.modules['mcp.client.stdio'].stdio_client = MagicMock()
+sys.modules['mcp.client.sse'] = MagicMock()
+sys.modules['mcp.client.sse'].sse_client = MagicMock()
+sys.modules['mcp.client.streamable_http'] = MagicMock()
+sys.modules['mcp.client.streamable_http'].streamablehttp_client = MagicMock()
+
+# Mock mcp.shared submodules
+sys.modules['mcp.shared'] = MagicMock()
+sys.modules['mcp.shared.message'] = MagicMock()
+sys.modules['mcp.shared.message'].SessionMessage = MagicMock()
+
+# Mock mcp.types
+sys.modules['mcp.types'] = MagicMock()
+sys.modules['mcp.types'].CallToolResult = MagicMock()
+sys.modules['mcp.types'].ListToolsResult = MagicMock()
+
 create_mock_module('fasta2a')
 create_mock_module('croniter')
 create_mock_module('imapclient')
@@ -102,6 +125,14 @@ create_mock_module('unstructured_client')
 create_mock_module('pathspec')
 create_mock_module('pywinpty')
 create_mock_module('regex')
+create_mock_module('httpx')
+
+# Mock anyio for MCP handler
+anyio_mock = create_mock_module('anyio')
+sys.modules['anyio.streams'] = MagicMock()
+sys.modules['anyio.streams.memory'] = MagicMock()
+sys.modules['anyio.streams.memory'].MemoryObjectReceiveStream = MagicMock()
+sys.modules['anyio.streams.memory'].MemoryObjectSendStream = MagicMock()
 
 # Mock langchain submodules
 sys.modules['langchain_core.language_models'] = MagicMock()
