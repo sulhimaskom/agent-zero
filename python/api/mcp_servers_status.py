@@ -12,4 +12,3 @@ class McpServersStatuss(ApiHandler):
         return {"success": True, "status": status}
         # except Exception as e:
         #     return {"success": False, "error": str(e)}
-

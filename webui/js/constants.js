@@ -230,3 +230,21 @@ export const API_ENDPOINTS = {
   SETTINGS_SAVE: "/api/settings_save",
   TEST_CONNECTION: "/api/test_connection",
 };
+
+// =============================================================================
+// RETRY CONFIGURATION
+// =============================================================================
+
+export const RETRY = {
+  MAX_RETRIES: 3,
+  INTERVAL_MS: 1000,
+};
+
+// =============================================================================
+// QR CODE CONFIGURATION
+// =============================================================================
+
+export const QR_CODE = {
+  WIDTH: 128,
+  HEIGHT: 128,
+};

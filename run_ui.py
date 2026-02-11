@@ -7,6 +7,7 @@ import struct
 from functools import wraps
 import threading
 from flask import Flask, request, Response, session, redirect, url_for, render_template_string
+from flask_compress import Compress
 from werkzeug.wrappers.response import Response as BaseResponse
 import initialize
 from python.helpers import files, git, mcp_server, fasta2a_server
@@ -37,8 +38,25 @@ webapp.config.update(
     SESSION_COOKIE_NAME="session_" + runtime.get_runtime_id(),  # bind the session cookie name to runtime id to prevent session collision on same host
     SESSION_COOKIE_SAMESITE="Strict",
     SESSION_PERMANENT=True,
-    PERMANENT_SESSION_LIFETIME=timedelta(days=1)
+    PERMANENT_SESSION_LIFETIME=timedelta(days=1),
+    COMPRESS_MIMETYPES=[
+        'text/html',
+        'text/css',
+        'text/javascript',
+        'text/plain',
+        'text/xml',
+        'application/json',
+        'application/javascript',
+        'application/x-javascript',
+        'application/xml',
+        'text/x-component',
+    ],
+    COMPRESS_LEVEL=6,
+    COMPRESS_MIN_SIZE=500
 )
+
+# Enable gzip compression for static assets
+Compress(webapp)
 
 lock = threading.Lock()
 
