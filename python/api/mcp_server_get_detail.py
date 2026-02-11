@@ -14,4 +14,3 @@ class McpServerGetDetail(ApiHandler):
         return {"success": True, "detail": detail}
         # except Exception as e:
         #     return {"success": False, "error": str(e)}
-

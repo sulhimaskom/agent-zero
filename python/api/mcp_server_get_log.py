@@ -14,4 +14,3 @@ class McpServerGetLog(ApiHandler):
         return {"success": True, "log": log}
         # except Exception as e:
         #     return {"success": False, "error": str(e)}
-
