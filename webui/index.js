@@ -399,7 +399,16 @@ export async function poll() {
     lastLogVersion = response.log_version;
     lastLogGuid = response.log_guid;
   } catch (error) {
-    console.error("Error:", error);
+    // Silently handle connection errors to prevent console spam
+    // Only log if it's not a common connection/backend unavailable error
+    const isConnectionError = error.message?.includes('fetch') || 
+                              error.message?.includes('network') ||
+                              error.message?.includes('CSRF') ||
+                              error.message?.includes('JSON');
+    
+    if (!isConnectionError) {
+      console.error("Poll error:", error);
+    }
     setConnectionStatus(false);
   }
 
