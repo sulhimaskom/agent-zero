@@ -14,8 +14,6 @@ pause_time = 0
 
 
 async def run_loop():
-    global pause_time, keep_running
-
     while True:
         if runtime.is_development():
             # Signal to container that the job loop should be paused

@@ -10,7 +10,6 @@ def set_server(server):
     _server = server
 
 def get_server(server):
-    global _server
     return _server
 
 def stop_server():
