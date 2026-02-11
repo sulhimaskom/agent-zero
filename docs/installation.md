@@ -372,9 +372,68 @@ For developers or users who need to run Agent Zero directly on their system,see 
 > docker run -p $PORT:80 -v /path/to/your/data:/a0 agent0ai/agent-zero
 > ```
 
-      
+       
 ### Conclusion
 After following the instructions for your specific operating system, you should have Agent Zero successfully installed and running. You can now start exploring the framework's capabilities and experimenting with creating your own intelligent agents. 
 
 If you encounter any issues during the installation process, please consult the [Troubleshooting section](troubleshooting.md) of this documentation or refer to the Agent Zero [Skool](https://www.skool.com/agent-zero) or [Discord](https://discord.gg/B8KZKNsPpj) community for assistance.
+
+---
+
+## In-Depth Guide for Full Binaries Installation
+
+This section provides instructions for running Agent Zero directly on your host system without Docker. This is considered the legacy approach and is primarily intended for development or advanced use cases.
+
+> [!WARNING]
+> Running Agent Zero directly on your host system requires careful configuration and may have different security implications compared to the Docker runtime. This approach is recommended for developers who need to modify the framework's core code.
+
+### Prerequisites
+
+1. **Python 3.12+** - Agent Zero requires Python 3.12 or higher
+2. **Git** - For cloning the repository
+3. **Conda or venv** - Recommended for environment isolation
+
+### Installation Steps
+
+1. **Clone the Repository:**
+   ```bash
+   git clone https://github.com/agent0ai/agent-zero.git
+   cd agent-zero
+   ```
+
+2. **Create Virtual Environment:**
+   ```bash
+   # Using conda
+   conda create -n agent-zero python=3.12
+   conda activate agent-zero
+   
+   # Or using venv
+   python -m venv .venv
+   source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+   ```
+
+3. **Install Dependencies:**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. **Configure Environment:**
+   - Copy `.env.example` to `.env`
+   - Edit `.env` and add your API keys and configuration
+
+5. **Run Agent Zero:**
+   ```bash
+   python run_ui.py --development=true
+   ```
+
+### Development Mode
+
+When running in development mode, the Web UI will auto-reload on file changes. Use the `--development=true` flag to enable this feature.
+
+### RFC Configuration
+
+When running Agent Zero directly on your system, you may need to configure Remote Function Calling (RFC) parameters to enable communication between components. Access these settings in the Web UI under Settings → Development Settings.
+
+> [!NOTE]
+> For most users, the Docker runtime approach described in the sections above is the recommended way to run Agent Zero.
 

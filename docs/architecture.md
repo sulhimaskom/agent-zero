@@ -63,17 +63,17 @@ This architecture ensures:
 | `/logs` | HTML CLI-style chat logs |
 | `/memory` | Persistent agent memory storage |
 | `/prompts` | System and tool prompts |
- | `/python` | Core Python codebase: |
-| `/api` | API endpoints and interfaces |
-| `/coordinators` | Coordination layer for separating concerns |
-| `/extensions` | Modular extensions |
-| `/helpers` | Utility functions |
-| `/tools` | Tool implementations |
+| `/python` | Core Python codebase: |
+| &nbsp;&nbsp;&nbsp;&nbsp;`/api` | API endpoints and interfaces |
+| &nbsp;&nbsp;&nbsp;&nbsp;`/coordinators` | Coordination layer for separating concerns |
+| &nbsp;&nbsp;&nbsp;&nbsp;`/extensions` | Modular extensions |
+| &nbsp;&nbsp;&nbsp;&nbsp;`/helpers` | Utility functions |
+| &nbsp;&nbsp;&nbsp;&nbsp;`/tools` | Tool implementations |
 | `/tmp` | Temporary runtime data |
 | `/webui` | Web interface components: |
-| `/css` | Stylesheets |
-| `/js` | JavaScript modules |
-| `/public` | Static assets |
+| &nbsp;&nbsp;&nbsp;&nbsp;`/css` | Stylesheets |
+| &nbsp;&nbsp;&nbsp;&nbsp;`/js` | JavaScript modules |
+| &nbsp;&nbsp;&nbsp;&nbsp;`/public` | Static assets |
 | `/work_dir` | Working directory |
 
 ### Key Files
