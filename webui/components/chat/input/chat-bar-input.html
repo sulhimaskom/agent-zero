@@ -151,18 +151,32 @@
     background-clip: border-box;
     border: 6px solid transparent;
     outline: 1px solid var(--color-border);
-    transition: all 0.3s ease;
-    -webkit-transition: all 0.3s ease;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    -webkit-transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, box-shadow;
     }
     #chat-input::-webkit-scrollbar { width: 6px; height: 6px; }
     #chat-input::-webkit-scrollbar-track { background: transparent; margin: 4px 0; border-radius: 6px; }
     #chat-input::-webkit-scrollbar-thumb { background-color: rgba(155,155,155,0.5); border-radius: 6px; -webkit-transition: background-color 0.2s ease; transition: background-color 0.2s ease; }
     #chat-input::-webkit-scrollbar-thumb:hover { background-color: rgba(155,155,155,0.7); }
-    #chat-input:focus { outline: 0.05rem solid rgba(155,155,155,0.5); font-size: 0.955rem; padding-top: 0.45rem; background-color: var(--color-input-focus); }
+    #chat-input:focus { 
+      outline: none;
+      font-size: 0.955rem; 
+      padding-top: 0.45rem; 
+      background-color: var(--color-input-focus);
+      border-color: var(--color-highlight);
+      box-shadow: 0 0 0 3px rgba(66, 72, 241, 0.15), 
+                  0 0 20px rgba(66, 72, 241, 0.1),
+                  inset 0 1px 2px rgba(255, 255, 255, 0.05);
+      transform: scale(1.005);
+    }
     #chat-input::placeholder { 
       color: var(--color-text-muted); 
       opacity: 0.7;
       transition: opacity 0.3s ease;
+    }
+    #chat-input:focus::placeholder {
+      opacity: 0.5;
     }
     #chat-input.placeholder-typing::placeholder {
       opacity: 0.4;
@@ -203,6 +217,18 @@
     .chat-button svg { width: 1.5rem; height: 1.5rem; }
     /* Microphone button */
     .chat-button.mic-inactive svg { /* Add specific styles if needed */ }
+    /* Accessibility: Respect reduced motion preferences */
+    @media (prefers-reduced-motion: reduce) {
+      #chat-input {
+        transition: none;
+        -webkit-transition: none;
+      }
+      #chat-input:focus {
+        transform: none;
+        box-shadow: 0 0 0 2px var(--color-highlight);
+      }
+    }
+
     /* Responsive tweaks */
     @media (max-width: 640px) {
       #chat-input { min-height: 5.3rem; align-content: start; }
