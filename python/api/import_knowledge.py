@@ -36,7 +36,7 @@ class ImportKnowledge(ApiHandler):
                 file.save(os.path.join(KNOWLEDGE_FOLDER, filename))
                 saved_filenames.append(filename)
 
-        #reload memory to re-import knowledge
+        # reload memory to re-import knowledge
         await memory.Memory.reload(context.agent0)
         context.log.set_initial_progress()
 

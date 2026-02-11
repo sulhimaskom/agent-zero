@@ -23,7 +23,10 @@ class BackupTest(ApiHandler):
             patterns_string = input.get("patterns", "")
             if patterns_string and not include_patterns:
                 # Parse patterns string into arrays
-                lines = [line.strip() for line in patterns_string.split('\n') if line.strip() and not line.strip().startswith('#')]
+                lines = [
+                    line.strip() for line in patterns_string.split('\n')
+                    if line.strip() and not line.strip().startswith('#')
+                ]
                 for line in lines:
                     if line.startswith('!'):
                         exclude_patterns.append(line[1:])

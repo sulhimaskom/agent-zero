@@ -4,6 +4,7 @@ from typing import Optional
 from python.helpers.errors import format_error
 from python.helpers.print_style import PrintStyle
 from python.helpers.log import Log
+from python.helpers.constants import Timeouts
 
 class DockerContainerManager:
     def __init__(self, image: str, name: str, ports: Optional[dict[str, int]] = None, volumes: Optional[dict[str, dict[str, str]]] = None,logger: Log|None=None):
@@ -29,7 +30,7 @@ class DockerContainerManager:
                     PrintStyle.error(err)
                     if self.logger:
                         self.logger.log(type="error", content=err)
-                    time.sleep(5) # try again in 5 seconds
+                    time.sleep(Timeouts.DOCKER_RETRY_DELAY) # try again in a few seconds
                 else:
                     raise
         return self.client
@@ -83,7 +84,7 @@ class DockerContainerManager:
                 
                 existing_container.start()
                 self.container = existing_container
-                time.sleep(2) # this helps to get SSH ready
+                time.sleep(Timeouts.DOCKER_INIT_DELAY) # this helps to get SSH ready
                 
             else:
                 self.container = existing_container
@@ -104,4 +105,4 @@ class DockerContainerManager:
             PrintStyle.standard(f"Started container with ID: {self.container.id}")
             if self.logger:
                 self.logger.log(type="info", content=f"Started container with ID: {self.container.id}")
-            time.sleep(5) # this helps to get SSH ready
+            time.sleep(Timeouts.DOCKER_STARTUP_DELAY) # this helps to get SSH ready

@@ -9,6 +9,9 @@ import sys
 import json
 import time
 from pathlib import Path
+import sys
+sys.path.insert(0, '/home/runner/work/agent-zero/agent-zero')
+from python.helpers.constants import Network
 
 def run_command(cmd, timeout=60):
     """Run a shell command and return output"""
@@ -112,7 +115,7 @@ def main():
     print()
     
     # Configuration
-    target_url = "http://localhost:50001"
+    target_url = f"http://{Network.DEFAULT_HOSTNAME}:50001"
     check_interval = 300  # 5 minutes between checks
     
     print(f"🎯 Target URL: {target_url}")

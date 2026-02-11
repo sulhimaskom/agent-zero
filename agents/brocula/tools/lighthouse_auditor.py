@@ -2,6 +2,7 @@ import json
 import subprocess
 import os
 from python.helpers.tool import Tool, Response
+from python.helpers.constants import Network
 
 class State:
     @staticmethod
@@ -20,18 +21,20 @@ class lighthouse_auditor(Tool):
     Checks performance, accessibility, best practices, and SEO.
     """
 
-    async def execute(self, url: str = "http://localhost:50001", 
+    async def execute(self, url: str = None,
                       categories: str = "performance,accessibility,best-practices,seo",
                       device: str = "desktop",
                       **kwargs) -> Response:
         """
         Run Lighthouse audit and report optimization opportunities.
-        
+
         Args:
             url: The URL to audit (default: http://localhost:50001)
             categories: Comma-separated list of categories to audit (default: all)
             device: Device type - 'desktop' or 'mobile' (default: desktop)
         """
+        if url is None:
+            url = f"http://{Network.DEFAULT_HOSTNAME}:50001"
         await self.agent.handle_intervention()
         
         state = await self.agent.get_tool_state(self, State)
