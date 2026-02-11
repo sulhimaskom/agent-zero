@@ -64,7 +64,46 @@
             </div>
         </div>
 
-        <div id="chat-buttons-wrapper" x-data="{ showSendTooltip: false }">
+        <div id="chat-buttons-wrapper" x-data="{ showSendTooltip: false }"
+             x-init="
+                const sendBtn = document.getElementById('send-button');
+                sendBtn.addEventListener('click', function(e) {
+                    // Trigger ripple effect
+                    this.classList.remove('ripple');
+                    void this.offsetWidth; // Force reflow
+                    this.classList.add('ripple');
+                    
+                    // Remove ripple class after animation
+                    setTimeout(() => {
+                        this.classList.remove('ripple');
+                    }, 600);
+                });
+             
+                // Watch for sending state changes
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        if (mutation.type === 'attributes' && mutation.attributeName === 'disabled') {
+                            const isDisabled = sendBtn.disabled;
+                            if (isDisabled) {
+                                sendBtn.classList.add('sending');
+                                sendBtn.classList.remove('success');
+                            } else {
+                                sendBtn.classList.remove('sending');
+                                // Show success animation briefly
+                                if (sendBtn.dataset.sent === 'true') {
+                                    sendBtn.classList.add('success');
+                                    setTimeout(() => {
+                                        sendBtn.classList.remove('success');
+                                        sendBtn.dataset.sent = 'false';
+                                    }, 600);
+                                }
+                            }
+                        }
+                    });
+                });
+                observer.observe(sendBtn, { attributes: true });
+             "
+             @sent-message.window="document.getElementById('send-button').dataset.sent = 'true'">
             <!-- Send button -->
             <button class="chat-button" id="send-button"
                     :aria-label="$store.chatInput.isSending ? 'Sending message...' : 'Send message'"
@@ -73,7 +112,8 @@
                     @mouseover="showSendTooltip = true"
                     @mouseleave="showSendTooltip = false"
                     @focus="showSendTooltip = true"
-                    @blur="showSendTooltip = false">
+                    @blur="showSendTooltip = false"
+                    data-sent="false">
                 <!-- Send Icon -->
                 <svg x-show="!$store.chatInput.isSending" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
                     <path d="M25 20 L75 50 L25 80" fill="none" stroke="currentColor" stroke-width="15"></path>
@@ -207,14 +247,100 @@
 
     /* Chat buttons (Send/Mic) */
     #chat-buttons-wrapper { gap: var(--spacing-xs); padding-left: var(--spacing-xs); line-height: 0.5rem; display: -webkit-flex; display: flex; }
-    .chat-button { border: none; border-radius: 50%; color: var(--color-background); cursor: pointer; font-size: var(--font-size-normal); height: 2.525rem; width: 2.525rem; margin: 0 0.18rem 0 0 var(--spacing-xs); display: -webkit-flex; display: flex; align-items: center; justify-content: center; flex-shrink: 0; flex-grow: 0; min-width: 2.525rem; -webkit-transition: all var(--transition-speed), transform 0.1s ease-in-out; transition: all var(--transition-speed), transform 0.1s ease-in-out; }
-    #send-button { background-color: #4248f1; }
-    #send-button:hover { -webkit-transform: scale(1.05); transform: scale(1.05); transform-origin: center; background-color: #353bc5; }
-    #send-button:active { -webkit-transform: scale(1); transform: scale(1); transform-origin: center; background-color: #2b309c; }
-    #send-button:disabled { opacity: 0.7; cursor: not-allowed; transform: none !important; }
-    #send-button .spinner { animation: spin 1s linear infinite; }
-    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-    .chat-button svg { width: 1.5rem; height: 1.5rem; }
+    .chat-button { border: none; border-radius: 50%; color: var(--color-background); cursor: pointer; font-size: var(--font-size-normal); height: 2.525rem; width: 2.525rem; margin: 0 0.18rem 0 0 var(--spacing-xs); display: -webkit-flex; display: flex; align-items: center; justify-content: center; flex-shrink: 0; flex-grow: 0; min-width: 2.525rem; -webkit-transition: all var(--transition-speed), transform 0.1s ease-in-out; transition: all var(--transition-speed), transform 0.1s ease-in-out; position: relative; overflow: hidden; }
+    
+    /* Send Button with Ripple Effect */
+    #send-button { 
+      background-color: #4248f1; 
+      position: relative;
+      overflow: hidden;
+    }
+    #send-button:hover { 
+      -webkit-transform: scale(1.05); 
+      transform: scale(1.05); 
+      transform-origin: center; 
+      background-color: #353bc5; 
+      box-shadow: 0 4px 15px rgba(66, 72, 241, 0.4);
+    }
+    #send-button:active { 
+      -webkit-transform: scale(0.95); 
+      transform: scale(0.95); 
+      transform-origin: center; 
+      background-color: #2b309c; 
+    }
+    #send-button:disabled { 
+      opacity: 0.7; 
+      cursor: not-allowed; 
+      transform: none !important; 
+      box-shadow: none;
+    }
+    
+    /* Ripple Effect */
+    #send-button::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.6s ease-out, height 0.6s ease-out, opacity 0.6s ease-out;
+      pointer-events: none;
+    }
+    #send-button.ripple::after {
+      width: 200%;
+      height: 200%;
+      opacity: 0;
+    }
+    
+    /* Enhanced Sending State */
+    #send-button.sending {
+      background-color: #2b309c;
+      animation: send-pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes send-pulse {
+      0%, 100% { 
+        box-shadow: 0 0 0 0 rgba(66, 72, 241, 0.4);
+      }
+      50% { 
+        box-shadow: 0 0 0 8px rgba(66, 72, 241, 0);
+      }
+    }
+    
+    /* Success Animation */
+    #send-button.success {
+      background-color: #4CAF50;
+      animation: success-bounce 0.5s ease;
+    }
+    @keyframes success-bounce {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+    
+    /* Spinner Animation */
+    #send-button .spinner { 
+      animation: spin 1s linear infinite; 
+    }
+    @keyframes spin { 
+      from { transform: rotate(0deg); } 
+      to { transform: rotate(360deg); } 
+    }
+    
+    /* Icon transitions */
+    #send-button svg {
+      width: 1.5rem;
+      height: 1.5rem;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+    #send-button:hover svg {
+      transform: translateX(2px);
+    }
+    #send-button.sending svg {
+      transform: scale(0.9);
+    }
     /* Microphone button */
     .chat-button.mic-inactive svg { /* Add specific styles if needed */ }
     /* Accessibility: Respect reduced motion preferences */
@@ -226,6 +352,18 @@
       #chat-input:focus {
         transform: none;
         box-shadow: 0 0 0 2px var(--color-highlight);
+      }
+      #send-button::after {
+        transition: none;
+      }
+      #send-button.sending {
+        animation: none;
+      }
+      #send-button.success {
+        animation: none;
+      }
+      #send-button:hover svg {
+        transform: none;
       }
     }
 
