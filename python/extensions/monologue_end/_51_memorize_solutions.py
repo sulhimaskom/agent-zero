@@ -191,8 +191,3 @@ class MemorizeSolutions(Extension):
                     log_item.stream(result=f"\nReplaced {len(rem)} previous solutions.")
 
 
-    # except Exception as e:
-    #     err = errors.format_error(e)
-    #     self.agent.context.log.log(
-    #         type="error", heading="Memorize solutions extension error:", content=err
-    #     )

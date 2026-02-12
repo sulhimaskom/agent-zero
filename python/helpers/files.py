@@ -1,3 +1,8 @@
+"""File I/O utilities and plugin system for Agent Zero.
+
+Provides file operations including read/write, compression,
+path resolution, and a plugin system for variable substitution.
+"""
 from abc import ABC, abstractmethod
 from fnmatch import fnmatch
 import json

@@ -1,3 +1,8 @@
+"""Runtime environment detection and management for Agent Zero.
+
+Handles command-line arguments, environment initialization,
+Docker operations, and runtime configuration.
+"""
 import argparse
 import inspect
 import secrets

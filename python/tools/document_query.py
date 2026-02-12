@@ -1,3 +1,8 @@
+"""Document query tool for RAG-based document Q&A.
+
+Enables agents to query documents using semantic search and
+retrieve relevant content or answers to specific questions.
+"""
 import asyncio
 
 from python.helpers.tool import Tool, Response
