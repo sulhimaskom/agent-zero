@@ -6,13 +6,17 @@ from python.helpers.shell_ssh import clean_string
 class LocalInteractiveSession:
     def __init__(self, cwd: str | None = None):
         self.session: tty_session.TTYSession | None = None
-        self.full_output = ''
+        self.full_output = ""
         self.cwd = cwd
 
     async def connect(self):
-        self.session = tty_session.TTYSession(runtime.get_terminal_executable(), cwd=self.cwd)
+        self.session = tty_session.TTYSession(
+            runtime.get_terminal_executable(), cwd=self.cwd
+        )
         await self.session.start()
-        await self.session.read_full_until_idle(idle_timeout=1, total_timeout=1)
+        await self.session.read_full_until_idle(
+            idle_timeout=1, total_timeout=1
+        )
 
     async def close(self):
         if self.session:
@@ -25,7 +29,9 @@ class LocalInteractiveSession:
         self.full_output = ""
         await self.session.sendline(command)
 
-    async def read_output(self, timeout: float = 0, reset_full_output: bool = False) -> Tuple[str, Optional[str]]:
+    async def read_output(
+        self, timeout: float = 0, reset_full_output: bool = False
+    ) -> Tuple[str, Optional[str]]:
         if not self.session:
             raise Exception("Shell not connected")
 
@@ -33,7 +39,9 @@ class LocalInteractiveSession:
             self.full_output = ""
 
         # get output from terminal
-        partial_output = await self.session.read_full_until_idle(idle_timeout=0.01, total_timeout=timeout)
+        partial_output = await self.session.read_full_until_idle(
+            idle_timeout=0.01, total_timeout=timeout
+        )
         self.full_output += partial_output
 
         # clean output

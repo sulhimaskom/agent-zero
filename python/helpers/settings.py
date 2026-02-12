@@ -11,7 +11,13 @@ from . import files, dotenv
 from python.helpers.print_style import PrintStyle
 from python.helpers.providers import get_providers
 from python.helpers.secrets import get_default_secrets_manager
-from python.helpers.constants import Limits, Network, Timeouts, Colors, AgentDefaults
+from python.helpers.constants import (
+    Limits,
+    Network,
+    Timeouts,
+    Colors,
+    AgentDefaults,
+)
 
 
 class Settings(TypedDict):
@@ -86,7 +92,7 @@ class Settings(TypedDict):
     rfc_port_http: int
     rfc_port_ssh: int
 
-    shell_interface: Literal['local', 'ssh']
+    shell_interface: Literal["local", "ssh"]
 
     stt_model_size: str
     stt_language: str
@@ -649,7 +655,9 @@ def convert_out(settings: Settings) -> SettingsOutput:
             "value": settings["agent_knowledge_subdir"],
             "options": [
                 {"value": subdir, "label": subdir}
-                for subdir in files.get_subdirectories("knowledge", exclude="default")
+                for subdir in files.get_subdirectories(
+                    "knowledge", exclude="default"
+                )
             ],
         }
     )
@@ -854,7 +862,10 @@ def convert_out(settings: Settings) -> SettingsOutput:
             "description": "Terminal interface used for Code Execution Tool. Local Python TTY works locally in both dockerized and development environments. SSH always connects to dockerized environment (automatically at localhost or RFC host address).",
             "type": "select",
             "value": settings["shell_interface"],
-            "options": [{"value": "local", "label": "Local Python TTY"}, {"value": "ssh", "label": "SSH"}],
+            "options": [
+                {"value": "local", "label": "Local Python TTY"},
+                {"value": "ssh", "label": "SSH"},
+            ],
         }
     )
 
@@ -1118,23 +1129,27 @@ def convert_out(settings: Settings) -> SettingsOutput:
     except Exception:
         secrets = ""
 
-    secrets_fields.append({
-        "id": "variables",
-        "title": "Variables Store",
-        "description": "Store non-sensitive variables in .env format e.g. EMAIL_IMAP_SERVER=\"imap.gmail.com\", one item per line. You can use comments starting with # to add descriptions for the agent. See <a href=\"javascript:openModal('settings/secrets/example-vars.html')\">example</a>.<br>These variables are visible to LLMs and in chat history, they are not being masked.",
-        "type": "textarea",
-        "value": settings["variables"].strip(),
-        "style": "height: 20em",
-    })
+    secrets_fields.append(
+        {
+            "id": "variables",
+            "title": "Variables Store",
+            "description": 'Store non-sensitive variables in .env format e.g. EMAIL_IMAP_SERVER="imap.gmail.com", one item per line. You can use comments starting with # to add descriptions for the agent. See <a href="javascript:openModal(\'settings/secrets/example-vars.html\')">example</a>.<br>These variables are visible to LLMs and in chat history, they are not being masked.',
+            "type": "textarea",
+            "value": settings["variables"].strip(),
+            "style": "height: 20em",
+        }
+    )
 
-    secrets_fields.append({
-        "id": "secrets",
-        "title": "Secrets Store",
-        "description": "Store secrets and credentials in .env format e.g. EMAIL_PASSWORD=\"s3cret-p4$$w0rd\", one item per line. You can use comments starting with # to add descriptions for the agent. See <a href=\"javascript:openModal('settings/secrets/example-secrets.html')\">example</a>.<br>These variables are not visile to LLMs and in chat history, they are being masked. ⚠️ only values with length >= 4 are being masked to prevent false positives. ",
-        "type": "textarea",
-        "value": secrets,
-        "style": "height: 20em",
-    })
+    secrets_fields.append(
+        {
+            "id": "secrets",
+            "title": "Secrets Store",
+            "description": 'Store secrets and credentials in .env format e.g. EMAIL_PASSWORD="s3cret-p4$$w0rd", one item per line. You can use comments starting with # to add descriptions for the agent. See <a href="javascript:openModal(\'settings/secrets/example-secrets.html\')">example</a>.<br>These variables are not visile to LLMs and in chat history, they are being masked. ⚠️ only values with length >= 4 are being masked to prevent false positives. ',
+            "type": "textarea",
+            "value": secrets,
+            "style": "height: 20em",
+        }
+    )
 
     secrets_section: SettingsSection = {
         "id": "secrets",
@@ -1213,7 +1228,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
         "id": "external_api",
         "title": "External API",
         "description": "Agent Zero provides external API endpoints for integration with other applications. "
-                       "These endpoints use API key authentication and support text messages and file attachments.",
+        "These endpoints use API key authentication and support text messages and file attachments.",
         "fields": external_api_fields,
         "tab": "external",
     }
@@ -1300,7 +1315,9 @@ def convert_out(settings: Settings) -> SettingsOutput:
     return result
 
 
-def _get_api_key_field(settings: Settings, provider: str, title: str) -> SettingsField:
+def _get_api_key_field(
+    settings: Settings, provider: str, title: str
+) -> SettingsField:
     key = settings["api_keys"].get(provider, models.get_api_key(provider))
     # For API keys, use simple asterisk placeholder for existing keys
     return {
@@ -1324,7 +1341,9 @@ def convert_in(settings: dict) -> Settings:
 
                 if not should_skip:
                     # Special handling for browser_http_headers
-                    if field["id"] == "browser_http_headers" or field["id"].endswith("_kwargs"):
+                    if field["id"] == "browser_http_headers" or field[
+                        "id"
+                    ].endswith("_kwargs"):
                         current[field["id"]] = _env_to_dict(field["value"])
                     elif field["id"].startswith("api_key_"):
                         current["api_keys"][field["id"]] = field["value"]
@@ -1400,7 +1419,10 @@ def _adjust_to_version(settings: Settings, default: Settings):
     # starting with 0.9, the default prompt subfolder for agent no. 0 is agent0
     # switch to agent0 if the old default is used from v0.8
     if "version" not in settings or settings["version"].startswith("v0.8"):
-        if "agent_profile" not in settings or settings["agent_profile"] == "default":
+        if (
+            "agent_profile" not in settings
+            or settings["agent_profile"] == "default"
+        ):
             settings["agent_profile"] = AgentDefaults.PROFILE
 
 
@@ -1437,12 +1459,18 @@ def _write_sensitive_settings(settings: Settings):
 
     dotenv.save_dotenv_value(dotenv.KEY_AUTH_LOGIN, settings["auth_login"])
     if settings["auth_password"]:
-        dotenv.save_dotenv_value(dotenv.KEY_AUTH_PASSWORD, settings["auth_password"])
+        dotenv.save_dotenv_value(
+            dotenv.KEY_AUTH_PASSWORD, settings["auth_password"]
+        )
     if settings["rfc_password"]:
-        dotenv.save_dotenv_value(dotenv.KEY_RFC_PASSWORD, settings["rfc_password"])
+        dotenv.save_dotenv_value(
+            dotenv.KEY_RFC_PASSWORD, settings["rfc_password"]
+        )
 
     if settings["root_password"]:
-        dotenv.save_dotenv_value(dotenv.KEY_ROOT_PASSWORD, settings["root_password"])
+        dotenv.save_dotenv_value(
+            dotenv.KEY_ROOT_PASSWORD, settings["root_password"]
+        )
     if settings["root_password"]:
         set_root_password(settings["root_password"])
 
@@ -1542,7 +1570,9 @@ def _apply_settings(previous: Settings | None):
 
         config = initialize_agent()
         for ctx in AgentContext._contexts.values():
-            ctx.config = config  # reinitialize context config with new settings
+            ctx.config = (
+                config  # reinitialize context config with new settings
+            )
             # apply config to agents
             agent = ctx.agent0
             while agent:
@@ -1550,7 +1580,10 @@ def _apply_settings(previous: Settings | None):
                 agent = agent.get_data(agent.DATA_NAME_SUBORDINATE)
 
         # reload whisper model if necessary
-        if not previous or _settings["stt_model_size"] != previous["stt_model_size"]:
+        if (
+            not previous
+            or _settings["stt_model_size"] != previous["stt_model_size"]
+        ):
             _ = defer.DeferredTask().start_task(
                 whisper.preload, _settings["stt_model_size"]
             )  # TODO overkill, replace with background task
@@ -1558,8 +1591,10 @@ def _apply_settings(previous: Settings | None):
         # force memory reload on embedding model change
         if not previous or (
             _settings["embed_model_name"] != previous["embed_model_name"]
-            or _settings["embed_model_provider"] != previous["embed_model_provider"]
-            or _settings["embed_model_kwargs"] != previous["embed_model_kwargs"]
+            or _settings["embed_model_provider"]
+            != previous["embed_model_provider"]
+            or _settings["embed_model_kwargs"]
+            != previous["embed_model_kwargs"]
         ):
             from python.helpers.memory import reload as memory_reload
 
@@ -1588,25 +1623,35 @@ def _apply_settings(previous: Settings | None):
                     )
                     (
                         PrintStyle(
-                            background_color="red", font_color="black", padding=True
+                            background_color="red",
+                            font_color="black",
+                            padding=True,
                         ).print("Failed to update MCP settings")
                     )
                     (
                         PrintStyle(
-                            background_color="black", font_color="red", padding=True
+                            background_color="black",
+                            font_color="red",
+                            padding=True,
                         ).print(f"{e}")
                     )
 
                 PrintStyle(
-                    background_color=Colors.SETTINGS_PURPLE, font_color=Colors.BG_WHITE, padding=True
+                    background_color=Colors.SETTINGS_PURPLE,
+                    font_color=Colors.BG_WHITE,
+                    padding=True,
                 ).print("Parsed MCP config:")
                 (
                     PrintStyle(
-                        background_color=Colors.SETTINGS_DARK, font_color=Colors.BG_WHITE, padding=False
+                        background_color=Colors.SETTINGS_DARK,
+                        font_color=Colors.BG_WHITE,
+                        padding=False,
                     ).print(mcp_config.model_dump_json())
                 )
                 AgentContext.log_to_all(
-                    type="info", content="Finished updating MCP settings.", temp=True
+                    type="info",
+                    content="Finished updating MCP settings.",
+                    temp=True,
                 )
 
             _ = defer.DeferredTask().start_task(
@@ -1645,13 +1690,13 @@ def _env_to_dict(data: str):
     result = {}
     for line in data.splitlines():
         line = line.strip()
-        if not line or line.startswith('#'):
+        if not line or line.startswith("#"):
             continue
 
-        if '=' not in line:
+        if "=" not in line:
             continue
 
-        key, value = line.split('=', 1)
+        key, value = line.split("=", 1)
         key = key.strip()
         value = value.strip()
 
@@ -1682,14 +1727,16 @@ def _dict_to_env(data_dict):
             lines.append(f'{key}={json.dumps(value, separators=(",", ":"))}')
         else:
             # Numbers and other types as unquoted strings
-            lines.append(f'{key}={value}')
+            lines.append(f"{key}={value}")
 
     return "\n".join(lines)
 
 
 def set_root_password(password: str):
     if not runtime.is_dockerized():
-        raise Exception("root password can only be set in dockerized environments")
+        raise Exception(
+            "root password can only be set in dockerized environments"
+        )
     subprocess.run(
         ["chpasswd"],
         input=f"root:{password}".encode(),
@@ -1703,9 +1750,15 @@ def get_runtime_config(set: Settings):
     if runtime.is_dockerized():
         return {
             "code_exec_ssh_enabled": set["shell_interface"] == "ssh",
-            "code_exec_ssh_addr": dotenv.get_dotenv_value("CODE_EXEC_SSH_ADDR", "localhost"),
-            "code_exec_ssh_port": int(dotenv.get_dotenv_value("CODE_EXEC_SSH_PORT", "22")),
-            "code_exec_ssh_user": dotenv.get_dotenv_value("CODE_EXEC_SSH_USER", "root"),
+            "code_exec_ssh_addr": dotenv.get_dotenv_value(
+                "CODE_EXEC_SSH_ADDR", "localhost"
+            ),
+            "code_exec_ssh_port": int(
+                dotenv.get_dotenv_value("CODE_EXEC_SSH_PORT", "22")
+            ),
+            "code_exec_ssh_user": dotenv.get_dotenv_value(
+                "CODE_EXEC_SSH_USER", "root"
+            ),
         }
     else:
         host = set["rfc_url"]
@@ -1719,7 +1772,9 @@ def get_runtime_config(set: Settings):
             "code_exec_ssh_enabled": set["shell_interface"] == "ssh",
             "code_exec_ssh_addr": host,
             "code_exec_ssh_port": set["rfc_port_ssh"],
-            "code_exec_ssh_user": dotenv.get_dotenv_value("CODE_EXEC_SSH_USER", "root"),
+            "code_exec_ssh_user": dotenv.get_dotenv_value(
+                "CODE_EXEC_SSH_USER", "root"
+            ),
         }
 
 
@@ -1728,7 +1783,9 @@ def create_auth_token() -> str:
     username = dotenv.get_dotenv_value(dotenv.KEY_AUTH_LOGIN) or ""
     password = dotenv.get_dotenv_value(dotenv.KEY_AUTH_PASSWORD) or ""
     # use base64 encoding for a more compact token with alphanumeric chars
-    hash_bytes = hashlib.sha256(f"{runtime_id}:{username}:{password}".encode()).digest()
+    hash_bytes = hashlib.sha256(
+        f"{runtime_id}:{username}:{password}".encode()
+    ).digest()
     # encode as base64 and remove any non-alphanumeric chars (like +, /, =)
     b64_token = base64.urlsafe_b64encode(hash_bytes).decode().replace("=", "")
     return b64_token[:16]

@@ -34,7 +34,15 @@ class ImageGet(ApiHandler):
         filename = os.path.basename(path)
 
         # list of allowed image extensions
-        image_extensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".svg"]
+        image_extensions = [
+            ".jpg",
+            ".jpeg",
+            ".png",
+            ".gif",
+            ".bmp",
+            ".webp",
+            ".svg",
+        ]
 
         # # If metadata is requested, return file information
         # if metadata:
@@ -46,7 +54,9 @@ class ImageGet(ApiHandler):
             if runtime.is_development():
                 if files.exists(path):
                     response = send_file(path)
-                elif await runtime.call_development_function(files.exists, path):
+                elif await runtime.call_development_function(
+                    files.exists, path
+                ):
                     b64_content = await runtime.call_development_function(
                         files.read_file_base64, path
                     )
@@ -69,7 +79,9 @@ class ImageGet(ApiHandler):
                     response = _send_fallback_icon("image")
 
             # Add cache headers for better device sync performance
-            response.headers["Cache-Control"] = f"public, max-age={Timeouts.HTTP_CACHE_MAX_AGE}"
+            response.headers["Cache-Control"] = (
+                f"public, max-age={Timeouts.HTTP_CACHE_MAX_AGE}"
+            )
             response.headers["X-File-Type"] = "image"
             response.headers["X-File-Name"] = filename
             return response

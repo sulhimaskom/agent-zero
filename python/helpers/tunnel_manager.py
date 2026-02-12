@@ -21,7 +21,9 @@ class TunnelManager:
         self.is_running = False
         self.provider = None
 
-    def start_tunnel(self, port=Network.TUNNEL_DEFAULT_PORT, provider="serveo"):
+    def start_tunnel(
+        self, port=Network.TUNNEL_DEFAULT_PORT, provider="serveo"
+    ):
         """Start a new tunnel or return the existing one's URL"""
         if self.is_running and self.tunnel_url:
             return self.tunnel_url

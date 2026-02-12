@@ -3,6 +3,7 @@
 Enables agents to query documents using semantic search and
 retrieve relevant content or answers to specific questions.
 """
+
 import asyncio
 
 from python.helpers.tool import Tool, Response
@@ -21,14 +22,18 @@ class DocumentQueryTool(Tool):
             document_uris = [document_uri]
 
         if not document_uris:
-            return Response(message="Error: no document provided", break_loop=False)
+            return Response(
+                message="Error: no document provided", break_loop=False
+            )
 
         queries = (
             kwargs["queries"]
             if "queries" in kwargs
-            else [kwargs["query"]]
-            if ("query" in kwargs and kwargs["query"])
-            else []
+            else (
+                [kwargs["query"]]
+                if ("query" in kwargs and kwargs["query"])
+                else []
+            )
         )
         try:
 
@@ -42,11 +47,16 @@ class DocumentQueryTool(Tool):
             helper = DocumentQueryHelper(self.agent, progress_callback)
             if not queries:
                 contents = await asyncio.gather(
-                    *[helper.document_get_content(uri) for uri in document_uris]
+                    *[
+                        helper.document_get_content(uri)
+                        for uri in document_uris
+                    ]
                 )
                 content = "\n\n---\n\n".join(contents)
             else:
                 _, content = await helper.document_qa(document_uris, queries)
             return Response(message=content, break_loop=False)
         except Exception as e:  # pylint: disable=broad-exception-caught
-            return Response(message=f"Error processing document: {e}", break_loop=False)
+            return Response(
+                message=f"Error processing document: {e}", break_loop=False
+            )

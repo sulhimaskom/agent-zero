@@ -127,7 +127,9 @@ def _serialize_context(context: AgentContext):
         agent = agent.data.get(Agent.DATA_NAME_SUBORDINATE, None)
 
     data = {k: v for k, v in context.data.items() if not k.startswith("_")}
-    output_data = {k: v for k, v in context.output_data.items() if not k.startswith("_")}
+    output_data = {
+        k: v for k, v in context.output_data.items() if not k.startswith("_")
+    }
 
     return {
         "id": context.id,
@@ -207,8 +209,12 @@ def _deserialize_context(data):
     agents = data.get("agents", [])
     agent0 = _deserialize_agents(agents, config, context)
     streaming_agent = agent0
-    while streaming_agent and streaming_agent.number != data.get("streaming_agent", 0):
-        streaming_agent = streaming_agent.data.get(Agent.DATA_NAME_SUBORDINATE, None)
+    while streaming_agent and streaming_agent.number != data.get(
+        "streaming_agent", 0
+    ):
+        streaming_agent = streaming_agent.data.get(
+            Agent.DATA_NAME_SUBORDINATE, None
+        )
 
     context.agent0 = agent0
     context.streaming_agent = streaming_agent
@@ -258,7 +264,11 @@ def _deserialize_log(data: dict[str, Any]) -> "Log":
                 type=item_data["type"],
                 heading=item_data.get("heading", ""),
                 content=item_data.get("content", ""),
-                kvps=OrderedDict(item_data["kvps"]) if item_data["kvps"] else None,
+                kvps=(
+                    OrderedDict(item_data["kvps"])
+                    if item_data["kvps"]
+                    else None
+                ),
                 temp=item_data.get("temp", False),
             )
         )

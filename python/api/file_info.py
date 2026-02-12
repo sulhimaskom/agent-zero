@@ -50,5 +50,5 @@ async def get_file_info(path: str) -> FileInfo:
         "dir_path": os.path.dirname(abs_path),
         "file_name": os.path.basename(abs_path),
         "file_ext": os.path.splitext(abs_path)[1],
-        "message": message
+        "message": message,
     }

@@ -9,14 +9,17 @@ def sanitize_string(s: str, encoding: str = "utf-8") -> str:
     # Replace surrogates and invalid unicode with replacement character
     if not isinstance(s, str):
         s = str(s)
-    return s.encode(encoding, 'replace').decode(encoding, 'replace')
+    return s.encode(encoding, "replace").decode(encoding, "replace")
 
 
-def calculate_valid_match_lengths(first: bytes | str, second: bytes | str,
-                                  deviation_threshold: int = 5,
-                                  deviation_reset: int = 5,
-                                  ignore_patterns: list[bytes | str] = [],
-                                  debug: bool = False) -> tuple[int, int]:
+def calculate_valid_match_lengths(
+    first: bytes | str,
+    second: bytes | str,
+    deviation_threshold: int = 5,
+    deviation_reset: int = 5,
+    ignore_patterns: list[bytes | str] = [],
+    debug: bool = False,
+) -> tuple[int, int]:
 
     first_length = len(first)
     second_length = len(second)
@@ -44,7 +47,10 @@ def calculate_valid_match_lengths(first: bytes | str, second: bytes | str,
         j = skip_ignored_patterns(second, j)
 
         if i < first_length and j < second_length and first[i] == second[j]:
-            last_matched_i, last_matched_j = i + 1, j + 1  # Update last matched position
+            last_matched_i, last_matched_j = (
+                i + 1,
+                j + 1,
+            )  # Update last matched position
             i += 1
             j += 1
             matched_since_deviation += 1
@@ -60,17 +66,25 @@ def calculate_valid_match_lengths(first: bytes | str, second: bytes | str,
             # Look ahead to find the best match within the remaining deviation allowance
             best_match = None
             for k in range(1, look_ahead + 1):
-                if i + k < first_length and j < second_length and first[i + k] == second[j]:
-                    best_match = ('i', k)
+                if (
+                    i + k < first_length
+                    and j < second_length
+                    and first[i + k] == second[j]
+                ):
+                    best_match = ("i", k)
                     break
-                if j + k < second_length and i < first_length and first[i] == second[j + k]:
-                    best_match = ('j', k)
+                if (
+                    j + k < second_length
+                    and i < first_length
+                    and first[i] == second[j + k]
+                ):
+                    best_match = ("j", k)
                     break
 
             if best_match:
-                if best_match[0] == 'i':
+                if best_match[0] == "i":
                     i += best_match[1]
-                elif best_match[0] == 'j':
+                elif best_match[0] == "j":
                     j += best_match[1]
             else:
                 i += 1
@@ -90,11 +104,14 @@ def calculate_valid_match_lengths(first: bytes | str, second: bytes | str,
                 "\n"
                 f"Current deviation: {deviations}\n"
                 f"Matched since last deviation: {matched_since_deviation}\n"
-                + "-" * 40 + "\n"
+                + "-" * 40
+                + "\n"
             )
             sys.stdout.write("\r" + output)
             sys.stdout.flush()
-            time.sleep(UITiming.ANIMATION_STEP)  # Add a short delay for readability (optional)
+            time.sleep(
+                UITiming.ANIMATION_STEP
+            )  # Add a short delay for readability (optional)
 
     # Return the last matched positions instead of the current indices
     return last_matched_i, last_matched_j
@@ -104,18 +121,18 @@ def format_key(key: str) -> str:
     """Format a key string to be more readable.
     Converts camelCase and snake_case to Title Case with spaces."""
     # First replace non-alphanumeric with spaces
-    result = ''.join(' ' if not c.isalnum() else c for c in key)
+    result = "".join(" " if not c.isalnum() else c for c in key)
 
     # Handle camelCase
-    formatted = ''
+    formatted = ""
     for i, c in enumerate(result):
         if i > 0 and c.isupper() and result[i - 1].islower():
-            formatted += ' ' + c
+            formatted += " " + c
         else:
             formatted += c
 
     # Split on spaces and capitalize each word
-    return ' '.join(word.capitalize() for word in formatted.split())
+    return " ".join(word.capitalize() for word in formatted.split())
 
 
 def dict_to_text(d: dict) -> str:
@@ -128,7 +145,9 @@ def dict_to_text(d: dict) -> str:
     return "\n".join(parts).rstrip()  # rstrip to remove trailing newline
 
 
-def truncate_text(text: str, length: int, at_end: bool = True, replacement: str = "...") -> str:
+def truncate_text(
+    text: str, length: int, at_end: bool = True, replacement: str = "..."
+) -> str:
     orig_length = len(text)
     if orig_length <= length:
         return text
@@ -138,7 +157,9 @@ def truncate_text(text: str, length: int, at_end: bool = True, replacement: str 
         return replacement + text[-length:]
 
 
-def truncate_text_by_ratio(text: str, threshold: int, replacement: str = "...", ratio: float = 0.5) -> str:
+def truncate_text_by_ratio(
+    text: str, threshold: int, replacement: str = "...", ratio: float = 0.5
+) -> str:
     """Truncate text with replacement at a specified ratio position."""
     threshold = int(threshold)
     if not threshold or len(text) <= threshold:
@@ -166,7 +187,9 @@ def truncate_text_by_ratio(text: str, threshold: int, replacement: str = "...", 
         return text[:start_len] + replacement + text[-end_len:]
 
 
-def replace_file_includes(text: str, placeholder_pattern: str = r"§§include\(([^)]+)\)") -> str:
+def replace_file_includes(
+    text: str, placeholder_pattern: str = r"§§include\(([^)]+)\)"
+) -> str:
     # Replace include aliases with file content
     if not text:
         return text

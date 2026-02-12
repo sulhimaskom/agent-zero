@@ -4,7 +4,12 @@ import math
 from python.helpers.constants import Limits
 
 
-def compress_image(image_data: bytes, *, max_pixels: int = Limits.IMAGE_MAX_PIXELS, quality: int = Limits.IMAGE_QUALITY) -> bytes:
+def compress_image(
+    image_data: bytes,
+    *,
+    max_pixels: int = Limits.IMAGE_MAX_PIXELS,
+    quality: int = Limits.IMAGE_QUALITY
+) -> bytes:
     """Compress an image by scaling it down and converting to JPEG with quality settings.
 
     Args:
@@ -27,10 +32,10 @@ def compress_image(image_data: bytes, *, max_pixels: int = Limits.IMAGE_MAX_PIXE
         img = img.resize((new_width, new_height), Image.Resampling.LANCZOS)
 
     # convert to RGB if needed (for JPEG)
-    if img.mode in ('RGBA', 'P'):
-        img = img.convert('RGB')
+    if img.mode in ("RGBA", "P"):
+        img = img.convert("RGB")
 
     # save as JPEG with compression
     output = io.BytesIO()
-    img.save(output, format='JPEG', quality=quality, optimize=True)
+    img.save(output, format="JPEG", quality=quality, optimize=True)
     return output.getvalue()

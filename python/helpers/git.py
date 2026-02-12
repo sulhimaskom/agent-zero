@@ -12,7 +12,9 @@ def get_git_info():
 
     # Ensure the repository is not bare
     if repo.bare:
-        raise ValueError(f"Repository at {repo_path} is bare and cannot be used.")
+        raise ValueError(
+            f"Repository at {repo_path} is bare and cannot be used."
+        )
 
     # Get the current branch name
     branch = repo.active_branch.name if repo.head.is_detached is False else ""
@@ -21,13 +23,15 @@ def get_git_info():
     commit_hash = repo.head.commit.hexsha
 
     # Get the commit date (ISO 8601 format)
-    commit_time = datetime.fromtimestamp(repo.head.commit.committed_date).strftime('%y-%m-%d %H:%M')
+    commit_time = datetime.fromtimestamp(
+        repo.head.commit.committed_date
+    ).strftime("%y-%m-%d %H:%M")
 
     # Get the latest tag description (if available)
     short_tag = ""
     try:
         tag = repo.git.describe(tags=True)
-        tag_split = tag.split('-')
+        tag_split = tag.split("-")
         if len(tag_split) >= 3:
             short_tag = "-".join(tag_split[:-1])
         else:
@@ -44,7 +48,7 @@ def get_git_info():
         "commit_time": commit_time,
         "tag": tag,
         "short_tag": short_tag,
-        "version": version
+        "version": version,
     }
 
     return git_info

@@ -1,5 +1,9 @@
 from python.helpers.api import ApiHandler, Request, Response
-from python.helpers.memory import Memory, get_existing_memory_subdirs, get_context_memory_subdir
+from python.helpers.memory import (
+    Memory,
+    get_existing_memory_subdirs,
+    get_context_memory_subdir,
+)
 from python.helpers.constants import Limits
 from langchain_core.documents import Document
 from agent import AgentContext
@@ -31,7 +35,12 @@ class MemoryDashboard(ApiHandler):
                 }
 
         except Exception as e:
-            return {"success": False, "error": str(e), "memories": [], "total_count": 0}
+            return {
+                "success": False,
+                "error": str(e),
+                "memories": [],
+                "total_count": 0,
+            }
 
     async def _delete_memory(self, input: dict) -> dict:
         """Delete a memory by ID from the specified subdirectory."""
@@ -40,9 +49,14 @@ class MemoryDashboard(ApiHandler):
             memory_id = input.get("memory_id")
 
             if not memory_id:
-                return {"success": False, "error": "Memory ID is required for deletion"}
+                return {
+                    "success": False,
+                    "error": "Memory ID is required for deletion",
+                }
 
-            memory = await Memory.get_by_subdir(memory_subdir, preload_knowledge=False)
+            memory = await Memory.get_by_subdir(
+                memory_subdir, preload_knowledge=False
+            )
 
             rem = await memory.delete_documents_by_ids([memory_id])
 
@@ -58,7 +72,10 @@ class MemoryDashboard(ApiHandler):
                 }
 
         except Exception as e:
-            return {"success": False, "error": f"Failed to delete memory: {str(e)}"}
+            return {
+                "success": False,
+                "error": f"Failed to delete memory: {str(e)}",
+            }
 
     async def _bulk_delete_memories(self, input: dict) -> dict:
         """Delete multiple memories by IDs from the specified subdirectory."""
@@ -79,7 +96,9 @@ class MemoryDashboard(ApiHandler):
                 }
 
             # delete
-            memory = await Memory.get_by_subdir(memory_subdir, preload_knowledge=False)
+            memory = await Memory.get_by_subdir(
+                memory_subdir, preload_knowledge=False
+            )
             rem = await memory.delete_documents_by_ids(memory_ids)
 
             if len(rem) == len(memory_ids):
@@ -118,7 +137,10 @@ class MemoryDashboard(ApiHandler):
                 return {"success": True, "memory_subdir": "default"}
 
             memory_subdir = get_context_memory_subdir(context)
-            return {"success": True, "memory_subdir": memory_subdir or "default"}
+            return {
+                "success": True,
+                "memory_subdir": memory_subdir or "default",
+            }
 
         except Exception:
             return {
@@ -146,10 +168,14 @@ class MemoryDashboard(ApiHandler):
             memory_subdir = input.get("memory_subdir", "default")
             area_filter = input.get("area", "")  # Filter by memory area
             search_query = input.get("search", "")  # Full-text search query
-            limit = input.get("limit", Limits.DOCUMENT_MAX_LIMIT)  # Number of results to return from constants
+            limit = input.get(
+                "limit", Limits.DOCUMENT_MAX_LIMIT
+            )  # Number of results to return from constants
             threshold = input.get("threshold", 0.6)  # Similarity threshold
 
-            memory = await Memory.get_by_subdir(memory_subdir, preload_knowledge=False)
+            memory = await Memory.get_by_subdir(
+                memory_subdir, preload_knowledge=False
+            )
 
             memories = []
 
@@ -166,13 +192,18 @@ class MemoryDashboard(ApiHandler):
                 all_docs = memory.db.get_all_docs()
                 for doc_id, doc in all_docs.items():
                     # Apply area filter if specified
-                    if area_filter and doc.metadata.get("area", "") != area_filter:
+                    if (
+                        area_filter
+                        and doc.metadata.get("area", "") != area_filter
+                    ):
                         continue
                     memories.append(doc)
 
                 # sort by timestamp
                 def get_sort_key(m):
-                    timestamp = m.metadata.get("timestamp", Limits.DEFAULT_TIMESTAMP)
+                    timestamp = m.metadata.get(
+                        "timestamp", Limits.DEFAULT_TIMESTAMP
+                    )
                     return timestamp
 
                 memories.sort(key=get_sort_key, reverse=True)
@@ -182,7 +213,9 @@ class MemoryDashboard(ApiHandler):
                     memories = memories[:limit]
 
             # Format memories for the dashboard
-            formatted_memories = [self._format_memory_for_dashboard(m) for m in memories]
+            formatted_memories = [
+                self._format_memory_for_dashboard(m) for m in memories
+            ]
 
             # Get summary statistics
             total_memories = len(formatted_memories)
@@ -207,7 +240,12 @@ class MemoryDashboard(ApiHandler):
             }
 
         except Exception as e:
-            return {"success": False, "error": str(e), "memories": [], "total_count": 0}
+            return {
+                "success": False,
+                "error": str(e),
+                "memories": [],
+                "total_count": 0,
+            }
 
     def _format_memory_for_dashboard(self, m: Document) -> dict:
         """Format a memory document for the dashboard."""
@@ -234,18 +272,28 @@ class MemoryDashboard(ApiHandler):
             edited = input.get("edited")
 
             if not memory_subdir or not original or not edited:
-                return {"success": False, "error": "Missing required parameters"}
+                return {
+                    "success": False,
+                    "error": "Missing required parameters",
+                }
 
             doc = Document(
                 page_content=edited["content_full"],
                 metadata=edited["metadata"],
             )
 
-            memory = await Memory.get_by_subdir(memory_subdir, preload_knowledge=False)
+            memory = await Memory.get_by_subdir(
+                memory_subdir, preload_knowledge=False
+            )
             id = (await memory.update_documents([doc]))[0]
             doc = memory.get_document_by_id(id)
-            formatted_doc = self._format_memory_for_dashboard(doc) if doc else None
+            formatted_doc = (
+                self._format_memory_for_dashboard(doc) if doc else None
+            )
 
-            return {"success": formatted_doc is not None, "memory": formatted_doc}
+            return {
+                "success": formatted_doc is not None,
+                "memory": formatted_doc,
+            }
         except Exception as e:
             return {"success": False, "error": str(e), "memory": None}

@@ -7,7 +7,9 @@ async def get_root_password():
     else:
         priv = crypto._generate_private_key()
         pub = crypto._generate_public_key(priv)
-        enc = await runtime.call_development_function(_provide_root_password, pub)
+        enc = await runtime.call_development_function(
+            _provide_root_password, pub
+        )
         pswd = crypto.decrypt_data(enc, priv)
     return pswd
 

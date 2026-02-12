@@ -3,6 +3,7 @@
 Handles command-line arguments, environment initialization,
 Docker operations, and runtime configuration.
 """
+
 import argparse
 import inspect
 import secrets
@@ -89,13 +90,13 @@ def get_persistent_id() -> str:
 @overload
 async def call_development_function(
     func: Callable[..., Awaitable[T]], *args, **kwargs
-) -> T:
-    ...
+) -> T: ...
 
 
 @overload
-async def call_development_function(func: Callable[..., T], *args, **kwargs) -> T:
-    ...
+async def call_development_function(
+    func: Callable[..., T], *args, **kwargs
+) -> T: ...
 
 
 async def call_development_function(
@@ -126,7 +127,9 @@ async def call_development_function(
 
 
 async def handle_rfc(rfc_call: rfc.RFCCall):
-    return await rfc.handle_rfc(rfc_call=rfc_call, password=_get_rfc_password())
+    return await rfc.handle_rfc(
+        rfc_call=rfc_call, password=_get_rfc_password()
+    )
 
 
 def _get_rfc_password() -> str:
@@ -160,10 +163,14 @@ def call_development_function_sync(
 
     thread = threading.Thread(target=run_in_thread)
     thread.start()
-    thread.join(timeout=Timeouts.RFC_FUNCTION_TIMEOUT)  # wait for thread with timeout
+    thread.join(
+        timeout=Timeouts.RFC_FUNCTION_TIMEOUT
+    )  # wait for thread with timeout
 
     if thread.is_alive():
-        raise TimeoutError(f"Function call timed out after {Timeouts.RFC_FUNCTION_TIMEOUT} seconds")
+        raise TimeoutError(
+            f"Function call timed out after {Timeouts.RFC_FUNCTION_TIMEOUT} seconds"
+        )
 
     result = result_queue.get_nowait()
     return cast(T, result)
@@ -171,7 +178,9 @@ def call_development_function_sync(
 
 def get_web_ui_port():
     web_ui_port = (
-        get_arg("port") or int(dotenv.get_dotenv_value("WEB_UI_PORT", 0)) or Network.WEB_UI_PORT_DEFAULT
+        get_arg("port")
+        or int(dotenv.get_dotenv_value("WEB_UI_PORT", 0))
+        or Network.WEB_UI_PORT_DEFAULT
     )
     return web_ui_port
 

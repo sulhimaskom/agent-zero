@@ -20,7 +20,9 @@ class GetWorkDirFiles(ApiHandler):
 
         # browser = FileBrowser()
         # result = browser.get_files(current_path)
-        result = await runtime.call_development_function(get_files, current_path)
+        result = await runtime.call_development_function(
+            get_files, current_path
+        )
 
         return {"data": result}
 

@@ -12,7 +12,16 @@ class PrintStyle:
     last_endline = True
     log_file_path = None
 
-    def __init__(self, bold=False, italic=False, underline=False, font_color="default", background_color="default", padding=False, log_only=False):
+    def __init__(
+        self,
+        bold=False,
+        italic=False,
+        underline=False,
+        font_color="default",
+        background_color="default",
+        padding=False,
+        log_only=False,
+    ):
         self.bold = bold
         self.italic = italic
         self.underline = underline
@@ -28,7 +37,9 @@ class PrintStyle:
             log_filename = datetime.now().strftime("log_%Y%m%d_%H%M%S.html")
             PrintStyle.log_file_path = os.path.join(logs_dir, log_filename)
             with open(PrintStyle.log_file_path, "w") as f:
-                f.write("<html><body style='background-color:black;font-family: Arial, Helvetica, sans-serif;'><pre>\n")
+                f.write(
+                    "<html><body style='background-color:black;font-family: Arial, Helvetica, sans-serif;'><pre>\n"
+                )
 
     def _get_rgb_color_code(self, color, is_background=False):
         try:
@@ -41,7 +52,10 @@ class PrintStyle:
                 r, g, b = rgb_color.red, rgb_color.green, rgb_color.blue
 
             if is_background:
-                return f"\033[48;2;{r};{g};{b}m", f"background-color: rgb({r}, {g}, {b});"
+                return (
+                    f"\033[48;2;{r};{g};{b}m",
+                    f"background-color: rgb({r}, {g}, {b});",
+                )
             else:
                 return f"\033[38;2;{r};{g};{b}m", f"color: rgb({r}, {g}, {b});"
         except ValueError:
@@ -57,7 +71,9 @@ class PrintStyle:
         if self.underline:
             start += "\033[4m"
         font_color_code, _ = self._get_rgb_color_code(self.font_color)
-        background_color_code, _ = self._get_rgb_color_code(self.background_color, True)
+        background_color_code, _ = self._get_rgb_color_code(
+            self.background_color, True
+        )
         start += font_color_code
         start += background_color_code
         return start + text + end
@@ -71,11 +87,15 @@ class PrintStyle:
         if self.underline:
             styles.append("text-decoration: underline;")
         _, font_color_code = self._get_rgb_color_code(self.font_color)
-        _, background_color_code = self._get_rgb_color_code(self.background_color, True)
+        _, background_color_code = self._get_rgb_color_code(
+            self.background_color, True
+        )
         styles.append(font_color_code)
         styles.append(background_color_code)
         style_attr = " ".join(styles)
-        escaped_text = html.escape(text).replace("\n", "<br>")  # Escape HTML special characters
+        escaped_text = html.escape(text).replace(
+            "\n", "<br>"
+        )  # Escape HTML special characters
         return f'<span style="{style_attr}">{escaped_text}</span>'
 
     def _add_padding_if_needed(self):
@@ -86,7 +106,7 @@ class PrintStyle:
             self.padding_added = True
 
     def _log_html(self, html):
-        with open(PrintStyle.log_file_path, "a", encoding='utf-8') as f:  # type: ignore # add encoding='utf-8'
+        with open(PrintStyle.log_file_path, "a", encoding="utf-8") as f:  # type: ignore # add encoding='utf-8'
             f.write(html)
 
     @staticmethod
@@ -95,37 +115,42 @@ class PrintStyle:
             with open(PrintStyle.log_file_path, "a") as f:
                 f.write("</pre></body></html>")
 
-    def get(self, *args, sep=' ', **kwargs):
+    def get(self, *args, sep=" ", **kwargs):
         text = sep.join(map(str, args))
 
         # Automatically mask secrets in all print output
         try:
             if not hasattr(self, "secrets_mgr"):
                 from python.helpers.secrets import get_secrets_manager
+
                 self.secrets_mgr = get_secrets_manager()
             text = self.secrets_mgr.mask_values(text)
         except Exception:
             # If masking fails, proceed without masking to avoid breaking functionality
             pass
 
-        return text, self._get_styled_text(text), self._get_html_styled_text(text)
+        return (
+            text,
+            self._get_styled_text(text),
+            self._get_html_styled_text(text),
+        )
 
-    def print(self, *args, sep=' ', **kwargs):
+    def print(self, *args, sep=" ", **kwargs):
         self._add_padding_if_needed()
         if not PrintStyle.last_endline:
             print()
             self._log_html("<br>")
         plain_text, styled_text, html_text = self.get(*args, sep=sep, **kwargs)
         if not self.log_only:
-            print(styled_text, end='\n', flush=True)
+            print(styled_text, end="\n", flush=True)
         self._log_html(html_text + "<br>\n")
         PrintStyle.last_endline = True
 
-    def stream(self, *args, sep=' ', **kwargs):
+    def stream(self, *args, sep=" ", **kwargs):
         self._add_padding_if_needed()
         plain_text, styled_text, html_text = self.get(*args, sep=sep, **kwargs)
         if not self.log_only:
-            print(styled_text, end='', flush=True)
+            print(styled_text, end="", flush=True)
         self._log_html(html_text)
         PrintStyle.last_endline = False
 
@@ -147,15 +172,21 @@ class PrintStyle:
 
     @staticmethod
     def success(text: str):
-        PrintStyle(font_color=Colors.SUCCESS, padding=True).print("Success: " + text)
+        PrintStyle(font_color=Colors.SUCCESS, padding=True).print(
+            "Success: " + text
+        )
 
     @staticmethod
     def warning(text: str):
-        PrintStyle(font_color=Colors.WARNING, padding=True).print("Warning: " + text)
+        PrintStyle(font_color=Colors.WARNING, padding=True).print(
+            "Warning: " + text
+        )
 
     @staticmethod
     def debug(text: str):
-        PrintStyle(font_color=Colors.DEBUG, padding=True).print("Debug: " + text)
+        PrintStyle(font_color=Colors.DEBUG, padding=True).print(
+            "Debug: " + text
+        )
 
     @staticmethod
     def error(text: str):

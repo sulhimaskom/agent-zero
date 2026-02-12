@@ -21,7 +21,7 @@ async def call_llm(
     model: BaseChatModel | BaseLLM,
     message: str,
     examples: list[Example] = [],
-    callback: Callable[[str], None] | None = None
+    callback: Callable[[str], None] | None = None,
 ):
 
     example_prompt = ChatPromptTemplate.from_messages(

@@ -24,13 +24,18 @@ async def process(input: dict) -> dict | Response:
         if tunnel_url is None:
             # Add a little delay and check again - tunnel might be starting
             import time
+
             time.sleep(Timeouts.TUNNEL_CHECK_DELAY)
             tunnel_url = tunnel_manager.get_tunnel_url()
 
         return {
             "success": tunnel_url is not None,
             "tunnel_url": tunnel_url,
-            "message": "Tunnel creation in progress" if tunnel_url is None else "Tunnel created successfully"
+            "message": (
+                "Tunnel creation in progress"
+                if tunnel_url is None
+                else "Tunnel created successfully"
+            ),
         }
 
     elif action == "stop":
@@ -41,18 +46,16 @@ async def process(input: dict) -> dict | Response:
         return {
             "success": tunnel_url is not None,
             "tunnel_url": tunnel_url,
-            "is_running": tunnel_manager.is_running
+            "is_running": tunnel_manager.is_running,
         }
 
     return {
         "success": False,
-        "error": "Invalid action. Use 'create', 'stop', or 'get'."
+        "error": "Invalid action. Use 'create', 'stop', or 'get'.",
     }
 
 
 def stop():
     tunnel_manager = TunnelManager.get_instance()
     tunnel_manager.stop_tunnel()
-    return {
-        "success": True
-    }
+    return {"success": True}

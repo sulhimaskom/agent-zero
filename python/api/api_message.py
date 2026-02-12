@@ -3,6 +3,7 @@
 Provides API access for sending messages to agents with support
 for file attachments, context management, and authentication.
 """
+
 import base64
 import os
 from datetime import datetime, timedelta
@@ -38,10 +39,16 @@ class ApiMessage(ApiHandler):
         context_id = input.get("context_id", "")
         message = input.get("message", "")
         attachments = input.get("attachments", [])
-        lifetime_hours = input.get("lifetime_hours", Timeouts.NOTIFICATION_LIFETIME_HOURS)  # Default from constants
+        lifetime_hours = input.get(
+            "lifetime_hours", Timeouts.NOTIFICATION_LIFETIME_HOURS
+        )  # Default from constants
 
         if not message:
-            return Response('{"error": "Message is required"}', status=400, mimetype="application/json")
+            return Response(
+                '{"error": "Message is required"}',
+                status=400,
+                mimetype="application/json",
+            )
 
         # Handle attachments (base64 encoded)
         attachment_paths = []
@@ -51,7 +58,11 @@ class ApiMessage(ApiHandler):
             os.makedirs(upload_folder_ext, exist_ok=True)
 
             for attachment in attachments:
-                if not isinstance(attachment, dict) or "filename" not in attachment or "base64" not in attachment:
+                if (
+                    not isinstance(attachment, dict)
+                    or "filename" not in attachment
+                    or "base64" not in attachment
+                ):
                     continue
 
                 try:
@@ -67,16 +78,24 @@ class ApiMessage(ApiHandler):
                     with open(save_path, "wb") as f:
                         f.write(file_content)
 
-                    attachment_paths.append(os.path.join(upload_folder_int, filename))
+                    attachment_paths.append(
+                        os.path.join(upload_folder_int, filename)
+                    )
                 except Exception as e:
-                    PrintStyle.error(f"Failed to process attachment {attachment.get('filename', 'unknown')}: {e}")
+                    PrintStyle.error(
+                        f"Failed to process attachment {attachment.get('filename', 'unknown')}: {e}"
+                    )
                     continue
 
         # Get or create context
         if context_id:
             context = AgentContext.use(context_id)
             if not context:
-                return Response('{"error": "Context not found"}', status=404, mimetype="application/json")
+                return Response(
+                    '{"error": "Context not found"}',
+                    status=404,
+                    mimetype="application/json",
+                )
         else:
             config = initialize_agent()
             context = AgentContext(config=config, type=AgentContextType.USER)
@@ -85,21 +104,36 @@ class ApiMessage(ApiHandler):
 
         # Update chat lifetime
         with self._cleanup_lock:
-            self._chat_lifetimes[context_id] = datetime.now() + timedelta(hours=lifetime_hours)
+            self._chat_lifetimes[context_id] = datetime.now() + timedelta(
+                hours=lifetime_hours
+            )
 
         # Process message
         try:
             # Log the message
-            attachment_filenames = [os.path.basename(path) for path in attachment_paths] if attachment_paths else []
+            attachment_filenames = (
+                [os.path.basename(path) for path in attachment_paths]
+                if attachment_paths
+                else []
+            )
 
             PrintStyle(
-                background_color=Colors.AGENT_PURPLE, font_color=Colors.BG_WHITE, bold=True, padding=True
+                background_color=Colors.AGENT_PURPLE,
+                font_color=Colors.BG_WHITE,
+                bold=True,
+                padding=True,
             ).print("External API message:")
-            PrintStyle(font_color=Colors.BG_WHITE, padding=False).print(f"> {message}")
+            PrintStyle(font_color=Colors.BG_WHITE, padding=False).print(
+                f"> {message}"
+            )
             if attachment_filenames:
-                PrintStyle(font_color="white", padding=False).print("Attachments:")
+                PrintStyle(font_color="white", padding=False).print(
+                    "Attachments:"
+                )
                 for filename in attachment_filenames:
-                    PrintStyle(font_color="white", padding=False).print(f"- {filename}")
+                    PrintStyle(font_color="white", padding=False).print(
+                        f"- {filename}"
+                    )
 
             # Add user message to chat history so it's visible in the UI
             context.log.log(
@@ -116,14 +150,15 @@ class ApiMessage(ApiHandler):
             # Clean up expired chats
             self._cleanup_expired_chats()
 
-            return {
-                "context_id": context_id,
-                "response": result
-            }
+            return {"context_id": context_id, "response": result}
 
         except Exception as e:
             PrintStyle.error(f"External API error: {e}")
-            return Response(f'{{"error": "{str(e)}"}}', status=500, mimetype="application/json")
+            return Response(
+                f'{{"error": "{str(e)}"}}',
+                status=500,
+                mimetype="application/json",
+            )
 
     @classmethod
     def _cleanup_expired_chats(cls):
@@ -131,7 +166,8 @@ class ApiMessage(ApiHandler):
         with cls._cleanup_lock:
             now = datetime.now()
             expired_contexts = [
-                context_id for context_id, expiry in cls._chat_lifetimes.items()
+                context_id
+                for context_id, expiry in cls._chat_lifetimes.items()
                 if now > expiry
             ]
 
@@ -142,6 +178,10 @@ class ApiMessage(ApiHandler):
                         context.reset()
                         AgentContext.remove(context_id)
                     del cls._chat_lifetimes[context_id]
-                    PrintStyle().print(f"Cleaned up expired chat: {context_id}")
+                    PrintStyle().print(
+                        f"Cleaned up expired chat: {context_id}"
+                    )
                 except Exception as e:
-                    PrintStyle.error(f"Failed to cleanup chat {context_id}: {e}")
+                    PrintStyle.error(
+                        f"Failed to cleanup chat {context_id}: {e}"
+                    )

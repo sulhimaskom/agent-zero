@@ -60,7 +60,9 @@ class VectorDB:
         self.agent = agent
         self.cache = cache  # store cache preference
         self.embeddings = self._get_embeddings(agent, cache=cache)
-        self.index = faiss.IndexFlatIP(len(self.embeddings.embed_query("example")))
+        self.index = faiss.IndexFlatIP(
+            len(self.embeddings.embed_query("example"))
+        )
 
         self.db = MyFaiss(
             embedding_function=self.embeddings,
@@ -85,7 +87,9 @@ class VectorDB:
             filter=comparator,
         )
 
-    async def search_by_metadata(self, filter: str, limit: int = 0) -> list[Document]:
+    async def search_by_metadata(
+        self, filter: str, limit: int = 0
+    ) -> list[Document]:
         comparator = get_comparator(filter)
         all_docs = self.db.get_all_docs()
         result = []

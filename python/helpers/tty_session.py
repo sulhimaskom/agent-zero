@@ -20,7 +20,9 @@ sys.stdout.reconfigure(errors="replace")  # type: ignore
 
 
 class TTYSession:
-    def __init__(self, cmd, *, cwd=None, env=None, encoding="utf-8", echo=False):
+    def __init__(
+        self, cmd, *, cwd=None, env=None, encoding="utf-8", echo=False
+    ):
         self.cmd = cmd if isinstance(cmd, str) else " ".join(cmd)
         self.cwd = cwd
         self.env = env or os.environ.copy()
@@ -144,7 +146,9 @@ class TTYSession:
             raise RuntimeError("TTYSpawn is not started")
         reader = self._proc.stdout
         while True:
-            chunk = await reader.read(4096)  # grab whatever is ready # type: ignore
+            chunk = await reader.read(
+                4096
+            )  # grab whatever is ready # type: ignore
             if not chunk:
                 break
             self._buf.put_nowait(chunk.decode(self.encoding, "replace"))
@@ -215,7 +219,11 @@ async def _spawn_winpty(cmd, cwd, env, echo):
     # Clean PowerShell startup: no logo, no profile, bypass execution policy for deterministic behavior
     if cmd.strip().lower().startswith("powershell"):
         if "-nolog" not in cmd.lower():
-            cmd = cmd.replace("powershell.exe", "powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass", 1)
+            cmd = cmd.replace(
+                "powershell.exe",
+                "powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass",
+                1,
+            )
 
     cols, rows = Limits.TTY_DEFAULT_COLS, Limits.TTY_DEFAULT_ROWS
     child = winpty.PtyProcess.spawn(cmd, dimensions=(rows, cols), cwd=cwd or os.getcwd(), env=env)  # type: ignore
@@ -229,7 +237,9 @@ async def _spawn_winpty(cmd, cwd, env, echo):
                 # Run blocking read in executor to not block event loop
                 data = await loop.run_in_executor(None, child.read, 1 << 16)
                 if data:
-                    reader.feed_data(data.encode('utf-8') if isinstance(data, str) else data)
+                    reader.feed_data(
+                        data.encode("utf-8") if isinstance(data, str) else data
+                    )
             except EOFError:
                 break
             except Exception:
@@ -243,10 +253,10 @@ async def _spawn_winpty(cmd, cwd, env, echo):
         def write(self, d):
             # Use winpty's write method, not os.write
             if isinstance(d, bytes):
-                d = d.decode('utf-8', errors='replace')
+                d = d.decode("utf-8", errors="replace")
             # Windows needs \r\n for proper line endings
             if _IS_WIN:
-                d = d.replace('\n', '\r\n')
+                d = d.replace("\n", "\r\n")
             child.write(d)
 
         async def drain(self):
@@ -280,7 +290,9 @@ async def _spawn_winpty(cmd, cwd, env, echo):
 if __name__ == "__main__":
 
     async def interactive_shell():
-        shell_cmd, prompt_hint = ("powershell.exe", ">") if _IS_WIN else ("/bin/bash", "$")
+        shell_cmd, prompt_hint = (
+            ("powershell.exe", ">") if _IS_WIN else ("/bin/bash", "$")
+        )
 
         # echo=False → suppress the shell’s own echo of commands
         term = TTYSession(shell_cmd)
@@ -294,7 +306,11 @@ if __name__ == "__main__":
         print("• /exit         → quit helper\n")
 
         await term.sendline(" ")
-        print(await term.read_full_until_idle(timeout, timeout), end="", flush=True)
+        print(
+            await term.read_full_until_idle(timeout, timeout),
+            end="",
+            flush=True,
+        )
 
         while True:
             try:

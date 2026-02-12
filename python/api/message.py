@@ -31,7 +31,9 @@ class Message(ApiHandler):
             attachment_paths = []
 
             upload_folder_int = Paths.UPLOAD_FOLDER
-            upload_folder_ext = files.get_abs_path("tmp/uploads")  # for development environment
+            upload_folder_ext = files.get_abs_path(
+                "tmp/uploads"
+            )  # for development environment
 
             if attachments:
                 os.makedirs(upload_folder_ext, exist_ok=True)
@@ -41,7 +43,9 @@ class Message(ApiHandler):
                     filename = secure_filename(attachment.filename)
                     save_path = files.get_abs_path(upload_folder_ext, filename)
                     attachment.save(save_path)
-                    attachment_paths.append(os.path.join(upload_folder_int, filename))
+                    attachment_paths.append(
+                        os.path.join(upload_folder_int, filename)
+                    )
         else:
             # Handle JSON request as before
             input_data = request.get_json()
@@ -58,7 +62,9 @@ class Message(ApiHandler):
 
         # call extension point, alow it to modify data
         data = {"message": message, "attachment_paths": attachment_paths}
-        await extension.call_extensions("user_message_ui", agent=context.get_agent(), data=data)
+        await extension.call_extensions(
+            "user_message_ui", agent=context.get_agent(), data=data
+        )
         message = data.get("message", "")
         attachment_paths = data.get("attachment_paths", [])
 
@@ -74,13 +80,18 @@ class Message(ApiHandler):
 
         # Print to console and log
         PrintStyle(
-            background_color=Colors.AGENT_PURPLE, font_color=Colors.BG_WHITE, bold=True, padding=True
+            background_color=Colors.AGENT_PURPLE,
+            font_color=Colors.BG_WHITE,
+            bold=True,
+            padding=True,
         ).print("User message:")
         PrintStyle(font_color="white", padding=False).print(f"> {message}")
         if attachment_filenames:
             PrintStyle(font_color="white", padding=False).print("Attachments:")
             for filename in attachment_filenames:
-                PrintStyle(font_color="white", padding=False).print(f"- {filename}")
+                PrintStyle(font_color="white", padding=False).print(
+                    f"- {filename}"
+                )
 
         # Log the message with message_id and attachments
         context.log.log(
@@ -91,4 +102,7 @@ class Message(ApiHandler):
             id=message_id,
         )
 
-        return context.communicate(UserMessage(message, attachment_paths)), context
+        return (
+            context.communicate(UserMessage(message, attachment_paths)),
+            context,
+        )

@@ -28,18 +28,18 @@ def json_parse_dirty(json: str) -> dict[str, Any] | None:
 
 
 def extract_json_object_string(content):
-    start = content.find('{')
+    start = content.find("{")
     if start == -1:
         return ""
 
     # Find the first '{'
-    end = content.rfind('}')
+    end = content.rfind("}")
     if end == -1:
         # If there's no closing '}', return from start to the end
         return content[start:]
     else:
         # If there's a closing '}', return the substring from start to end
-        return content[start:end + 1]
+        return content[start : end + 1]
 
 
 def extract_json_string(content):
@@ -59,20 +59,25 @@ def extract_json_string(content):
 def fix_json_string(json_string):
     # Function to replace unescaped line breaks within JSON string values
     def replace_unescaped_newlines(match):
-        return match.group(0).replace('\n', '\\n')
+        return match.group(0).replace("\n", "\\n")
 
     # Use regex to find string values and apply the replacement function
-    fixed_string = re.sub(r'(?<=: ")(.*?)(?=")', replace_unescaped_newlines, json_string, flags=re.DOTALL)
+    fixed_string = re.sub(
+        r'(?<=: ")(.*?)(?=")',
+        replace_unescaped_newlines,
+        json_string,
+        flags=re.DOTALL,
+    )
     return fixed_string
 
 
-T = TypeVar('T')  # Define a generic type variable
+T = TypeVar("T")  # Define a generic type variable
 
 
 def import_module(file_path: str) -> ModuleType:
     # Handle file paths with periods in the name using importlib.util
     abs_path = get_abs_path(file_path)
-    module_name = os.path.basename(abs_path).replace('.py', '')
+    module_name = os.path.basename(abs_path).replace(".py", "")
 
     # Create the module spec and load the module
     spec = importlib.util.spec_from_file_location(module_name, abs_path)
@@ -84,13 +89,22 @@ def import_module(file_path: str) -> ModuleType:
     return module
 
 
-def load_classes_from_folder(folder: str, name_pattern: str, base_class: Type[T], one_per_file: bool = True) -> list[Type[T]]:
+def load_classes_from_folder(
+    folder: str,
+    name_pattern: str,
+    base_class: Type[T],
+    one_per_file: bool = True,
+) -> list[Type[T]]:
     classes = []
     abs_folder = get_abs_path(folder)
 
     # Get all .py files in the folder that match the pattern, sorted alphabetically
     py_files = sorted(
-        [file_name for file_name in os.listdir(abs_folder) if fnmatch(file_name, name_pattern) and file_name.endswith(".py")]
+        [
+            file_name
+            for file_name in os.listdir(abs_folder)
+            if fnmatch(file_name, name_pattern) and file_name.endswith(".py")
+        ]
     )
 
     # Iterate through the sorted list of files
@@ -113,7 +127,9 @@ def load_classes_from_folder(folder: str, name_pattern: str, base_class: Type[T]
     return classes
 
 
-def load_classes_from_file(file: str, base_class: type[T], one_per_file: bool = True) -> list[type[T]]:
+def load_classes_from_file(
+    file: str, base_class: type[T], one_per_file: bool = True
+) -> list[type[T]]:
     classes = []
     # Use the new import_module function
     module = import_module(file)

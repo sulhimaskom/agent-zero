@@ -14,7 +14,8 @@ class UpdateBehaviour(Tool):
 
         await update_behaviour(self.agent, self.log, adjustments)
         return Response(
-            message=self.agent.read_prompt("behaviour.updated.md"), break_loop=False
+            message=self.agent.read_prompt("behaviour.updated.md"),
+            break_loop=False,
         )
 
     # async def before_execution(self, **kwargs):
@@ -35,7 +36,9 @@ async def update_behaviour(agent: Agent, log_item: LogItem, adjustments: str):
         log_item.stream(ruleset=content)
 
     msg = agent.read_prompt(
-        "behaviour.merge.msg.md", current_rules=current_rules, adjustments=adjustments
+        "behaviour.merge.msg.md",
+        current_rules=current_rules,
+        adjustments=adjustments,
     )
 
     # call util llm to find solutions in history
@@ -52,7 +55,9 @@ async def update_behaviour(agent: Agent, log_item: LogItem, adjustments: str):
 
 
 def get_custom_rules_file(agent: Agent):
-    return files.get_abs_path(memory.get_memory_subdir_abs(agent), "behaviour.md")
+    return files.get_abs_path(
+        memory.get_memory_subdir_abs(agent), "behaviour.md"
+    )
 
 
 def read_rules(agent: Agent):

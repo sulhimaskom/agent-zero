@@ -32,7 +32,7 @@ class ApiResetChat(ApiHandler):
                 return Response(
                     '{"error": "context_id is required"}',
                     status=400,
-                    mimetype="application/json"
+                    mimetype="application/json",
                 )
 
             # Check if context exists
@@ -41,7 +41,7 @@ class ApiResetChat(ApiHandler):
                 return Response(
                     '{"error": "Chat context not found"}',
                     status=404,
-                    mimetype="application/json"
+                    mimetype="application/json",
                 )
 
             # Reset the chat context (clears history but keeps context alive)
@@ -51,14 +51,17 @@ class ApiResetChat(ApiHandler):
 
             # Log the reset
             PrintStyle(
-                background_color=Colors.API_RESET_BLUE, font_color=Colors.BG_WHITE, bold=True, padding=True
+                background_color=Colors.API_RESET_BLUE,
+                font_color=Colors.BG_WHITE,
+                bold=True,
+                padding=True,
             ).print(f"API Chat reset: {context_id}")
 
             # Return success response
             return {
                 "success": True,
                 "message": "Chat reset successfully",
-                "context_id": context_id
+                "context_id": context_id,
             }
 
         except Exception as e:
@@ -66,5 +69,5 @@ class ApiResetChat(ApiHandler):
             return Response(
                 json.dumps({"error": f"Internal server error: {str(e)}"}),
                 status=500,
-                mimetype="application/json"
+                mimetype="application/json",
             )

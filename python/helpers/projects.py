@@ -5,7 +5,6 @@ from python.helpers import files, dirty_json, persist_chat, file_tree
 from python.helpers.print_style import PrintStyle
 from python.helpers.constants import Paths, Limits
 
-
 if TYPE_CHECKING:
     from agent import AgentContext
 
@@ -55,7 +54,9 @@ def get_project_folder(name: str):
 
 
 def get_project_meta_folder(name: str, *sub_dirs: str):
-    return files.get_abs_path(get_project_folder(name), PROJECT_META_DIR, *sub_dirs)
+    return files.get_abs_path(
+        get_project_folder(name), PROJECT_META_DIR, *sub_dirs
+    )
 
 
 def delete_project(name: str):
@@ -67,7 +68,8 @@ def delete_project(name: str):
 
 def create_project(name: str, data: BasicProjectData):
     files.create_dir_safe(
-        files.get_abs_path(PROJECTS_PARENT_DIR, name), rename_format="{name}_{number}"
+        files.get_abs_path(PROJECTS_PARENT_DIR, name),
+        rename_format="{name}_{number}",
     )
     create_project_meta_folders(name)
     data = _normalizeBasicData(data)
@@ -231,7 +233,9 @@ def activate_project(context_id: str, name: str):
     if context is None:
         raise Exception("Context not found")
     display_name = str(data.get("title", name))
-    display_name = display_name[:22] + "..." if len(display_name) > 25 else display_name
+    display_name = (
+        display_name[:22] + "..." if len(display_name) > 25 else display_name
+    )
     context.set_data(CONTEXT_DATA_KEY_PROJECT, name)
     context.set_output_data(
         CONTEXT_DATA_KEY_PROJECT,
@@ -304,14 +308,18 @@ def get_context_project_name(context: "AgentContext") -> str | None:
 
 def load_project_variables(name: str):
     try:
-        abs_path = files.get_abs_path(get_project_meta_folder(name), "variables.env")
+        abs_path = files.get_abs_path(
+            get_project_meta_folder(name), "variables.env"
+        )
         return files.read_file(abs_path)
     except Exception:
         return ""
 
 
 def save_project_variables(name: str, variables: str):
-    abs_path = files.get_abs_path(get_project_meta_folder(name), "variables.env")
+    abs_path = files.get_abs_path(
+        get_project_meta_folder(name), "variables.env"
+    )
     files.write_file(abs_path, variables)
 
 
@@ -349,7 +357,9 @@ def create_project_meta_folders(name: str):
 
     for memory_type in memory.Memory.Area:
         files.create_dir(
-            get_project_meta_folder(name, PROJECT_KNOWLEDGE_DIR, memory_type.value)
+            get_project_meta_folder(
+                name, PROJECT_KNOWLEDGE_DIR, memory_type.value
+            )
         )
 
 
@@ -360,20 +370,24 @@ def get_knowledge_files_count(name: str):
     return len(files.list_files_in_dir_recursively(knowledge_folder))
 
 
-def get_file_structure(name: str, basic_data: BasicProjectData | None = None) -> str:
+def get_file_structure(
+    name: str, basic_data: BasicProjectData | None = None
+) -> str:
     project_folder = get_project_folder(name)
     if basic_data is None:
         basic_data = load_basic_project_data(name)
 
-    tree = str(file_tree.file_tree(
-        project_folder,
-        max_depth=basic_data["file_structure"]["max_depth"],
-        max_files=basic_data["file_structure"]["max_files"],
-        max_folders=basic_data["file_structure"]["max_folders"],
-        max_lines=basic_data["file_structure"]["max_lines"],
-        ignore=basic_data["file_structure"]["gitignore"],
-        output_mode=file_tree.OUTPUT_MODE_STRING
-    ))
+    tree = str(
+        file_tree.file_tree(
+            project_folder,
+            max_depth=basic_data["file_structure"]["max_depth"],
+            max_files=basic_data["file_structure"]["max_files"],
+            max_folders=basic_data["file_structure"]["max_folders"],
+            max_lines=basic_data["file_structure"]["max_lines"],
+            ignore=basic_data["file_structure"]["gitignore"],
+            output_mode=file_tree.OUTPUT_MODE_STRING,
+        )
+    )
 
     # empty?
     if "\n" not in tree:

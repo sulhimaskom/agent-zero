@@ -140,7 +140,10 @@ class DirtyJson:
 
     def _match(self, text: str) -> bool:
         # first char should match current char
-        if not self.current_char or self.current_char.lower() != text[0].lower():
+        if (
+            not self.current_char
+            or self.current_char.lower() != text[0].lower()
+        ):
             return False
 
         # peek remaining chars
@@ -247,10 +250,22 @@ class DirtyJson:
         result = ""
         quote_char = self.current_char
         self._advance()  # Skip opening quote
-        while self.current_char is not None and self.current_char != quote_char:
+        while (
+            self.current_char is not None and self.current_char != quote_char
+        ):
             if self.current_char == "\\":
                 self._advance()
-                if self.current_char in ['"', "'", "\\", "/", "b", "f", "n", "r", "t"]:
+                if self.current_char in [
+                    '"',
+                    "'",
+                    "\\",
+                    "/",
+                    "b",
+                    "f",
+                    "n",
+                    "r",
+                    "t",
+                ]:
                     result += {
                         "b": "\b",
                         "f": "\f",
@@ -263,7 +278,10 @@ class DirtyJson:
                     unicode_char = ""
                     # Try to collect exactly 4 hex digits
                     for _ in range(4):
-                        if self.current_char is None or not self.current_char.isalnum():
+                        if (
+                            self.current_char is None
+                            or not self.current_char.isalnum()
+                        ):
                             # If we can't get 4 hex digits, treat it as a literal '\u' followed by whatever we got
                             return result + "\\u" + unicode_char
                         unicode_char += self.current_char
@@ -332,5 +350,9 @@ class DirtyJson:
 
     def get_start_pos(self, input_str: str) -> int:
         chars = ["{", "[", '"']
-        indices = [input_str.find(char) for char in chars if input_str.find(char) != -1]
+        indices = [
+            input_str.find(char)
+            for char in chars
+            if input_str.find(char) != -1
+        ]
         return min(indices) if indices else 0

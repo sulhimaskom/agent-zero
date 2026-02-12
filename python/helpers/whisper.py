@@ -5,7 +5,11 @@ import tempfile
 import asyncio
 from python.helpers import files
 from python.helpers.print_style import PrintStyle
-from python.helpers.notification import NotificationManager, NotificationType, NotificationPriority
+from python.helpers.notification import (
+    NotificationManager,
+    NotificationType,
+    NotificationPriority,
+)
 from python.helpers.constants import Paths, Timeouts
 
 # Suppress FutureWarning from torch.load
@@ -39,7 +43,8 @@ async def _preload(model_name: str):
                 NotificationPriority.NORMAL,
                 "Loading Whisper model...",
                 display_time=99,
-                group="whisper-preload")
+                group="whisper-preload",
+            )
             PrintStyle.standard(f"Loading Whisper model: {model_name}")
             _model = whisper.load_model(name=model_name, download_root=files.get_abs_path(Paths.WHISPER_MODEL_ROOT))  # type: ignore
             _model_name = model_name
@@ -48,7 +53,8 @@ async def _preload(model_name: str):
                 NotificationPriority.NORMAL,
                 "Whisper model loaded.",
                 display_time=2,
-                group="whisper-preload")
+                group="whisper-preload",
+            )
     finally:
         is_updating_model = False
 
@@ -90,7 +96,10 @@ async def _transcribe(model_name: str, audio_bytes_b64: str):
 
     # Create temp audio file
     import os
-    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as audio_file:
+
+    with tempfile.NamedTemporaryFile(
+        suffix=".wav", delete=False
+    ) as audio_file:
         audio_file.write(audio_bytes)
         temp_path = audio_file.name
     try:

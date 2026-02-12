@@ -6,6 +6,7 @@ from typing import Tuple
 from python.helpers.log import Log
 from python.helpers.print_style import PrintStyle
 from python.helpers.constants import Shell, Timeouts, Limits
+
 # from python.helpers.strings import calculate_valid_match_lengths
 
 
@@ -15,7 +16,13 @@ class SSHInteractiveSession:
     # ps1_label = "SSHInteractiveSession CLI>"
 
     def __init__(
-        self, logger: Log, hostname: str, port: int, username: str, password: str, cwd: str | None = None
+        self,
+        logger: Log,
+        hostname: str,
+        port: int,
+        username: str,
+        password: str,
+        cwd: str | None = None,
     ):
         self.logger = logger
         self.hostname = hostname
@@ -61,7 +68,10 @@ class SSHInteractiveSession:
                 # ----------------------------------------------------------------
 
                 # invoke interactive shell
-                self.shell = self.client.invoke_shell(width=Limits.SSH_SHELL_WIDTH, height=Limits.SSH_SHELL_HEIGHT)
+                self.shell = self.client.invoke_shell(
+                    width=Limits.SSH_SHELL_WIDTH,
+                    height=Limits.SSH_SHELL_HEIGHT,
+                )
 
                 # disable systemd/OSC prompt metadata and disable local echo
                 initial_command = Shell.SSH_INIT_COMMAND
@@ -157,8 +167,12 @@ class SSHInteractiveSession:
             await asyncio.sleep(0.1)  # Prevent busy waiting
 
         # Decode once at the end
-        decoded_partial_output = partial_output.decode("utf-8", errors="replace")
-        decoded_full_output = self.full_output.decode("utf-8", errors="replace")
+        decoded_partial_output = partial_output.decode(
+            "utf-8", errors="replace"
+        )
+        decoded_full_output = self.full_output.decode(
+            "utf-8", errors="replace"
+        )
 
         decoded_partial_output = clean_string(decoded_partial_output)
         decoded_full_output = clean_string(decoded_full_output)
@@ -187,7 +201,9 @@ class SSHInteractiveSession:
             last_byte = data[-1]
 
             # Check if the last byte is part of a multi-byte UTF-8 sequence (continuation byte)
-            if (last_byte & 0b11000000) == 0b10000000:  # It's a continuation byte
+            if (
+                last_byte & 0b11000000
+            ) == 0b10000000:  # It's a continuation byte
                 # Now, find the start of this sequence by checking earlier bytes
                 for i in range(
                     2, 5
@@ -197,7 +213,9 @@ class SSHInteractiveSession:
                     byte = data[-i]
 
                     # Detect the leading byte of a multi-byte sequence
-                    if (byte & 0b11100000) == 0b11000000:  # 2-byte sequence (110xxxxx)
+                    if (
+                        byte & 0b11100000
+                    ) == 0b11000000:  # 2-byte sequence (110xxxxx)
                         data += recv_all(1)  # Need 1 more byte to complete
                         break
                     elif (
@@ -223,9 +241,9 @@ def clean_string(input_string):
     cleaned = cleaned.replace("\x00", "")
 
     # remove ipython \r\r\n> sequences from the start
-    cleaned = re.sub(r'^[ \r]*(?:\r*\n>[ \r]*)*', '', cleaned)
+    cleaned = re.sub(r"^[ \r]*(?:\r*\n>[ \r]*)*", "", cleaned)
     # also remove any amount of '> ' sequences from the start
-    cleaned = re.sub(r'^(>\s*)+', '', cleaned)
+    cleaned = re.sub(r"^(>\s*)+", "", cleaned)
 
     # Replace '\r\n' with '\n'
     cleaned = cleaned.replace("\r\n", "\n")

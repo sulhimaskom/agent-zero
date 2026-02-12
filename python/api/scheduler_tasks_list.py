@@ -25,5 +25,11 @@ class SchedulerTasksList(ApiHandler):
             return {"ok": True, "tasks": tasks_list}
 
         except Exception as e:
-            PrintStyle.error(f"Failed to list tasks: {str(e)} {traceback.format_exc()}")
-            return {"ok": False, "error": f"Failed to list tasks: {str(e)} {traceback.format_exc()}", "tasks": []}
+            PrintStyle.error(
+                f"Failed to list tasks: {str(e)} {traceback.format_exc()}"
+            )
+            return {
+                "ok": False,
+                "error": f"Failed to list tasks: {str(e)} {traceback.format_exc()}",
+                "tasks": [],
+            }

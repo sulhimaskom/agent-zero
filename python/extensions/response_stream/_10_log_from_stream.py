@@ -1,7 +1,10 @@
 from python.helpers.extension import Extension
 from agent import LoopData
 import math
-from python.extensions.before_main_llm_call._10_log_for_stream import build_heading, build_default_heading
+from python.extensions.before_main_llm_call._10_log_for_stream import (
+    build_heading,
+    build_default_heading,
+)
 
 
 class LogFromStream(Extension):
@@ -16,9 +19,11 @@ class LogFromStream(Extension):
 
         heading = build_default_heading(self.agent)
         if "headline" in parsed:
-            heading = build_heading(self.agent, parsed['headline'])
+            heading = build_heading(self.agent, parsed["headline"])
         elif "tool_name" in parsed:
-            heading = build_heading(self.agent, f"Using tool {parsed['tool_name']}")  # if the llm skipped headline
+            heading = build_heading(
+                self.agent, f"Using tool {parsed['tool_name']}"
+            )  # if the llm skipped headline
         elif "thoughts" in parsed:
             # thought length indicator
             thoughts = "\n".join(parsed["thoughts"])

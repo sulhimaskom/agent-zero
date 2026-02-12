@@ -5,9 +5,16 @@ from python.helpers.constants import Timeouts
 
 
 class RateLimiter:
-    def __init__(self, seconds: int = Timeouts.RATE_LIMITER_DEFAULT_TIMEFRAME, **limits: int):
+    def __init__(
+        self,
+        seconds: int = Timeouts.RATE_LIMITER_DEFAULT_TIMEFRAME,
+        **limits: int,
+    ):
         self.timeframe = seconds
-        self.limits = {key: value if isinstance(value, (int, float)) else 0 for key, value in (limits or {}).items()}
+        self.limits = {
+            key: value if isinstance(value, (int, float)) else 0
+            for key, value in (limits or {}).items()
+        }
         self.values = {key: [] for key in self.limits.keys()}
         self._lock = asyncio.Lock()
 
@@ -23,7 +30,9 @@ class RateLimiter:
             now = time.time()
             cutoff = now - self.timeframe
             for key in self.values:
-                self.values[key] = [(t, v) for t, v in self.values[key] if t > cutoff]
+                self.values[key] = [
+                    (t, v) for t, v in self.values[key] if t > cutoff
+                ]
 
     async def get_total(self, key: str) -> int:
         async with self._lock:
@@ -33,7 +42,9 @@ class RateLimiter:
 
     async def wait(
         self,
-        callback: Callable[[str, str, int, int], Awaitable[bool]] | None = None,
+        callback: (
+            Callable[[str, str, int, int], Awaitable[bool]] | None
+        ) = None,
     ):
         while True:
             await self.cleanup()
@@ -47,7 +58,9 @@ class RateLimiter:
                 if total > limit:
                     if callback:
                         msg = f"Rate limit exceeded for {key} ({total}/{limit}), waiting..."
-                        should_wait = not await callback(msg, key, total, limit)
+                        should_wait = not await callback(
+                            msg, key, total, limit
+                        )
                     else:
                         should_wait = True
                     break

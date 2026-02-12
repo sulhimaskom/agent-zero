@@ -23,7 +23,7 @@ class GetCsrfToken(ApiHandler):
         origin_check = await self.check_allowed_origin(request)
         if not origin_check["ok"]:
             origin = self.get_origin_from_request(request)
-            allowed_list = ",".join(origin_check['allowed_origins'])
+            allowed_list = ",".join(origin_check["allowed_origins"])
             return {
                 "ok": False,
                 "error": (
@@ -65,7 +65,11 @@ class GetCsrfToken(ApiHandler):
             fnmatch.fnmatch(origin, allowed_origin)
             for allowed_origin in allowed_origins
         )
-        return {"ok": match, "origin": origin, "allowed_origins": allowed_origins}
+        return {
+            "ok": match,
+            "origin": origin,
+            "allowed_origins": allowed_origins,
+        }
 
     def get_origin_from_request(self, request: Request):
         # get from origin
@@ -89,7 +93,9 @@ class GetCsrfToken(ApiHandler):
         # get the allowed origins from the environment
         allowed_origins = [
             origin.strip()
-            for origin in (dotenv.get_dotenv_value("ALLOWED_ORIGINS") or "").split(",")
+            for origin in (
+                dotenv.get_dotenv_value("ALLOWED_ORIGINS") or ""
+            ).split(",")
             if origin.strip()
         ]
 

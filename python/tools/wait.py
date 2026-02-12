@@ -23,9 +23,13 @@ class WaitTool(Tool):
 
         if until_timestamp_str:
             try:
-                target_time = Localization.get().localtime_str_to_utc_dt(until_timestamp_str)
+                target_time = Localization.get().localtime_str_to_utc_dt(
+                    until_timestamp_str
+                )
                 if not target_time:
-                    raise ValueError(f"Invalid timestamp format: {until_timestamp_str}")
+                    raise ValueError(
+                        f"Invalid timestamp format: {until_timestamp_str}"
+                    )
             except ValueError as e:
                 return Response(
                     message=str(e),
@@ -46,8 +50,9 @@ class WaitTool(Tool):
             target_time = now + wait_duration
 
         if target_time <= now:
+            msg = f"Target time {target_time.isoformat()} is in the past."
             return Response(
-                message=f"Target time {target_time.isoformat()} is in the past.",
+                message=msg,
                 break_loop=False,
             )
 
@@ -58,15 +63,14 @@ class WaitTool(Tool):
             target_time=target_time,
             is_duration_wait=is_duration_wait,
             log=self.log,
-            get_heading_callback=self.get_heading
+            get_heading_callback=self.get_heading,
         )
 
         if self.log:
             self.log.update(heading=self.get_heading("Done", done=True))
 
         message = self.agent.read_prompt(
-            "fw.wait_complete.md",
-            target_time=target_time.isoformat()
+            "fw.wait_complete.md", target_time=target_time.isoformat()
         )
 
         return Response(
