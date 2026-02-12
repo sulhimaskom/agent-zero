@@ -714,7 +714,7 @@ class LocalSentenceTransformerWrapper(Embeddings):
 
         # Remove the "sentence-transformers/" prefix if present
         if model.startswith("sentence-transformers/"):
-            model = model[len("sentence-transformers/") :]
+            model = model[len("sentence-transformers/"):]
 
         # Filter kwargs for SentenceTransformer only (no LiteLLM params like 'stream_timeout')
         st_allowed_keys = {
