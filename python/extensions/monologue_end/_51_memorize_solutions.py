@@ -18,7 +18,7 @@ class MemorizeSolutions(Extension):
 
         if not set["memory_memorize_enabled"]:
             return
- 
+
         # show full util message
         log_item = self.agent.context.log.log(
             type="util",
@@ -118,7 +118,7 @@ class MemorizeSolutions(Extension):
                     )
 
                     # Create solution-specific log for detailed tracking
-                    solution_log = None # too many utility messages, skip log for now
+                    solution_log = None  # too many utility messages, skip log for now
                     # solution_log = self.agent.context.log.log(
                     #     type="util",
                     #     heading=f"Processing solution: {txt[:50]}...",
@@ -189,5 +189,3 @@ class MemorizeSolutions(Extension):
                 )
                 if rem:
                     log_item.stream(result=f"\nReplaced {len(rem)} previous solutions.")
-
-

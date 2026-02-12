@@ -99,7 +99,7 @@ class MemorizeMemories(Extension):
             txt = f"{memory}"
 
             if set["memory_memorize_consolidation"]:
-                
+
                 try:
                     # Use intelligent consolidation system
                     from python.helpers.memory_consolidation import create_memory_consolidator
@@ -111,7 +111,7 @@ class MemorizeMemories(Extension):
                     )
 
                     # Create memory item-specific log for detailed tracking
-                    memory_log = None # too many utility messages, skip log for now
+                    memory_log = None  # too many utility messages, skip log for now
                     # memory_log = self.agent.context.log.log(
                     #     type="util",
                     #     heading=f"Processing memory fragment: {txt[:50]}...",
@@ -184,6 +184,3 @@ class MemorizeMemories(Extension):
                 )
                 if rem:
                     log_item.stream(result=f"\nReplaced {len(rem)} previous memories.")
-            
-
-
