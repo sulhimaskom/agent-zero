@@ -9,7 +9,6 @@ import sys
 import json
 import time
 from pathlib import Path
-import sys
 sys.path.insert(0, '/home/runner/work/agent-zero/agent-zero')
 from python.helpers.constants import Network
 
