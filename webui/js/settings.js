@@ -43,7 +43,6 @@ const settingsModalProxy = {
 
             // When switching to the scheduler tab, initialize Flatpickr components
             if (tabName === 'scheduler') {
-                console.log('Switching to scheduler tab, initializing Flatpickr');
                 const schedulerElement = document.querySelector('[x-data="schedulerSettings"]');
                 if (schedulerElement) {
                     const schedulerData = Alpine.$data(schedulerElement);
@@ -74,7 +73,6 @@ const settingsModalProxy = {
     },
 
     async openModal() {
-        console.log('Settings modal opening');
         const modalEl = document.getElementById('settingsModal');
         const modalAD = Alpine.$data(modalEl);
 
@@ -117,7 +115,6 @@ const settingsModalProxy = {
             setTimeout(() => {
                 // Get stored tab or default to 'agent'
                 const savedTab = localStorage.getItem('settingsActiveTab') || 'agent';
-                console.log(`Setting initial tab to: ${savedTab}`);
 
                 // Directly set the active tab
                 modalAD.activeTab = savedTab;
@@ -135,15 +132,8 @@ const settingsModalProxy = {
                     if (activeTabElement) {
                         activeTabElement.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
                     }
-                    // Debug log
-                    const schedulerTab = document.querySelector('.settings-tab[title="Task Scheduler"]');
-                    console.log(`Current active tab after direct set: ${modalAD.activeTab}`);
-                    console.log('Scheduler tab active after direct initialization?',
-                        schedulerTab && schedulerTab.classList.contains('active'));
-
                     // Explicitly start polling if we're on the scheduler tab
                     if (modalAD.activeTab === 'scheduler') {
-                        console.log('Settings opened directly to scheduler tab, initializing polling');
                         const schedulerElement = document.querySelector('[x-data="schedulerSettings"]');
                         if (schedulerElement) {
                             const schedulerData = Alpine.$data(schedulerElement);
@@ -265,15 +255,12 @@ const settingsModalProxy = {
         if (schedulerElement) {
             const schedulerData = Alpine.$data(schedulerElement);
             if (schedulerData && typeof schedulerData.stopPolling === 'function') {
-                console.log('Stopping scheduler polling on modal close');
                 schedulerData.stopPolling();
             }
         }
     },
 
     async handleFieldButton(field) {
-        console.log(`Button clicked: ${field.id}`);
-
         if (field.id === "mcp_servers_config") {
             openModal("settings/mcp/client/mcp-servers.html");
         } else if (field.id === "backup_create") {
@@ -369,14 +356,10 @@ document.addEventListener('alpine:init', function () {
                         const data = await response.json();
                         if (data && data.settings) {
                             this.settingsData = data.settings;
-                        } else {
-                            console.error('Invalid settings data format');
                         }
-                    } else {
-                        console.error('Failed to fetch settings:', response.statusText);
                     }
                 } catch (error) {
-                    console.error('Error fetching settings:', error);
+                    Logger.error('Error fetching settings:', error);
                 } finally {
                     this.isLoading = false;
                 }
@@ -448,21 +431,13 @@ document.addEventListener('alpine:init', function () {
                         throw new Error(errorData.error || 'Failed to save settings');
                     }
                 } catch (error) {
-                    console.error('Error saving settings:', error);
-                    showToast('Failed to save settings: ' + error.message, 'error');
+                    Logger.error('Error saving settings:', error);
+                    showToast('Error saving settings', 'error');
                 }
             },
 
-            // Handle special button field actions
-            handleFieldButton(field) {
-                if (field.action === 'test_connection') {
-                    this.testConnection(field);
-                } else if (field.action === 'reveal_token') {
-                    this.revealToken(field);
-                } else if (field.action === 'generate_token') {
-                    this.generateToken(field);
-                } else {
-                    console.warn('Unknown button action:', field.action);
+            async handleButtonAction(field) {
+                Logger.warn('Unknown button action:', field.action);
                 }
             },
 
@@ -508,7 +483,7 @@ document.addEventListener('alpine:init', function () {
                         throw new Error(data.error || 'Connection failed');
                     }
                 } catch (error) {
-                    console.error('Connection test failed:', error);
+                    Logger.error('Connection test failed:', error);
                     field.testResult = `Failed: ${error.message}`;
                     field.testStatus = 'error';
                 }
@@ -559,7 +534,6 @@ document.addEventListener('alpine:init', function () {
                 if (schedulerElement) {
                     const schedulerData = Alpine.$data(schedulerElement);
                     if (schedulerData && typeof schedulerData.stopPolling === 'function') {
-                        console.log('Stopping scheduler polling on modal close');
                         schedulerData.stopPolling();
                     }
                 }
@@ -588,7 +562,7 @@ function showToast(message, type = 'info') {
         }
     } else {
         // Fallback if Alpine/store not ready
-        console.log(`SETTINGS ${type.toUpperCase()}: ${message}`);
+        Logger.info(`SETTINGS ${type.toUpperCase()}: ${message}`);
         return null;
     }
 }

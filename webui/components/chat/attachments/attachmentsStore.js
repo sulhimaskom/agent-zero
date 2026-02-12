@@ -68,7 +68,6 @@ const model = {
 
   // Setup drag and drop event handlers
   setupDragDropHandlers() {
-    console.log("Setting up drag and drop handlers...");
     let dragCounter = 0;
 
     // Prevent default drag behaviors
@@ -87,10 +86,8 @@ const model = {
     document.addEventListener(
       "dragenter",
       (e) => {
-        console.log("Drag enter detected");
         dragCounter++;
         if (dragCounter === 1) {
-          console.log("Showing drag drop overlay");
           this.showDragDropOverlay();
         }
       },
@@ -113,7 +110,6 @@ const model = {
     document.addEventListener(
       "drop",
       (e) => {
-        console.log("Drop detected with files:", e.dataTransfer.files.length);
         dragCounter = 0;
         this.hideDragDropOverlay();
 
@@ -126,13 +122,9 @@ const model = {
 
   // Setup paste event handler for clipboard images
   setupPasteHandler() {
-    console.log("Setting up paste handler...");
     document.addEventListener("paste", (e) => {
-      console.log("Paste event detected, target:", e.target.tagName);
-
       const items = e.clipboardData.items;
       let imageFound = false;
-      console.log("Checking clipboard items:", items.length);
 
       // First, check if there are any images in the clipboard
       for (let i = 0; i < items.length; i++) {
@@ -143,7 +135,6 @@ const model = {
           if (blob) {
             e.preventDefault(); // Prevent default paste behavior for images
             this.handleClipboardImage(blob);
-            console.log("Image detected in clipboard, processing...");
           }
           break; // Only handle the first image found
         }
@@ -154,15 +145,7 @@ const model = {
         !imageFound &&
         (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")
       ) {
-        console.log(
-          "No images in clipboard, allowing normal text paste in input field"
-        );
         return;
-      }
-
-      // If no images found and not in input field, do nothing
-      if (!imageFound) {
-        console.log("No images in clipboard");
       }
     });
   },
@@ -193,9 +176,6 @@ const model = {
         this.addAttachment(attachment);
       };
       reader.readAsDataURL(file);
-
-      // Show success feedback
-      console.log("Clipboard image pasted successfully:", filename);
     } catch (error) {
       console.error("Failed to handle clipboard image:", error);
     }
@@ -210,9 +190,7 @@ const model = {
 
   // File handling logic (moved from index.js)
   handleFiles(files) {
-    console.log("handleFiles called with", files.length, "files");
     Array.from(files).forEach((file) => {
-      console.log("Processing file:", file.name, file.type);
       const ext = file.name.split(".").pop().toLowerCase();
       const isImage = ["jpg", "jpeg", "png", "bmp", "gif", "webp", "svg"].includes(
         ext

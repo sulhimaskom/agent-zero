@@ -8,6 +8,7 @@ import { store as speechStore } from "/components/chat/speech/speech-store.js";
 import { store as notificationStore } from "/components/notifications/notification-store.js";
 import { store as preferencesStore } from "/components/sidebar/bottom/preferences/preferences-store.js";
 import { store as inputStore } from "/components/chat/input/input-store.js";
+import Logger from "/js/logger.js";
 import { store as chatsStore } from "/components/sidebar/chats/chats-store.js";
 import { store as tasksStore } from "/components/sidebar/tasks/tasks-store.js";
 import { store as chatTopStore } from "/components/chat/top-section/chat-top-store.js";
@@ -37,7 +38,7 @@ let skipOneSpeech = false;
 export async function sendMessage() {
   const chatInputEl = document.getElementById("chat-input");
   if (!chatInputEl) {
-    console.warn("chatInput not available, cannot send message");
+    Logger.warn("chatInput not available, cannot send message");
     return;
   }
   try {
@@ -113,21 +114,21 @@ export async function sendMessage() {
 globalThis.sendMessage = sendMessage;
 
 export function toastFetchError(text, error) {
-  console.error(text, error);
+  Logger.error(text, error);
   // Use new frontend error notification system (async, but we don't need to wait)
   const errorMessage = error?.message || error?.toString() || "Unknown error";
 
   if (getConnectionStatus()) {
     // Backend is connected, just show the error
     toastFrontendError(`${text}: ${errorMessage}`).catch((e) =>
-      console.error("Failed to show error toast:", e)
+      Logger.error("Failed to show error toast:", e)
     );
   } else {
     // Backend is disconnected, show connection error
     toastFrontendError(
       `${text} (backend appears to be disconnected): ${errorMessage}`,
       "Connection Error"
-    ).catch((e) => console.error("Failed to show connection error toast:", e));
+    ).catch((e) => Logger.error("Failed to show connection error toast:", e));
   }
 }
 globalThis.toastFetchError = toastFetchError;
@@ -137,10 +138,9 @@ globalThis.toastFetchError = toastFetchError;
 export function updateChatInput(text) {
   const chatInputEl = document.getElementById("chat-input");
   if (!chatInputEl) {
-    console.warn("`chatInput` element not found, cannot update.");
+    Logger.warn("`chatInput` element not found, cannot update.");
     return;
   }
-  // Removed console.log for production
 
   // Append text with proper spacing
   const currentValue = chatInputEl.value;
@@ -289,7 +289,7 @@ export async function poll() {
 
     // Check if the response is valid
     if (!response) {
-      console.error("Invalid response from poll endpoint");
+      Logger.error("Invalid response from poll endpoint");
       return false;
     }
 
@@ -408,7 +408,7 @@ export async function poll() {
                               error.message?.includes('JSON');
     
     if (!isConnectionError) {
-      console.error("Poll error:", error);
+      Logger.error("Poll error:", error);
     }
     setConnectionStatus(false);
   }
@@ -618,7 +618,7 @@ async function startPolling() {
       if (shortIntervalCount > 0) shortIntervalCount--; // Decrease the counter on each call
       nextInterval = shortIntervalCount > 0 ? shortInterval : longInterval;
     } catch (error) {
-      console.error("Error:", error);
+      Logger.error("Error:", error);
     }
 
     // Call the function again after the selected interval
@@ -675,7 +675,7 @@ function openTaskDetail(taskId) {
       // Now get a reference to the modal element
       const modalEl = document.getElementById("settingsModal");
       if (!modalEl) {
-        console.error("Settings modal element not found after clicking button");
+        Logger.error("Settings modal element not found after clicking button");
         return;
       }
 
@@ -694,7 +694,7 @@ function openTaskDetail(taskId) {
             '[x-data="schedulerSettings"]'
           );
           if (!schedulerComponent) {
-            console.error("Scheduler component not found");
+            Logger.error("Scheduler component not found");
             return;
           }
 
@@ -705,15 +705,13 @@ function openTaskDetail(taskId) {
 
           // Show the task detail view for the specific task
           schedulerData.showTaskDetail(taskId);
-
-          console.log("Task detail view opened for task:", taskId);
         }, 50); // Give time for the scheduler tab to initialize
       }, 25); // Give time for the modal to render
     } else {
-      console.error("Settings button not found");
+      Logger.error("Settings button not found");
     }
   } else {
-    console.error("Alpine.js not loaded");
+    Logger.error("Alpine.js not loaded");
   }
 }
 

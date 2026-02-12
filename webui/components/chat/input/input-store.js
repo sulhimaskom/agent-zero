@@ -25,7 +25,6 @@ const model = {
   ],
 
   init() {
-    console.log("Input store initialized");
     // Event listeners are now handled via Alpine directives in the component
     this.startPlaceholderRotation();
   },
