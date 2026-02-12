@@ -585,9 +585,13 @@ class SchedulerTaskList(BaseModel):
     async def get_due_tasks(self) -> list[Union[ScheduledTask, AdHocTask, PlannedTask]]:
         with self._lock:
             await self.reload()
+            now = datetime.now(timezone.utc)
             return [
                 task for task in self.tasks
                 if task.check_schedule() and task.state == TaskState.IDLE
+                # Prevent running same task multiple times within the same minute
+                # This fixes the race condition when SLEEP_TIME is lowered below 1 minute
+                and (task.last_run is None or (now - task.last_run).total_seconds() >= 60)
             ]
 
     def get_task_by_uuid(self, task_uuid: str) -> Union[ScheduledTask, AdHocTask, PlannedTask] | None:
