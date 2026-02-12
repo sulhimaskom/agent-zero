@@ -22,7 +22,7 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 │   ├── js/            # ES modules, stores (scheduler.js 1835 lines, messages.js 1009 lines)
 │   └── css/           # Styling
 ├── conf/               # model_providers.yaml (15+ LLM providers), projects.default.gitignore
-├── docker/             # base/ (Kali Linux, Python 3.13+3.12) + run/ (runtime container)
+├── docker/             # base/ (Debian 13 slim, Python 3.13+3.12) + run/ (runtime container)
 ├── docs/               # Comprehensive documentation (architecture, extensibility, installation)
 ├── instruments/        # Custom scripts/procedures for agent use
 ├── knowledge/          # RAG document storage (separate from agent memory)
@@ -46,7 +46,7 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 | Scheduler | `/python/helpers/task_scheduler.py` | Crontab-based scheduled tasks |
 | Agent profiles | `/agents/{profile}/` | Each has prompts/, tools/, extensions/ subdirs |
 | Model config | `/conf/model_providers.yaml` | LiteLLM provider configurations |
-| Docker build | `/docker/` | Two-stage: base (Kali) → runtime (Agent Zero) |
+| Docker build | `/docker/` | Two-stage: base (Debian) → runtime (Agent Zero) |
 | LLM abstraction | `/models.py` | LiteLLM wrappers for chat/embedding/browser models |
 | Core agent loop | `/agent.py` | Agent class, AgentContext, AgentConfig |
 | Frontend stores | `/webui/components/{feature}/*-store.js` | Alpine.js component stores |
@@ -138,7 +138,8 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 - **A2A**: Agent-to-Agent protocol for inter-agent communication
 
 ### Docker-Centric Runtime
-- Kali Linux base (unusual for web services)
+- Debian 13 slim base (secure, minimal)
+- Optional Kali Linux variant for security tools (`agent0ai/agent-zero:hacking`)
 - Dual Python: 3.13 system-wide + 3.12.4 via pyenv at `/opt/venv-a0`
 - Branch-based builds via `ARG BRANCH`
 - Preload models in Docker build (`preload.py --dockerized=true`)
