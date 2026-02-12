@@ -8,6 +8,7 @@ import { store as chatsStore } from "/components/sidebar/chats/chats-store.js"
 import { store as  notificationsStore } from "/components/notifications/notification-store.js"
 import { store as projectsStore } from "/components/projects/projects-store.js"
 import { TIMING } from './constants.js';
+import Logger from './logger.js';
 
 // Ensure the showToast function is available
 // if (typeof window.showToast !== 'function') {
@@ -211,7 +212,7 @@ const fullComponentImplementation = function() {
 
             // Cleanup on component destruction
             this.$cleanup = () => {
-                console.log('Cleaning up schedulerSettings component');
+                Logger.debug('Cleaning up schedulerSettings component');
                 this.stopPolling();
 
                 // Clean up any Flatpickr instances
@@ -231,11 +232,11 @@ const fullComponentImplementation = function() {
         startPolling() {
             // Don't start if already polling
             if (this.pollingInterval) {
-                console.log('Polling already active, not starting again');
+                Logger.debug('Polling already active, not starting again');
                 return;
             }
 
-            console.log('Starting task polling');
+            Logger.debug('Starting task polling');
             this.pollingActive = true;
 
             // Fetch immediately, then set up interval for every 2 seconds
@@ -249,7 +250,7 @@ const fullComponentImplementation = function() {
 
         // Stop polling when tab is inactive
         stopPolling() {
-            console.log('Stopping task polling');
+            Logger.debug('Stopping task polling');
             this.pollingActive = false;
 
             if (this.pollingInterval) {

@@ -28,13 +28,26 @@
     <link rel="stylesheet" href="index.css">
     <link rel="stylesheet" href="css/messages.css">
     <link rel="stylesheet" href="components/messages/action-buttons/simple-action-buttons.css">
-    <link rel="stylesheet" href="css/toast.css">
-    <link rel="stylesheet" href="css/settings.css">
-    <link rel="stylesheet" href="css/modals.css">
-    <link rel="stylesheet" href="css/speech.css">
-    <link rel="stylesheet" href="css/scheduler-datepicker.css">
-    <link rel="stylesheet" href="css/notification.css">
     <link rel="stylesheet" href="css/buttons.css">
+    
+    <!-- Non-critical CSS loaded asynchronously -->
+    <link rel="preload" href="css/toast.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="css/toast.css"></noscript>
+    
+    <link rel="preload" href="css/settings.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="css/settings.css"></noscript>
+    
+    <link rel="preload" href="css/modals.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="css/modals.css"></noscript>
+    
+    <link rel="preload" href="css/speech.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="css/speech.css"></noscript>
+    
+    <link rel="preload" href="css/scheduler-datepicker.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="css/scheduler-datepicker.css"></noscript>
+    
+    <link rel="preload" href="css/notification.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="css/notification.css"></noscript>
 
     <!-- Flatpickr for datetime picker - async loaded -->
     <link rel="stylesheet" href="vendor/flatpickr/flatpickr.min.css">
