@@ -31,7 +31,7 @@ class browser_console_checker(Tool):
             wait_time: Time to wait after page load for console messages (default: 5 seconds)
         """
         if url is None:
-            url = f"http://{Network.DEFAULT_HOSTNAME}:50001"
+            url = f"http://{Network.DEFAULT_HOSTNAME}:{Network.BROCULA_PORT_DEFAULT}"
         await self.agent.handle_intervention()
         
         state = await self.agent.get_tool_state(self, State)

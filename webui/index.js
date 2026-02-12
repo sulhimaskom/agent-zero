@@ -2,6 +2,7 @@ import * as msgs from "/js/messages.js";
 import * as api from "/js/api.js";
 import * as css from "/js/css.js";
 import { sleep } from "/js/sleep.js";
+import { STORAGE_KEYS } from "/js/constants.js";
 import { store as attachmentsStore } from "/components/chat/attachments/attachmentsStore.js";
 import { store as speechStore } from "/components/chat/speech/speech-store.js";
 import { store as notificationStore } from "/components/notifications/notification-store.js";
@@ -417,7 +418,7 @@ export async function poll() {
 globalThis.poll = poll;
 
 function afterMessagesUpdate(logs) {
-  if (localStorage.getItem("speech") == "true") {
+  if (localStorage.getItem(STORAGE_KEYS.SPEECH) == "true") {
     speakMessages(logs);
   }
 }
@@ -518,7 +519,7 @@ export const setContext = function (id) {
   tasksStore.setSelected(id);
 
   //skip one speech if enabled when switching context
-  if (localStorage.getItem("speech") == "true") skipOneSpeech = true;
+  if (localStorage.getItem(STORAGE_KEYS.SPEECH) == "true") skipOneSpeech = true;
 };
 
 export const deselectChat = function () {
@@ -526,8 +527,8 @@ export const deselectChat = function () {
   setContext(null);
 
   // Clear localStorage selections so we don't auto-restore
-  localStorage.removeItem("lastSelectedChat");
-  localStorage.removeItem("lastSelectedTask");
+  localStorage.removeItem(STORAGE_KEYS.LAST_SELECTED_CHAT);
+  localStorage.removeItem(STORAGE_KEYS.LAST_SELECTED_TASK);
 
   // Clear the chat history safely
   while (chatHistory.firstChild) {

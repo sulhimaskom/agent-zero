@@ -304,6 +304,9 @@ class Network:
     TUNNEL_API_PORT_FALLBACK: Final[int] = 55520
     SEARXNG_PORT_DEFAULT: Final[int] = 55510
     TUNNEL_DEFAULT_PORT: Final[int] = 80
+    
+    # Agent-specific ports
+    BROCULA_PORT_DEFAULT: Final[int] = 50001
 
     # CORS allowed origins (development)
     DEV_CORS_ORIGINS: Final[list[str]] = [
@@ -382,6 +385,28 @@ class FileExtensions:
     JSON: Final[str] = ".json"
     YAML: Final[str] = ".yaml"
     YML: Final[str] = ".yml"
+
+
+# =============================================================================
+# AGENT DEFAULTS
+# =============================================================================
+
+class AgentDefaults:
+    """Default values for agent configuration"""
+
+    PROFILE: Final[str] = "agent0"
+    MEMORY_SUBDIR: Final[str] = "default"
+    KNOWLEDGE_SUBDIR: Final[str] = "custom"
+
+
+# =============================================================================
+# FILE PATTERNS
+# =============================================================================
+
+class FilePatterns:
+    """File search patterns used throughout the system"""
+
+    KNOWLEDGE_MARKDOWN: Final[str] = "**/*.md"
 
 
 # =============================================================================
