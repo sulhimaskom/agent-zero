@@ -6,7 +6,9 @@ from python.helpers.dirty_json import DirtyJson
 from python.helpers.constants import Limits
 from agent import LoopData
 from python.helpers.log import LogItem
-from python.tools.memory_load import DEFAULT_THRESHOLD as DEFAULT_MEMORY_THRESHOLD
+from python.tools.memory_load import (
+    DEFAULT_THRESHOLD as DEFAULT_MEMORY_THRESHOLD,
+)
 
 
 class MemorizeSolutions(Extension):
@@ -66,7 +68,9 @@ class MemorizeSolutions(Extension):
         try:
             solutions = DirtyJson.parse_string(solutions_json)
         except Exception as e:
-            log_item.update(heading=f"Failed to parse solutions response: {str(e)}")
+            log_item.update(
+                heading=f"Failed to parse solutions response: {str(e)}"
+            )
             return
 
         # Validate that solutions is a list or convertible to one
@@ -86,9 +90,12 @@ class MemorizeSolutions(Extension):
             log_item.update(heading="No successful solutions to memorize.")
             return
         else:
-            solutions_txt = "\n\n".join([str(solution) for solution in solutions]).strip()
+            solutions_txt = "\n\n".join(
+                [str(solution) for solution in solutions]
+            ).strip()
             log_item.update(
-                heading=f"{len(solutions)} successful solutions to memorize.", solutions=solutions_txt
+                heading=f"{len(solutions)} successful solutions to memorize.",
+                solutions=solutions_txt,
             )
 
         # Process solutions with intelligent consolidation
@@ -99,8 +106,8 @@ class MemorizeSolutions(Extension):
         for solution in solutions:
             # Convert solution to structured text
             if isinstance(solution, dict):
-                problem = solution.get('problem', 'Unknown problem')
-                solution_text = solution.get('solution', 'Unknown solution')
+                problem = solution.get("problem", "Unknown problem")
+                solution_text = solution.get("solution", "Unknown solution")
                 txt = f"# Problem\n {problem}\n# Solution\n {solution_text}"
             else:
                 # If solution is not a dict, convert it to string
@@ -109,16 +116,21 @@ class MemorizeSolutions(Extension):
             if set["memory_memorize_consolidation"]:
                 try:
                     # Use intelligent consolidation system
-                    from python.helpers.memory_consolidation import create_memory_consolidator
+                    from python.helpers.memory_consolidation import (
+                        create_memory_consolidator,
+                    )
+
                     consolidator = create_memory_consolidator(
                         self.agent,
                         similarity_threshold=DEFAULT_MEMORY_THRESHOLD,  # More permissive for discovery
-                        max_similar_memories=Limits.MEMORY_SOL_MAX_SIMILAR_MEMORIES,    # Fewer for solutions (more complex)
-                        max_llm_context_memories=Limits.MEMORY_SOL_MAX_LLM_CONTEXT_MEMORIES
+                        max_similar_memories=Limits.MEMORY_SOL_MAX_SIMILAR_MEMORIES,  # Fewer for solutions (more complex)
+                        max_llm_context_memories=Limits.MEMORY_SOL_MAX_LLM_CONTEXT_MEMORIES,
                     )
 
                     # Create solution-specific log for detailed tracking
-                    solution_log = None  # too many utility messages, skip log for now
+                    solution_log = (
+                        None  # too many utility messages, skip log for now
+                    )
                     # solution_log = self.agent.context.log.log(
                     #     type="util",
                     #     heading=f"Processing solution: {txt[:50]}...",
@@ -131,7 +143,7 @@ class MemorizeSolutions(Extension):
                         new_memory=txt,
                         area=Memory.Area.SOLUTIONS.value,
                         metadata={"area": Memory.Area.SOLUTIONS.value},
-                        log_item=solution_log
+                        log_item=solution_log,
                     )
 
                     # Update the individual log item with completion status but keep it temporary
@@ -142,7 +154,7 @@ class MemorizeSolutions(Extension):
                                 result="Solution processed successfully",
                                 heading=f"Solution completed: {txt[:50]}...",
                                 temp=False,  # Show completion message
-                                update_progress="none"  # Show briefly then disappear
+                                update_progress="none",  # Show briefly then disappear
                             )
                     else:
                         if solution_log:
@@ -150,7 +162,7 @@ class MemorizeSolutions(Extension):
                                 result="Solution processing failed",
                                 heading=f"Solution failed: {txt[:50]}...",
                                 temp=False,  # Show completion message
-                                update_progress="none"  # Show briefly then disappear
+                                update_progress="none",  # Show briefly then disappear
                             )
                     total_processed += 1
 
@@ -166,7 +178,7 @@ class MemorizeSolutions(Extension):
                     result=f"{total_processed} solutions processed, {total_consolidated} intelligently consolidated",
                     solutions_processed=total_processed,
                     solutions_consolidated=total_consolidated,
-                    update_progress="none"
+                    update_progress="none",
                 )
             else:
                 # remove previous solutions too similiar to this one
@@ -181,11 +193,15 @@ class MemorizeSolutions(Extension):
                         log_item.update(replaced=rem_txt)
 
                 # insert new solution
-                await db.insert_text(text=txt, metadata={"area": Memory.Area.SOLUTIONS.value})
+                await db.insert_text(
+                    text=txt, metadata={"area": Memory.Area.SOLUTIONS.value}
+                )
 
                 log_item.update(
                     result=f"{len(solutions)} solutions memorized.",
                     heading=f"{len(solutions)} solutions memorized.",
                 )
                 if rem:
-                    log_item.stream(result=f"\nReplaced {len(rem)} previous solutions.")
+                    log_item.stream(
+                        result=f"\nReplaced {len(rem)} previous solutions."
+                    )

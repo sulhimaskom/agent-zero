@@ -21,7 +21,9 @@ class MaskReasoningStreamChunk(Extension):
                 agent.set_data(filter_key, filter_instance)
 
             # Process the chunk through the streaming filter
-            processed_chunk = filter_instance.process_chunk(stream_data["chunk"])
+            processed_chunk = filter_instance.process_chunk(
+                stream_data["chunk"]
+            )
 
             # Update the stream data with processed chunk
             stream_data["chunk"] = processed_chunk
@@ -32,6 +34,7 @@ class MaskReasoningStreamChunk(Extension):
             # Print the processed chunk (this is where printing should happen)
             if processed_chunk:
                 from python.helpers.print_style import PrintStyle
+
                 PrintStyle().stream(processed_chunk)
         except Exception:
             # If masking fails, proceed without masking

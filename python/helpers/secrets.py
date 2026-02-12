@@ -2,7 +2,16 @@ import re
 import threading
 from io import StringIO
 from dataclasses import dataclass
-from typing import Dict, Optional, List, Literal, Set, Callable, Tuple, TYPE_CHECKING
+from typing import (
+    Dict,
+    Optional,
+    List,
+    Literal,
+    Set,
+    Callable,
+    Tuple,
+    TYPE_CHECKING,
+)
 from dotenv.parser import parse_stream
 from python.helpers.errors import RepairableException
 from python.helpers import files
@@ -50,13 +59,17 @@ class StreamingSecretsFilter:
             v: k for k, v in key_to_value.items() if isinstance(v, str) and v
         }
         # Only keep non-empty values
-        self.secret_values: List[str] = [v for v in self.value_to_key.keys() if v]
+        self.secret_values: List[str] = [
+            v for v in self.value_to_key.keys() if v
+        ]
         # Precompute all prefixes for quick suffix matching
         self.prefixes: Set[str] = set()
         for v in self.secret_values:
             for i in range(self.min_trigger, len(v) + 1):
                 self.prefixes.add(v[:i])
-        self.max_len: int = max((len(v) for v in self.secret_values), default=0)
+        self.max_len: int = max(
+            (len(v) for v in self.secret_values), default=0
+        )
 
         # Internal buffer of pending text that is not safe to flush yet
         self.pending: str = ""
@@ -106,7 +119,8 @@ class StreamingSecretsFilter:
 
     def finalize(self) -> str:
         """Flush any remaining buffered text. If pending contains an unresolved partial
-        (i.e., a prefix of a secret >= min_trigger), mask it with *** to avoid leaks."""
+        (i.e., a prefix of a secret >= min_trigger), mask it with *** to avoid leaks.
+        """
         if not self.pending:
             return ""
 
@@ -141,7 +155,9 @@ class SecretsManager:
     def __init__(self, *files: str):
         self._lock = threading.RLock()
         # instance-level list of secrets files
-        self._files: Tuple[str, ...] = tuple(files) if files else (DEFAULT_SECRETS_FILE,)
+        self._files: Tuple[str, ...] = (
+            tuple(files) if files else (DEFAULT_SECRETS_FILE,)
+        )
         self._raw_snapshots: Dict[str, str] = {}
         self._secrets_cache = None
         self._last_raw_text = None
@@ -290,12 +306,17 @@ class SecretsManager:
         for key, _value in sorted(
             secrets.items(), key=lambda x: len(x[1]), reverse=True
         ):
-            result = result.replace(alias_for_key(key), new_format.format(key=key))
+            result = result.replace(
+                alias_for_key(key), new_format.format(key=key)
+            )
 
         return result
 
     def mask_values(
-        self, text: str, min_length: int = 4, placeholder: str = "§§secret({key})"
+        self,
+        text: str,
+        min_length: int = 4,
+        placeholder: str = "§§secret({key})",
     ) -> str:
         """Replace actual secret values with placeholders in text"""
         if not text:
@@ -441,7 +462,9 @@ class SecretsManager:
                     else f"{key_delimiter}{left}{key_delimiter}"
                 )
                 val_part = f'="{val}"' if with_values else ""
-                comment_part = f" {comment}" if with_comments and comment else ""
+                comment_part = (
+                    f" {comment}" if with_comments and comment else ""
+                )
                 out.append(f"{formatted_key}{val_part}{comment_part}")
             elif ln.type == "blank" and with_blank:
                 out.append(ln.raw)
@@ -451,7 +474,9 @@ class SecretsManager:
                 out.append(ln.raw)
         return "\n".join(out)
 
-    def _merge_env(self, existing_text: str, submitted_text: str) -> List[EnvLine]:
+    def _merge_env(
+        self, existing_text: str, submitted_text: str
+    ) -> List[EnvLine]:
         """Merge using submitted content as the base to preserve its comments and structure.
         Behavior:
         - Iterate submitted lines in order and keep them (including comments/blanks/other).
@@ -493,7 +518,9 @@ class SecretsManager:
                         inline_comment=sub.inline_comment,
                     )
                 )
-            elif key not in existing_pairs and submitted_val == self.MASK_VALUE:
+            elif (
+                key not in existing_pairs and submitted_val == self.MASK_VALUE
+            ):
                 # Masked-only new key -> ignore
                 continue
             else:
@@ -512,18 +539,25 @@ def get_secrets_manager(context: "AgentContext|None" = None) -> SecretsManager:
     # use AgentContext from contextvars if no context provided
     if not context:
         from agent import AgentContext
+
         context = AgentContext.current()
 
     # merged with project secrets if active
     if context:
         project = projects.get_context_project_name(context)
         if project:
-            secret_files.append(files.get_abs_path(projects.get_project_meta_folder(project), "secrets.env"))
+            secret_files.append(
+                files.get_abs_path(
+                    projects.get_project_meta_folder(project), "secrets.env"
+                )
+            )
 
     return SecretsManager.get_instance(*secret_files)
 
 
-def get_project_secrets_manager(project_name: str, merge_with_global: bool = False) -> SecretsManager:
+def get_project_secrets_manager(
+    project_name: str, merge_with_global: bool = False
+) -> SecretsManager:
     from python.helpers import projects
 
     # default secrets file
@@ -533,7 +567,11 @@ def get_project_secrets_manager(project_name: str, merge_with_global: bool = Fal
         secret_files.append(DEFAULT_SECRETS_FILE)
 
     # merged with project secrets if active
-    secret_files.append(files.get_abs_path(projects.get_project_meta_folder(project_name), "secrets.env"))
+    secret_files.append(
+        files.get_abs_path(
+            projects.get_project_meta_folder(project_name), "secrets.env"
+        )
+    )
 
     return SecretsManager.get_instance(*secret_files)
 

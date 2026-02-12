@@ -3,6 +3,7 @@
 Provides file operations including read/write, compression,
 path resolution, and a plugin system for variable substitution.
 """
+
 from abc import ABC, abstractmethod
 from fnmatch import fnmatch
 import json
@@ -80,7 +81,10 @@ def load_plugin_variables(
 
 
 def parse_file(
-    _filename: str, _directories: list[str] | None = None, _encoding="utf-8", **kwargs
+    _filename: str,
+    _directories: list[str] | None = None,
+    _encoding="utf-8",
+    **kwargs,
 ):
     if _directories is None:
         _directories = []
@@ -115,7 +119,10 @@ def parse_file(
 
 
 def read_prompt_file(
-    _file: str, _directories: list[str] | None = None, _encoding="utf-8", **kwargs
+    _file: str,
+    _directories: list[str] | None = None,
+    _encoding="utf-8",
+    **kwargs,
 ):
     if _directories is None:
         _directories = []
@@ -208,7 +215,8 @@ def replace_placeholders_dict(_content: dict, **kwargs):
                             return replacement
                         elif isinstance(replacement, (dict, list)):
                             value = value.replace(
-                                f"{{{{{placeholder}}}}}", json.dumps(replacement)
+                                f"{{{{{placeholder}}}}}",
+                                json.dumps(replacement),
                             )
                         else:
                             value = value.replace(
@@ -236,7 +244,9 @@ def process_includes(_content: str, _directories: list[str], **kwargs):
             return match.group(0)
         # Search for the include file in the directories
         try:
-            included_content = read_prompt_file(include_path, _directories, **kwargs)
+            included_content = read_prompt_file(
+                include_path, _directories, **kwargs
+            )
             return included_content
         except FileNotFoundError:
             return match.group(0)  # Return original if file not found
@@ -350,6 +360,7 @@ def delete_dir(relative_path: str):
                 # suppress all errors - we're ensuring no errors propagate
                 # log warning for debugging purposes
                 import warnings
+
                 warnings.warn(f"Failed to remove directory {abs_path}: {e}")
 
 
@@ -365,7 +376,10 @@ def move_dir(old_path: str, new_path: str):
         # suppress all errors, keep behavior consistent
         # log warning for debugging purposes
         import warnings
-        warnings.warn(f"Failed to move directory from {abs_old} to {abs_new}: {e}")
+
+        warnings.warn(
+            f"Failed to move directory from {abs_old} to {abs_new}: {e}"
+        )
 
 
 # move dir safely, remove with number if needed
@@ -442,7 +456,9 @@ def exists(*relative_paths):
 
 def get_base_dir():
     # Get the base directory from the current file path
-    base_dir = os.path.dirname(os.path.abspath(os.path.join(__file__, "../../")))
+    base_dir = os.path.dirname(
+        os.path.abspath(os.path.join(__file__, "../../"))
+    )
     return base_dir
 
 
@@ -482,15 +498,21 @@ def get_subdirectories(
         for subdir in os.listdir(abs_path)
         if os.path.isdir(os.path.join(abs_path, subdir))
         and any(fnmatch(subdir, inc) for inc in include)
-        and (exclude is None or not any(fnmatch(subdir, exc) for exc in exclude))
+        and (
+            exclude is None or not any(fnmatch(subdir, exc) for exc in exclude)
+        )
     ]
 
 
 def zip_dir(dir_path: str):
     full_path = get_abs_path(dir_path)
-    zip_file_path = tempfile.NamedTemporaryFile(suffix=".zip", delete=False).name
+    zip_file_path = tempfile.NamedTemporaryFile(
+        suffix=".zip", delete=False
+    ).name
     base_name = os.path.basename(full_path)
-    with zipfile.ZipFile(zip_file_path, "w", compression=zipfile.ZIP_DEFLATED) as zip:
+    with zipfile.ZipFile(
+        zip_file_path, "w", compression=zipfile.ZIP_DEFLATED
+    ) as zip:
         for root, _, files in os.walk(full_path):
             for file in files:
                 file_path = os.path.join(root, file)

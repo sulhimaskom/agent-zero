@@ -16,17 +16,23 @@ class ImportKnowledge(ApiHandler):
         context = self.use_context(ctxid)
 
         file_list = request.files.getlist("files[]")
-        KNOWLEDGE_FOLDER = files.get_abs_path(memory.get_custom_knowledge_subdir_abs(context.agent0), "main")
+        KNOWLEDGE_FOLDER = files.get_abs_path(
+            memory.get_custom_knowledge_subdir_abs(context.agent0), "main"
+        )
 
         # Ensure knowledge folder exists (create if missing)
         try:
             os.makedirs(KNOWLEDGE_FOLDER, exist_ok=True)
         except (OSError, PermissionError) as e:
-            raise Exception(f"Failed to create knowledge folder {KNOWLEDGE_FOLDER}: {e}")
+            raise Exception(
+                f"Failed to create knowledge folder {KNOWLEDGE_FOLDER}: {e}"
+            )
 
         # Verify the directory is accessible
         if not os.access(KNOWLEDGE_FOLDER, os.W_OK):
-            raise Exception(f"Knowledge folder {KNOWLEDGE_FOLDER} is not writable")
+            raise Exception(
+                f"Knowledge folder {KNOWLEDGE_FOLDER} is not writable"
+            )
 
         saved_filenames = []
 
@@ -42,5 +48,5 @@ class ImportKnowledge(ApiHandler):
 
         return {
             "message": "Knowledge Imported",
-            "filenames": saved_filenames[:5]
+            "filenames": saved_filenames[:5],
         }

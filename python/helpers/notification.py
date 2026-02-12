@@ -28,7 +28,9 @@ class NotificationItem:
     message: str
     detail: str  # HTML content for expandable details
     timestamp: datetime
-    display_time: int = Limits.NOTIFICATION_DISPLAY_TIME  # Display duration in seconds, default 3 seconds
+    display_time: int = (
+        Limits.NOTIFICATION_DISPLAY_TIME
+    )  # Display duration in seconds, default 3 seconds
     read: bool = False
     id: str = ""
     group: str = ""  # Group identifier for grouping related notifications
@@ -48,8 +50,16 @@ class NotificationItem:
         return {
             "no": self.no,
             "id": self.id,
-            "type": self.type.value if isinstance(self.type, NotificationType) else self.type,
-            "priority": self.priority.value if isinstance(self.priority, NotificationPriority) else self.priority,
+            "type": (
+                self.type.value
+                if isinstance(self.type, NotificationType)
+                else self.type
+            ),
+            "priority": (
+                self.priority.value
+                if isinstance(self.priority, NotificationPriority)
+                else self.priority
+            ),
             "title": self.title,
             "message": self.message,
             "detail": self.detail,
@@ -78,6 +88,7 @@ class NotificationManager:
         group: str = "",
     ) -> NotificationItem:
         from agent import AgentContext
+
         return AgentContext.get_notification_manager().add_notification(
             type, priority, message, title, detail, display_time, group
         )
@@ -124,13 +135,19 @@ class NotificationManager:
             for i, notification in enumerate(self.notifications):
                 notification.no = i
             # Adjust updates list
-            self.updates = [no - to_remove for no in self.updates if no >= to_remove]
+            self.updates = [
+                no - to_remove for no in self.updates if no >= to_remove
+            ]
 
-    def get_recent_notifications(self, seconds: int = Limits.NOTIFICATION_RECENT_SECONDS) -> list[NotificationItem]:
+    def get_recent_notifications(
+        self, seconds: int = Limits.NOTIFICATION_RECENT_SECONDS
+    ) -> list[NotificationItem]:
         cutoff = datetime.now(timezone.utc) - timedelta(seconds=seconds)
         return [n for n in self.notifications if n.timestamp >= cutoff]
 
-    def output(self, start: int | None = None, end: int | None = None) -> list[dict]:
+    def output(
+        self, start: int | None = None, end: int | None = None
+    ) -> list[dict]:
         if start is None:
             start = 0
         if end is None:
@@ -162,5 +179,7 @@ class NotificationManager:
         self.updates = []
         self.guid = str(uuid.uuid4())
 
-    def get_notifications_by_type(self, type: NotificationType) -> list[NotificationItem]:
+    def get_notifications_by_type(
+        self, type: NotificationType
+    ) -> list[NotificationItem]:
         return [n for n in self.notifications if n.type == type]

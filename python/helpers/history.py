@@ -101,7 +101,9 @@ class Message(Record):
         return False
 
     def output(self):
-        return [OutputMessage(ai=self.ai, content=self.summary or self.content)]
+        return [
+            OutputMessage(ai=self.ai, content=self.summary or self.content)
+        ]
 
     def output_langchain(self):
         return output_langchain(self.output())
@@ -216,14 +218,16 @@ class Topic(Record):
     async def compress_attention(self) -> bool:
 
         if len(self.messages) > 2:
-            cnt_to_sum = math.ceil((len(self.messages) - 2) * TOPIC_COMPRESS_RATIO)
-            msg_to_sum = self.messages[1:cnt_to_sum + 1]
+            cnt_to_sum = math.ceil(
+                (len(self.messages) - 2) * TOPIC_COMPRESS_RATIO
+            )
+            msg_to_sum = self.messages[1 : cnt_to_sum + 1]
             summary = await self.summarize_messages(msg_to_sum)
             sum_msg_content = self.history.agent.parse_prompt(
                 "fw.msg_summary.md", summary=summary
             )
             sum_msg = Message(False, sum_msg_content)
-            self.messages[1:cnt_to_sum + 1] = [sum_msg]
+            self.messages[1 : cnt_to_sum + 1] = [sum_msg]
             self._tokens = None
             return True
         return False
@@ -251,7 +255,8 @@ class Topic(Record):
         topic = Topic(history=history)
         topic.summary = data.get("summary", "")
         topic.messages = [
-            Message.from_dict(m, history=history) for m in data.get("messages", [])
+            Message.from_dict(m, history=history)
+            for m in data.get("messages", [])
         ]
         topic._tokens = None
         return topic
@@ -310,7 +315,9 @@ class Bulk(Record):
     def from_dict(data: dict, history: "History"):
         bulk = Bulk(history=history)
         bulk.summary = data["summary"]
-        bulk.records = [Record.from_dict(r, history=history) for r in data["records"]]
+        bulk.records = [
+            Record.from_dict(r, history=history) for r in data["records"]
+        ]
         bulk._tokens = None
         return bulk
 
@@ -372,8 +379,12 @@ class History(Record):
     @staticmethod
     def from_dict(data: dict, history: "History"):
         history.counter = data.get("counter", 0)
-        history.bulks = [Bulk.from_dict(b, history=history) for b in data["bulks"]]
-        history.topics = [Topic.from_dict(t, history=history) for t in data["topics"]]
+        history.bulks = [
+            Bulk.from_dict(b, history=history) for b in data["bulks"]
+        ]
+        history.topics = [
+            Topic.from_dict(t, history=history) for t in data["topics"]
+        ]
         history.current = Topic.from_dict(data["current"], history=history)
         history._tokens = None
         return history
@@ -405,7 +416,9 @@ class History(Record):
                 (hist, HISTORY_TOPIC_RATIO, "history_topic"),
                 (bulk, HISTORY_BULK_RATIO, "history_bulk"),
             ]
-            ratios = sorted(ratios, key=lambda x: (x[0] / total) / x[1], reverse=True)
+            ratios = sorted(
+                ratios, key=lambda x: (x[0] / total) / x[1], reverse=True
+            )
             compressed_part = False
             for ratio in ratios:
                 if ratio[0] > ratio[1] * total:
@@ -464,7 +477,7 @@ class History(Record):
         # merge bulks in groups of count, even if there are fewer than count
         bulks = await asyncio.gather(
             *[
-                self.merge_bulks(self.bulks[i:i + count])
+                self.merge_bulks(self.bulks[i : i + count])
                 for i in range(0, len(self.bulks), count)
             ]
         )
@@ -492,7 +505,9 @@ def _get_ctx_size_for_history() -> int:
     return int(set["chat_model_ctx_length"] * set["chat_model_ctx_history"])
 
 
-def _stringify_output(output: OutputMessage, ai_label="ai", human_label="human"):
+def _stringify_output(
+    output: OutputMessage, ai_label="ai", human_label="human"
+):
     return f'{ai_label if output["ai"] else human_label}: {_stringify_content(output["content"])}'
 
 
@@ -564,8 +579,12 @@ def output_langchain(messages: list[OutputMessage]):
     return result
 
 
-def output_text(messages: list[OutputMessage], ai_label="ai", human_label="human"):
-    return "\n".join(_stringify_output(o, ai_label, human_label) for o in messages)
+def output_text(
+    messages: list[OutputMessage], ai_label="ai", human_label="human"
+):
+    return "\n".join(
+        _stringify_output(o, ai_label, human_label) for o in messages
+    )
 
 
 def _merge_outputs(a: MessageContent, b: MessageContent) -> MessageContent:

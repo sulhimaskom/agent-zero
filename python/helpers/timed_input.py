@@ -3,6 +3,7 @@
 Provides a cross-platform way to get user input with a timeout,
 falling back gracefully when input times out.
 """
+
 import sys
 from inputimeout import inputimeout, TimeoutOccurred
 from python.helpers.constants import Timeouts

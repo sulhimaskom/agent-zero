@@ -23,7 +23,7 @@ async def process(input: dict) -> dict | Response:
         response = requests.post(
             f"{Protocols.HTTP}{Network.DEFAULT_HOSTNAME}:{tunnel_api_port}/",
             json={"action": "health"},
-            timeout=Timeouts.HTTP_CLIENT_DEFAULT_TIMEOUT
+            timeout=Timeouts.HTTP_CLIENT_DEFAULT_TIMEOUT,
         )
         if response.status_code == 200:
             service_ok = True
@@ -36,7 +36,7 @@ async def process(input: dict) -> dict | Response:
             response = requests.post(
                 f"{Protocols.HTTP}{Network.DEFAULT_HOSTNAME}:{tunnel_api_port}/",
                 json=input,
-                timeout=Timeouts.HTTP_CLIENT_DEFAULT_TIMEOUT
+                timeout=Timeouts.HTTP_CLIENT_DEFAULT_TIMEOUT,
             )
             return response.json()
         except Exception as e:
@@ -44,4 +44,5 @@ async def process(input: dict) -> dict | Response:
     else:
         # forward to API handler directly
         from python.api.tunnel import process as local_process
+
         return await local_process(input)

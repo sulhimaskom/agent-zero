@@ -17,7 +17,9 @@ class ReplaceIncludeAlias(Extension):
         def replace_placeholders(value: Any) -> Any:
             if isinstance(value, str):
                 new_val = value
-                new_val = replace_file_includes(new_val, r"§§include\(([^)]+)\)")
+                new_val = replace_file_includes(
+                    new_val, r"§§include\(([^)]+)\)"
+                )
                 return new_val
             if isinstance(value, dict):
                 return {k: replace_placeholders(v) for k, v in value.items()}

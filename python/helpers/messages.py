@@ -22,7 +22,9 @@ def truncate_text(agent, output, threshold=Limits.MESSAGE_TRUNCATE_THRESHOLD):
     return truncated_output
 
 
-def truncate_dict_by_ratio(agent, data: dict | list | str, threshold_chars: int, truncate_to: int):
+def truncate_dict_by_ratio(
+    agent, data: dict | list | str, threshold_chars: int, truncate_to: int
+):
     threshold_chars = int(threshold_chars)
     truncate_to = int(truncate_to)
 
@@ -33,7 +35,9 @@ def truncate_dict_by_ratio(agent, data: dict | list | str, threshold_chars: int,
 
             for key, value in item.items():
                 processed_value = process_item(value)
-                serialized_value = json.dumps(processed_value, ensure_ascii=False)
+                serialized_value = json.dumps(
+                    processed_value, ensure_ascii=False
+                )
                 size = len(serialized_value)
 
                 if cumulative_size + size > threshold_chars:
@@ -52,7 +56,9 @@ def truncate_dict_by_ratio(agent, data: dict | list | str, threshold_chars: int,
 
             for value in item:
                 processed_value = process_item(value)
-                serialized_value = json.dumps(processed_value, ensure_ascii=False)
+                serialized_value = json.dumps(
+                    processed_value, ensure_ascii=False
+                )
                 size = len(serialized_value)
 
                 if cumulative_size + size > threshold_chars:

@@ -67,7 +67,10 @@ class DeferredTask:
         self.children: list[ChildTask] = []
 
     def start_task(
-        self, func: Callable[..., Coroutine[Any, Any, Any]], *args: Any, **kwargs: Any
+        self,
+        func: Callable[..., Coroutine[Any, Any, Any]],
+        *args: Any,
+        **kwargs: Any
     ):
         self.func = func
         self.args = args
@@ -131,7 +134,8 @@ class DeferredTask:
                 tasks = [
                     t
                     for t in asyncio.all_tasks(self.event_loop_thread.loop)
-                    if t is not asyncio.current_task(self.event_loop_thread.loop)
+                    if t
+                    is not asyncio.current_task(self.event_loop_thread.loop)
                 ]
                 for task in tasks:
                     task.cancel()
@@ -173,7 +177,9 @@ class DeferredTask:
             return await result
         return result
 
-    def execute_inside(self, func: Callable[..., T], *args, **kwargs) -> Awaitable[T]:
+    def execute_inside(
+        self, func: Callable[..., T], *args, **kwargs
+    ) -> Awaitable[T]:
         if not self.event_loop_thread.loop:
             raise RuntimeError("Event loop is not initialized")
 
@@ -183,7 +189,9 @@ class DeferredTask:
             if not self.event_loop_thread.loop:
                 raise RuntimeError("Event loop is not initialized")
             try:
-                result = await self._execute_in_task_context(func, *args, **kwargs)
+                result = await self._execute_in_task_context(
+                    func, *args, **kwargs
+                )
                 # Keep awaiting until we get a concrete value
                 while isinstance(result, Awaitable):
                     result = await result
@@ -195,5 +203,7 @@ class DeferredTask:
                     future.set_exception, e
                 )
 
-        asyncio.run_coroutine_threadsafe(wrapped(), self.event_loop_thread.loop)
+        asyncio.run_coroutine_threadsafe(
+            wrapped(), self.event_loop_thread.loop
+        )
         return asyncio.wrap_future(future)

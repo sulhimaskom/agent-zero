@@ -8,12 +8,23 @@ DEFAULT_LIMIT = Limits.MEMORY_DEFAULT_LIMIT
 
 class MemoryLoad(Tool):
 
-    async def execute(self, query="", threshold=DEFAULT_THRESHOLD, limit=DEFAULT_LIMIT, filter="", **kwargs):
+    async def execute(
+        self,
+        query="",
+        threshold=DEFAULT_THRESHOLD,
+        limit=DEFAULT_LIMIT,
+        filter="",
+        **kwargs
+    ):
         db = await Memory.get(self.agent)
-        docs = await db.search_similarity_threshold(query=query, limit=limit, threshold=threshold, filter=filter)
+        docs = await db.search_similarity_threshold(
+            query=query, limit=limit, threshold=threshold, filter=filter
+        )
 
         if len(docs) == 0:
-            result = self.agent.read_prompt("fw.memories_not_found.md", query=query)
+            result = self.agent.read_prompt(
+                "fw.memories_not_found.md", query=query
+            )
         else:
             text = "\n\n".join(Memory.format_docs_plain(docs))
             result = str(text)

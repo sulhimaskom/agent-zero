@@ -49,4 +49,7 @@ class SchedulerTaskDelete(ApiHandler):
         # Remove the task
         await scheduler.remove_task_by_uuid(task_id)
 
-        return {"success": True, "message": f"Task {task_id} deleted successfully"}
+        return {
+            "success": True,
+            "message": f"Task {task_id} deleted successfully",
+        }

@@ -10,12 +10,16 @@ class IStreamHandler(ABC):
     """Interface for stream handling"""
 
     @abstractmethod
-    def create_reasoning_callback(self, loop_data: Any) -> Callable[[str, str], Any]:
+    def create_reasoning_callback(
+        self, loop_data: Any
+    ) -> Callable[[str, str], Any]:
         """Create callback for handling reasoning stream chunks"""
         pass
 
     @abstractmethod
-    def create_response_callback(self, loop_data: Any) -> Callable[[str, str], Any]:
+    def create_response_callback(
+        self, loop_data: Any
+    ) -> Callable[[str, str], Any]:
         """Create callback for handling response stream chunks"""
         pass
 
@@ -40,9 +44,13 @@ class StreamCoordinator(IStreamHandler):
 
     def __init__(self, agent):
         self.agent = agent
-        self.printer = PrintStyle(italic=True, font_color=Colors.STREAM_MINT, padding=False)
+        self.printer = PrintStyle(
+            italic=True, font_color=Colors.STREAM_MINT, padding=False
+        )
 
-    def create_reasoning_callback(self, loop_data: Any) -> Callable[[str, str], Any]:
+    def create_reasoning_callback(
+        self, loop_data: Any
+    ) -> Callable[[str, str], Any]:
         """Create callback for handling reasoning stream chunks"""
 
         async def reasoning_callback(chunk: str, full: str):
@@ -51,7 +59,9 @@ class StreamCoordinator(IStreamHandler):
                 self.printer.print("Reasoning: ")
             stream_data = {"chunk": chunk, "full": full}
             await self.agent.call_extensions(
-                "reasoning_stream_chunk", loop_data=loop_data, stream_data=stream_data
+                "reasoning_stream_chunk",
+                loop_data=loop_data,
+                stream_data=stream_data,
             )
             if stream_data.get("chunk"):
                 self.printer.stream(stream_data["chunk"])
@@ -59,7 +69,9 @@ class StreamCoordinator(IStreamHandler):
 
         return reasoning_callback
 
-    def create_response_callback(self, loop_data: Any) -> Callable[[str, str], Any]:
+    def create_response_callback(
+        self, loop_data: Any
+    ) -> Callable[[str, str], Any]:
         """Create callback for handling response stream chunks"""
 
         async def stream_callback(chunk: str, full: str):
@@ -68,7 +80,9 @@ class StreamCoordinator(IStreamHandler):
                 self.printer.print("Response: ")
             stream_data = {"chunk": chunk, "full": full}
             await self.agent.call_extensions(
-                "response_stream_chunk", loop_data=loop_data, stream_data=stream_data
+                "response_stream_chunk",
+                loop_data=loop_data,
+                stream_data=stream_data,
             )
             if stream_data.get("chunk"):
                 self.printer.stream(stream_data["chunk"])
@@ -101,11 +115,16 @@ class StreamCoordinator(IStreamHandler):
                 )
         except Exception as e:
             from python.helpers.print_style import PrintStyle
+
             PrintStyle(font_color="yellow", padding=False).print(
                 f"Failed to parse response stream (stream may be incomplete): {type(e).__name__}"
             )
 
     async def finalize_streams(self, loop_data: Any):
         """Finalize stream processing after LLM call completes"""
-        await self.agent.call_extensions("reasoning_stream_end", loop_data=loop_data)
-        await self.agent.call_extensions("response_stream_end", loop_data=loop_data)
+        await self.agent.call_extensions(
+            "reasoning_stream_end", loop_data=loop_data
+        )
+        await self.agent.call_extensions(
+            "response_stream_end", loop_data=loop_data
+        )

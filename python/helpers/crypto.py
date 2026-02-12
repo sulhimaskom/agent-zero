@@ -5,7 +5,9 @@ from cryptography.hazmat.primitives import serialization, hashes
 
 
 def hash_data(data: str, password: str):
-    return hmac.new(password.encode(), data.encode(), hashlib.sha256).hexdigest()
+    return hmac.new(
+        password.encode(), data.encode(), hashlib.sha256
+    ).hexdigest()
 
 
 def verify_data(data: str, hash: str, password: str):
@@ -41,7 +43,9 @@ def _decode_public_key(public_key: str) -> rsa.RSAPublicKey:
 
 
 def encrypt_data(data: str, public_key_pem: str):
-    return _encrypt_data(data.encode("utf-8"), _decode_public_key(public_key_pem))
+    return _encrypt_data(
+        data.encode("utf-8"), _decode_public_key(public_key_pem)
+    )
 
 
 def _encrypt_data(data: bytes, public_key: rsa.RSAPublicKey):

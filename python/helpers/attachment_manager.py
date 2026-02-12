@@ -11,9 +11,9 @@ from python.helpers.constants import Limits
 
 class AttachmentManager:
     ALLOWED_EXTENSIONS = {
-        'image': {'jpg', 'jpeg', 'png', 'bmp'},
-        'code': {'py', 'js', 'sh', 'html', 'css'},
-        'document': {'md', 'pdf', 'txt', 'csv', 'json'}
+        "image": {"jpg", "jpeg", "png", "bmp"},
+        "code": {"py", "js", "sh", "html", "css"},
+        "document": {"md", "pdf", "txt", "csv", "json"},
     }
 
     def __init__(self, work_dir: str):
@@ -30,16 +30,16 @@ class AttachmentManager:
         for file_type, extensions in self.ALLOWED_EXTENSIONS.items():
             if ext in extensions:
                 return file_type
-        return 'unknown'
+        return "unknown"
 
     @staticmethod
     def get_file_extension(filename: str) -> str:
-        return filename.rsplit('.', 1)[1].lower() if '.' in filename else ''
+        return filename.rsplit(".", 1)[1].lower() if "." in filename else ""
 
     def validate_mime_type(self, file) -> bool:
         try:
             mime_type = file.content_type
-            return mime_type.split('/')[0] in ['image', 'text', 'application']
+            return mime_type.split("/")[0] in ["image", "text", "application"]
         except AttributeError:
             return False
 
@@ -54,18 +54,18 @@ class AttachmentManager:
 
             file_type = self.get_file_type(filename)
             metadata = {
-                'filename': filename,
-                'type': file_type,
-                'extension': self.get_file_extension(filename),
-                'preview': None
+                "filename": filename,
+                "type": file_type,
+                "extension": self.get_file_extension(filename),
+                "preview": None,
             }
 
             # Save file
             file.save(file_path)
 
             # Generate preview for images
-            if file_type == 'image':
-                metadata['preview'] = self.generate_image_preview(file_path)
+            if file_type == "image":
+                metadata["preview"] = self.generate_image_preview(file_path)
 
             return file_path, metadata
 
@@ -73,22 +73,29 @@ class AttachmentManager:
             PrintStyle.error(f"Error saving file {filename}: {e}")
             return None, {}  # type: ignore
 
-    def generate_image_preview(self, image_path: str, max_size: int = Limits.IMAGE_PREVIEW_MAX_SIZE) -> Optional[str]:
+    def generate_image_preview(
+        self, image_path: str, max_size: int = Limits.IMAGE_PREVIEW_MAX_SIZE
+    ) -> Optional[str]:
         try:
             with Image.open(image_path) as img:
                 # Convert image if needed
-                if img.mode in ('RGBA', 'P'):
-                    img = img.convert('RGB')
+                if img.mode in ("RGBA", "P"):
+                    img = img.convert("RGB")
 
                 # Resize for preview
                 img.thumbnail((max_size, max_size))
 
                 # Save to buffer
                 buffer = io.BytesIO()
-                img.save(buffer, format="JPEG", quality=Limits.IMAGE_PREVIEW_QUALITY, optimize=True)
+                img.save(
+                    buffer,
+                    format="JPEG",
+                    quality=Limits.IMAGE_PREVIEW_QUALITY,
+                    optimize=True,
+                )
 
                 # Convert to base64
-                return base64.b64encode(buffer.getvalue()).decode('utf-8')
+                return base64.b64encode(buffer.getvalue()).decode("utf-8")
         except Exception as e:
             PrintStyle.error(f"Error generating preview for {image_path}: {e}")
             return None

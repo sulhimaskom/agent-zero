@@ -112,6 +112,7 @@ class Timeouts:
 # SIZE LIMITS AND THRESHOLDS
 # =============================================================================
 
+
 class Limits:
     """Size limits, thresholds, and count limits"""
 
@@ -192,7 +193,9 @@ class Limits:
 
     # File browser limits
     FILE_BROWSER_MAX_FILE_SIZE: Final[int] = 100 * 1024 * 1024  # 100MB
-    FILE_BROWSER_MAX_ITEMS: Final[int] = 10000  # Maximum number of files/folders to list
+    FILE_BROWSER_MAX_ITEMS: Final[int] = (
+        10000  # Maximum number of files/folders to list
+    )
     FILE_READ_MAX_SIZE: Final[int] = 1024 * 1024  # 1MB
 
     # Project file structure limits
@@ -248,7 +251,9 @@ class Limits:
 
     # IMAP settings
     IMAP_DEFAULT_PORT: Final[int] = 993
-    IMAP_MAX_LINE_LENGTH: Final[int] = 100000  # Increased from default 10000 to handle large emails
+    IMAP_MAX_LINE_LENGTH: Final[int] = (
+        100000  # Increased from default 10000 to handle large emails
+    )
 
     # TTY settings
     TTY_BUFFER_SIZE: Final[int] = 4096
@@ -291,6 +296,7 @@ class Limits:
 # NETWORK AND PORTS
 # =============================================================================
 
+
 class Network:
     """Network-related constants"""
 
@@ -304,7 +310,7 @@ class Network:
     TUNNEL_API_PORT_FALLBACK: Final[int] = 55520
     SEARXNG_PORT_DEFAULT: Final[int] = 55510
     TUNNEL_DEFAULT_PORT: Final[int] = 80
-    
+
     # Agent-specific ports
     BROCULA_PORT_DEFAULT: Final[int] = 50001
 
@@ -312,7 +318,7 @@ class Network:
     DEV_CORS_ORIGINS: Final[list[str]] = [
         "*://localhost:*",
         "*://127.0.0.1:*",
-        "*://0.0.0.0:*"
+        "*://0.0.0.0:*",
     ]
 
     # External API endpoints
@@ -324,6 +330,7 @@ class Network:
 # =============================================================================
 # FILE PATHS AND DIRECTORIES
 # =============================================================================
+
 
 class Paths:
     """File system paths and directories"""
@@ -377,6 +384,7 @@ class Paths:
 # FILE EXTENSIONS
 # =============================================================================
 
+
 class FileExtensions:
     """File extensions used throughout the system"""
 
@@ -391,6 +399,7 @@ class FileExtensions:
 # AGENT DEFAULTS
 # =============================================================================
 
+
 class AgentDefaults:
     """Default values for agent configuration"""
 
@@ -403,6 +412,7 @@ class AgentDefaults:
 # FILE PATTERNS
 # =============================================================================
 
+
 class FilePatterns:
     """File search patterns used throughout the system"""
 
@@ -412,6 +422,7 @@ class FilePatterns:
 # =============================================================================
 # SHELL AND COMMANDS
 # =============================================================================
+
 
 class Shell:
     """Shell-related constants"""
@@ -431,6 +442,7 @@ class Shell:
 # HTTP STATUS CODES
 # =============================================================================
 
+
 class HttpStatus:
     """HTTP status codes used in the application"""
 
@@ -446,30 +458,31 @@ class HttpStatus:
 # COLOR CONSTANTS (PrintStyle colors)
 # =============================================================================
 
+
 class Colors:
     """Color constants for terminal and UI output"""
 
     # Primary UI colors
-    PRIMARY_BLUE: Final[str] = "#1B4F72"           # Dark blue - tool headers
-    PRIMARY_LIGHT_BLUE: Final[str] = "#85C1E9"     # Light blue - tool content
+    PRIMARY_BLUE: Final[str] = "#1B4F72"  # Dark blue - tool headers
+    PRIMARY_LIGHT_BLUE: Final[str] = "#85C1E9"  # Light blue - tool content
 
     # Semantic colors
-    SUCCESS: Final[str] = "#008000"                # Green - success messages
-    WARNING: Final[str] = "#FFA500"                # Orange - warnings
-    ERROR: Final[str] = "#E74C3C"                  # Red - errors
-    INFO: Final[str] = "#0000FF"                   # Blue - info messages
-    DEBUG: Final[str] = "#808080"                  # Gray - debug messages
-    HINT: Final[str] = "#6C3483"                   # Purple - hints
+    SUCCESS: Final[str] = "#008000"  # Green - success messages
+    WARNING: Final[str] = "#FFA500"  # Orange - warnings
+    ERROR: Final[str] = "#E74C3C"  # Red - errors
+    INFO: Final[str] = "#0000FF"  # Blue - info messages
+    DEBUG: Final[str] = "#808080"  # Gray - debug messages
+    HINT: Final[str] = "#6C3483"  # Purple - hints
 
     # Accent colors
-    AGENT_PURPLE: Final[str] = "#6C3483"           # Purple - agent messages
-    SETTINGS_PURPLE: Final[str] = "#6734C3"        # Purple - settings UI
-    SETTINGS_DARK: Final[str] = "#334455"          # Dark blue-gray
-    MCP_MAGENTA: Final[str] = "#CC34C3"            # Magenta - MCP UI
-    MCP_ERROR_RED: Final[str] = "#AA4455"          # Reddish - MCP errors
-    FILES_GREEN: Final[str] = "#2ECC71"            # Green - file operations
-    STREAM_MINT: Final[str] = "#b3ffd9"            # Mint green - stream coordinator
-    API_RESET_BLUE: Final[str] = "#3498DB"         # Blue - API reset chat
+    AGENT_PURPLE: Final[str] = "#6C3483"  # Purple - agent messages
+    SETTINGS_PURPLE: Final[str] = "#6734C3"  # Purple - settings UI
+    SETTINGS_DARK: Final[str] = "#334455"  # Dark blue-gray
+    MCP_MAGENTA: Final[str] = "#CC34C3"  # Magenta - MCP UI
+    MCP_ERROR_RED: Final[str] = "#AA4455"  # Reddish - MCP errors
+    FILES_GREEN: Final[str] = "#2ECC71"  # Green - file operations
+    STREAM_MINT: Final[str] = "#b3ffd9"  # Mint green - stream coordinator
+    API_RESET_BLUE: Final[str] = "#3498DB"  # Blue - API reset chat
 
     # Background colors
     BG_WHITE: Final[str] = "white"
@@ -478,6 +491,7 @@ class Colors:
 # =============================================================================
 # UI TIMING CONSTANTS (Frontend)
 # =============================================================================
+
 
 class UITiming:
     """UI animation and timing constants (in milliseconds)"""
@@ -496,6 +510,7 @@ class UITiming:
 # =============================================================================
 # UTILITY FUNCTIONS
 # =============================================================================
+
 
 def get_env_int(key: str, default: int) -> int:
     """Get integer value from environment variable or return default"""
@@ -522,6 +537,7 @@ def get_env_str(key: str, default: str) -> str:
 # PROTOCOL CONSTANTS
 # =============================================================================
 
+
 class Protocols:
     """Protocol strings for URL construction"""
 
@@ -532,6 +548,7 @@ class Protocols:
 # =============================================================================
 # TEMPORARY PATH PATTERNS (for backup and file operations)
 # =============================================================================
+
 
 class TmpPaths:
     """Temporary path patterns used throughout the system"""
@@ -550,6 +567,7 @@ class TmpPaths:
 # INTERNAL PATH PREFIXES
 # =============================================================================
 
+
 class InternalPaths:
     """Internal path prefixes for file mapping"""
 
@@ -559,6 +577,7 @@ class InternalPaths:
 # =============================================================================
 # EXTERNAL URLS
 # =============================================================================
+
 
 class ExternalUrls:
     """External URLs used in the application - All configurable via environment variables"""
@@ -589,6 +608,7 @@ class ExternalUrls:
 # BROWSER CONFIGURATION
 # =============================================================================
 
+
 class Browser:
     """Browser agent configuration - All values configurable via environment variables"""
 
@@ -601,16 +621,25 @@ class Browser:
 # Allow overriding constants via environment variables
 # =============================================================================
 
+
 class Config:
     """Runtime configuration with environment variable support"""
 
     # Timeouts
-    CODE_EXEC_TIMEOUT = get_env_int("A0_CODE_EXEC_TIMEOUT", Timeouts.CODE_EXEC_MAX)
-    BROWSER_TIMEOUT = get_env_int("A0_BROWSER_TIMEOUT", Timeouts.BROWSER_OPERATION_TIMEOUT)
+    CODE_EXEC_TIMEOUT = get_env_int(
+        "A0_CODE_EXEC_TIMEOUT", Timeouts.CODE_EXEC_MAX
+    )
+    BROWSER_TIMEOUT = get_env_int(
+        "A0_BROWSER_TIMEOUT", Timeouts.BROWSER_OPERATION_TIMEOUT
+    )
 
     # Limits
-    MAX_MEMORY_RESULTS = get_env_int("A0_MAX_MEMORY_RESULTS", Limits.MEMORY_DEFAULT_LIMIT)
-    MEMORY_THRESHOLD = get_env_float("A0_MEMORY_THRESHOLD", Limits.MEMORY_DEFAULT_THRESHOLD)
+    MAX_MEMORY_RESULTS = get_env_int(
+        "A0_MAX_MEMORY_RESULTS", Limits.MEMORY_DEFAULT_LIMIT
+    )
+    MEMORY_THRESHOLD = get_env_float(
+        "A0_MEMORY_THRESHOLD", Limits.MEMORY_DEFAULT_THRESHOLD
+    )
 
     # Network
     DEFAULT_PORT = get_env_int("A0_DEFAULT_PORT", Network.WEB_UI_PORT_DEFAULT)
@@ -621,28 +650,52 @@ class Config:
     MEMORY_PATH = get_env_str("A0_MEMORY_PATH", Paths.MEMORY_DIR)
 
     # Notification settings
-    NOTIFICATION_LIFETIME_HOURS = get_env_int("A0_NOTIFICATION_LIFETIME_HOURS", Timeouts.NOTIFICATION_LIFETIME_HOURS)
+    NOTIFICATION_LIFETIME_HOURS = get_env_int(
+        "A0_NOTIFICATION_LIFETIME_HOURS", Timeouts.NOTIFICATION_LIFETIME_HOURS
+    )
 
     # MCP settings
-    MCP_SERVER_APPLY_DELAY = get_env_int("A0_MCP_SERVER_APPLY_DELAY", Timeouts.MCP_SERVER_APPLY_DELAY)
+    MCP_SERVER_APPLY_DELAY = get_env_int(
+        "A0_MCP_SERVER_APPLY_DELAY", Timeouts.MCP_SERVER_APPLY_DELAY
+    )
 
     # Tunnel settings
-    TUNNEL_CHECK_DELAY = get_env_int("A0_TUNNEL_CHECK_DELAY", Timeouts.TUNNEL_CHECK_DELAY)
+    TUNNEL_CHECK_DELAY = get_env_int(
+        "A0_TUNNEL_CHECK_DELAY", Timeouts.TUNNEL_CHECK_DELAY
+    )
 
     # External URLs - Fully configurable via environment variables
-    UPDATE_CHECK_URL = get_env_str("A0_UPDATE_CHECK_URL", ExternalUrls.UPDATE_CHECK_URL)
-    PERPLEXITY_API_BASE_URL = get_env_str("A0_PERPLEXITY_API_BASE_URL", ExternalUrls.PERPLEXITY_API_BASE_URL)
-    PERPLEXITY_DEFAULT_MODEL = get_env_str("A0_PERPLEXITY_DEFAULT_MODEL", ExternalUrls.PERPLEXITY_DEFAULT_MODEL)
-    AGENT_ZERO_REPO_URL = get_env_str("A0_AGENT_ZERO_REPO_URL", ExternalUrls.AGENT_ZERO_REPO)
+    UPDATE_CHECK_URL = get_env_str(
+        "A0_UPDATE_CHECK_URL", ExternalUrls.UPDATE_CHECK_URL
+    )
+    PERPLEXITY_API_BASE_URL = get_env_str(
+        "A0_PERPLEXITY_API_BASE_URL", ExternalUrls.PERPLEXITY_API_BASE_URL
+    )
+    PERPLEXITY_DEFAULT_MODEL = get_env_str(
+        "A0_PERPLEXITY_DEFAULT_MODEL", ExternalUrls.PERPLEXITY_DEFAULT_MODEL
+    )
+    AGENT_ZERO_REPO_URL = get_env_str(
+        "A0_AGENT_ZERO_REPO_URL", ExternalUrls.AGENT_ZERO_REPO
+    )
 
     # Venice.ai configuration
-    VENICE_API_BASE = get_env_str("A0_VENICE_API_BASE", ExternalUrls.VENICE_API_BASE)
-    A0_VENICE_API_BASE = get_env_str("A0_A0_VENICE_API_BASE", ExternalUrls.A0_VENICE_API_BASE)
+    VENICE_API_BASE = get_env_str(
+        "A0_VENICE_API_BASE", ExternalUrls.VENICE_API_BASE
+    )
+    A0_VENICE_API_BASE = get_env_str(
+        "A0_A0_VENICE_API_BASE", ExternalUrls.A0_VENICE_API_BASE
+    )
 
     # OpenRouter configuration
-    OPENROUTER_API_BASE = get_env_str("A0_OPENROUTER_API_BASE", ExternalUrls.OPENROUTER_API_BASE)
-    OPENROUTER_HTTP_REFERER = get_env_str("A0_OPENROUTER_HTTP_REFERER", ExternalUrls.OPENROUTER_HTTP_REFERER)
-    OPENROUTER_X_TITLE = get_env_str("A0_OPENROUTER_X_TITLE", ExternalUrls.OPENROUTER_X_TITLE)
+    OPENROUTER_API_BASE = get_env_str(
+        "A0_OPENROUTER_API_BASE", ExternalUrls.OPENROUTER_API_BASE
+    )
+    OPENROUTER_HTTP_REFERER = get_env_str(
+        "A0_OPENROUTER_HTTP_REFERER", ExternalUrls.OPENROUTER_HTTP_REFERER
+    )
+    OPENROUTER_X_TITLE = get_env_str(
+        "A0_OPENROUTER_X_TITLE", ExternalUrls.OPENROUTER_X_TITLE
+    )
 
     # Browser configuration (Note: ALLOWED_DOMAINS uses a different pattern - comma-separated string in env var)
     # To customize allowed domains, set A0_BROWSER_ALLOWED_DOMAINS as comma-separated list

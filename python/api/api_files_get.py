@@ -33,14 +33,14 @@ class ApiFilesGet(ApiHandler):
                 return Response(
                     '{"error": "paths array is required"}',
                     status=400,
-                    mimetype="application/json"
+                    mimetype="application/json",
                 )
 
             if not isinstance(paths, list):
                 return Response(
                     '{"error": "paths must be an array"}',
                     status=400,
-                    mimetype="application/json"
+                    mimetype="application/json",
                 )
 
             result = {}
@@ -50,8 +50,12 @@ class ApiFilesGet(ApiHandler):
                     # Convert internal paths to external paths
                     if path.startswith(InternalPaths.A0_TMP_UPLOADS):
                         # Internal path - convert to external
-                        filename = path.replace(InternalPaths.A0_TMP_UPLOADS, "")
-                        external_path = files.get_abs_path("tmp/uploads", filename)
+                        filename = path.replace(
+                            InternalPaths.A0_TMP_UPLOADS, ""
+                        )
+                        external_path = files.get_abs_path(
+                            "tmp/uploads", filename
+                        )
                         filename = os.path.basename(external_path)
                     elif path.startswith("/a0/"):
                         # Other internal Agent Zero paths
@@ -71,10 +75,14 @@ class ApiFilesGet(ApiHandler):
                     # Read and encode file
                     with open(external_path, "rb") as f:
                         file_content = f.read()
-                        base64_content = base64.b64encode(file_content).decode('utf-8')
+                        base64_content = base64.b64encode(file_content).decode(
+                            "utf-8"
+                        )
                         result[filename] = base64_content
 
-                    PrintStyle().print(f"Retrieved file: {filename} ({len(file_content)} bytes)")
+                    PrintStyle().print(
+                        f"Retrieved file: {filename} ({len(file_content)} bytes)"
+                    )
 
                 except Exception as e:
                     PrintStyle.error(f"Failed to read file {path}: {str(e)}")
@@ -82,7 +90,10 @@ class ApiFilesGet(ApiHandler):
 
             # Log the retrieval
             PrintStyle(
-                background_color=Colors.FILES_GREEN, font_color=Colors.BG_WHITE, bold=True, padding=True
+                background_color=Colors.FILES_GREEN,
+                font_color=Colors.BG_WHITE,
+                bold=True,
+                padding=True,
             ).print(f"API Files retrieved: {len(result)} files")
 
             return result
@@ -92,5 +103,5 @@ class ApiFilesGet(ApiHandler):
             return Response(
                 json.dumps({"error": f"Internal server error: {str(e)}"}),
                 status=500,
-                mimetype="application/json"
+                mimetype="application/json",
             )

@@ -20,7 +20,9 @@ class IHistoryManager(ABC):
         pass
 
     @abstractmethod
-    def add_user_message(self, message: "UserMessage", intervention: bool = False) -> history.Message:
+    def add_user_message(
+        self, message: "UserMessage", intervention: bool = False
+    ) -> history.Message:
         """Add a user message to history, starting a new topic"""
         pass
 
@@ -35,7 +37,9 @@ class IHistoryManager(ABC):
         pass
 
     @abstractmethod
-    def add_tool_result(self, tool_name: str, tool_result: str, **kwargs) -> history.Message:
+    def add_tool_result(
+        self, tool_name: str, tool_result: str, **kwargs
+    ) -> history.Message:
         """Add a tool result to history"""
         pass
 
@@ -52,10 +56,18 @@ class HistoryCoordinator(IHistoryManager):
         """Add a message to history"""
         self.agent.context.last_message = datetime.now(timezone.utc)
         content_data = {"content": content}
-        asyncio.run(self.agent.call_extensions("hist_add_before", content_data=content_data, ai=ai))
-        return self.agent.history.add_message(ai=ai, content=content_data["content"], tokens=tokens)
+        asyncio.run(
+            self.agent.call_extensions(
+                "hist_add_before", content_data=content_data, ai=ai
+            )
+        )
+        return self.agent.history.add_message(
+            ai=ai, content=content_data["content"], tokens=tokens
+        )
 
-    def add_user_message(self, message: "UserMessage", intervention: bool = False) -> history.Message:
+    def add_user_message(
+        self, message: "UserMessage", intervention: bool = False
+    ) -> history.Message:
         """Add a user message to history, starting a new topic"""
         self.agent.history.new_topic()
 
@@ -92,12 +104,16 @@ class HistoryCoordinator(IHistoryManager):
         content = self.agent.parse_prompt("fw.warning.md", message=message)
         return self.add_message(False, content=content)
 
-    def add_tool_result(self, tool_name: str, tool_result: str, **kwargs) -> history.Message:
+    def add_tool_result(
+        self, tool_name: str, tool_result: str, **kwargs
+    ) -> history.Message:
         """Add a tool result to history"""
         data = {
             "tool_name": tool_name,
             "tool_result": tool_result,
             **kwargs,
         }
-        asyncio.run(self.agent.call_extensions("hist_add_tool_result", data=data))
+        asyncio.run(
+            self.agent.call_extensions("hist_add_tool_result", data=data)
+        )
         return self.add_message(False, content=data)

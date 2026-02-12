@@ -5,7 +5,6 @@ from typing import Any, TypedDict
 import aiohttp
 from python.helpers import crypto
 
-
 # Remote Function Call library
 # Call function via http request
 # Secured by pre-shared key
@@ -24,7 +23,12 @@ class RFCCall(TypedDict):
 
 
 async def call_rfc(
-    url: str, password: str, module: str, function_name: str, args: list, kwargs: dict
+    url: str,
+    password: str,
+    module: str,
+    function_name: str,
+    args: list,
+    kwargs: dict,
 ):
     input = RFCInput(
         module=module,
@@ -33,19 +37,25 @@ async def call_rfc(
         kwargs=kwargs,
     )
     call = RFCCall(
-        rfc_input=json.dumps(input), hash=crypto.hash_data(json.dumps(input), password)
+        rfc_input=json.dumps(input),
+        hash=crypto.hash_data(json.dumps(input), password),
     )
     result = await _send_json_data(url, call)
     return result
 
 
 async def handle_rfc(rfc_call: RFCCall, password: str):
-    if not crypto.verify_data(rfc_call["rfc_input"], rfc_call["hash"], password):
+    if not crypto.verify_data(
+        rfc_call["rfc_input"], rfc_call["hash"], password
+    ):
         raise Exception("Invalid RFC hash")
 
     input: RFCInput = json.loads(rfc_call["rfc_input"])
     return await _call_function(
-        input["module"], input["function_name"], *input["args"], **input["kwargs"]
+        input["module"],
+        input["function_name"],
+        *input["args"],
+        **input["kwargs"]
     )
 
 

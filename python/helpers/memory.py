@@ -4,6 +4,7 @@ Provides semantic search, storage, and retrieval of agent memories
 across multiple areas (main, fragments, solutions, instruments).
 Supports AI filtering and memory consolidation.
 """
+
 from datetime import datetime
 from typing import Any, List, Sequence
 from langchain_core.stores import InMemoryByteStore
@@ -40,7 +41,6 @@ from agent import Agent, AgentContext
 import models
 import logging
 from simpleeval import simple_eval
-
 
 # Raise the log level so WARNING messages aren't shown
 logging.getLogger("langchain_core.vectorstores.base").setLevel(logging.ERROR)
@@ -89,7 +89,9 @@ class Memory:
                 memory_subdir, agent.config.knowledge_subdirs or []
             )
             if knowledge_subdirs:
-                await wrap.preload_knowledge(log_item, knowledge_subdirs, memory_subdir)
+                await wrap.preload_knowledge(
+                    log_item, knowledge_subdirs, memory_subdir
+                )
             return wrap
         else:
             return Memory(
@@ -124,7 +126,9 @@ class Memory:
                         log_item, knowledge_subdirs, memory_subdir
                     )
             Memory.index[memory_subdir] = db
-        return Memory(db=Memory.index[memory_subdir], memory_subdir=memory_subdir)
+        return Memory(
+            db=Memory.index[memory_subdir], memory_subdir=memory_subdir
+        )
 
     @staticmethod
     async def reload(agent: Agent):
@@ -227,7 +231,9 @@ class Memory:
                 PrintStyle.standard("Indexing memories...")
                 if log_item:
                     log_item.stream(progress="\nIndexing memories")
-                db.add_documents(documents=list(docs.values()), ids=list(docs.keys()))
+                db.add_documents(
+                    documents=list(docs.values()), ids=list(docs.keys())
+                )
 
             # save DB
             Memory._save_db_file(db, memory_subdir)
@@ -280,7 +286,9 @@ class Memory:
         index = self._preload_knowledge_folders(log_item, kn_dirs, index)
 
         for file in index:
-            if index[file]["state"] in ["changed", "removed"] and index[file].get(
+            if index[file]["state"] in ["changed", "removed"] and index[
+                file
+            ].get(
                 "ids", []
             ):  # for knowledge files that have been changed or removed and have IDs
                 await self.delete_documents_by_ids(
@@ -429,7 +437,9 @@ class Memory:
     async def update_documents(self, docs: list[Document]):
         ids = [doc.metadata["id"] for doc in docs]
         await self.db.adelete(ids=ids)  # delete originals
-        ins = await self.db.aadd_documents(documents=docs, ids=ids)  # add updated
+        ins = await self.db.aadd_documents(
+            documents=docs, ids=ids
+        )  # add updated
         self._save_db()  # persist
         return ins
 
@@ -505,7 +515,9 @@ def abs_db_dir(memory_subdir: str) -> str:
     if memory_subdir.startswith("projects/"):
         from python.helpers.projects import get_project_meta_folder
 
-        return files.get_abs_path(get_project_meta_folder(memory_subdir[9:]), "memory")
+        return files.get_abs_path(
+            get_project_meta_folder(memory_subdir[9:]), "memory"
+        )
     # standard subdirs
     return files.get_abs_path("memory", memory_subdir)
 
@@ -516,7 +528,9 @@ def abs_knowledge_dir(knowledge_subdir: str, *sub_dirs: str) -> str:
         from python.helpers.projects import get_project_meta_folder
 
         return files.get_abs_path(
-            get_project_meta_folder(knowledge_subdir[9:]), "knowledge", *sub_dirs
+            get_project_meta_folder(knowledge_subdir[9:]),
+            "knowledge",
+            *sub_dirs,
         )
     # standard subdirs
     return files.get_abs_path("knowledge", knowledge_subdir, *sub_dirs)
@@ -556,10 +570,14 @@ def get_existing_memory_subdirs() -> list[str]:
         # Get subdirectories from memory folder
         subdirs = files.get_subdirectories("memory", exclude="embeddings")
 
-        project_subdirs = files.get_subdirectories(get_projects_parent_folder())
+        project_subdirs = files.get_subdirectories(
+            get_projects_parent_folder()
+        )
         for project_subdir in project_subdirs:
             if files.exists(
-                get_project_meta_folder(project_subdir), "memory", "index.faiss"
+                get_project_meta_folder(project_subdir),
+                "memory",
+                "index.faiss",
             ):
                 subdirs.append(f"projects/{project_subdir}")
 

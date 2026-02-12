@@ -8,7 +8,6 @@ from python.helpers.strings import truncate_text_by_ratio
 from python.helpers.secrets import get_secrets_manager
 from python.helpers.constants import Limits
 
-
 if TYPE_CHECKING:
     from agent import AgentContext
 
@@ -50,7 +49,9 @@ def _truncate_heading(text: str | None) -> str:
 def _truncate_progress(text: str | None) -> str:
     if text is None:
         return ""
-    return truncate_text_by_ratio(str(text), PROGRESS_MAX_LEN, "...", ratio=1.0)
+    return truncate_text_by_ratio(
+        str(text), PROGRESS_MAX_LEN, "...", ratio=1.0
+    )
 
 
 def _truncate_key(text: str) -> str:
@@ -88,13 +89,17 @@ def _truncate_value(val: T) -> T:
     # Do a single truncation calculation
     removed = len(raw) - VALUE_MAX_LEN
     replacement = f"\n\n<< {removed} Characters hidden >>\n\n"
-    truncated = truncate_text_by_ratio(raw, VALUE_MAX_LEN, replacement, ratio=0.3)
+    truncated = truncate_text_by_ratio(
+        raw, VALUE_MAX_LEN, replacement, ratio=0.3
+    )
     return truncated
 
 
 def _truncate_content(text: str | None, type: Type) -> str:
 
-    max_len = CONTENT_MAX_LEN if type != "response" else RESPONSE_CONTENT_MAX_LEN
+    max_len = (
+        CONTENT_MAX_LEN if type != "response" else RESPONSE_CONTENT_MAX_LEN
+    )
 
     if text is None:
         return ""
@@ -106,7 +111,9 @@ def _truncate_content(text: str | None, type: Type) -> str:
     removed = len(raw) - max_len
     while True:
         replacement = f"\n\n<< {removed} Characters hidden >>\n\n"
-        truncated = truncate_text_by_ratio(raw, max_len, replacement, ratio=0.3)
+        truncated = truncate_text_by_ratio(
+            raw, max_len, replacement, ratio=0.3
+        )
         new_removed = len(raw) - (len(truncated) - len(replacement))
         if new_removed == removed:
             break
@@ -317,7 +324,10 @@ class Log:
         """Recursively mask secrets in nested objects."""
         try:
             from agent import AgentContext
-            secrets_mgr = get_secrets_manager(self.context or AgentContext.current())
+
+            secrets_mgr = get_secrets_manager(
+                self.context or AgentContext.current()
+            )
 
             # debug helper to identify context mismatch
             # self_id = self.context.id if self.context else None
