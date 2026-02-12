@@ -1,3 +1,5 @@
+import Logger from './logger.js';
+
 /**
  * Call a JSON-in JSON-out API endpoint
  * Data is automatically serialized
@@ -101,10 +103,9 @@ async function getCsrfToken() {
     // Check for 404 or other error status
     if (!response.ok) {
       csrfTokenFailed = true;
-      if (!csrfTokenErrorLogged) {
-        console.warn("Backend API not available - CSRF token endpoint returned", response.status);
-        csrfTokenErrorLogged = true;
-      }
+      Logger.once('csrf_error', () => {
+        Logger.warn("Backend API not available - CSRF token endpoint returned", response.status);
+      });
       throw new Error(`CSRF token endpoint returned ${response.status}`);
     }
     
@@ -114,10 +115,9 @@ async function getCsrfToken() {
       json = await response.json();
     } catch (parseError) {
       csrfTokenFailed = true;
-      if (!csrfTokenErrorLogged) {
-        console.warn("Backend API not available - CSRF endpoint returned non-JSON response");
-        csrfTokenErrorLogged = true;
-      }
+      Logger.once('csrf_json_error', () => {
+        Logger.warn("Backend API not available - CSRF endpoint returned non-JSON response");
+      });
       throw new Error("Invalid JSON response from CSRF endpoint");
     }
     
@@ -132,10 +132,9 @@ async function getCsrfToken() {
   } catch (error) {
     csrfTokenFailed = true;
     // Only log the first error to prevent console spam
-    if (!csrfTokenErrorLogged) {
-      console.warn("Backend connection failed - API calls will not work:", error.message);
-      csrfTokenErrorLogged = true;
-    }
+    Logger.once('backend_connection_error', () => {
+      Logger.warn("Backend connection failed - API calls will not work:", error.message);
+    });
     throw error;
   }
 }
