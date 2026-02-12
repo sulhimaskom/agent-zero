@@ -75,7 +75,7 @@ class RecallMemories(Extension):
             else "None"
         )
         history = self.agent.history.output_text()[
-            -set["memory_recall_history_len"] :
+            -set["memory_recall_history_len"]:
         ]
         message = self.agent.read_prompt(
             "memory.memories_query.msg.md",

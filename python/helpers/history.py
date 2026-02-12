@@ -221,13 +221,13 @@ class Topic(Record):
             cnt_to_sum = math.ceil(
                 (len(self.messages) - 2) * TOPIC_COMPRESS_RATIO
             )
-            msg_to_sum = self.messages[1 : cnt_to_sum + 1]
+            msg_to_sum = self.messages[1: cnt_to_sum + 1]
             summary = await self.summarize_messages(msg_to_sum)
             sum_msg_content = self.history.agent.parse_prompt(
                 "fw.msg_summary.md", summary=summary
             )
             sum_msg = Message(False, sum_msg_content)
-            self.messages[1 : cnt_to_sum + 1] = [sum_msg]
+            self.messages[1: cnt_to_sum + 1] = [sum_msg]
             self._tokens = None
             return True
         return False
@@ -477,7 +477,7 @@ class History(Record):
         # merge bulks in groups of count, even if there are fewer than count
         bulks = await asyncio.gather(
             *[
-                self.merge_bulks(self.bulks[i : i + count])
+                self.merge_bulks(self.bulks[i: i + count])
                 for i in range(0, len(self.bulks), count)
             ]
         )
