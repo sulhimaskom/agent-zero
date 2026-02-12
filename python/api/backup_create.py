@@ -1,4 +1,5 @@
-from python.helpers.api import ApiHandler, Request, Response, send_file
+from python.helpers.api import ApiHandler, Request, Response
+from flask import send_file
 from python.helpers.backup import BackupService
 from python.helpers.persist_chat import save_tmp_chats
 
