@@ -174,6 +174,28 @@ export const STORAGE_KEYS = {
   SETTINGS: "a0_settings",
   THEME: "a0_theme",
   LANGUAGE: "a0_language",
+  
+  // UI state keys
+  DARK_MODE: "darkMode",
+  SPEECH: "speech",
+  LAST_SELECTED_CHAT: "lastSelectedChat",
+  LAST_SELECTED_TASK: "lastSelectedTask",
+  SIDEBAR_SECTIONS: "sidebarSections",
+  SETTINGS_ACTIVE_TAB: "settingsActiveTab",
+  SCHEDULER_VIEW_MODE: "scheduler_view_mode",
+  BACKUP_PREVIEW_MODE: "backupPreviewMode",
+  
+  // Device/Feature keys
+  MICROPHONE_SELECTED_DEVICE: "microphoneSelectedDevice",
+  MESSAGE_RESIZE_SETTINGS: "messageResizeSettings",
+  
+  // Feature-specific keys
+  TUNNEL_URL: "agent_zero_tunnel_url",
+  MEMORY_DASHBOARD_THRESHOLD: "memoryDashboard_threshold",
+  MEMORY_DASHBOARD_LIMIT: "memoryDashboard_limit",
+  
+  // Debug keys
+  DEBUG: "debug",
 };
 
 // =============================================================================
@@ -229,6 +251,23 @@ export const API_ENDPOINTS = {
   SETTINGS_GET: "/api/settings_get",
   SETTINGS_SAVE: "/api/settings_save",
   TEST_CONNECTION: "/api/test_connection",
+  
+  // Chat endpoints
+  MESSAGE_ASYNC: "/message_async",
+  CHAT_LOAD: "/chat_load",
+  CHAT_FILES_PATH_GET: "/chat_files_path_get",
+  
+  // Poll endpoint
+  POLL: "/poll",
+  
+  // Scheduler endpoints
+  SCHEDULER_TASKS_LIST: "/scheduler_tasks_list",
+  
+  // Tunnel endpoints
+  TUNNEL_PROXY: "/tunnel_proxy",
+  
+  // Notification endpoints
+  NOTIFICATION_CREATE: "/notification_create",
 };
 
 // =============================================================================
@@ -247,4 +286,45 @@ export const RETRY = {
 export const QR_CODE = {
   WIDTH: 128,
   HEIGHT: 128,
+};
+
+// =============================================================================
+// DEFAULT VALUES
+// =============================================================================
+
+export const DEFAULTS = {
+  // Scheduler
+  SCHEDULER_VIEW_MODE: "list",
+  SETTINGS_TAB: "agent",
+  BACKUP_PREVIEW_MODE: "grouped",
+  
+  // Memory dashboard
+  MEMORY_THRESHOLD: "0.6",
+  MEMORY_LIMIT: "1000",
+  
+  // Notification
+  MAX_TOASTS: 5,
+  MAX_NOTIFICATIONS: 100,
+};
+
+// =============================================================================
+// TOAST/NOTIFICATION MESSAGES
+// =============================================================================
+
+export const MESSAGES = {
+  // Success messages
+  TUNNEL_CREATED: "Tunnel created successfully",
+  TUNNEL_URL_COPIED: "Tunnel URL copied to clipboard!",
+  CHAT_DELETED: "Chat deleted successfully",
+  CHATS_LOADED: "Chats loaded.",
+  BACKUP_CREATED: "Backup created and downloaded successfully!",
+  COPIED_TO_CLIPBOARD: "Copied to clipboard!",
+  
+  // Progress messages
+  CREATING_TUNNEL: "Creating tunnel...",
+  
+  // Button labels
+  SAVE: "Save",
+  CANCEL: "Cancel",
+  COPY: "Copy to clipboard",
 };

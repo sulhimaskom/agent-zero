@@ -11,7 +11,7 @@ from . import files, dotenv
 from python.helpers.print_style import PrintStyle
 from python.helpers.providers import get_providers
 from python.helpers.secrets import get_default_secrets_manager
-from python.helpers.constants import Limits, Network, Timeouts, Colors
+from python.helpers.constants import Limits, Network, Timeouts, Colors, AgentDefaults
 
 
 class Settings(TypedDict):
@@ -1401,7 +1401,7 @@ def _adjust_to_version(settings: Settings, default: Settings):
     # switch to agent0 if the old default is used from v0.8
     if "version" not in settings or settings["version"].startswith("v0.8"):
         if "agent_profile" not in settings or settings["agent_profile"] == "default":
-            settings["agent_profile"] = "agent0"
+            settings["agent_profile"] = AgentDefaults.PROFILE
 
 
 def _read_settings_file() -> Settings | None:
@@ -1507,9 +1507,9 @@ def get_default_settings() -> Settings:
         auth_login="",
         auth_password="",
         root_password="",
-        agent_profile="agent0",
-        agent_memory_subdir="default",
-        agent_knowledge_subdir="custom",
+        agent_profile=AgentDefaults.PROFILE,
+        agent_memory_subdir=AgentDefaults.MEMORY_SUBDIR,
+        agent_knowledge_subdir=AgentDefaults.KNOWLEDGE_SUBDIR,
         rfc_auto_docker=True,
         rfc_url=Network.DEFAULT_HOSTNAME,
         rfc_password="",

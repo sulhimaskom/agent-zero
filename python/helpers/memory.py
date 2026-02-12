@@ -34,7 +34,7 @@ from . import files
 from langchain_core.documents import Document
 from python.helpers import knowledge_import
 from python.helpers.log import LogItem
-from python.helpers.constants import Limits, Paths
+from python.helpers.constants import Limits, Paths, FilePatterns
 from enum import Enum
 from agent import Agent, AgentContext
 import models
@@ -337,7 +337,7 @@ class Memory:
             files.get_abs_path("instruments"),
             index,
             {"area": Memory.Area.INSTRUMENTS.value},
-            filename_pattern="**/*.md",
+            filename_pattern=FilePatterns.KNOWLEDGE_MARKDOWN,
             recursive=True,
         )
 

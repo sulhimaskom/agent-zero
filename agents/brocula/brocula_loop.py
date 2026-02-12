@@ -114,7 +114,7 @@ def main():
     print()
     
     # Configuration
-    target_url = f"http://{Network.DEFAULT_HOSTNAME}:50001"
+    target_url = f"http://{Network.DEFAULT_HOSTNAME}:{Network.BROCULA_PORT_DEFAULT}"
     check_interval = 300  # 5 minutes between checks
     
     print(f"🎯 Target URL: {target_url}")

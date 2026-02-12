@@ -3,7 +3,7 @@ import { getContext } from "/index.js";
 import * as API from "/js/api.js";
 import { openModal, closeModal } from "/js/modals.js";
 import { store as notificationStore } from "/components/notifications/notification-store.js";
-import { LIMITS } from "/js/constants.js";
+import { LIMITS, STORAGE_KEYS, DEFAULTS } from "/js/constants.js";
 
 // Helper function for toasts
 function justToast(text, type = "info", timeout = 5000) {
@@ -33,9 +33,9 @@ const memoryDashboardStore = {
   searchQuery: "",
   areaFilter: "",
   threshold: parseFloat(
-    localStorage.getItem("memoryDashboard_threshold") || "0.6"
+    localStorage.getItem(STORAGE_KEYS.MEMORY_DASHBOARD_THRESHOLD) || DEFAULTS.MEMORY_THRESHOLD
   ),
-  limit: parseInt(localStorage.getItem("memoryDashboard_limit") || "1000"),
+  limit: parseInt(localStorage.getItem(STORAGE_KEYS.MEMORY_DASHBOARD_LIMIT) || DEFAULTS.MEMORY_LIMIT),
 
   // Stats
   totalCount: 0,
