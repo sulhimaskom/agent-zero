@@ -1,3 +1,8 @@
+"""External API endpoint for agent messaging.
+
+Provides API access for sending messages to agents with support
+for file attachments, context management, and authentication.
+"""
 import base64
 import os
 from datetime import datetime, timedelta

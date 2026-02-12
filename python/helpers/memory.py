@@ -1,3 +1,9 @@
+"""Memory management with FAISS vector database for agent learnings.
+
+Provides semantic search, storage, and retrieval of agent memories
+across multiple areas (main, fragments, solutions, instruments).
+Supports AI filtering and memory consolidation.
+"""
 from datetime import datetime
 from typing import Any, List, Sequence
 from langchain_core.stores import InMemoryByteStore
@@ -9,7 +15,7 @@ from python.helpers import guids
 from langchain_community.vectorstores import FAISS
 
 # faiss needs to be patched for python 3.12 on arm #TODO remove once not needed
-from python.helpers import faiss_monkey_patch
+from python.helpers import faiss_monkey_patch  # noqa: F401
 import faiss
 
 

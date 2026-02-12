@@ -1,3 +1,9 @@
+"""Directory tree rendering with gitignore support.
+
+Provides utilities for generating file tree visualizations with
+configurable depth limits, sorting options, and output formats.
+Respects .gitignore patterns when traversing directories.
+"""
 from __future__ import annotations
 
 from collections import deque

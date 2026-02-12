@@ -1,3 +1,8 @@
+"""File I/O utilities and plugin system for Agent Zero.
+
+Provides file operations including read/write, compression,
+path resolution, and a plugin system for variable substitution.
+"""
 from abc import ABC, abstractmethod
 from fnmatch import fnmatch
 import json
@@ -327,7 +332,7 @@ def delete_dir(relative_path: str):
         # first try with ignore_errors=True which is the safest option
         shutil.rmtree(abs_path, ignore_errors=True)
 
-                # if directory still exists, try more aggressive methods
+        # if directory still exists, try more aggressive methods
         if os.path.exists(abs_path):
             try:
                 # try to change permissions and delete again
@@ -530,6 +535,7 @@ def read_text_files_in_dir(
             continue
     return result
 
+
 def list_files_in_dir_recursively(relative_path: str) -> list[str]:
     abs_path = get_abs_path(relative_path)
     if not os.path.exists(abs_path):
@@ -542,4 +548,3 @@ def list_files_in_dir_recursively(relative_path: str) -> list[str]:
             rel_path = os.path.relpath(file_path, abs_path)
             result.append(rel_path)
     return result
-    
