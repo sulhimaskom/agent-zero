@@ -58,7 +58,8 @@ class SchedulerTaskCreate(ApiHandler):
 
         # Generate a random token if empty or not provided
         if not token:
-            token = str(random.randint(1000000000000000000, 9999999999999999999))
+            from python.helpers.constants import Limits
+            token = str(random.randint(Limits.SCHEDULER_TOKEN_MIN, Limits.SCHEDULER_TOKEN_MAX))
             printer.print(f"Generated new token: '{token}'")
 
         plan = input.get("plan", {})

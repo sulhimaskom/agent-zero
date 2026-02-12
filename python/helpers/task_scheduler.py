@@ -1123,7 +1123,7 @@ def deserialize_task(task_data: Dict[str, Any], task_class: Optional[Type[T]] = 
         determined_class = task_class
         # If this is an AdHocTask, ensure token is valid
         if determined_class == AdHocTask and not task_data.get('token'):  # type: ignore
-            task_data['token'] = str(random.randint(1000000000000000000, 9999999999999999999))
+            task_data['token'] = str(random.randint(Limits.SCHEDULER_TOKEN_MIN, Limits.SCHEDULER_TOKEN_MAX))
 
     common_args = {
         "uuid": task_data.get("uuid"),

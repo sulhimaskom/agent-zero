@@ -192,6 +192,7 @@ class Limits:
 
     # File browser limits
     FILE_BROWSER_MAX_FILE_SIZE: Final[int] = 100 * 1024 * 1024  # 100MB
+    FILE_BROWSER_MAX_ITEMS: Final[int] = 10000  # Maximum number of files/folders to list
     FILE_READ_MAX_SIZE: Final[int] = 1024 * 1024  # 1MB
 
     # Project file structure limits

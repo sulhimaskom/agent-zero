@@ -214,7 +214,7 @@ class FileBrowser:
                         PrintStyle.warning(f"No access to {filename}: {e}")
                         continue
 
-                    if len(files) + len(folders) > 10000:
+                    if len(files) + len(folders) > Limits.FILE_BROWSER_MAX_ITEMS:
                         break
 
                 except Exception as e:
