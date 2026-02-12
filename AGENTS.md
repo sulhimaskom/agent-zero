@@ -1,8 +1,8 @@
 # AGENT ZERO PROJECT KNOWLEDGE BASE
 
-**Generated:** 2026-02-10
+**Generated:** 2026-02-12
 **Branch:** custom
-**Commit:** 2a65199
+**Commit:** 5dfe61f
 
 ## OVERVIEW
 Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpine.js). Prompt-driven behavior - everything controlled by `/prompts/` markdown files. Grows organically through memory, tools, extensions, and agent profiles.
@@ -11,7 +11,7 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 ```
 ./
 ├── agents/              # Agent profiles (agent0, developer, hacker, researcher) with custom prompts/tools/extensions
-├── prompts/             # 95+ system prompts defining framework behavior (fw.* = framework, agent.system.* = agent behavior)
+├── prompts/             # 98 system prompts defining framework behavior (fw.* = framework, agent.system.* = agent behavior)
 ├── python/
 │   ├── api/            # 61 Flask API endpoints (auto-registered via ApiHandler base class)
 │   ├── helpers/        # 70+ utility modules (memory, history, settings, mcp, scheduler)
@@ -24,22 +24,24 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 ├── conf/               # model_providers.yaml (15+ LLM providers), projects.default.gitignore
 ├── docker/             # base/ (Kali Linux, Python 3.13+3.12) + run/ (runtime container)
 ├── docs/               # Comprehensive documentation (architecture, extensibility, installation)
-├── tests/              # pytest tests (minimal coverage, no CI integration)
 ├── instruments/        # Custom scripts/procedures for agent use
 ├── knowledge/          # RAG document storage (separate from agent memory)
-└── memory/            # FAISS vector DB for agent's persistent learnings
+├── lib/                # Library dependencies (browser automation, etc.)
+├── memory/             # FAISS vector DB for agent's persistent learnings
+├── tests/              # pytest tests (minimal coverage, no CI integration)
+└── usr/                # User-specific configurations and data
 ```
 
 ## WHERE TO LOOK
 | Task | Location | Notes |
 |------|----------|-------|
-| Change agent behavior | `/prompts/agent.system.md` | Core system prompt - controls entire framework |
+| Change agent behavior | `/prompts/agent.system.main.md` | Core system prompt - controls entire framework |
 | Add tools | `/python/tools/` or `/agents/{profile}/tools/` | Agent-specific overrides defaults |
 | Add extensions | `/python/extensions/{hook}/` or `/agents/{profile}/extensions/{hook}/` | Use numeric prefixes (_10_, _20_) for ordering |
 | API endpoints | `/python/api/` | Classes inheriting `ApiHandler` auto-register as Flask routes |
 | Memory management | `/python/helpers/memory.py` | FAISS vector DB, semantic search, AI filtering |
 | History & context | `/python/helpers/history.py` | Message summarization, context management |
-| Settings | `/python/helpers/settings.py` | 1738 lines - complexity hotspot, needs refactoring to background tasks |
+| Settings | `/python/helpers/settings.py` | 1795 lines - complexity hotspot, needs refactoring to background tasks |
 | MCP integration | `/python/helpers/mcp_handler.py` | Server + client for Model Context Protocol |
 | Scheduler | `/python/helpers/task_scheduler.py` | Crontab-based scheduled tasks |
 | Agent profiles | `/agents/{profile}/` | Each has prompts/, tools/, extensions/ subdirs |
@@ -93,14 +95,14 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 
 ### Code Smells (TODOs to address)
 - `/python/helpers/settings.py` - Multiple TODOs about replacing with background tasks (lines 1558, 1616, 1621, 1631, 1643) - CRITICAL complexity hotspot
-- `/python/helpers/task_scheduler.py` - 1159 lines, consider splitting task types from scheduler logic
-- `/python/helpers/mcp_handler.py` - 1114 lines, TODO about inline prompts (lines 742-744)
-- `/python/helpers/history.py:218` - FIXME: vision bytes sent to utility LLM (inefficiency)
+- `/python/helpers/task_scheduler.py` - 1384 lines, consider splitting task types from scheduler logic
+- `/python/helpers/mcp_handler.py` - 1187 lines, TODO about inline prompts (lines 742-744)
+- `/python/helpers/history.py:236` - FIXME: vision bytes sent to utility LLM (inefficiency)
 - `/python/helpers/vector_db.py`, `/python/helpers/memory.py` - FAISS patch for Python 3.12 ARM (remove when fixed upstream)
 - `/python/helpers/job_loop.py:34` - TODO: lowering SLEEP_TIME below 1min causes job duplication
-- 141 `# type: ignore` comments across 47 files - type suppression issues
-- 204 `except Exception as e:` handlers - broad exception catching
-- 177 print statements across 39 files - should use proper logging
+- 174 `# type: ignore` comments across 47 files - type suppression issues
+- 257 `except Exception as e:` handlers - broad exception catching
+- 366 print statements across 39 files - should use proper logging
 
 ### Testing
 - pytest.ini exists and configured (asyncio mode, markers, test paths)
@@ -176,10 +178,10 @@ docker run -p 50001:80 agent0ai/agent-zero
 ## NOTES
 - **No LSP servers installed** - relies on VS Code Python extension for type checking
 - **CI is AI-powered** - GitHub workflows use OpenCode agent, not traditional pytest/linting
-- **Settings module** (1741 lines) identified as complexity hotspot needing refactoring
-- **Large files**: `agent.py` (741 lines), `models.py` (919 lines), `settings.py` (1738 lines), `task_scheduler.py` (1159 lines), `mcp_handler.py` (1114 lines)
+- **Settings module** (1795 lines) identified as complexity hotspot needing refactoring
+- **Large files**: `agent.py` (741 lines), `models.py` (919 lines), `settings.py` (1795 lines), `task_scheduler.py` (1384 lines), `mcp_handler.py` (1187 lines)
 - **Large frontend files**: `webui/js/scheduler.js` (1835 lines), `webui/js/messages.js` (1009 lines), `webui/components/chat/speech/speech-store.js` (967 lines)
 - **FAISS patch required** for Python 3.12 ARM - temporary workaround
-- **56 bare `pass` statements** - mostly in base classes/abstract methods (acceptable)
+- **57 bare `pass` statements** - mostly in base classes/abstract methods (acceptable)
 - **No traditional testing** - CI uses AI code analysis instead of pytest runs
 - **Automatic SSH password generation** - `prepare.py` generates random root password (security concern for production)
