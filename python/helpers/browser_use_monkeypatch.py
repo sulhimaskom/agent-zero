@@ -56,8 +56,8 @@ def gemini_clean_and_conform(text: str):
                     summary_text = v.pop("page_summary", None)
                     title_text = v.pop("title", "Task Completed")
 
-                    final_response = response_text or "Task completed successfully." # browser-use expects string
-                    final_summary = summary_text or "No page summary available." # browser-use expects string
+                    final_response = response_text or "Task completed successfully."  # browser-use expects string
+                    final_summary = summary_text or "No page summary available."  # browser-use expects string
 
                     v["data"] = {
                         "title": title_text,
@@ -79,6 +79,7 @@ def gemini_clean_and_conform(text: str):
 # The original _fix_gemini_schema in browser_use.llm.google.chat.ChatGoogle
 # removes the 'title' property but fails to remove it from the 'required' list,
 # causing a validation error with the Gemini API. This patch corrects that behavior.
+
 
 def _patched_fix_gemini_schema(self, schema: dict[str, Any]) -> dict[str, Any]:
     """
@@ -156,6 +157,7 @@ def _patched_fix_gemini_schema(self, schema: dict[str, Any]) -> dict[str, Any]:
         return obj
 
     return clean_schema(schema)
+
 
 def apply():
     """Applies the monkey-patch to ChatGoogle."""

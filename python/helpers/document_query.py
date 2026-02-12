@@ -3,31 +3,27 @@ import os
 import asyncio
 import aiohttp
 import json
-
-from python.helpers.vector_db import VectorDB
-from python.helpers.constants import Limits
-
-os.environ["USER_AGENT"] = "@mixedbread-ai/unstructured"  # noqa E402
-from langchain_unstructured import UnstructuredLoader  # noqa E402
-
 from urllib.parse import urlparse
 from typing import Callable, Sequence, List, Optional, Tuple
 from datetime import datetime
 
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+from langchain_core.documents import Document
+from langchain.schema import SystemMessage, HumanMessage
 from langchain_community.document_loaders import AsyncHtmlLoader
 from langchain_community.document_loaders.pdf import PyMuPDFLoader
 from langchain_community.document_transformers import MarkdownifyTransformer
 from langchain_community.document_loaders.parsers.images import TesseractBlobParser
 
-from langchain_core.documents import Document
-from langchain.schema import SystemMessage, HumanMessage
-
+from python.helpers.vector_db import VectorDB
+from python.helpers.constants import Limits
 from python.helpers.print_style import PrintStyle
 from python.helpers import files, errors
 from python.helpers.constants import Timeouts
 from agent import Agent
 
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+os.environ["USER_AGENT"] = "@mixedbread-ai/unstructured"  # noqa: E402
+from langchain_unstructured import UnstructuredLoader  # noqa: E402
 
 
 DEFAULT_SEARCH_THRESHOLD = Limits.DOCUMENT_DEFAULT_THRESHOLD

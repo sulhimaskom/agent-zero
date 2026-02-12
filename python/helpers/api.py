@@ -58,7 +58,6 @@ class ApiHandler:
                 # input_data = {"data": request.get_data(as_text=True)}
                 input_data = {}
 
-
             # process via handler
             output = await self.process(input_data, request)
 
@@ -95,4 +94,3 @@ class ApiHandler:
                 return context
             else:
                 raise Exception(f"Context {ctxid} not found")
-            

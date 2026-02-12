@@ -4,6 +4,7 @@ from python.helpers.print_style import PrintStyle
 from python.helpers.wait import managed_wait
 from python.helpers.localization import Localization
 
+
 class WaitTool(Tool):
 
     async def execute(self, **kwargs) -> Response:
@@ -43,7 +44,7 @@ class WaitTool(Tool):
                     break_loop=False,
                 )
             target_time = now + wait_duration
-        
+
         if target_time <= now:
             return Response(
                 message=f"Target time {target_time.isoformat()} is in the past.",

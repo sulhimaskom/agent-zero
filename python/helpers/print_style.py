@@ -7,6 +7,7 @@ from datetime import datetime
 from . import files
 from .constants import Colors
 
+
 class PrintStyle:
     last_endline = True
     log_file_path = None
@@ -85,7 +86,7 @@ class PrintStyle:
             self.padding_added = True
 
     def _log_html(self, html):
-        with open(PrintStyle.log_file_path, "a", encoding='utf-8') as f: # type: ignore # add encoding='utf-8'
+        with open(PrintStyle.log_file_path, "a", encoding='utf-8') as f:  # type: ignore # add encoding='utf-8'
             f.write(html)
 
     @staticmethod
@@ -96,7 +97,7 @@ class PrintStyle:
 
     def get(self, *args, sep=' ', **kwargs):
         text = sep.join(map(str, args))
-        
+
         # Automatically mask secrets in all print output
         try:
             if not hasattr(self, "secrets_mgr"):
@@ -106,7 +107,7 @@ class PrintStyle:
         except Exception:
             # If masking fails, proceed without masking to avoid breaking functionality
             pass
-        
+
         return text, self._get_styled_text(text), self._get_html_styled_text(text)
 
     def print(self, *args, sep=' ', **kwargs):
@@ -117,7 +118,7 @@ class PrintStyle:
         plain_text, styled_text, html_text = self.get(*args, sep=sep, **kwargs)
         if not self.log_only:
             print(styled_text, end='\n', flush=True)
-        self._log_html(html_text+"<br>\n")
+        self._log_html(html_text + "<br>\n")
         PrintStyle.last_endline = True
 
     def stream(self, *args, sep=' ', **kwargs):
@@ -138,27 +139,28 @@ class PrintStyle:
 
     @staticmethod
     def hint(text: str):
-        PrintStyle(font_color=Colors.HINT, padding=True).print("Hint: "+text)
+        PrintStyle(font_color=Colors.HINT, padding=True).print("Hint: " + text)
 
     @staticmethod
     def info(text: str):
-        PrintStyle(font_color=Colors.INFO, padding=True).print("Info: "+text)
+        PrintStyle(font_color=Colors.INFO, padding=True).print("Info: " + text)
 
     @staticmethod
     def success(text: str):
-        PrintStyle(font_color=Colors.SUCCESS, padding=True).print("Success: "+text)
+        PrintStyle(font_color=Colors.SUCCESS, padding=True).print("Success: " + text)
 
     @staticmethod
     def warning(text: str):
-        PrintStyle(font_color=Colors.WARNING, padding=True).print("Warning: "+text)
+        PrintStyle(font_color=Colors.WARNING, padding=True).print("Warning: " + text)
 
     @staticmethod
     def debug(text: str):
-        PrintStyle(font_color=Colors.DEBUG, padding=True).print("Debug: "+text)
+        PrintStyle(font_color=Colors.DEBUG, padding=True).print("Debug: " + text)
 
     @staticmethod
     def error(text: str):
-        PrintStyle(font_color="red", padding=True).print("Error: "+text)
+        PrintStyle(font_color="red", padding=True).print("Error: " + text)
+
 
 # Ensure HTML file is closed properly when the program exits
 atexit.register(PrintStyle._close_html_log)

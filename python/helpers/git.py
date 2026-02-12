@@ -2,10 +2,11 @@ from git import Repo
 from datetime import datetime
 from python.helpers import files
 
+
 def get_git_info():
     # Get the current working directory (assuming the repo is in the same folder as the script)
     repo_path = files.get_base_dir()
-    
+
     # Open the Git repository
     repo = Repo(repo_path)
 
@@ -34,7 +35,7 @@ def get_git_info():
     except Exception:
         tag = ""
 
-    version = branch[0].upper() + " " + ( short_tag or commit_hash[:7] )
+    version = branch[0].upper() + " " + (short_tag or commit_hash[:7])
 
     # Create the dictionary with collected information
     git_info = {
@@ -47,6 +48,7 @@ def get_git_info():
     }
 
     return git_info
+
 
 def get_version():
     try:

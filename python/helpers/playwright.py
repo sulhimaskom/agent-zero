@@ -19,8 +19,10 @@ def get_playwright_binary():
             return binary
     return None
 
+
 def get_playwright_cache_dir():
     return files.get_abs_path("tmp/playwright")
+
 
 def ensure_playwright_binary():
     bin = get_playwright_binary()

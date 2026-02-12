@@ -1,11 +1,13 @@
 import pkg_resources
 import re
 
+
 def get_installed_version(package_name):
     try:
         return pkg_resources.get_distribution(package_name).version
     except pkg_resources.DistributionNotFound:
         return None
+
 
 def update_requirements():
     with open('requirements.txt', 'r') as f:
@@ -17,7 +19,7 @@ def update_requirements():
         if not req or req.startswith('#'):
             updated_requirements.append(req)
             continue
-            
+
         # Extract package name
         match = re.match(r'^([^=<>]+)==', req)
         if match:
@@ -33,6 +35,7 @@ def update_requirements():
     # Write updated requirements
     with open('requirements.txt', 'w') as f:
         f.write('\n'.join(updated_requirements) + '\n')
+
 
 if __name__ == '__main__':
     update_requirements()

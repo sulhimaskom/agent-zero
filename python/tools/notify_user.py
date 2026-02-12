@@ -3,6 +3,7 @@ from agent import AgentContext
 from python.helpers.notification import NotificationPriority, NotificationType
 from python.helpers.constants import Timeouts
 
+
 class NotifyUserTool(Tool):
 
     async def execute(self, **kwargs):
@@ -11,8 +12,8 @@ class NotifyUserTool(Tool):
         title = self.args.get("title", "")
         detail = self.args.get("detail", "")
         notification_type = self.args.get("type", NotificationType.INFO)
-        priority = self.args.get("priority", NotificationPriority.HIGH) # by default, agents should notify with high priority
-        timeout = int(self.args.get("timeout", Timeouts.NOTIFICATION_AGENT_TIMEOUT)) # agent's notifications should have longer timeouts
+        priority = self.args.get("priority", NotificationPriority.HIGH)  # by default, agents should notify with high priority
+        timeout = int(self.args.get("timeout", Timeouts.NOTIFICATION_AGENT_TIMEOUT))  # agent's notifications should have longer timeouts
 
         try:
             notification_type = NotificationType(notification_type)

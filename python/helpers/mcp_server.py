@@ -336,7 +336,6 @@ class DynamicMcpProxy:
 
         self.http_session_task_group = None
 
-
         # Create session manager
         self.http_session_manager = StreamableHTTPSessionManager(
             app=mcp_server._mcp_server,
@@ -345,8 +344,8 @@ class DynamicMcpProxy:
             stateless=False,
         )
 
-
         # Custom ASGI handler that ensures task group is initialized
+
         async def handle_streamable_http(scope, receive, send):
             # Lazy initialization of task group
             if self.http_session_task_group is None:

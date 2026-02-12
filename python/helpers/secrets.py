@@ -522,6 +522,7 @@ def get_secrets_manager(context: "AgentContext|None" = None) -> SecretsManager:
 
     return SecretsManager.get_instance(*secret_files)
 
+
 def get_project_secrets_manager(project_name: str, merge_with_global: bool = False) -> SecretsManager:
     from python.helpers import projects
 
@@ -535,6 +536,7 @@ def get_project_secrets_manager(project_name: str, merge_with_global: bool = Fal
     secret_files.append(files.get_abs_path(projects.get_project_meta_folder(project_name), "secrets.env"))
 
     return SecretsManager.get_instance(*secret_files)
+
 
 def get_default_secrets_manager() -> SecretsManager:
     return SecretsManager.get_instance()

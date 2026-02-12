@@ -17,22 +17,23 @@ last_notification_id = ""
 last_notification_time = datetime.datetime.fromtimestamp(0)
 notification_cooldown_seconds = Timeouts.UPDATE_NOTIFICATION_COOLDOWN_SECONDS  # 24 hours between same notification
 
+
 class UpdateCheck(Extension):
 
     async def execute(self, loop_data: LoopData = LoopData(), text: str = "", **kwargs):
         try:
             global last_check, last_notification_id, last_notification_time
-            
+
             # first check if update check is enabled
             current_settings = settings.get_settings()
             if not current_settings["update_check_enabled"]:
                 return
-            
+
             # check if cooldown has passed
             if (datetime.datetime.now() - last_check).total_seconds() < check_cooldown_seconds:
                 return
             last_check = datetime.datetime.now()
-            
+
             # check for updates
             version = await update_check.check_version()
 
@@ -43,8 +44,7 @@ class UpdateCheck(Extension):
                     last_notification_time = datetime.datetime.now()
                     self.send_notification(notif)
         except Exception:
-            pass # no need to log if the update server is inaccessible
-
+            pass  # no need to log if the update server is inaccessible
 
     def send_notification(self, notif):
         notifs = self.agent.context.get_notification_manager()

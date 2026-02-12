@@ -218,7 +218,7 @@ async def _spawn_winpty(cmd, cwd, env, echo):
             cmd = cmd.replace("powershell.exe", "powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass", 1)
 
     cols, rows = Limits.TTY_DEFAULT_COLS, Limits.TTY_DEFAULT_ROWS
-    child = winpty.PtyProcess.spawn(cmd, dimensions=(rows, cols), cwd=cwd or os.getcwd(), env=env) # type: ignore
+    child = winpty.PtyProcess.spawn(cmd, dimensions=(rows, cols), cwd=cwd or os.getcwd(), env=env)  # type: ignore
 
     loop = asyncio.get_running_loop()
     reader = asyncio.StreamReader()
@@ -246,7 +246,7 @@ async def _spawn_winpty(cmd, cwd, env, echo):
                 d = d.decode('utf-8', errors='replace')
             # Windows needs \r\n for proper line endings
             if _IS_WIN:
-              d = d.replace('\n', '\r\n')
+                d = d.replace('\n', '\r\n')
             child.write(d)
 
         async def drain(self):

@@ -28,7 +28,8 @@ def _generate_public_key(private_key: rsa.RSAPrivateKey):
         )
         .hex()
     )
-    
+
+
 def _decode_public_key(public_key: str) -> rsa.RSAPublicKey:
     # Decode hex string back to bytes
     pem_bytes = bytes.fromhex(public_key)
@@ -38,8 +39,10 @@ def _decode_public_key(public_key: str) -> rsa.RSAPublicKey:
         raise TypeError("The provided key is not an RSAPublicKey")
     return key
 
+
 def encrypt_data(data: str, public_key_pem: str):
     return _encrypt_data(data.encode("utf-8"), _decode_public_key(public_key_pem))
+
 
 def _encrypt_data(data: bytes, public_key: rsa.RSAPublicKey):
     b = public_key.encrypt(
@@ -52,6 +55,7 @@ def _encrypt_data(data: bytes, public_key: rsa.RSAPublicKey):
     )
     return b.hex()
 
+
 def decrypt_data(data: str, private_key: rsa.RSAPrivateKey):
     b = private_key.decrypt(
         bytes.fromhex(data),
@@ -62,4 +66,3 @@ def decrypt_data(data: str, private_key: rsa.RSAPrivateKey):
         ),
     )
     return b.decode("utf-8")
-
