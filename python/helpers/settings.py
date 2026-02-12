@@ -86,7 +86,7 @@ class Settings(TypedDict):
     rfc_port_http: int
     rfc_port_ssh: int
 
-    shell_interface: Literal['local','ssh']
+    shell_interface: Literal['local', 'ssh']
 
     stt_model_size: str
     stt_language: str
@@ -111,6 +111,7 @@ class Settings(TypedDict):
     litellm_global_kwargs: dict[str, Any]
 
     update_check_enabled: bool
+
 
 class PartialSettings(Settings, total=False):
     pass
@@ -1108,7 +1109,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
         "tab": "mcp",
     }
 
-   # Secrets section
+    # Secrets section
     secrets_fields: list[SettingsField] = []
 
     secrets_manager = get_default_secrets_manager()
@@ -1194,7 +1195,6 @@ def convert_out(settings: Settings) -> SettingsOutput:
         "fields": a2a_fields,
         "tab": "mcp",
     }
-
 
     # External API section
     external_api_fields: list[SettingsField] = []
@@ -1318,8 +1318,8 @@ def convert_in(settings: dict) -> Settings:
             for field in section["fields"]:
                 # Skip saving if value is a placeholder
                 should_skip = (
-                    field["value"] == PASSWORD_PLACEHOLDER or
-                    field["value"] == API_KEY_PLACEHOLDER
+                    field["value"] == PASSWORD_PLACEHOLDER
+                    or field["value"] == API_KEY_PLACEHOLDER
                 )
 
                 if not should_skip:
@@ -1331,6 +1331,7 @@ def convert_in(settings: dict) -> Settings:
                     else:
                         current[field["id"]] = field["value"]
     return current
+
 
 def get_settings() -> Settings:
     global _settings
@@ -1449,7 +1450,6 @@ def _write_sensitive_settings(settings: Settings):
     secrets_manager = get_default_secrets_manager()
     submitted_content = settings["secrets"]
     secrets_manager.save_secrets_with_merge(submitted_content)
-
 
 
 def get_default_settings() -> Settings:
@@ -1647,14 +1647,14 @@ def _env_to_dict(data: str):
         line = line.strip()
         if not line or line.startswith('#'):
             continue
-        
+
         if '=' not in line:
             continue
-            
+
         key, value = line.split('=', 1)
         key = key.strip()
         value = value.strip()
-        
+
         # If quoted, treat as string
         if value.startswith('"') and value.endswith('"'):
             result[key] = value[1:-1].replace('\\"', '"')  # Unescape quotes
@@ -1666,7 +1666,7 @@ def _env_to_dict(data: str):
                 result[key] = json.loads(value)
             except (json.JSONDecodeError, ValueError):
                 result[key] = value
-    
+
     return result
 
 
@@ -1683,14 +1683,14 @@ def _dict_to_env(data_dict):
         else:
             # Numbers and other types as unquoted strings
             lines.append(f'{key}={value}')
-    
+
     return "\n".join(lines)
 
 
 def set_root_password(password: str):
     if not runtime.is_dockerized():
         raise Exception("root password can only be set in dockerized environments")
-    _result = subprocess.run(
+    subprocess.run(
         ["chpasswd"],
         input=f"root:{password}".encode(),
         capture_output=True,

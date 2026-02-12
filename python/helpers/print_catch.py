@@ -3,6 +3,7 @@ import io
 import sys
 from typing import Callable, Any, Awaitable, Tuple
 
+
 def capture_prints_async(
     func: Callable[..., Awaitable[Any]],
     *args,

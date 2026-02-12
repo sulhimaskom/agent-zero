@@ -2,7 +2,7 @@ import asyncio
 from python.helpers.extension import Extension
 from python.helpers.memory import Memory
 from agent import LoopData
-from python.helpers import dirty_json, errors, settings, log 
+from python.helpers import dirty_json, errors, settings, log
 
 
 DATA_NAME_TASK = "_recall_memories_task"
@@ -55,7 +55,6 @@ class RecallMemories(Extension):
         if "solutions" in extras:
             del extras["solutions"]
 
-
         set = settings.get_settings()
         # try:
 
@@ -98,7 +97,7 @@ class RecallMemories(Extension):
                     heading="Failed to generate memory query",
                 )
                 return
-        
+
         # otherwise use the message and history as query
         else:
             query = user_instruction + "\n\n" + history
@@ -182,7 +181,6 @@ class RecallMemories(Extension):
                     type="error", heading="Failed to filter relevant memories", content=err
                 )
                 filter_inds = []
-
 
         # limit the number of memories and solutions
         memories = memories[: set["memory_recall_memories_max_result"]]

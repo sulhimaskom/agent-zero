@@ -58,7 +58,8 @@ load_dotenv()
 turn_off_logging()
 browser_use_monkeypatch.apply()
 
-litellm.modify_params = True # helps fix anthropic tool calls by browser-use
+litellm.modify_params = True  # helps fix anthropic tool calls by browser-use
+
 
 class ModelType(Enum):
     CHAT = "Chat"
@@ -90,9 +91,11 @@ class ChatChunk(TypedDict):
     response_delta: str
     reasoning_delta: str
 
+
 class ChatGenerationResult:
     """Chat generation result object"""
-    def __init__(self, chunk: ChatChunk|None = None):
+
+    def __init__(self, chunk: ChatChunk | None = None):
         self.reasoning = ""
         self.response = ""
         self.thinking = False
@@ -414,8 +417,8 @@ class LiteLLMChatWrapper(SimpleChatModel):
             **{**self.kwargs, **kwargs},
         ):
             # parse chunk
-            parsed = _parse_chunk(chunk) # chunk parsing
-            output = result.add_chunk(parsed) # chunk processing
+            parsed = _parse_chunk(chunk)  # chunk parsing
+            output = result.add_chunk(parsed)  # chunk processing
 
             # Only yield chunks with non-None content
             if output["response_delta"]:
@@ -446,8 +449,8 @@ class LiteLLMChatWrapper(SimpleChatModel):
         )
         async for chunk in response:  # type: ignore
             # parse chunk
-            parsed = _parse_chunk(chunk) # chunk parsing
-            output = result.add_chunk(parsed) # chunk processing
+            parsed = _parse_chunk(chunk)  # chunk parsing
+            output = result.add_chunk(parsed)  # chunk processing
 
             # Only yield chunks with non-None content
             if output["response_delta"]:
@@ -584,6 +587,7 @@ class AsyncAIChatReplacement:
 
 from browser_use.llm import ChatOpenRouter, ChatGoogle  # noqa: E402
 
+
 class BrowserCompatibleChatWrapper(ChatOpenRouter):
     """
     A wrapper for browser agent that can filter/sanitize messages
@@ -637,9 +641,9 @@ class BrowserCompatibleChatWrapper(ChatOpenRouter):
 
             # Gemini: strip triple backticks and conform schema
             try:
-                msg = resp.choices[0].message # type: ignore
+                msg = resp.choices[0].message  # type: ignore
                 if self.provider == "gemini" and isinstance(getattr(msg, "content", None), str):
-                    cleaned = browser_use_monkeypatch.gemini_clean_and_conform(msg.content) # type: ignore
+                    cleaned = browser_use_monkeypatch.gemini_clean_and_conform(msg.content)  # type: ignore
                     if cleaned:
                         msg.content = cleaned
             except Exception:
@@ -651,13 +655,14 @@ class BrowserCompatibleChatWrapper(ChatOpenRouter):
         # another hack for browser-use post process invalid jsons
         try:
             if "response_format" in kwrgs and "json_schema" in kwrgs["response_format"] or "json_object" in kwrgs["response_format"]:
-                if resp.choices[0].message.content is not None and not resp.choices[0].message.content.startswith("{"): # type: ignore
-                    js = dirty_json.parse(resp.choices[0].message.content) # type: ignore
-                    resp.choices[0].message.content = dirty_json.stringify(js) # type: ignore
+                if resp.choices[0].message.content is not None and not resp.choices[0].message.content.startswith("{"):  # type: ignore
+                    js = dirty_json.parse(resp.choices[0].message.content)  # type: ignore
+                    resp.choices[0].message.content = dirty_json.stringify(js)  # type: ignore
         except Exception:
             pass
 
         return resp
+
 
 class LiteLLMEmbeddingWrapper(Embeddings):
     model_name: str
@@ -709,7 +714,7 @@ class LocalSentenceTransformerWrapper(Embeddings):
 
         # Remove the "sentence-transformers/" prefix if present
         if model.startswith("sentence-transformers/"):
-            model = model[len("sentence-transformers/") :]
+            model = model[len("sentence-transformers/"):]
 
         # Filter kwargs for SentenceTransformer only (no LiteLLM params like 'stream_timeout')
         st_allowed_keys = {
@@ -827,7 +832,6 @@ def _parse_chunk(chunk: Any) -> ChatChunk:
     )
 
     return ChatChunk(reasoning_delta=reasoning_delta, response_delta=response_delta)
-
 
 
 def _adjust_call_args(provider_name: str, model_name: str, kwargs: dict):

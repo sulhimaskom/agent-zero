@@ -72,6 +72,7 @@ async def is_downloading():
 def _is_downloading():
     return is_updating_model
 
+
 async def is_downloaded():
     try:
         # return await runtime.call_development_function(_is_downloaded)
@@ -81,6 +82,7 @@ async def is_downloaded():
         raise e
         # Fallback to direct execution if RFC fails in development
         # return _is_downloaded()
+
 
 def _is_downloaded():
     return _pipeline is not None
@@ -106,12 +108,12 @@ async def _synthesize_sentences(sentences: list[str]):
     try:
         for sentence in sentences:
             if sentence.strip():
-                segments = _pipeline(sentence.strip(), voice=_voice, speed=_speed) # type: ignore
+                segments = _pipeline(sentence.strip(), voice=_voice, speed=_speed)  # type: ignore
                 segment_list = list(segments)
 
                 for segment in segment_list:
                     audio_tensor = segment.audio
-                    audio_numpy = audio_tensor.detach().cpu().numpy() # type: ignore
+                    audio_numpy = audio_tensor.detach().cpu().numpy()  # type: ignore
                     combined_audio.extend(audio_numpy)
 
         # Convert combined audio to bytes
@@ -124,4 +126,4 @@ async def _synthesize_sentences(sentences: list[str]):
 
     except Exception as e:
         PrintStyle.error(f"Error in Kokoro TTS synthesis: {e}")
-        raise    
+        raise

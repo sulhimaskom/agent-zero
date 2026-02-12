@@ -97,6 +97,7 @@ def is_loopback_address(address):
                     return False
         return True
 
+
 def requires_api_key(f):
     @wraps(f)
     async def decorated(*args, **kwargs):
@@ -144,10 +145,11 @@ def requires_auth(f):
 
         if session.get('authentication') != user_pass_hash:
             return redirect(url_for('login_handler'))
-        
+
         return await f(*args, **kwargs)
 
     return decorated
+
 
 def csrf_protect(f):
     @wraps(f)
@@ -162,21 +164,23 @@ def csrf_protect(f):
 
     return decorated
 
+
 @webapp.route("/login", methods=["GET", "POST"])
 async def login_handler():
     error = None
     if request.method == 'POST':
         user = dotenv.get_dotenv_value("AUTH_LOGIN")
         password = dotenv.get_dotenv_value("AUTH_PASSWORD")
-        
+
         if request.form['username'] == user and request.form['password'] == password:
             session['authentication'] = login.get_credentials_hash()
             return redirect(url_for('serve_index'))
         else:
             error = 'Invalid Credentials. Please try again.'
-            
+
     login_page_content = files.read_file("webui/login.html")
     return render_template_string(login_page_content, error=error)
+
 
 @webapp.route("/logout")
 async def logout_handler():
@@ -184,6 +188,8 @@ async def logout_handler():
     return redirect(url_for('login_handler'))
 
 # handle default address, load index
+
+
 @webapp.route("/", methods=["GET"])
 @requires_auth
 async def serve_index():
@@ -209,6 +215,8 @@ async def serve_index():
     return response
 
 # Serve static files with cache headers for better performance
+
+
 @webapp.route('/<path:filename>')
 async def serve_static(filename):
     # Only serve files from webui folder
@@ -239,6 +247,7 @@ async def serve_static(filename):
             return Response("File not found", 404)
     except Exception:
         return Response("Error serving file", 500)
+
 
 def run():
     PrintStyle().print("Initializing framework...")
@@ -329,7 +338,6 @@ def init_a0():
     initialize.initialize_job_loop()
     # preload
     initialize.initialize_preload()
-
 
 
 # run the internal server

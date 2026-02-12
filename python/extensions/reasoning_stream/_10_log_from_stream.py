@@ -3,6 +3,7 @@ from agent import LoopData
 import math
 from python.extensions.before_main_llm_call._10_log_for_stream import build_heading
 
+
 class LogFromStream(Extension):
 
     async def execute(self, loop_data: LoopData = LoopData(), text: str = "", **kwargs):

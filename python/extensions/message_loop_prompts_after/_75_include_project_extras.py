@@ -43,5 +43,5 @@ def cleanup_gitignore(gitignore_raw: str) -> str:
         # Keep only non-empty lines
         if line:
             gitignore_lines.append(line)
-    
+
     return '\n'.join(gitignore_lines) if gitignore_lines else "nothing ignored"

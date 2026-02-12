@@ -14,9 +14,10 @@ from python.helpers.constants import Colors
 
 @dataclass
 class Response:
-    message:str
+    message: str
     break_loop: bool
     additional: dict[str, Any] | None = None
+
 
 class Tool:
 
@@ -30,7 +31,7 @@ class Tool:
         self.progress: str = ""
 
     @abstractmethod
-    async def execute(self,**kwargs) -> Response:
+    async def execute(self, **kwargs) -> Response:
         pass
 
     def set_progress(self, content: str | None):
@@ -46,8 +47,8 @@ class Tool:
         self.log = self.get_log_object()
         if self.args and isinstance(self.args, dict):
             for key, value in self.args.items():
-                PrintStyle(font_color=Colors.PRIMARY_LIGHT_BLUE, bold=True).stream(self.nice_key(key)+": ")
-                PrintStyle(font_color=Colors.PRIMARY_LIGHT_BLUE, padding=isinstance(value,str) and "\n" in value).stream(value)
+                PrintStyle(font_color=Colors.PRIMARY_LIGHT_BLUE, bold=True).stream(self.nice_key(key) + ": ")
+                PrintStyle(font_color=Colors.PRIMARY_LIGHT_BLUE, padding=isinstance(value, str) and "\n" in value).stream(value)
                 PrintStyle().print()
 
     async def after_execution(self, response: Response, **kwargs):
@@ -64,7 +65,7 @@ class Tool:
             heading = f"icon://construction {self.agent.agent_name}: Using tool '{self.name}'"
         return self.agent.context.log.log(type="tool", heading=heading, content="", kvps=self.args)
 
-    def nice_key(self, key:str):
+    def nice_key(self, key: str):
         words = key.split('_')
         words = [words[0].capitalize()] + [word.lower() for word in words[1:]]
         result = ' '.join(words)

@@ -15,6 +15,7 @@ class Example(TypedDict):
     input: str
     output: str
 
+
 async def call_llm(
     system: str,
     model: BaseChatModel | BaseLLM,
@@ -37,7 +38,6 @@ async def call_llm(
     )
 
     few_shot_prompt.format()
-
 
     final_prompt = ChatPromptTemplate.from_messages(
         [
@@ -66,4 +66,3 @@ async def call_llm(
         response += content
 
     return response
-

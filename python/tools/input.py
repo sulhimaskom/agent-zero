@@ -8,7 +8,7 @@ class Input(Tool):
         # normalize keyboard input
         keyboard = keyboard.rstrip()
         # keyboard += "\n" # no need to, code_exec does that
-        
+
         # terminal session number
         session = int(self.args.get("session", 0))
 

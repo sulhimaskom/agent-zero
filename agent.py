@@ -86,8 +86,6 @@ class AgentContext:
         self.data = data or {}
         self.output_data = output_data or {}
 
-
-
     @staticmethod
     def get(id: str):
         return AgentContext._contexts.get(id, None)
@@ -103,7 +101,7 @@ class AgentContext:
 
     @staticmethod
     def current():
-        ctxid = context_helper.get_context_data("agent_context_id","")
+        ctxid = context_helper.get_context_data("agent_context_id", "")
         if not ctxid:
             return None
         return AgentContext.get(ctxid)
@@ -269,7 +267,6 @@ class AgentContext:
             return response
         except Exception as e:
             agent.handle_critical_exception(e)
-
 
 
 @dataclass

@@ -1020,6 +1020,7 @@ class MCPClientLocal(MCPClientBase):
         # do not read or close the file here, as stdio is async
         return stdio_transport
 
+
 class CustomHTTPClientFactory(ABC):
     def __init__(self, verify: bool = True):
         self.verify = verify
@@ -1050,6 +1051,7 @@ class CustomHTTPClientFactory(ABC):
             kwargs["auth"] = auth
 
         return httpx.AsyncClient(**kwargs, verify=self.verify)
+
 
 class MCPClientRemote(MCPClientBase):
 

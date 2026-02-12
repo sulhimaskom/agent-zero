@@ -32,7 +32,7 @@ class State:
 
     def __del__(self):
         self.kill_task()
-        files.delete_dir(self.get_user_data_dir()) # cleanup user data dir
+        files.delete_dir(self.get_user_data_dir())  # cleanup user data dir
 
     def get_user_data_dir(self):
         return str(
@@ -49,7 +49,7 @@ class State:
 
         # for some reason we need to provide exact path to headless shell, otherwise it looks for headed browser
         pw_binary = ensure_playwright_binary()
-                
+
         self.browser_session = browser_use.BrowserSession(
             browser_profile=browser_use.BrowserProfile(
                 headless=True,
@@ -71,7 +71,7 @@ class State:
                 # Use a unique user data directory to avoid conflicts
                 user_data_dir=self.get_user_data_dir(),
                 extra_http_headers=self.agent.config.browser_http_headers or {},
-                )
+            )
         )
 
         await self.browser_session.start() if self.browser_session else None
@@ -92,8 +92,8 @@ class State:
             except Exception as e:
                 PrintStyle().warning(f"Could not force set viewport size: {e}")
 
-        # --------------------------------------------------------------------------    
-        
+        # --------------------------------------------------------------------------
+
         # Add init script to the browser session
         if self.browser_session and self.browser_session.browser_context:
             js_override = files.get_abs_path("lib/browser/init_override.js")
@@ -213,10 +213,10 @@ class State:
 class BrowserAgent(Tool):
 
     async def execute(self, message="", reset="", **kwargs):
-        self.guid = self.agent.context.generate_id() # short random id
+        self.guid = self.agent.context.generate_id()  # short random id
         reset = str(reset).lower().strip() == "true"
         await self.prepare_state(reset=reset)
-        message = get_secrets_manager(self.agent.context).mask_values(message, placeholder="<secret>{key}</secret>") # mask any potential passwords passed from A0 to browser-use to browser-use format
+        message = get_secrets_manager(self.agent.context).mask_values(message, placeholder="<secret>{key}</secret>")  # mask any potential passwords passed from A0 to browser-use to browser-use format
         task = self.state.start_task(message) if self.state else None
 
         # wait for browser agent to finish and update progress with timeout

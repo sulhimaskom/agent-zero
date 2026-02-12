@@ -28,11 +28,13 @@ OUTPUT_TIMEOUTS: dict[str, int] = {
     "dialog_timeout": Timeouts.CODE_EXEC_DIALOG,
 }
 
+
 @dataclass
 class ShellWrap:
     id: int
     session: LocalInteractiveSession | SSHInteractiveSession
     running: bool
+
 
 @dataclass
 class State:
@@ -188,7 +190,7 @@ class CodeExecution(Tool):
         if not self.allow_running:
             if response := await self.handle_running_session(session):
                 return response
-        
+
         # try again on lost connection
         for i in range(2):
             try:
@@ -373,14 +375,14 @@ class CodeExecution(Tool):
     async def handle_running_session(
         self,
         session=0,
-        reset_full_output=True, 
+        reset_full_output=True,
         prefix=""
     ):
         if not self.state or session not in self.state.shells:
             return None
         if not self.state.shells[session].running:
             return None
-        
+
         full_output, _ = await self.state.shells[session].session.read_output(
             timeout=Timeouts.TTY_READ_TIMEOUT, reset_full_output=reset_full_output
         )
@@ -401,7 +403,7 @@ class CodeExecution(Tool):
                     self.mark_session_idle(session)
                     return None
 
-        has_dialog = False 
+        has_dialog = False
         for line in last_lines:
             for pat in self.dialog_patterns:
                 if pat.search(line.strip()):
@@ -411,7 +413,7 @@ class CodeExecution(Tool):
                 break
 
         if has_dialog:
-            sys_info = self.agent.read_prompt("fw.code.pause_dialog.md", timeout=1)       
+            sys_info = self.agent.read_prompt("fw.code.pause_dialog.md", timeout=1)
         else:
             sys_info = self.agent.read_prompt("fw.code.running.md", session=session)
 
@@ -421,7 +423,7 @@ class CodeExecution(Tool):
         PrintStyle(font_color=Colors.WARNING, bold=True).print(response)
         self.log.update(content=prefix + response, heading=heading)
         return response
-    
+
     def mark_session_idle(self, session: int = 0):
         # Mark session as idle - command finished
         if self.state and session in self.state.shells:
@@ -468,7 +470,7 @@ class CodeExecution(Tool):
         output = re.sub(r"(?<!\\)\\x[0-9A-Fa-f]{2}", "", output)
         # Strip every line of output before truncation
         # output = "\n".join(line.strip() for line in output.splitlines())
-        output = truncate_text_agent(agent=self.agent, output=output, threshold=Limits.OUTPUT_TRUNCATION_THRESHOLD) # ~1MB, larger outputs should be dumped to file, not read from terminal
+        output = truncate_text_agent(agent=self.agent, output=output, threshold=Limits.OUTPUT_TRUNCATION_THRESHOLD)  # ~1MB, larger outputs should be dumped to file, not read from terminal
         return output
 
     def get_cwd(self):
@@ -478,6 +480,3 @@ class CodeExecution(Tool):
         project_path = projects.get_project_folder(project_name)
         normalized = files.normalize_a0_path(project_path)
         return normalized
-        
-
-        

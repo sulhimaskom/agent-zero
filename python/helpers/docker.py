@@ -6,15 +6,16 @@ from python.helpers.print_style import PrintStyle
 from python.helpers.log import Log
 from python.helpers.constants import Timeouts
 
+
 class DockerContainerManager:
-    def __init__(self, image: str, name: str, ports: Optional[dict[str, int]] = None, volumes: Optional[dict[str, dict[str, str]]] = None,logger: Log|None=None):
+    def __init__(self, image: str, name: str, ports: Optional[dict[str, int]] = None, volumes: Optional[dict[str, dict[str, str]]] = None, logger: Log | None = None):
         self.logger = logger
         self.image = image
         self.name = name
         self.ports = ports
         self.volumes = volumes
         self.init_docker()
-                
+
     def init_docker(self):
         self.client = None
         while not self.client:
@@ -24,17 +25,17 @@ class DockerContainerManager:
             except Exception as e:
                 err = format_error(e)
                 if ("ConnectionRefusedError(61," in err or "Error while fetching server API version" in err):
-                    PrintStyle.hint("Connection to Docker failed. Is docker or Docker Desktop running?") # hint for user
+                    PrintStyle.hint("Connection to Docker failed. Is docker or Docker Desktop running?")  # hint for user
                     if self.logger:
                         self.logger.log(type="hint", content="Connection to Docker failed. Is docker or Docker Desktop running?")
                     PrintStyle.error(err)
                     if self.logger:
                         self.logger.log(type="error", content=err)
-                    time.sleep(Timeouts.DOCKER_RETRY_DELAY) # try again in a few seconds
+                    time.sleep(Timeouts.DOCKER_RETRY_DELAY)  # try again in a few seconds
                 else:
                     raise
         return self.client
-                            
+
     def cleanup_container(self) -> None:
         if self.container:
             try:
@@ -54,7 +55,7 @@ class DockerContainerManager:
         containers = self.client.containers.list(all=True, filters={"ancestor": self.image})
         infos = []
         for container in containers:
-            infos.append({                
+            infos.append({
                 "id": container.id,
                 "name": container.name,
                 "status": container.status,
@@ -81,11 +82,11 @@ class DockerContainerManager:
                 PrintStyle.standard(f"Starting existing container: {self.name} for safe code execution...")
                 if self.logger:
                     self.logger.log(type="info", content=f"Starting existing container: {self.name} for safe code execution...", temp=True)
-                
+
                 existing_container.start()
                 self.container = existing_container
-                time.sleep(Timeouts.DOCKER_INIT_DELAY) # this helps to get SSH ready
-                
+                time.sleep(Timeouts.DOCKER_INIT_DELAY)  # this helps to get SSH ready
+
             else:
                 self.container = existing_container
                 # PrintStyle.standard(f"Container with name '{self.name}' is already running with ID: {existing_container.id}")
@@ -97,12 +98,12 @@ class DockerContainerManager:
             self.container = self.client.containers.run(
                 self.image,
                 detach=True,
-                ports=self.ports, # type: ignore
+                ports=self.ports,  # type: ignore
                 name=self.name,
-                volumes=self.volumes, # type: ignore
-            ) 
+                volumes=self.volumes,  # type: ignore
+            )
             # atexit.register(self.cleanup_container)
             PrintStyle.standard(f"Started container with ID: {self.container.id}")
             if self.logger:
                 self.logger.log(type="info", content=f"Started container with ID: {self.container.id}")
-            time.sleep(Timeouts.DOCKER_STARTUP_DELAY) # this helps to get SSH ready
+            time.sleep(Timeouts.DOCKER_STARTUP_DELAY)  # this helps to get SSH ready

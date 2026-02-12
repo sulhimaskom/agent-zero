@@ -2,9 +2,10 @@ from typing import Optional, Tuple
 from python.helpers import tty_session, runtime
 from python.helpers.shell_ssh import clean_string
 
+
 class LocalInteractiveSession:
-    def __init__(self, cwd: str|None = None):
-        self.session: tty_session.TTYSession|None = None
+    def __init__(self, cwd: str | None = None):
+        self.session: tty_session.TTYSession | None = None
         self.full_output = ''
         self.cwd = cwd
 
@@ -23,7 +24,7 @@ class LocalInteractiveSession:
             raise Exception("Shell not connected")
         self.full_output = ""
         await self.session.sendline(command)
- 
+
     async def read_output(self, timeout: float = 0, reset_full_output: bool = False) -> Tuple[str, Optional[str]]:
         if not self.session:
             raise Exception("Shell not connected")

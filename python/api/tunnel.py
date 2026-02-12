@@ -3,18 +3,20 @@ from python.helpers import runtime
 from python.helpers.tunnel_manager import TunnelManager
 from python.helpers.constants import Timeouts
 
+
 class Tunnel(ApiHandler):
     async def process(self, input: dict, request: Request) -> dict | Response:
         return await process(input)
 
+
 async def process(input: dict) -> dict | Response:
     action = input.get("action", "get")
-    
+
     tunnel_manager = TunnelManager.get_instance()
 
     if action == "health":
         return {"success": True}
-    
+
     if action == "create":
         port = runtime.get_web_ui_port()
         provider = input.get("provider", "serveo")  # Default to serveo
@@ -24,16 +26,16 @@ async def process(input: dict) -> dict | Response:
             import time
             time.sleep(Timeouts.TUNNEL_CHECK_DELAY)
             tunnel_url = tunnel_manager.get_tunnel_url()
-        
+
         return {
             "success": tunnel_url is not None,
             "tunnel_url": tunnel_url,
             "message": "Tunnel creation in progress" if tunnel_url is None else "Tunnel created successfully"
         }
-    
+
     elif action == "stop":
         return stop()
-    
+
     elif action == "get":
         tunnel_url = tunnel_manager.get_tunnel_url()
         return {
@@ -41,11 +43,12 @@ async def process(input: dict) -> dict | Response:
             "tunnel_url": tunnel_url,
             "is_running": tunnel_manager.is_running
         }
-    
+
     return {
         "success": False,
         "error": "Invalid action. Use 'create', 'stop', or 'get'."
-    } 
+    }
+
 
 def stop():
     tunnel_manager = TunnelManager.get_instance()

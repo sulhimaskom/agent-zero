@@ -14,8 +14,10 @@ class LogForStream(Extension):
                 )
             )
 
+
 def build_heading(agent, text: str):
     return f"icon://network_intelligence {agent.agent_name}: {text}"
 
+
 def build_default_heading(agent):
-    return build_heading(agent, "Generating...") 
+    return build_heading(agent, "Generating...")

@@ -12,6 +12,7 @@ class NotificationType(Enum):
     ERROR = "error"
     PROGRESS = "progress"
 
+
 class NotificationPriority(Enum):
     NORMAL = 10
     HIGH = 20
