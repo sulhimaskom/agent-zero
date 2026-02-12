@@ -12,13 +12,13 @@
 
                 <!-- Header with buttons (following MCP servers pattern) -->
                 <h3>Backup Configuration JSON
-                    <button class="btn slim" style="margin-left: 0.5em;"
+                    <button class="btn slim btn-ml-5"
                         @click="$store.backupStore.formatJson()">Format</button>
-                    <button class="btn slim" style="margin-left: 0.5em;"
+                    <button class="btn slim btn-ml-5"
                         @click="$store.backupStore.resetToDefaults()">Reset</button>
-                    <button class="btn slim" style="margin-left: 0.5em;"
+                    <button class="btn slim btn-ml-5"
                         @click="$store.backupStore.dryRun()" :disabled="$store.backupStore.loading">Dry Run</button>
-                    <button class="btn slim primary" style="margin-left: 0.5em;"
+                    <button class="btn slim primary btn-ml-5"
                         @click="$store.backupStore.createBackup()" :disabled="$store.backupStore.loading">Create Backup</button>
                 </h3>
 

@@ -192,7 +192,7 @@
             <div id="chat-history" x-data x-show="!$store.welcomeStore || !$store.welcomeStore.isVisible"></div>
 
             <!-- NEW: Toast Stack Component -->
-            <div style="position: relative; height: 0;">
+            <div class="toast-container">
                 <x-component path="notifications/notification-toast-stack.html"></x-component>
             </div>
 
@@ -202,7 +202,7 @@
                     <div class="toast__separator"></div>
                     <div class="toast__message"></div>
                 </div>
-                <button class="toast__copy" style="display: none;">Copy</button>
+                <button class="toast__copy hidden">Copy</button>
                 <button class="toast__close">Close</button>
             </div>
             <!-- Chat Input Area -->
@@ -250,7 +250,7 @@
                                     <template x-for="(section, index) in filteredSections" :key="section.title">
                                         <li>
                                             <a :href="'#section' + (index + 1)">
-                                                <img :src="'/public/' + section.id +'.svg'" :alt="section.title">
+                                                <img :src="'/public/' + section.id +'.svg'" :alt="section.title" width="20" height="20" loading="lazy">
                                                 <span x-text="section.title"></span>
                                             </a>
                                         </li>
@@ -258,7 +258,7 @@
                                     <!-- Tunnel navigation entry - only visible in the External Services tab -->
                                     <li x-show="activeTab === 'external'">
                                         <a href="#section-tunnel">
-                                            <img src="/public/tunnel.svg" alt="Tunnel">
+                                            <img src="/public/tunnel.svg" alt="Tunnel" width="20" height="20" loading="lazy">
                                             <span>Flare Tunnel</span>
                                         </a>
                                     </li>
@@ -378,7 +378,7 @@
                                 <ul>
                                     <li>
                                         <a href="#section-task-scheduler">
-                                            <img src="/public/task_scheduler.svg" alt="Task Scheduler">
+                                            <img src="/public/task_scheduler.svg" alt="Task Scheduler" width="20" height="20" loading="lazy">
                                             <span>Task Scheduler</span>
                                         </a>
                                     </li>
@@ -621,7 +621,7 @@
                                                                     height="16" viewBox="0 0 24 24" fill="none"
                                                                     stroke="currentColor" stroke-width="2"
                                                                     stroke-linecap="round" stroke-linejoin="round"
-                                                                    style="margin-right: 4px;">
+                                                                    class="svg-mr-4">
                                                                     <line x1="12" y1="5" x2="12" y2="19"></line>
                                                                     <line x1="5" y1="12" x2="19" y2="12"></line>
                                                                 </svg>
@@ -900,7 +900,7 @@
                                                                     height="16" viewBox="0 0 24 24" fill="none"
                                                                     stroke="currentColor" stroke-width="2"
                                                                     stroke-linecap="round" stroke-linejoin="round"
-                                                                    style="margin-right: 4px;">
+                                                                    class="svg-mr-4">
                                                                     <line x1="12" y1="5" x2="12" y2="19"></line>
                                                                     <line x1="5" y1="12" x2="19" y2="12"></line>
                                                                 </svg>
