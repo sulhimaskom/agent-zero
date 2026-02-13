@@ -127,10 +127,6 @@ function handleKeyDown(event) {
 
 export function initKeyboardShortcuts() {
   document.addEventListener("keydown", handleKeyDown);
-
-  console.log("[Keyboard Shortcuts] Initialized with shortcuts:",
-    Object.keys(shortcuts).map(k => `${k}: ${shortcuts[k].description}`)
-  );
 }
 
 export function getRegisteredShortcuts() {

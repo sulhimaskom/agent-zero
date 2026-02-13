@@ -10,58 +10,6 @@ import { store as projectsStore } from "/components/projects/projects-store.js"
 import { TIMING } from './constants.js';
 import Logger from './logger.js';
 
-// Ensure the showToast function is available
-// if (typeof window.showToast !== 'function') {
-//     window.showToast = function(message, type = 'info') {
-//         console.log(`[Toast ${type}]: ${message}`);
-//         // Create toast element if not already present
-//         let toastContainer = document.getElementById('toast-container');
-//         if (!toastContainer) {
-//             toastContainer = document.createElement('div');
-//             toastContainer.id = 'toast-container';
-//             toastContainer.style.position = 'fixed';
-//             toastContainer.style.bottom = '20px';
-//             toastContainer.style.right = '20px';
-//             toastContainer.style.zIndex = '9999';
-//             document.body.appendChild(toastContainer);
-//         }
-
-//         // Create the toast
-//         const toast = document.createElement('div');
-//         toast.className = `toast toast-${type}`;
-//         toast.style.padding = '10px 15px';
-//         toast.style.margin = '5px 0';
-//         toast.style.backgroundColor = type === 'error' ? '#f44336' :
-//                                     type === 'success' ? '#4CAF50' :
-//                                     type === 'warning' ? '#ff9800' : '#2196F3';
-//         toast.style.color = 'white';
-//         toast.style.borderRadius = '4px';
-//         toast.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
-//         toast.style.width = 'auto';
-//         toast.style.maxWidth = '300px';
-//         toast.style.wordWrap = 'break-word';
-
-//         toast.innerHTML = message;
-
-//         // Add to container
-//         toastContainer.appendChild(toast);
-
-//         // Auto remove after 3 seconds
-//         setTimeout(() => {
-//             if (toast.parentNode) {
-//                 toast.style.opacity = '0';
-//                 toast.style.transition = 'opacity 0.5s ease';
-//                 setTimeout(() => {
-//                     if (toast.parentNode) {
-//                         toast.parentNode.removeChild(toast);
-//                     }
-//                 }, 500);
-//             }
-//         }, 3000);
-//     };
-// }
-
-// Add this near the top of the scheduler.js file, outside of any function
 const showToast = function(message, type = 'info') {
     // Use new frontend notification system
     switch (type.toLowerCase()) {
@@ -295,36 +243,18 @@ const fullComponentImplementation = function() {
 
                 // Check if data.tasks exists and is an array
                 if (!data || !data.tasks) {
-                    console.error('Invalid response: data.tasks is missing', data);
                     this.tasks = [];
                 } else if (!Array.isArray(data.tasks)) {
-                    console.error('Invalid response: data.tasks is not an array', data.tasks);
                     this.tasks = [];
                 } else {
                     // Verify each task has necessary properties
                     const validTasks = data.tasks.filter(task => {
-                        if (!task || typeof task !== 'object') {
-                            console.error('Invalid task (not an object):', task);
-                            return false;
-                        }
-                        if (!task.uuid) {
-                            console.error('Task missing uuid:', task);
-                            return false;
-                        }
-                        if (!task.name) {
-                            console.error('Task missing name:', task);
-                            return false;
-                        }
-                        if (!task.type) {
-                            console.error('Task missing type:', task);
-                            return false;
-                        }
+                        if (!task || typeof task !== 'object') return false;
+                        if (!task.uuid) return false;
+                        if (!task.name) return false;
+                        if (!task.type) return false;
                         return true;
                     });
-
-                    if (validTasks.length !== data.tasks.length) {
-                        console.warn(`Filtered out ${data.tasks.length - validTasks.length} invalid tasks`);
-                    }
 
                     this.tasks = validTasks;
 
@@ -337,12 +267,9 @@ const fullComponentImplementation = function() {
                                              error.message?.includes('CSRF token endpoint returned') ||
                                              error.message?.includes('backend not running') ||
                                              error.message?.includes('Failed to fetch');
-                if (!isBackendUnavailable) {
-                    console.error('Error fetching tasks:', error);
+                if (!isBackendUnavailable && !this.pollingInterval) {
                     // Only show toast for errors on manual refresh, not during polling
-                    if (!this.pollingInterval) {
-                        showToast('Failed to fetch tasks: ' + error.message, 'error');
-                    }
+                    showToast('Failed to fetch tasks: ' + error.message, 'error');
                 }
                 // Reset tasks to empty array on error
                 this.tasks = [];
@@ -421,10 +348,8 @@ const fullComponentImplementation = function() {
                         nextRun = formatDateTime(nextTime, 'short');
                     } else {
                         nextRun = 'Invalid date';
-                        console.warn(`Invalid date format in plan.todo[0]: ${task.plan.todo[0]}`);
                     }
-                } catch (error) {
-                    console.error(`Error formatting next run time: ${error.message}`);
+                } catch (_error) {
                     nextRun = 'Error';
                 }
             } else {
@@ -493,8 +418,7 @@ const fullComponentImplementation = function() {
                         await projectsStore.loadProjectsList();
                     }
                 }
-            } catch (error) {
-                console.warn('schedulerSettings: failed to load project list', error);
+            } catch (_error) {
             }
 
             const list = Array.isArray(projectsStore.projectList) ? projectsStore.projectList : [];
@@ -886,11 +810,8 @@ const fullComponentImplementation = function() {
                             const date = new Date(dateStr);
                             if (!isNaN(date.getTime())) {
                                 validatedTodo.push(date.toISOString());
-                            } else {
-                                console.warn(`Skipping invalid date in todo list: ${dateStr}`);
                             }
-                        } catch (error) {
-                            console.warn(`Error processing date: ${error.message}`);
+                        } catch (_error) {
                         }
                     }
 
@@ -1003,7 +924,6 @@ const fullComponentImplementation = function() {
                 this.isEditing = false;
                 document.querySelector('[x-data="schedulerSettings"]')?.removeAttribute('data-editing-state');
             } catch (error) {
-                console.error('Error saving task:', error);
                 showToast('Failed to save task: ' + error.message, 'error');
             }
         },
@@ -1035,7 +955,6 @@ const fullComponentImplementation = function() {
                 // Refresh task list
                 this.fetchTasks();
             } catch (error) {
-                console.error('Error running task:', error);
                 showToast('Failed to run task: ' + error.message, 'error');
             }
         },
@@ -1081,7 +1000,6 @@ const fullComponentImplementation = function() {
                 await this.fetchTasks();
                 this.showLoadingState = false;
             } catch (error) {
-                console.error('Error resetting task state:', error);
                 showToast('Failed to reset task state: ' + error.message, 'error');
                 this.showLoadingState = false;
             }
@@ -1128,7 +1046,6 @@ const fullComponentImplementation = function() {
                 // Update UI using the shared function
                 this.updateTasksUI();
             } catch (error) {
-                console.error('Error deleting task:', error);
                 showToast('Failed to delete task: ' + error.message, 'error');
             }
         },
@@ -1169,7 +1086,6 @@ const fullComponentImplementation = function() {
         get filteredTasks() {
             // Make sure we have tasks to filter
             if (!Array.isArray(this.tasks)) {
-                console.warn('Tasks is not an array:', this.tasks);
                 return [];
             }
 
@@ -1255,9 +1171,6 @@ const fullComponentImplementation = function() {
 
         // Debug method to test filtering logic
         testFiltering() {
-            console.group('SchedulerSettings Debug: Filter Test');
-
-
         },
 
         // Initialize Flatpickr datetime pickers for both create and edit forms

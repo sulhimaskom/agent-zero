@@ -14,7 +14,7 @@ export async function importComponent(path, targetElement) {
   
   // If this component is already being loaded, return early
   if (importLocks.get(lockKey)) {
-    console.log(`Component ${path} is already being loaded for target`, targetElement);
+    // Component already loading, skip duplicate request
     return;
   }
   
