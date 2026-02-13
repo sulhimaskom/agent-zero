@@ -169,7 +169,11 @@ const fullComponentImplementation = function() {
             });
 
             // Set up default configuration
-            this.viewMode = localStorage.getItem('scheduler_view_mode') || 'list';
+            try {
+                this.viewMode = localStorage.getItem('scheduler_view_mode') || 'list';
+            } catch (e) {
+                this.viewMode = 'list';
+            }
             this.selectedTask = null;
             this.expandedTaskId = null;
             this.editingTask = {

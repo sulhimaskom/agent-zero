@@ -32,7 +32,11 @@ const settingsModalProxy = {
             store.activeTab = tabName;
         }
 
-        localStorage.setItem('settingsActiveTab', tabName);
+        try {
+            localStorage.setItem('settingsActiveTab', tabName);
+        } catch (e) {
+            // Silent fail in private browsing mode
+        }
 
         // Auto-scroll active tab into view after a short delay to ensure DOM updates
         setTimeout(() => {
@@ -114,7 +118,12 @@ const settingsModalProxy = {
             // This ensures Alpine reactivity works as expected
             setTimeout(() => {
                 // Get stored tab or default to 'agent'
-                const savedTab = localStorage.getItem('settingsActiveTab') || 'agent';
+                let savedTab = 'agent';
+                try {
+                    savedTab = localStorage.getItem('settingsActiveTab') || 'agent';
+                } catch (e) {
+                    // Use default in private browsing mode
+                }
 
                 // Directly set the active tab
                 modalAD.activeTab = savedTab;
@@ -124,7 +133,11 @@ const settingsModalProxy = {
                     store.activeTab = savedTab;
                 }
 
-                localStorage.setItem('settingsActiveTab', savedTab);
+                try {
+                    localStorage.setItem('settingsActiveTab', savedTab);
+                } catch (e) {
+                    // Silent fail in private browsing mode
+                }
 
                 // Add a small delay *after* setting the tab to ensure scrolling works
                 setTimeout(() => {
@@ -296,8 +309,14 @@ const settingsModalProxy = {
 
 document.addEventListener('alpine:init', function () {
     // Initialize the root store first to ensure it exists before components try to access it
+    let initialTab = 'agent';
+    try {
+        initialTab = localStorage.getItem('settingsActiveTab') || 'agent';
+    } catch (e) {
+        // Use default in private browsing mode
+    }
     Alpine.store('root', {
-        activeTab: localStorage.getItem('settingsActiveTab') || 'agent',
+        activeTab: initialTab,
         isOpen: false,
 
         toggleSettings() {
@@ -321,7 +340,11 @@ document.addEventListener('alpine:init', function () {
                 this.$watch('$store.root.activeTab', (newTab) => {
                     if (typeof newTab !== 'undefined') {
                         this.activeTab = newTab;
-                        localStorage.setItem('settingsActiveTab', newTab);
+                        try {
+                            localStorage.setItem('settingsActiveTab', newTab);
+                        } catch (e) {
+                            // Silent fail in private browsing mode
+                        }
                         this.updateFilteredSections();
                     }
                 });

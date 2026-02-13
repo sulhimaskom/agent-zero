@@ -101,11 +101,19 @@ const model = {
       document.body.classList.remove("dark-mode");
       document.body.classList.add("light-mode");
     }
-    localStorage.setItem("darkMode", value);
+    try {
+      localStorage.setItem("darkMode", value);
+    } catch (e) {
+      // Silent fail in private browsing mode
+    }
   },
 
   _applySpeech(value) {
-    localStorage.setItem("speech", value);
+    try {
+      localStorage.setItem("speech", value);
+    } catch (e) {
+      // Silent fail in private browsing mode
+    }
     if (!value) speechStore.stopAudio();
   },
 
