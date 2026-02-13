@@ -233,12 +233,24 @@ class Topic(Record):
         return False
 
     async def summarize_messages(self, messages: list[Message]):
-        # FIXME: vision bytes are sent to utility LLM, send summary instead
-        msg_txt = [m.output_text() for m in messages]
+        # Process messages to replace image data with placeholders
+        processed_messages = []
+        for m in messages:
+            msg_text = m.output_text()
+            # Replace base64 image data URLs with placeholder
+            import re
+            # Pattern to match data:image/...;base64,... URLs
+            msg_text = re.sub(
+                r'data:image/[^;]+;base64,[A-Za-z0-9+/=]+',
+                '[Image]',
+                msg_text
+            )
+            processed_messages.append(msg_text)
+
         summary = await self.history.agent.call_utility_model(
             system=self.history.agent.read_prompt("fw.topic_summary.sys.md"),
             message=self.history.agent.read_prompt(
-                "fw.topic_summary.msg.md", content=msg_txt
+                "fw.topic_summary.msg.md", content=processed_messages
             ),
         )
         return summary

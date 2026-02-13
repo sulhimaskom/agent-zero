@@ -6,6 +6,42 @@ from typing import Any, Callable, Optional, Coroutine, TypeVar, Awaitable
 
 T = TypeVar("T")
 
+# Global background task set to prevent garbage collection of fire-and-forget tasks
+_background_tasks: set[asyncio.Task] = set()
+
+
+def run_in_background(coro: Coroutine[Any, Any, Any]) -> asyncio.Task:
+    """
+    Fire-and-forget background task runner.
+    
+    Simpler alternative to DeferredTask for tasks that don't need
+    complex lifecycle management or thread isolation.
+    
+    Args:
+        coro: The coroutine to run in the background
+        
+    Returns:
+        The created Task (for reference, but fire-and-forget usage is fine)
+    """
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        # No event loop running, create a new one
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+    
+    task = loop.create_task(coro)
+    
+    # Keep reference to prevent garbage collection
+    _background_tasks.add(task)
+    
+    # Clean up when done
+    def cleanup(t: asyncio.Task) -> None:
+        _background_tasks.discard(t)
+    
+    task.add_done_callback(cleanup)
+    return task
+
 
 class EventLoopThread:
     _instances = {}

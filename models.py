@@ -646,7 +646,7 @@ class BrowserCompatibleChatWrapper(ChatOpenRouter):
                     cleaned = browser_use_monkeypatch.gemini_clean_and_conform(msg.content)  # type: ignore
                     if cleaned:
                         msg.content = cleaned
-            except Exception:
+            except (AttributeError, TypeError):
                 pass
 
         except Exception as e:
@@ -658,7 +658,7 @@ class BrowserCompatibleChatWrapper(ChatOpenRouter):
                 if resp.choices[0].message.content is not None and not resp.choices[0].message.content.startswith("{"):  # type: ignore
                     js = dirty_json.parse(resp.choices[0].message.content)  # type: ignore
                     resp.choices[0].message.content = dirty_json.stringify(js)  # type: ignore
-        except Exception:
+        except (KeyError, IndexError, AttributeError):
             pass
 
         return resp
@@ -888,7 +888,7 @@ def _merge_provider_defaults(
     # Merge LiteLLM global kwargs (timeouts, stream_timeout, etc.)
     try:
         global_kwargs = settings.get_settings().get("litellm_global_kwargs", {})  # type: ignore[union-attr]
-    except Exception:
+    except (KeyError, AttributeError):
         global_kwargs = {}
     if isinstance(global_kwargs, dict):
         for k, v in _normalize_values(global_kwargs).items():

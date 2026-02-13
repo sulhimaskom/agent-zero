@@ -1585,9 +1585,7 @@ def _apply_settings(previous: Settings | None):
             not previous
             or _settings["stt_model_size"] != previous["stt_model_size"]
         ):
-            _ = defer.DeferredTask().start_task(
-                whisper.preload, _settings["stt_model_size"]
-            )  # TODO overkill, replace with background task
+            _ = defer.run_in_background(whisper.preload(_settings["stt_model_size"]))
 
         # force memory reload on embedding model change
         if not previous or (
@@ -1655,9 +1653,7 @@ def _apply_settings(previous: Settings | None):
                     temp=True,
                 )
 
-            _ = defer.DeferredTask().start_task(
-                update_mcp_settings, config.mcp_servers
-            )  # TODO overkill, replace with background task
+            _ = defer.run_in_background(update_mcp_settings(config.mcp_servers))
 
         # update token in mcp server
         current_token = (
@@ -1670,9 +1666,7 @@ def _apply_settings(previous: Settings | None):
 
                 DynamicMcpProxy.get_instance().reconfigure(token=token)
 
-            _ = defer.DeferredTask().start_task(
-                update_mcp_token, current_token
-            )  # TODO overkill, replace with background task
+            _ = defer.run_in_background(update_mcp_token(current_token))
 
         # update token in a2a server
         if not previous or current_token != previous["mcp_server_token"]:
@@ -1682,9 +1676,7 @@ def _apply_settings(previous: Settings | None):
 
                 DynamicA2AProxy.get_instance().reconfigure(token=token)
 
-            _ = defer.DeferredTask().start_task(
-                update_a2a_token, current_token
-            )  # TODO overkill, replace with background task
+            _ = defer.run_in_background(update_a2a_token(current_token))
 
 
 def _env_to_dict(data: str):

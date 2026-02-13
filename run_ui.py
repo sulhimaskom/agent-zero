@@ -197,7 +197,7 @@ async def serve_index():
     gitinfo = None
     try:
         gitinfo = git.get_git_info()
-    except Exception:
+    except (OSError, RuntimeError, KeyError):
         gitinfo = {
             "version": "unknown",
             "commit_time": "unknown",
@@ -246,7 +246,7 @@ async def serve_static(filename):
             return response
         else:
             return Response("File not found", 404)
-    except Exception:
+    except (OSError, IOError):
         return Response("Error serving file", 500)
 
 
