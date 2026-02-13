@@ -4,7 +4,13 @@
  */
 const Logger = {
   isDevelopment: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1',
-  isDebugEnabled: localStorage.getItem('debug') === 'true',
+  isDebugEnabled: (() => {
+    try {
+      return localStorage.getItem('debug') === 'true';
+    } catch (e) {
+      return false;
+    }
+  })(),
 
   /**
    * Check if logging is enabled

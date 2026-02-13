@@ -6,9 +6,12 @@ import { store as attachmentsStore } from "/components/chat/attachments/attachme
 import { addActionButtonsToElement } from "/components/messages/action-buttons/simple-action-buttons.js";
 import { LIMITS } from './constants.js';
 
-const chatHistory = document.getElementById("chat-history");
-
 let messageGroup = null;
+
+// Lazy getter for chatHistory to ensure DOM is ready
+function getChatHistory() {
+  return document.getElementById("chat-history");
+}
 
 // Simplified implementation - no complex interactions needed
 
@@ -68,7 +71,10 @@ export function setMessage(id, type, heading, content, temp, kvps = null) {
       messageGroup.setAttribute("data-group-type", groupType);
     }
     messageGroup.appendChild(messageContainer);
-    chatHistory.appendChild(messageGroup);
+    const chatHistory = getChatHistory();
+    if (chatHistory) {
+      chatHistory.appendChild(messageGroup);
+    }
   }
 
   // Simplified implementation - no setup needed

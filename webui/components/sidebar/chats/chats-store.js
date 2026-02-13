@@ -31,10 +31,14 @@ const model = {
 
   init() {
     // Initialize from localStorage
-    const lastSelectedChat = localStorage.getItem("lastSelectedChat");
-    if (lastSelectedChat) {
-      this.selectChat(lastSelectedChat);
-      // this.selected = lastSelectedChat;
+    try {
+      const lastSelectedChat = localStorage.getItem("lastSelectedChat");
+      if (lastSelectedChat) {
+        this.selectChat(lastSelectedChat);
+        // this.selected = lastSelectedChat;
+      }
+    } catch (e) {
+      // Silent fail in private browsing mode
     }
   },
 
@@ -276,7 +280,11 @@ const model = {
     this.selectedContext = this.contexts.find((ctx) => ctx.id === contextId);
     // if not found in contexts, try to find in tasks < not nice, will need refactor later
     if(!this.selectedContext) this.selectedContext = tasksStore.tasks.find((ctx) => ctx.id === contextId);
-    localStorage.setItem("lastSelectedChat", contextId);
+    try {
+      localStorage.setItem("lastSelectedChat", contextId);
+    } catch (e) {
+      // Silent fail in private browsing mode
+    }
   },
 
   // Restart the backend
