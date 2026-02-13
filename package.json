@@ -1,0 +1,11 @@
+{
+  "name": "agent-zero-webui",
+  "version": "0.9.7",
+  "description": "Agent Zero WebUI - Vanilla JS frontend with no Node dependencies",
+  "private": true,
+  "scripts": {
+    "test": "echo 'No tests configured - frontend uses vanilla JS'"
+  },
+  "keywords": ["agent-zero", "webui"],
+  "license": "MIT"
+}
