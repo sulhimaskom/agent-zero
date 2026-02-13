@@ -56,7 +56,6 @@ class MicrophoneInput {
 
         const oldStatus = this._status;
         this._status = newStatus;
-        console.log(`Mic status changed from ${oldStatus} to ${newStatus}`);
 
         // Update UI
         microphoneButton.classList.remove(`mic-${oldStatus.toLowerCase()}`);
@@ -114,7 +113,6 @@ class MicrophoneInput {
         if (!this.hasStartedRecording && this.mediaRecorder.state !== 'recording') {
             this.hasStartedRecording = true;
             this.mediaRecorder.start(SPEECH.RECORDER_CHUNK_SIZE);
-            console.log('Speech started');
         }
         if (this.waitingTimer) {
             clearTimeout(this.waitingTimer);
@@ -167,7 +165,6 @@ class MicrophoneInput {
                         this.lastChunk = null;
                     }
                     this.audioChunks.push(event.data);
-                    console.log('Audio chunk received, total chunks:', this.audioChunks.length);
                 }
                 else if (this.status === Status.LISTENING) {
                     this.lastChunk = event.data;
@@ -264,7 +261,6 @@ class MicrophoneInput {
             const text = this.filterResult(result.text || "")
 
             if (text) {
-                console.log('Transcription:', result.text);
                 await this.updateCallback(result.text, true);
             }
         } catch (error) {
@@ -288,7 +284,7 @@ class MicrophoneInput {
             ok = true
         }
         if (ok) return text
-        else console.log(`Discarding transcription: ${text}`)
+        return null
     }
 }
 
@@ -368,7 +364,6 @@ class Speech {
     }
 
     speak(text) {
-        console.log('Speaking:', text);
         // Stop any current utterance
         this.stop();
 
