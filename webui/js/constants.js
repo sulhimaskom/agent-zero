@@ -77,6 +77,10 @@ export const TIMING = {
   UI_DELAY: 300,
   CHECK_DELAY: 100,
   IMAGE_REFRESH_INTERVAL: 1000,
+
+  // Missing constants (fixes runtime errors)
+  WELCOME_ANIMATION_DELAY: 350,
+  SLEEP_MAX_TIMEOUT: 1000,
 };
 
 // =============================================================================
