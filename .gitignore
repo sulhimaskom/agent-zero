@@ -64,6 +64,10 @@ agent_history.gif
 
 # Worktrees directory for isolated development
 .worktrees/
+
+# Ralph loop state files
+.sisyphus/
+
 brocula_check_*.py
 
 # Node.js
