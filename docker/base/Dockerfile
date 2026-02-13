@@ -1,19 +1,22 @@
 # Use Debian 13 slim
 FROM debian:13-slim
 
+# Build arguments for locale and timezone (configurable at build time)
+ARG LOCALE=en_US.UTF-8
+ARG TZ=UTC
 
-# Set locale to en_US.UTF-8 and timezone to UTC
+# Set locale and timezone
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y locales tzdata
-RUN sed -i -e 's/# \(en_US\.UTF-8 .*\)/\1/' /etc/locale.gen && \
+RUN sed -i -e "s/# \(${LOCALE} .*\)/\1/" /etc/locale.gen && \
     dpkg-reconfigure --frontend=noninteractive locales && \
-    update-locale LANG=en_US.UTF-8 LANGUAGE=en_US:en LC_ALL=en_US.UTF-8
-RUN ln -sf /usr/share/zoneinfo/UTC /etc/localtime
-RUN echo "UTC" > /etc/timezone
+    update-locale LANG=${LOCALE} LANGUAGE=en_US:en LC_ALL=${LOCALE}
+RUN ln -sf /usr/share/zoneinfo/${TZ} /etc/localtime
+RUN echo "${TZ}" > /etc/timezone
 RUN dpkg-reconfigure -f noninteractive tzdata
-ENV LANG=en_US.UTF-8
+ENV LANG=${LOCALE}
 ENV LANGUAGE=en_US:en
-ENV LC_ALL=en_US.UTF-8
-ENV TZ=UTC
+ENV LC_ALL=${LOCALE}
+ENV TZ=${TZ}
 
 # Copy contents of the project to /
 COPY ./fs/ /

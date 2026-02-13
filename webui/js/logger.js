@@ -2,8 +2,10 @@
  * Production-safe logging utility
  * Logs are only shown in development mode or when explicitly enabled
  */
+import { API } from './constants.js';
+
 const Logger = {
-  isDevelopment: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1',
+  isDevelopment: window.location.hostname === API.HOSTNAME || window.location.hostname === API.LOCALHOST,
   isDebugEnabled: (() => {
     try {
       return localStorage.getItem('debug') === 'true';

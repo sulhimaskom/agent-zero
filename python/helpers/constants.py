@@ -697,6 +697,33 @@ class Config:
         "A0_OPENROUTER_X_TITLE", ExternalUrls.OPENROUTER_X_TITLE
     )
 
-    # Browser configuration (Note: ALLOWED_DOMAINS uses a different pattern - comma-separated string in env var)
-    # To customize allowed domains, set A0_BROWSER_ALLOWED_DOMAINS as comma-separated list
-    # Example: A0_BROWSER_ALLOWED_DOMAINS="example.com,*.example.com"
+    # Hostname defaults
+    DEFAULT_HOSTNAME = get_env_str(
+        "A0_DEFAULT_HOSTNAME", Network.DEFAULT_HOSTNAME
+    )
+    DEFAULT_LOCALHOST = get_env_str(
+        "A0_DEFAULT_LOCALHOST", Network.DEFAULT_LOCALHOST
+    )
+
+    # Browser configuration - Allowed domains (comma-separated in env var)
+    BROWSER_ALLOWED_DOMAINS = get_env_str(
+        "A0_BROWSER_ALLOWED_DOMAINS", ",".join(Browser.ALLOWED_DOMAINS)
+    ).split(",")
+
+    # CORS Origins (comma-separated in env var)
+    DEV_CORS_ORIGINS = get_env_str(
+        "A0_DEV_CORS_ORIGINS",
+        ",".join(Network.DEV_CORS_ORIGINS)
+    ).split(",")
+
+    # Model defaults - All configurable via environment variables
+    DEFAULT_CHAT_MODEL_PROVIDER = get_env_str("A0_CHAT_MODEL_PROVIDER", "openrouter")
+    DEFAULT_CHAT_MODEL_NAME = get_env_str("A0_CHAT_MODEL_NAME", "openai/gpt-4.1")
+    DEFAULT_UTIL_MODEL_PROVIDER = get_env_str("A0_UTIL_MODEL_PROVIDER", "openrouter")
+    DEFAULT_UTIL_MODEL_NAME = get_env_str("A0_UTIL_MODEL_NAME", "openai/gpt-4.1-mini")
+    DEFAULT_EMBED_MODEL_PROVIDER = get_env_str("A0_EMBED_MODEL_PROVIDER", "huggingface")
+    DEFAULT_EMBED_MODEL_NAME = get_env_str(
+        "A0_EMBED_MODEL_NAME", "sentence-transformers/all-MiniLM-L6-v2"
+    )
+    DEFAULT_BROWSER_MODEL_PROVIDER = get_env_str("A0_BROWSER_MODEL_PROVIDER", "openrouter")
+    DEFAULT_BROWSER_MODEL_NAME = get_env_str("A0_BROWSER_MODEL_NAME", "openai/gpt-4.1")

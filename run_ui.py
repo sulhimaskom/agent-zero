@@ -13,6 +13,7 @@ import initialize
 from python.helpers import files, git, mcp_server, fasta2a_server
 from python.helpers.files import get_abs_path
 from python.helpers import runtime, dotenv, process
+from python.helpers.constants import Config
 from python.helpers.extract_tools import load_classes_from_folder
 from python.helpers.api import ApiHandler
 from python.helpers.print_style import PrintStyle
@@ -267,7 +268,7 @@ def run():
     # Get configuration from environment
     port = runtime.get_web_ui_port()
     host = (
-        runtime.get_arg("host") or dotenv.get_dotenv_value("WEB_UI_HOST") or "localhost"
+        runtime.get_arg("host") or dotenv.get_dotenv_value("WEB_UI_HOST") or Config.DEFAULT_HOSTNAME
     )
     server = None
 
