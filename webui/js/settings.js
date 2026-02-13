@@ -461,7 +461,6 @@ document.addEventListener('alpine:init', function () {
 
             async handleButtonAction(field) {
                 Logger.warn('Unknown button action:', field.action);
-                }
             },
 
             // Test API connection
