@@ -12,7 +12,10 @@
 <body>
     <div class="login-container">
         <form class="login-form" method="POST" action="/login" id="login-form">
-            <img src="/public/splash.jpg" alt="Agent Zero Logo" class="logo" width="200" height="200" loading="eager">
+            <picture>
+                <source srcset="/public/splash.webp" type="image/webp">
+                <img src="/public/splash.jpg" alt="Agent Zero Logo" class="logo" width="200" height="200" loading="eager">
+            </picture>
             <h2>Agent Zero</h2>
             <div class="input-group">
                 <label for="username">Username</label>

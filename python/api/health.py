@@ -21,7 +21,7 @@ class HealthCheck(ApiHandler):
         error = None
         try:
             gitinfo = git.get_git_info()
-        except Exception as e:
+        except (ImportError, AttributeError, OSError, ValueError) as e:
             error = errors.error_text(e)
 
         return {"gitinfo": gitinfo, "error": error}

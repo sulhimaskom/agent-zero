@@ -27,8 +27,11 @@
     <!-- Critical CSS loaded normally -->
     <link rel="stylesheet" href="index.css">
     <link rel="stylesheet" href="css/messages.css">
-    <link rel="stylesheet" href="components/messages/action-buttons/simple-action-buttons.css">
     <link rel="stylesheet" href="css/buttons.css">
+    
+    <!-- Action buttons CSS - async loading -->
+    <link rel="preload" href="components/messages/action-buttons/simple-action-buttons.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="components/messages/action-buttons/simple-action-buttons.css"></noscript>
     
     <!-- Non-critical CSS loaded asynchronously -->
     <link rel="preload" href="css/toast.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
@@ -50,7 +53,8 @@
     <noscript><link rel="stylesheet" href="css/notification.css"></noscript>
 
     <!-- Flatpickr for datetime picker - async loaded -->
-    <link rel="stylesheet" href="vendor/flatpickr/flatpickr.min.css">
+    <link rel="preload" href="vendor/flatpickr/flatpickr.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="vendor/flatpickr/flatpickr.min.css"></noscript>
     <script src="vendor/flatpickr/flatpickr.min.js" defer></script>
 
     <script>
@@ -149,14 +153,18 @@
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         crossorigin="anonymous" defer></script>
 
+    <!-- Settings must load before Alpine.js for settingsModalProxy to be available -->
+    <script type="module" src="js/settings.js"></script>
+
     <!-- Then load Alpine.js -->
     <!-- <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script> -->
     <script type="module" src="js/initFw.js"></script>
 
     <!-- ACE Editor - deferred loading -->
     <script src="vendor/ace-min/ace.js" defer></script>
-    <!-- KaTeX CSS -->
-    <link rel="stylesheet" href="vendor/katex/katex.min.css" crossorigin="anonymous">
+    <!-- KaTeX CSS - async for math rendering -->
+    <link rel="preload" href="vendor/katex/katex.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'" crossorigin="anonymous">
+    <noscript><link rel="stylesheet" href="vendor/katex/katex.min.css" crossorigin="anonymous"></noscript>
 
     <!-- KaTeX javascript -->
     <script defer src="vendor/katex/katex.min.js" crossorigin="anonymous"></script>
@@ -165,14 +173,13 @@
     <!-- QR Code Library - deferred loading -->
     <script src="vendor/qrcode.min.js" defer></script>
 
-    <!-- Google Icons -->
-    <link rel="stylesheet" href="vendor/google/google-icons.css" />
+    <!-- Google Icons - async loading -->
+    <link rel="preload" href="vendor/google/google-icons.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="vendor/google/google-icons.css"></noscript>
 
     <!-- Link the PWA manifest file -->
     <link rel="manifest" href="js/manifest.json">
 
-    <!-- Non-module scripts after Alpine.js -->
-    <script type="module" src="js/settings.js"></script>
     <script>
         // Expose git info for sidebar component
         globalThis.gitinfo = { version: "{{version_no}}", commit_time: "{{version_time}}" };
