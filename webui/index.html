@@ -17,40 +17,29 @@
     <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
 
     <!-- Load fonts with display=swap for better performance -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+    <noscript><link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&family=Rubik:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet"></noscript>
 
-    <!-- Preload critical CSS -->
-    <link rel="preload" href="index.css" as="style">
-    <link rel="preload" href="css/messages.css" as="style">
-    <link rel="preload" href="css/buttons.css" as="style">
-
-    <!-- Critical CSS loaded normally -->
-    <link rel="stylesheet" href="index.css">
-    <link rel="stylesheet" href="css/messages.css">
-    <link rel="stylesheet" href="css/buttons.css">
-    
-    <!-- Action buttons CSS - async loading -->
+    <link rel="preload" href="index.min.css" as="style">
+    <link rel="preload" href="css/messages.min.css" as="style">
+    <link rel="preload" href="css/buttons.min.css" as="style">
+    <link rel="stylesheet" href="index.min.css">
+    <link rel="stylesheet" href="css/messages.min.css">
+    <link rel="stylesheet" href="css/buttons.min.css">
     <link rel="preload" href="components/messages/action-buttons/simple-action-buttons.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <noscript><link rel="stylesheet" href="components/messages/action-buttons/simple-action-buttons.css"></noscript>
-    
-    <!-- Non-critical CSS loaded asynchronously -->
-    <link rel="preload" href="css/toast.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="css/toast.css"></noscript>
-    
-    <link rel="preload" href="css/settings.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="css/settings.css"></noscript>
-    
-    <link rel="preload" href="css/modals.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="css/modals.css"></noscript>
-    
-    <link rel="preload" href="css/speech.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="css/speech.css"></noscript>
-    
-    <link rel="preload" href="css/scheduler-datepicker.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="css/scheduler-datepicker.css"></noscript>
-    
-    <link rel="preload" href="css/notification.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="css/notification.css"></noscript>
+    <link rel="preload" href="css/toast.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="css/toast.min.css"></noscript>
+    <link rel="preload" href="css/settings.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="css/settings.min.css"></noscript>
+    <link rel="preload" href="css/modals.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="css/modals.min.css"></noscript>
+    <link rel="preload" href="css/speech.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="css/speech.min.css"></noscript>
+    <link rel="preload" href="css/scheduler-datepicker.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="css/scheduler-datepicker.min.css"></noscript>
+    <link rel="preload" href="css/notification.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="css/notification.min.css"></noscript>
 
     <!-- Flatpickr for datetime picker - async loaded -->
     <link rel="preload" href="vendor/flatpickr/flatpickr.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
