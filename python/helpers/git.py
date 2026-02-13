@@ -36,7 +36,7 @@ def get_git_info():
             short_tag = "-".join(tag_split[:-1])
         else:
             short_tag = tag
-    except Exception:
+    except (ValueError, IndexError):
         tag = ""
 
     version = branch[0].upper() + " " + (short_tag or commit_hash[:7])
@@ -58,5 +58,5 @@ def get_version():
     try:
         git_info = get_git_info()
         return str(git_info.get("short_tag", "")).strip() or "unknown"
-    except Exception:
+    except (OSError, RuntimeError, KeyError):
         return "unknown"

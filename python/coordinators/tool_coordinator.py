@@ -75,7 +75,7 @@ class ToolCoordinator(IToolExecutor):
                 ).print(
                     "MCP helper module not found. Skipping MCP tool lookup."
                 )
-            except Exception as e:
+            except (RuntimeError, AttributeError) as e:
                 PrintStyle(
                     background_color="black", font_color="red", padding=True
                 ).print(f"Failed to get MCP tool '{tool_name}': {e}")
@@ -164,7 +164,7 @@ class ToolCoordinator(IToolExecutor):
                     + ".py",
                     Tool,
                 )
-            except Exception:
+            except (ImportError, FileNotFoundError):
                 pass
 
         if not classes:
@@ -172,7 +172,7 @@ class ToolCoordinator(IToolExecutor):
                 classes = extract_tools.load_classes_from_file(
                     "python/tools/" + name + ".py", Tool
                 )
-            except Exception:
+            except (ImportError, FileNotFoundError):
                 pass
 
         tool_class = classes[0] if classes else Unknown
