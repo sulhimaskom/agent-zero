@@ -25,7 +25,7 @@ Agent Zero is a sophisticated multi-agent AI framework with a Python backend (Fl
 
 | Criterion | Weight | Score | Evidence |
 |-----------|--------|-------|----------|
-| **Correctness** | 15 | 10 | 141 `# type: ignore` comments bypass type checking; 29 tests passing |
+| **Correctness** | 15 | 10 | 139 `# type: ignore` comments bypass type checking; 29 tests passing |
 | **Readability & Naming** | 10 | 7 | Mixed naming conventions; some unclear variable names in helpers |
 | **Simplicity** | 10 | 6 | settings.py (1,738 lines), task_scheduler.py (1,159 lines) - complexity hotspots |
 | **Modularity & SRP** | 15 | 11 | 130 classes; good separation of concerns between tools/helpers/api |
@@ -39,7 +39,7 @@ Agent Zero is a sophisticated multi-agent AI framework with a Python backend (Fl
 **CODE QUALITY SCORE: 68/100** (-32 from penalties)
 
 **Key Issues:**
-1. ⚠️ **141 type:ignore comments** - Type safety compromised
+1. ⚠️ **139 type:ignore comments** - Type safety compromised
 2. ⚠️ **204 broad exception handlers** - Silent failures likely
 3. ⚠️ **177 print statements** - No structured logging
 4. ⚠️ **3 files >1000 lines** - Complexity debt
