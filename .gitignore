@@ -1,5 +1,6 @@
 # Ignore common unwanted files globally
 **/.DS_Store
+**/Thumbs.db
 **/.env
 **/.env.*
 **/__pycache__/

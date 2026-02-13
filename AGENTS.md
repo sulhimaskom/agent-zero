@@ -2,7 +2,8 @@
 
 **Generated:** 2026-02-13
 **Branch:** custom
-**Commit:** e8004d4
+**Commit:** ef143cc
+**Last RepoKeeper Run:** 2026-02-13
 
 ## OVERVIEW
 Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpine.js). Prompt-driven behavior - everything controlled by `/prompts/` markdown files. Grows organically through memory, tools, extensions, and agent profiles.
@@ -189,6 +190,7 @@ docker run -p 50001:80 agent0ai/agent-zero
 - **96 prompt files** - system prompts and agent behavior definitions
 - **No traditional testing** - CI uses AI code analysis instead of pytest runs
 - **Automatic SSH password generation** - `prepare.py` generates random root password (security concern for production)
+- **RepoKeeper Updates** - `.gitignore` updated to include Windows `Thumbs.db` files
 
 ---
 
