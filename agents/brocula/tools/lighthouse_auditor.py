@@ -36,10 +36,10 @@ class lighthouse_auditor(Tool):
         if url is None:
             url = f"http://{Network.DEFAULT_HOSTNAME}:{Network.BROCULA_PORT_DEFAULT}"
         await self.agent.handle_intervention()
-        
+
         state = await self.agent.get_tool_state(self, State)
         state.opportunities = []
-        
+
         try:
             # Check if lighthouse is installed
             try:
@@ -57,16 +57,16 @@ class lighthouse_auditor(Tool):
                     break_loop=False,
                     additional={"error": "lighthouse_not_installed", "has_issues": True}
                 )
-            
+
             # Prepare output file
             output_file = "/tmp/lighthouse-report.json"
-            
+
             # Build lighthouse command
             categories_list = [c.strip() for c in categories.split(",")]
             category_flags = []
             for cat in categories_list:
                 category_flags.extend(["--only-categories", cat])
-            
+
             cmd = [
                 "lighthouse",
                 url,
@@ -76,9 +76,9 @@ class lighthouse_auditor(Tool):
                 f"--preset={device}",
                 "--quiet"
             ] + category_flags
-            
+
             self.set_progress(f"Running Lighthouse audit on {url} ({device})...")
-            
+
             # Run lighthouse
             result = subprocess.run(
                 cmd,
@@ -86,14 +86,14 @@ class lighthouse_auditor(Tool):
                 text=True,
                 timeout=120
             )
-            
+
             if result.returncode != 0 and not os.path.exists(output_file):
                 return Response(
                     message=f"❌ Lighthouse audit failed: {result.stderr}",
                     break_loop=False,
                     additional={"error": result.stderr, "has_issues": True}
                 )
-            
+
             # Parse results
             if not os.path.exists(output_file):
                 return Response(
@@ -101,21 +101,21 @@ class lighthouse_auditor(Tool):
                     break_loop=False,
                     additional={"error": "no_report", "has_issues": True}
                 )
-            
+
             with open(output_file, 'r') as f:
                 report = json.load(f)
-            
+
             # Extract scores
             scores = {}
             for category in report.get("categories", {}).values():
                 cat_id = category.get("id", "unknown")
                 score = category.get("score", 0)
                 scores[cat_id] = round(score * 100) if score is not None else 0
-            
+
             # Extract opportunities (performance diagnostics)
             opportunities = []
             audits = report.get("audits", {})
-            
+
             for audit_id, audit in audits.items():
                 if audit.get("details", {}).get("type") == "opportunity":
                     score = audit.get("score", 1)
@@ -129,25 +129,25 @@ class lighthouse_auditor(Tool):
                             "numeric_value": audit.get("numericValue", 0),
                             "details": audit.get("details", {})
                         })
-            
+
             # Sort by impact (lower score = higher priority)
             opportunities.sort(key=lambda x: x["score"])
             state.opportunities = opportunities
-            
+
             # Generate report
             report_lines = [
                 f"Lighthouse Audit Results for {url}",
                 "=" * 60,
                 ""
             ]
-            
+
             # Report scores
             report_lines.append("📊 Scores:")
             for cat, score in scores.items():
                 emoji = "🟢" if score >= 90 else "🟡" if score >= 50 else "🔴"
                 report_lines.append(f"  {emoji} {cat.capitalize()}: {score}/100")
             report_lines.append("")
-            
+
             # Report opportunities
             if opportunities:
                 report_lines.append(f"🔧 Optimization Opportunities ({len(opportunities)} found):")
@@ -159,12 +159,12 @@ class lighthouse_auditor(Tool):
                         # Clean up description (remove markdown links)
                         desc = opp["description"].replace("[Learn more]", "").replace("(...)", "")
                         report_lines.append(f"     Details: {desc[:150]}")
-                
+
                 if len(opportunities) > 15:
                     report_lines.append(f"\n  ... and {len(opportunities) - 15} more opportunities")
             else:
                 report_lines.append("✅ No significant optimization opportunities found!")
-            
+
             # Summary
             low_scores = [cat for cat, score in scores.items() if score < 90]
             report_lines.append("")
@@ -173,9 +173,9 @@ class lighthouse_auditor(Tool):
                 report_lines.append(f"⚠️ Categories needing improvement: {', '.join(low_scores)}")
             else:
                 report_lines.append("✅ All categories score 90+ (excellent!)")
-            
+
             message = "\n".join(report_lines)
-            
+
             additional = {
                 "url": url,
                 "scores": scores,
@@ -185,13 +185,13 @@ class lighthouse_auditor(Tool):
                 "has_issues": len(opportunities) > 0 or len(low_scores) > 0,
                 "report_file": output_file
             }
-            
+
             return Response(
                 message=message,
                 break_loop=False,
                 additional=additional
             )
-            
+
         except subprocess.TimeoutExpired:
             return Response(
                 message="❌ Lighthouse audit timed out (120s)",

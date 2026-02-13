@@ -52,24 +52,24 @@ Execute the following strict workflow:
 
 5. DETAILED REPORT:
    Provide a comprehensive report with:
-   
+
    ## Browser Console Report
    - **Errors Found**: [count] with details
    - **Warnings Found**: [count] with details
    - **Status**: ✅ Clean / 🔴 Fixed / ⚠️ Partial
-   
+
    ## Lighthouse Report
    - **Performance**: [score]/100 (before → after)
    - **Accessibility**: [score]/100
    - **Best Practices**: [score]/100
    - **SEO**: [score]/100
    - **Optimizations Applied**: [list]
-   
+
    ## Build & Lint Status
    - **Build**: ✅ Pass / 🔴 Fail → ✅ Fixed
    - **Lint**: ✅ Pass / 🔴 Fail → ✅ Fixed
    - **Errors Fixed**: [count]
-   
+
    ## PR Status
    - **Branch**: [branch-name]
    - **Status**: ✅ Created / 🔴 Blocked / ⏭️ Not Needed
@@ -89,7 +89,7 @@ Remember: You are BroCula. You love working in the browser console. You fix erro
 def check_dependencies():
     """Check if required tools are available"""
     print("🔍 Checking dependencies...")
-    
+
     # Check Node.js
     try:
         result = subprocess.run(['node', '--version'], capture_output=True, text=True)
@@ -97,7 +97,7 @@ def check_dependencies():
     except FileNotFoundError:
         print("  ❌ Node.js not found")
         return False
-    
+
     # Check npm
     try:
         result = subprocess.run(['npm', '--version'], capture_output=True, text=True)
@@ -105,7 +105,7 @@ def check_dependencies():
     except FileNotFoundError:
         print("  ❌ npm not found")
         return False
-    
+
     # Check Python
     try:
         result = subprocess.run(['python3', '--version'], capture_output=True, text=True)
@@ -113,7 +113,7 @@ def check_dependencies():
     except FileNotFoundError:
         print("  ❌ Python not found")
         return False
-    
+
     # Check opencode CLI
     try:
         result = subprocess.run(['opencode', '--version'], capture_output=True, text=True)
@@ -121,13 +121,13 @@ def check_dependencies():
     except FileNotFoundError:
         print("  ⚠️  OpenCode CLI not found. Install from: https://opencode.ai")
         print("     Continuing anyway...")
-    
+
     return True
 
 def get_project_info():
     """Get information about the project"""
     project_root = Path.cwd()
-    
+
     info = {
         'has_package_json': (project_root / 'package.json').exists(),
         'has_requirements_txt': (project_root / 'requirements.txt').exists(),
@@ -136,7 +136,7 @@ def get_project_info():
         'build_command': None,
         'lint_command': None,
     }
-    
+
     if info['has_package_json']:
         with open(project_root / 'package.json') as f:
             package = json.load(f)
@@ -153,23 +153,23 @@ def get_project_info():
                     if cmd in scripts:
                         info['lint_command'] = f"npm run {cmd}"
                         break
-    
+
     return info
 
 def run_brocula():
     """Run BroCula agent with OpenCode"""
     print("\n🧛 Starting BroCula - Browser Console & Lighthouse Specialist...")
     print("=" * 60)
-    
+
     # Save prompt to temp file
     timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
     prompt_file = Path(f'/tmp/brocula_prompt_{timestamp}.txt')
     prompt_file.write_text(BROCULA_PROMPT)
-    
+
     print(f"\n📄 Prompt saved to: {prompt_file}")
     print("\n🚀 Executing BroCula workflow...")
     print("-" * 60)
-    
+
     # Run opencode with the prompt
     try:
         result = subprocess.run(
@@ -206,12 +206,12 @@ def main():
 ║                                                              ║
 ╚══════════════════════════════════════════════════════════════╝
 """)
-    
+
     # Check dependencies
     if not check_dependencies():
         print("\n❌ Missing required dependencies. Please install them first.")
         sys.exit(1)
-    
+
     # Get project info
     print("\n📋 Project Information:")
     info = get_project_info()
@@ -220,18 +220,18 @@ def main():
         if value is None:
             icon = "⚠️ "
         print(f"  {icon} {key}: {value}")
-    
+
     # Confirm execution
     print("\n" + "=" * 60)
     response = input("\n🚀 Start BroCula workflow? (yes/no): ").lower().strip()
-    
+
     if response not in ['yes', 'y']:
         print("\n👋 BroCula workflow cancelled.")
         sys.exit(0)
-    
+
     # Run BroCula
     success = run_brocula()
-    
+
     if success:
         print("\n✅ BroCula workflow completed successfully!")
         sys.exit(0)

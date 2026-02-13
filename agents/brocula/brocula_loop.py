@@ -34,17 +34,17 @@ def check_linter():
         ret, _, _ = run_command("which ruff")
         if ret == 0:
             return "ruff check ."
-        
+
         # Try flake8
         ret, _, _ = run_command("which flake8")
         if ret == 0:
             return "flake8"
-        
+
         # Try pylint
         ret, _, _ = run_command("which pylint")
         if ret == 0:
             return "pylint **/*.py"
-    
+
     # Check for Node.js linters
     if Path("package.json").exists():
         with open("package.json") as f:
@@ -54,7 +54,7 @@ def check_linter():
                     return "npm run lint"
                 if "eslint" in pkg["scripts"]:
                     return "npm run eslint"
-    
+
     return None
 
 def check_tests():
@@ -63,13 +63,13 @@ def check_tests():
         ret, _, _ = run_command("which pytest")
         if ret == 0:
             return "pytest"
-    
+
     if Path("package.json").exists():
         with open("package.json") as f:
             pkg = json.load(f)
             if "scripts" in pkg and "test" in pkg["scripts"]:
                 return "npm test"
-    
+
     return None
 
 def check_build():
@@ -79,7 +79,7 @@ def check_build():
             pkg = json.load(f)
             if "scripts" in pkg and "build" in pkg["scripts"]:
                 return "npm run build"
-    
+
     return None
 
 def main():
@@ -87,45 +87,45 @@ def main():
     print("🔧 BroCula Browser Optimization Agent")
     print("=" * 60)
     print()
-    
+
     # Check prerequisites
     print("📋 Checking prerequisites...")
-    
+
     # Check Node.js/npm (for lighthouse)
     ret, _, _ = run_command("which npm")
     if ret != 0:
         print("❌ npm not found. Install Node.js first.")
         sys.exit(1)
-    
+
     # Check lighthouse
     ret, _, _ = run_command("which lighthouse")
     if ret != 0:
         print("📦 Installing Lighthouse...")
         run_command("npm install -g lighthouse")
-    
+
     # Check playwright
     ret, _, _ = run_command("which playwright")
     if ret != 0:
         print("📦 Installing Playwright...")
         run_command("pip install playwright")
         run_command("playwright install chromium")
-    
+
     print("✅ Prerequisites ready")
     print()
-    
+
     # Configuration
     target_url = f"http://{Network.DEFAULT_HOSTNAME}:{Network.BROCULA_PORT_DEFAULT}"
     check_interval = 300  # 5 minutes between checks
-    
+
     print(f"🎯 Target URL: {target_url}")
     print(f"⏱️  Check interval: {check_interval}s")
     print()
-    
+
     # Determine verification commands
     lint_cmd = check_linter()
     test_cmd = check_tests()
     build_cmd = check_build()
-    
+
     if lint_cmd:
         print(f"🔍 Linter: {lint_cmd}")
     if test_cmd:
@@ -133,20 +133,20 @@ def main():
     if build_cmd:
         print(f"🔨 Build: {build_cmd}")
     print()
-    
+
     # Main loop
     iteration = 0
     while True:
         iteration += 1
         print(f"\n🔄 Iteration {iteration}")
         print("-" * 60)
-        
+
         # 1. Check browser console
         print("\n1️⃣  Checking browser console...")
         # This would run the browser_console_checker tool
         # For now, we'll document what should happen
         print("   (Run: python -m agents.brocula.tools.browser_console_checker)")
-        
+
         # 2. Run Lighthouse
         print("\n2️⃣  Running Lighthouse audit...")
         ret, stdout, stderr = run_command(
@@ -158,11 +158,11 @@ def main():
             # Parse and report scores
         else:
             print(f"   ❌ Lighthouse failed: {stderr}")
-        
+
         # 3. Verify build/lint (FATAL if fails)
         print("\n3️⃣  Verifying build and lint...")
         fatal_errors = []
-        
+
         if lint_cmd:
             ret, stdout, stderr = run_command(lint_cmd)
             if ret != 0:
@@ -170,7 +170,7 @@ def main():
                 print("   ❌ Lint failed")
             else:
                 print("   ✅ Lint passed")
-        
+
         if build_cmd:
             ret, stdout, stderr = run_command(build_cmd)
             if ret != 0:
@@ -178,7 +178,7 @@ def main():
                 print("   ❌ Build failed")
             else:
                 print("   ✅ Build passed")
-        
+
         if test_cmd:
             ret, stdout, stderr = run_command(test_cmd)
             if ret != 0:
@@ -186,13 +186,13 @@ def main():
                 print("   ❌ Tests failed")
             else:
                 print("   ✅ Tests passed")
-        
+
         if fatal_errors:
             print("\n🚨 FATAL ERRORS FOUND:")
             for error in fatal_errors:
                 print(f"   - {error}")
             print("\n⚠️  Fix these errors before creating PR!")
-        
+
         # 4. Git status check
         print("\n4️⃣  Checking git status...")
         ret, stdout, _ = run_command("git status --short")
@@ -201,7 +201,7 @@ def main():
             print(stdout)
         else:
             print("   ✅ Working directory clean")
-        
+
         # Wait before next iteration
         print(f"\n⏳ Waiting {check_interval}s before next check...")
         time.sleep(check_interval)
