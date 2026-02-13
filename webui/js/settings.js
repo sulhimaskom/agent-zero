@@ -27,9 +27,11 @@ const settingsModalProxy = {
         this.activeTab = tabName;
 
         // Update the store safely
-        const store = Alpine.store('root');
-        if (store) {
-            store.activeTab = tabName;
+        if (typeof Alpine !== 'undefined' && Alpine.store) {
+            const store = Alpine.store('root');
+            if (store) {
+                store.activeTab = tabName;
+            }
         }
 
         try {
@@ -78,13 +80,19 @@ const settingsModalProxy = {
 
     async openModal() {
         const modalEl = document.getElementById('settingsModal');
+        if (!modalEl || typeof Alpine === 'undefined' || !Alpine.$data) {
+            Logger.error('Settings modal not ready - Alpine not initialized');
+            return;
+        }
         const modalAD = Alpine.$data(modalEl);
 
         // First, ensure the store is updated properly
-        const store = Alpine.store('root');
-        if (store) {
-            // Set isOpen first to ensure proper state
-            store.isOpen = true;
+        if (typeof Alpine !== 'undefined' && Alpine.store) {
+            const store = Alpine.store('root');
+            if (store) {
+                // Set isOpen first to ensure proper state
+                store.isOpen = true;
+            }
         }
 
         //get settings from backend
@@ -129,8 +137,11 @@ const settingsModalProxy = {
                 modalAD.activeTab = savedTab;
 
                 // Also update the store
-                if (store) {
-                    store.activeTab = savedTab;
+                if (typeof Alpine !== 'undefined' && Alpine.store) {
+                    const store = Alpine.store('root');
+                    if (store) {
+                        store.activeTab = savedTab;
+                    }
                 }
 
                 try {
@@ -230,12 +241,14 @@ const settingsModalProxy = {
         this.isOpen = false;
 
         // Then safely update the store
-        const store = Alpine.store('root');
-        if (store) {
-            // Use a slight delay to avoid reactivity issues
-            setTimeout(() => {
-                store.isOpen = false;
-            }, 10);
+        if (typeof Alpine !== 'undefined' && Alpine.store) {
+            const store = Alpine.store('root');
+            if (store) {
+                // Use a slight delay to avoid reactivity issues
+                setTimeout(() => {
+                    store.isOpen = false;
+                }, 10);
+            }
         }
     },
 
@@ -252,12 +265,14 @@ const settingsModalProxy = {
         this.isOpen = false;
 
         // Then safely update the store
-        const store = Alpine.store('root');
-        if (store) {
-            // Use a slight delay to avoid reactivity issues
-            setTimeout(() => {
-                store.isOpen = false;
-            }, 10);
+        if (typeof Alpine !== 'undefined' && Alpine.store) {
+            const store = Alpine.store('root');
+            if (store) {
+                // Use a slight delay to avoid reactivity issues
+                setTimeout(() => {
+                    store.isOpen = false;
+                }, 10);
+            }
         }
     },
 
@@ -334,7 +349,10 @@ document.addEventListener('alpine:init', function () {
 
             async init() {
                 // Initialize with the store value
-                this.activeTab = Alpine.store('root').activeTab || 'agent';
+                if (typeof Alpine !== 'undefined' && Alpine.store) {
+                    const rootStore = Alpine.store('root');
+                    this.activeTab = rootStore?.activeTab || 'agent';
+                }
 
                 // Watch store tab changes
                 this.$watch('$store.root.activeTab', (newTab) => {
@@ -359,9 +377,11 @@ document.addEventListener('alpine:init', function () {
                 this.activeTab = tab;
 
                 // Update the store safely
-                const store = Alpine.store('root');
-                if (store) {
-                    store.activeTab = tab;
+                if (typeof Alpine !== 'undefined' && Alpine.store) {
+                    const store = Alpine.store('root');
+                    if (store) {
+                        store.activeTab = tab;
+                    }
                 }
             },
 

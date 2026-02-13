@@ -32,4 +32,10 @@ export const store = {
     },
 };
 
-globalThis.Alpine.store("keyboardShortcuts", store);
+if (globalThis.Alpine) {
+    globalThis.Alpine.store("keyboardShortcuts", store);
+} else {
+    document.addEventListener("alpine:init", () => {
+        globalThis.Alpine.store("keyboardShortcuts", store);
+    });
+}
