@@ -33,21 +33,21 @@ class browser_console_checker(Tool):
         if url is None:
             url = f"http://{Network.DEFAULT_HOSTNAME}:{Network.BROCULA_PORT_DEFAULT}"
         await self.agent.handle_intervention()
-        
+
         state = await self.agent.get_tool_state(self, State)
         state.console_logs = []
         state.errors_found = []
         state.warnings_found = []
-        
+
         try:
             # Ensure playwright binary is available
             ensure_playwright_binary()
-            
+
             async with async_playwright() as p:
                 browser = await p.chromium.launch(headless=True)
                 context = await browser.new_context()
                 page = await context.new_page()
-                
+
                 # Listen to console messages
                 def handle_console(msg):
                     log_entry = {
@@ -56,25 +56,25 @@ class browser_console_checker(Tool):
                         "location": msg.location if hasattr(msg, 'location') else None
                     }
                     state.console_logs.append(log_entry)
-                    
+
                     if msg.type == "error":
                         state.errors_found.append(log_entry)
                     elif msg.type == "warning":
                         state.warnings_found.append(log_entry)
-                
+
                 page.on("console", handle_console)
-                
+
                 # Navigate to the URL
                 self.set_progress(f"Navigating to {url}...")
                 await page.goto(url, wait_until="networkidle")
-                
+
                 # Wait for additional console messages
                 self.set_progress(f"Waiting {wait_time}s for console messages...")
                 await asyncio.sleep(wait_time)
-                
+
                 # Close browser
                 await browser.close()
-            
+
             # Prepare report
             report_lines = [
                 f"Browser Console Check Results for {url}",
@@ -84,7 +84,7 @@ class browser_console_checker(Tool):
                 f"Warnings: {len(state.warnings_found)}",
                 ""
             ]
-            
+
             if state.errors_found:
                 report_lines.append("❌ ERRORS FOUND (MUST FIX IMMEDIATELY):")
                 for i, error in enumerate(state.errors_found[:20], 1):  # Limit to 20
@@ -92,7 +92,7 @@ class browser_console_checker(Tool):
                 if len(state.errors_found) > 20:
                     report_lines.append(f"  ... and {len(state.errors_found) - 20} more errors")
                 report_lines.append("")
-            
+
             if state.warnings_found:
                 report_lines.append("⚠️ WARNINGS FOUND:")
                 for i, warning in enumerate(state.warnings_found[:20], 1):  # Limit to 20
@@ -100,12 +100,12 @@ class browser_console_checker(Tool):
                 if len(state.warnings_found) > 20:
                     report_lines.append(f"  ... and {len(state.warnings_found) - 20} more warnings")
                 report_lines.append("")
-            
+
             if not state.errors_found and not state.warnings_found:
                 report_lines.append("✅ No console errors or warnings found!")
-            
+
             message = "\n".join(report_lines)
-            
+
             # Return additional data for further processing
             additional = {
                 "url": url,
@@ -117,13 +117,13 @@ class browser_console_checker(Tool):
                 "has_errors": len(state.errors_found) > 0,
                 "has_warnings": len(state.warnings_found) > 0
             }
-            
+
             return Response(
                 message=message,
                 break_loop=False,
                 additional=additional
             )
-            
+
         except Exception as e:
             return Response(
                 message=f"❌ Failed to check browser console: {str(e)}",
