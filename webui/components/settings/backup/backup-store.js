@@ -150,7 +150,12 @@ const model = {
     if (container) {
       const editor = ace.edit("backup-metadata-editor");
 
-      const dark = localStorage.getItem("darkMode");
+      let dark = "true";
+      try {
+        dark = localStorage.getItem("darkMode");
+      } catch (e) {
+        // Silent fail in private browsing mode
+      }
       if (dark != "false") {
         editor.setTheme("ace/theme/github_dark");
       } else {
@@ -182,7 +187,12 @@ const model = {
     if (container) {
       const editor = ace.edit("restore-metadata-editor");
 
-      const dark = localStorage.getItem("darkMode");
+      let dark = "true";
+      try {
+        dark = localStorage.getItem("darkMode");
+      } catch (e) {
+        // Silent fail in private browsing mode
+      }
       if (dark != "false") {
         editor.setTheme("ace/theme/github_dark");
       } else {
@@ -319,12 +329,20 @@ const model = {
   initFilePreview() {
     this.fileSearchFilter = '';
     this.expandedGroups.clear();
-    this.previewMode = localStorage.getItem('backupPreviewMode') || 'grouped';
+    try {
+      this.previewMode = localStorage.getItem('backupPreviewMode') || 'grouped';
+    } catch (e) {
+      this.previewMode = 'grouped';
+    }
   },
 
   togglePreviewMode() {
     this.previewMode = this.previewMode === 'grouped' ? 'flat' : 'grouped';
-    localStorage.setItem('backupPreviewMode', this.previewMode);
+    try {
+      localStorage.setItem('backupPreviewMode', this.previewMode);
+    } catch (e) {
+      // Silent fail in private browsing mode
+    }
   },
 
   toggleGroup(groupPath) {

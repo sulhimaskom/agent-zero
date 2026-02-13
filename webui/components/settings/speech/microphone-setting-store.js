@@ -9,7 +9,12 @@ const model = {
 
     async init() {
         // Load selected device from localStorage if present
-        const saved = localStorage.getItem('microphoneSelectedDevice');
+        let saved = null;
+        try {
+            saved = localStorage.getItem('microphoneSelectedDevice');
+        } catch (e) {
+            // Silent fail in private browsing mode
+        }
         await this.loadDevices();
         if (saved && this.devices.some(d => d.deviceId === saved)) {
             this.selectedDevice = saved;
@@ -71,7 +76,11 @@ const model = {
     },
 
     async onSelectDevice() {
-        localStorage.setItem('microphoneSelectedDevice', this.selectedDevice);
+        try {
+            localStorage.setItem('microphoneSelectedDevice', this.selectedDevice);
+        } catch (e) {
+            // Silent fail in private browsing mode
+        }
     },
 
     getSelectedDevice() {

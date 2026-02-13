@@ -33,9 +33,23 @@ const memoryDashboardStore = {
   searchQuery: "",
   areaFilter: "",
   threshold: parseFloat(
-    localStorage.getItem(STORAGE_KEYS.MEMORY_DASHBOARD_THRESHOLD) || DEFAULTS.MEMORY_THRESHOLD
+    (() => {
+      try {
+        return localStorage.getItem(STORAGE_KEYS.MEMORY_DASHBOARD_THRESHOLD) || DEFAULTS.MEMORY_THRESHOLD;
+      } catch (e) {
+        return DEFAULTS.MEMORY_THRESHOLD;
+      }
+    })()
   ),
-  limit: parseInt(localStorage.getItem(STORAGE_KEYS.MEMORY_DASHBOARD_LIMIT) || DEFAULTS.MEMORY_LIMIT),
+  limit: parseInt(
+    (() => {
+      try {
+        return localStorage.getItem(STORAGE_KEYS.MEMORY_DASHBOARD_LIMIT) || DEFAULTS.MEMORY_LIMIT;
+      } catch (e) {
+        return DEFAULTS.MEMORY_LIMIT;
+      }
+    })()
+  ),
 
   // Stats
   totalCount: 0,
@@ -158,11 +172,15 @@ const memoryDashboardStore = {
 
   async searchMemories(silent = false) {
     // Save limit to localStorage for persistence
-    localStorage.setItem("memoryDashboard_limit", this.limit.toString());
-    localStorage.setItem(
-      "memoryDashboard_threshold",
-      this.threshold.toString()
-    );
+    try {
+      localStorage.setItem("memoryDashboard_limit", this.limit.toString());
+      localStorage.setItem(
+        "memoryDashboard_threshold",
+        this.threshold.toString()
+      );
+    } catch (e) {
+      // Silent fail in private browsing mode
+    }
 
     if (!silent) {
       this.loading = true;

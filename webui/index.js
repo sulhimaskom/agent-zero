@@ -418,8 +418,12 @@ export async function poll() {
 globalThis.poll = poll;
 
 function afterMessagesUpdate(logs) {
-  if (localStorage.getItem(STORAGE_KEYS.SPEECH) == "true") {
-    speakMessages(logs);
+  try {
+    if (localStorage.getItem(STORAGE_KEYS.SPEECH) == "true") {
+      speakMessages(logs);
+    }
+  } catch (e) {
+    // Silent fail in private browsing mode
   }
 }
 
@@ -519,7 +523,11 @@ export const setContext = function (id) {
   tasksStore.setSelected(id);
 
   //skip one speech if enabled when switching context
-  if (localStorage.getItem(STORAGE_KEYS.SPEECH) == "true") skipOneSpeech = true;
+  try {
+    if (localStorage.getItem(STORAGE_KEYS.SPEECH) == "true") skipOneSpeech = true;
+  } catch (e) {
+    // Silent fail in private browsing mode
+  }
 };
 
 export const deselectChat = function () {
@@ -527,8 +535,12 @@ export const deselectChat = function () {
   setContext(null);
 
   // Clear localStorage selections so we don't auto-restore
-  localStorage.removeItem(STORAGE_KEYS.LAST_SELECTED_CHAT);
-  localStorage.removeItem(STORAGE_KEYS.LAST_SELECTED_TASK);
+  try {
+    localStorage.removeItem(STORAGE_KEYS.LAST_SELECTED_CHAT);
+    localStorage.removeItem(STORAGE_KEYS.LAST_SELECTED_TASK);
+  } catch (e) {
+    // Silent fail in private browsing mode
+  }
 
   // Clear the chat history safely
   while (chatHistory.firstChild) {
