@@ -1,8 +1,8 @@
 # AGENT ZERO PROJECT KNOWLEDGE BASE
 
-**Generated:** 2026-02-12
+**Generated:** 2026-02-13
 **Branch:** custom
-**Commit:** 5dfe61f
+**Commit:** e8004d4
 
 ## OVERVIEW
 Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpine.js). Prompt-driven behavior - everything controlled by `/prompts/` markdown files. Grows organically through memory, tools, extensions, and agent profiles.
@@ -101,8 +101,8 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 - `/python/helpers/vector_db.py`, `/python/helpers/memory.py` - FAISS patch for Python 3.12 ARM (remove when fixed upstream)
 - `/python/helpers/job_loop.py:34` - TODO: lowering SLEEP_TIME below 1min causes job duplication
 - 174 `# type: ignore` comments across 47 files - type suppression issues
-- 257 `except Exception as e:` handlers - broad exception catching
-- 366 print statements across 39 files - should use proper logging
+- 231 `except Exception as e:` handlers - broad exception catching
+- 194 print statements across 39 files - should use proper logging
 
 ### Testing
 - pytest.ini exists and configured (asyncio mode, markers, test paths)
@@ -184,5 +184,8 @@ docker run -p 50001:80 agent0ai/agent-zero
 - **Large frontend files**: `webui/js/scheduler.js` (1835 lines), `webui/js/messages.js` (1009 lines), `webui/components/chat/speech/speech-store.js` (967 lines)
 - **FAISS patch required** for Python 3.12 ARM - temporary workaround
 - **57 bare `pass` statements** - mostly in base classes/abstract methods (acceptable)
+- **218 Python files** - backend codebase
+- **538 JavaScript files** - frontend codebase
+- **96 prompt files** - system prompts and agent behavior definitions
 - **No traditional testing** - CI uses AI code analysis instead of pytest runs
 - **Automatic SSH password generation** - `prepare.py` generates random root password (security concern for production)
