@@ -5,9 +5,13 @@ const model = {
   settings: {},
 
   async init() {
-    this.settings =
-      JSON.parse(localStorage.getItem("messageResizeSettings") || "null") ||
-      this._getDefaultSettings();
+    try {
+      this.settings =
+        JSON.parse(localStorage.getItem("messageResizeSettings") || "null") ||
+        this._getDefaultSettings();
+    } catch (e) {
+      this.settings = this._getDefaultSettings();
+    }
     this._applyAllSettings();
   },
 
@@ -29,10 +33,14 @@ const model = {
 
   _setSetting(className, setting) {
     this.settings[className] = setting;
-    localStorage.setItem(
-      "messageResizeSettings",
-      JSON.stringify(this.settings)
-    );
+    try {
+      localStorage.setItem(
+        "messageResizeSettings",
+        JSON.stringify(this.settings)
+      );
+    } catch (e) {
+      // Silent fail in private browsing mode
+    }
   },
 
   _applyAllSettings() {

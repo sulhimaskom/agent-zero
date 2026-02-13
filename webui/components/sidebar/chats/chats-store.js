@@ -12,7 +12,7 @@ import {
 } from "/index.js";
 import { store as notificationStore } from "/components/notifications/notification-store.js";
 import { store as tasksStore } from "/components/sidebar/tasks/tasks-store.js";
-import { RETRY } from '/js/constants.js';
+import { RETRY, TIMING } from '/js/constants.js';
 
 const model = {
   contexts: [],
@@ -92,7 +92,7 @@ const model = {
       this.contexts = [...updatedContexts];
 
       // Show success notification
-      justToast("Chat deleted successfully", "success", 1000, "chat-removal");
+      justToast("Chat deleted successfully", "success", TIMING.NOTIFICATION_DISPLAY, "chat-removal");
     } catch (e) {
       console.error("Error deleting chat:", e);
       toastFetchError("Error deleting chat", e);

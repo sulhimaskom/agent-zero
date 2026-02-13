@@ -3,10 +3,10 @@ import { getContext } from "/index.js";
 import * as API from "/js/api.js";
 import { openModal, closeModal } from "/js/modals.js";
 import { store as notificationStore } from "/components/notifications/notification-store.js";
-import { LIMITS, STORAGE_KEYS, DEFAULTS } from "/js/constants.js";
+import { LIMITS, STORAGE_KEYS, DEFAULTS, TIMING } from "/js/constants.js";
 
 // Helper function for toasts
-function justToast(text, type = "info", timeout = 5000) {
+function justToast(text, type = "info", timeout = TIMING.TOAST_DISPLAY) {
   notificationStore.addFrontendToastOnly(type, text, "", timeout / 1000);
 }
 
@@ -33,9 +33,23 @@ const memoryDashboardStore = {
   searchQuery: "",
   areaFilter: "",
   threshold: parseFloat(
-    localStorage.getItem(STORAGE_KEYS.MEMORY_DASHBOARD_THRESHOLD) || DEFAULTS.MEMORY_THRESHOLD
+    (() => {
+      try {
+        return localStorage.getItem(STORAGE_KEYS.MEMORY_DASHBOARD_THRESHOLD) || DEFAULTS.MEMORY_THRESHOLD;
+      } catch (e) {
+        return DEFAULTS.MEMORY_THRESHOLD;
+      }
+    })()
   ),
-  limit: parseInt(localStorage.getItem(STORAGE_KEYS.MEMORY_DASHBOARD_LIMIT) || DEFAULTS.MEMORY_LIMIT),
+  limit: parseInt(
+    (() => {
+      try {
+        return localStorage.getItem(STORAGE_KEYS.MEMORY_DASHBOARD_LIMIT) || DEFAULTS.MEMORY_LIMIT;
+      } catch (e) {
+        return DEFAULTS.MEMORY_LIMIT;
+      }
+    })()
+  ),
 
   // Stats
   totalCount: 0,
@@ -158,11 +172,15 @@ const memoryDashboardStore = {
 
   async searchMemories(silent = false) {
     // Save limit to localStorage for persistence
-    localStorage.setItem("memoryDashboard_limit", this.limit.toString());
-    localStorage.setItem(
-      "memoryDashboard_threshold",
-      this.threshold.toString()
-    );
+    try {
+      localStorage.setItem("memoryDashboard_limit", this.limit.toString());
+      localStorage.setItem(
+        "memoryDashboard_threshold",
+        this.threshold.toString()
+      );
+    } catch (e) {
+      // Silent fail in private browsing mode
+    }
 
     if (!silent) {
       this.loading = true;

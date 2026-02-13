@@ -1,6 +1,7 @@
 import { createStore } from "/js/AlpineStore.js";
 import * as API from "/js/api.js";
 import { openModal } from "/js/modals.js";
+import { LIMITS, DEFAULTS } from "/js/constants.js";
 
 export const NotificationType = {
   INFO: "info",
@@ -17,8 +18,8 @@ export const NotificationPriority = {
 
 export const defaultPriority = NotificationPriority.NORMAL;
 
-const maxNotifications = 100;
-const maxToasts = 5;
+const maxNotifications = LIMITS.MAX_NOTIFICATIONS;
+const maxToasts = DEFAULTS.MAX_TOASTS;
 
 const model = {
   notifications: [],

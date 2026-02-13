@@ -17,6 +17,7 @@ from python.helpers.constants import (
     Timeouts,
     Colors,
     AgentDefaults,
+    Config,
 )
 
 
@@ -859,7 +860,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
         {
             "id": "shell_interface",
             "title": "Shell Interface",
-            "description": "Terminal interface used for Code Execution Tool. Local Python TTY works locally in both dockerized and development environments. SSH always connects to dockerized environment (automatically at localhost or RFC host address).",
+            "description": f"Terminal interface used for Code Execution Tool. Local Python TTY works locally in both dockerized and development environments. SSH always connects to dockerized environment (automatically at {Config.DEFAULT_HOSTNAME} or RFC host address).",
             "type": "select",
             "value": settings["shell_interface"],
             "options": [
@@ -1483,8 +1484,8 @@ def _write_sensitive_settings(settings: Settings):
 def get_default_settings() -> Settings:
     return Settings(
         version=_get_version(),
-        chat_model_provider="openrouter",
-        chat_model_name="openai/gpt-4.1",
+        chat_model_provider=Config.DEFAULT_CHAT_MODEL_PROVIDER,
+        chat_model_name=Config.DEFAULT_CHAT_MODEL_NAME,
         chat_model_api_base="",
         chat_model_kwargs={"temperature": "0"},
         chat_model_ctx_length=Limits.DEFAULT_CHAT_MODEL_CTX_LENGTH,
@@ -1493,8 +1494,8 @@ def get_default_settings() -> Settings:
         chat_model_rl_requests=0,
         chat_model_rl_input=0,
         chat_model_rl_output=0,
-        util_model_provider="openrouter",
-        util_model_name="openai/gpt-4.1-mini",
+        util_model_provider=Config.DEFAULT_UTIL_MODEL_PROVIDER,
+        util_model_name=Config.DEFAULT_UTIL_MODEL_NAME,
         util_model_api_base="",
         util_model_ctx_length=Limits.DEFAULT_UTIL_MODEL_CTX_LENGTH,
         util_model_ctx_input=0.7,
@@ -1502,14 +1503,14 @@ def get_default_settings() -> Settings:
         util_model_rl_requests=0,
         util_model_rl_input=0,
         util_model_rl_output=0,
-        embed_model_provider="huggingface",
-        embed_model_name="sentence-transformers/all-MiniLM-L6-v2",
+        embed_model_provider=Config.DEFAULT_EMBED_MODEL_PROVIDER,
+        embed_model_name=Config.DEFAULT_EMBED_MODEL_NAME,
         embed_model_api_base="",
         embed_model_kwargs={},
         embed_model_rl_requests=0,
         embed_model_rl_input=0,
-        browser_model_provider="openrouter",
-        browser_model_name="openai/gpt-4.1",
+        browser_model_provider=Config.DEFAULT_BROWSER_MODEL_PROVIDER,
+        browser_model_name=Config.DEFAULT_BROWSER_MODEL_NAME,
         browser_model_api_base="",
         browser_model_vision=True,
         browser_model_rl_requests=0,
@@ -1751,7 +1752,7 @@ def get_runtime_config(set: Settings):
         return {
             "code_exec_ssh_enabled": set["shell_interface"] == "ssh",
             "code_exec_ssh_addr": dotenv.get_dotenv_value(
-                "CODE_EXEC_SSH_ADDR", "localhost"
+                "CODE_EXEC_SSH_ADDR", Config.DEFAULT_HOSTNAME
             ),
             "code_exec_ssh_port": int(
                 dotenv.get_dotenv_value("CODE_EXEC_SSH_PORT", "22")

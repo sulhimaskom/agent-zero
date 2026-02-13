@@ -1,4 +1,5 @@
 import { createStore } from "/js/AlpineStore.js";
+import { DEFAULTS, TIMING } from "/js/constants.js";
 
 // Global function references
 const sendJsonData = globalThis.sendJsonData;
@@ -149,7 +150,12 @@ const model = {
     if (container) {
       const editor = ace.edit("backup-metadata-editor");
 
-      const dark = localStorage.getItem("darkMode");
+      let dark = "true";
+      try {
+        dark = localStorage.getItem("darkMode");
+      } catch (e) {
+        // Silent fail in private browsing mode
+      }
       if (dark != "false") {
         editor.setTheme("ace/theme/github_dark");
       } else {
@@ -169,7 +175,7 @@ const model = {
         clearTimeout(timeout);
         timeout = setTimeout(() => {
           this.updatePreview();
-        }, 1000);
+        }, TIMING.DEBOUNCE_INPUT);
       });
 
       this.backupEditor = editor;
@@ -181,7 +187,12 @@ const model = {
     if (container) {
       const editor = ace.edit("restore-metadata-editor");
 
-      const dark = localStorage.getItem("darkMode");
+      let dark = "true";
+      try {
+        dark = localStorage.getItem("darkMode");
+      } catch (e) {
+        // Silent fail in private browsing mode
+      }
       if (dark != "false") {
         editor.setTheme("ace/theme/github_dark");
       } else {
@@ -318,12 +329,20 @@ const model = {
   initFilePreview() {
     this.fileSearchFilter = '';
     this.expandedGroups.clear();
-    this.previewMode = localStorage.getItem('backupPreviewMode') || 'grouped';
+    try {
+      this.previewMode = localStorage.getItem('backupPreviewMode') || 'grouped';
+    } catch (e) {
+      this.previewMode = 'grouped';
+    }
   },
 
   togglePreviewMode() {
     this.previewMode = this.previewMode === 'grouped' ? 'flat' : 'grouped';
-    localStorage.setItem('backupPreviewMode', this.previewMode);
+    try {
+      localStorage.setItem('backupPreviewMode', this.previewMode);
+    } catch (e) {
+      // Silent fail in private browsing mode
+    }
   },
 
   toggleGroup(groupPath) {
@@ -509,7 +528,7 @@ const model = {
       const response = await sendJsonData("backup_test", {
         patterns: patternsString,
         include_hidden: metadata.include_hidden || false,
-        max_files: 10000
+        max_files: DEFAULTS.BACKUP_MAX_FILES
       });
 
       if (response.success) {

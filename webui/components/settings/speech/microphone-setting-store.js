@@ -1,4 +1,5 @@
 import { createStore } from "/js/AlpineStore.js";
+import { TIMING } from "/js/constants.js";
 
 const model = {
 
@@ -8,7 +9,12 @@ const model = {
 
     async init() {
         // Load selected device from localStorage if present
-        const saved = localStorage.getItem('microphoneSelectedDevice');
+        let saved = null;
+        try {
+            saved = localStorage.getItem('microphoneSelectedDevice');
+        } catch (e) {
+            // Silent fail in private browsing mode
+        }
         await this.loadDevices();
         if (saved && this.devices.some(d => d.deviceId === saved)) {
             this.selectedDevice = saved;
@@ -61,7 +67,7 @@ const model = {
         
         // continue polling
         this.permissionAttempts++;
-        this.permissionTimer = setTimeout(() => this.pollForDevices(), 1000);
+        this.permissionTimer = setTimeout(() => this.pollForDevices(), TIMING.POLL_INTERVAL);
     },
 
     async selectDevice(deviceId) {
@@ -70,7 +76,11 @@ const model = {
     },
 
     async onSelectDevice() {
-        localStorage.setItem('microphoneSelectedDevice', this.selectedDevice);
+        try {
+            localStorage.setItem('microphoneSelectedDevice', this.selectedDevice);
+        } catch (e) {
+            // Silent fail in private browsing mode
+        }
     },
 
     getSelectedDevice() {

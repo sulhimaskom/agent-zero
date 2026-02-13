@@ -2,7 +2,7 @@ import * as msgs from "/js/messages.js";
 import * as api from "/js/api.js";
 import * as css from "/js/css.js";
 import { sleep } from "/js/sleep.js";
-import { STORAGE_KEYS } from "/js/constants.js";
+import { STORAGE_KEYS, TIMING } from "/js/constants.js";
 import { store as attachmentsStore } from "/components/chat/attachments/attachmentsStore.js";
 import { store as speechStore } from "/components/chat/speech/speech-store.js";
 import { store as notificationStore } from "/components/notifications/notification-store.js";
@@ -418,8 +418,12 @@ export async function poll() {
 globalThis.poll = poll;
 
 function afterMessagesUpdate(logs) {
-  if (localStorage.getItem(STORAGE_KEYS.SPEECH) == "true") {
-    speakMessages(logs);
+  try {
+    if (localStorage.getItem(STORAGE_KEYS.SPEECH) == "true") {
+      speakMessages(logs);
+    }
+  } catch (e) {
+    // Silent fail in private browsing mode
   }
 }
 
@@ -519,7 +523,11 @@ export const setContext = function (id) {
   tasksStore.setSelected(id);
 
   //skip one speech if enabled when switching context
-  if (localStorage.getItem(STORAGE_KEYS.SPEECH) == "true") skipOneSpeech = true;
+  try {
+    if (localStorage.getItem(STORAGE_KEYS.SPEECH) == "true") skipOneSpeech = true;
+  } catch (e) {
+    // Silent fail in private browsing mode
+  }
 };
 
 export const deselectChat = function () {
@@ -527,8 +535,12 @@ export const deselectChat = function () {
   setContext(null);
 
   // Clear localStorage selections so we don't auto-restore
-  localStorage.removeItem(STORAGE_KEYS.LAST_SELECTED_CHAT);
-  localStorage.removeItem(STORAGE_KEYS.LAST_SELECTED_TASK);
+  try {
+    localStorage.removeItem(STORAGE_KEYS.LAST_SELECTED_CHAT);
+    localStorage.removeItem(STORAGE_KEYS.LAST_SELECTED_TASK);
+  } catch (e) {
+    // Silent fail in private browsing mode
+  }
 
   // Clear the chat history safely
   while (chatHistory.firstChild) {
@@ -555,12 +567,12 @@ function removeClassFromElement(element, className) {
   element.classList.remove(className);
 }
 
-export function justToast(text, type = "info", timeout = 5000, group = "") {
+export function justToast(text, type = "info", timeout = TIMING.TOAST_DISPLAY, group = "") {
   notificationStore.addFrontendToastOnly(type, text, "", timeout / 1000, group);
 }
 globalThis.justToast = justToast;
 
-export function toast(text, type = "info", timeout = 5000) {
+export function toast(text, type = "info", timeout = TIMING.TOAST_DISPLAY) {
   // Convert timeout from milliseconds to seconds for new notification system
   const display_time = Math.max(timeout / 1000, 1); // Minimum 1 second
 

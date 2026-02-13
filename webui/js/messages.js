@@ -4,7 +4,7 @@ import { marked } from "../vendor/marked/marked.esm.js";
 import { store as _messageResizeStore } from "/components/messages/resize/message-resize-store.js"; // keep here, required in html
 import { store as attachmentsStore } from "/components/chat/attachments/attachmentsStore.js";
 import { addActionButtonsToElement } from "/components/messages/action-buttons/simple-action-buttons.js";
-import { LIMITS } from './constants.js';
+import { LIMITS, TIMING } from './constants.js';
 
 let messageGroup = null;
 
@@ -859,7 +859,7 @@ function drawKvpsIncremental(container, kvps, latex) {
         // Add click handler and cursor change
         imgElement.style.cursor = "pointer";
         imgElement.addEventListener("click", () => {
-          imageViewerStore.open(imgElement.src, { refreshInterval: 1000 });
+          imageViewerStore.open(imgElement.src, { refreshInterval: TIMING.IMAGE_REFRESH_INTERVAL });
         });
       } else {
         const pre = document.createElement("pre");

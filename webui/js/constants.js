@@ -4,19 +4,31 @@
  */
 
 // =============================================================================
+// ENVIRONMENT CONFIGURATION
+// Values can be overridden via window.ENV_CONFIG set at runtime
+// =============================================================================
+
+const getEnvConfig = (key, defaultValue) => {
+  if (typeof window !== 'undefined' && window.ENV_CONFIG && window.ENV_CONFIG[key] !== undefined) {
+    return window.ENV_CONFIG[key];
+  }
+  return defaultValue;
+};
+
+// =============================================================================
 // API CONFIGURATION
 // =============================================================================
 
 export const API = {
   // Default ports
-  WEB_UI_PORT: 5000,
-  TUNNEL_API_PORT: 55520,
-  SEARXNG_PORT: 55510,
-  A2A_PORT: 50101,
+  WEB_UI_PORT: getEnvConfig('WEB_UI_PORT', 5000),
+  TUNNEL_API_PORT: getEnvConfig('TUNNEL_API_PORT', 55520),
+  SEARXNG_PORT: getEnvConfig('SEARXNG_PORT', 55510),
+  A2A_PORT: getEnvConfig('A2A_PORT', 50101),
   
-  // Hosts
-  LOCALHOST: "127.0.0.1",
-  HOSTNAME: "localhost",
+  // Hosts - Configurable via window.ENV_CONFIG
+  LOCALHOST: getEnvConfig('LOCALHOST', "127.0.0.1"),
+  HOSTNAME: getEnvConfig('HOSTNAME', "localhost"),
   
   // Endpoints
   CSRF_TOKEN_ENDPOINT: "/csrf_token",
@@ -50,6 +62,7 @@ export const TIMING = {
   POLL_INTERVAL: 1000,
   POLL_INTERVAL_FAST: 500,
   SCHEDULER_POLL_INTERVAL: 2000,
+  MCP_POLL_INTERVAL: 3000,
 
   // Debounce delays
   DEBOUNCE_INPUT: 300,
@@ -297,14 +310,17 @@ export const DEFAULTS = {
   SCHEDULER_VIEW_MODE: "list",
   SETTINGS_TAB: "agent",
   BACKUP_PREVIEW_MODE: "grouped",
-  
+
   // Memory dashboard
   MEMORY_THRESHOLD: "0.6",
   MEMORY_LIMIT: "1000",
-  
+
   // Notification
   MAX_TOASTS: 5,
   MAX_NOTIFICATIONS: 100,
+
+  // Backup
+  BACKUP_MAX_FILES: 10000,
 };
 
 // =============================================================================
