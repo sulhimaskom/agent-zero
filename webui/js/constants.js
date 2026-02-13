@@ -50,6 +50,7 @@ export const TIMING = {
   POLL_INTERVAL: 1000,
   POLL_INTERVAL_FAST: 500,
   SCHEDULER_POLL_INTERVAL: 2000,
+  MCP_POLL_INTERVAL: 3000,
 
   // Debounce delays
   DEBOUNCE_INPUT: 300,
@@ -297,14 +298,17 @@ export const DEFAULTS = {
   SCHEDULER_VIEW_MODE: "list",
   SETTINGS_TAB: "agent",
   BACKUP_PREVIEW_MODE: "grouped",
-  
+
   // Memory dashboard
   MEMORY_THRESHOLD: "0.6",
   MEMORY_LIMIT: "1000",
-  
+
   // Notification
   MAX_TOASTS: 5,
   MAX_NOTIFICATIONS: 100,
+
+  // Backup
+  BACKUP_MAX_FILES: 10000,
 };
 
 // =============================================================================

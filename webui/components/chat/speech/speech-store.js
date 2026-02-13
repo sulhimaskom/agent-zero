@@ -3,7 +3,7 @@ import { updateChatInput, sendMessage } from "/index.js";
 import { sleep } from "/js/sleep.js";
 import { store as microphoneSettingStore } from "/components/settings/speech/microphone-setting-store.js";
 import * as shortcuts from "/js/shortcuts.js";
-import { TIMING } from "/js/constants.js";
+import { TIMING, SPEECH } from "/js/constants.js";
 import Logger from "/js/logger.js";
 
 const Status = {
@@ -21,11 +21,11 @@ const model = {
   _initialized: false,
 
   // STT Settings
-  stt_model_size: "tiny",
-  stt_language: "en",
-  stt_silence_threshold: 0.05,
-  stt_silence_duration: 1000,
-  stt_waiting_timeout: 2000,
+  stt_model_size: SPEECH.DEFAULT_MODEL_SIZE,
+  stt_language: SPEECH.DEFAULT_LANGUAGE,
+  stt_silence_threshold: SPEECH.SILENCE_THRESHOLD,
+  stt_silence_duration: SPEECH.SILENCE_DURATION,
+  stt_waiting_timeout: SPEECH.WAITING_TIMEOUT,
 
   // TTS Settings
   tts_kokoro: false,
@@ -781,7 +781,7 @@ class MicrophoneInput {
   handleRecordingState() {
     if (!this.hasStartedRecording && this.mediaRecorder.state !== "recording") {
       this.hasStartedRecording = true;
-      this.mediaRecorder.start(1000);
+      this.mediaRecorder.start(SPEECH.RECORDER_CHUNK_SIZE);
     }
     if (this.waitingTimer) {
       clearTimeout(this.waitingTimer);

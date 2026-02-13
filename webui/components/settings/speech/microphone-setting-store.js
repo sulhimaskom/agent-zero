@@ -1,4 +1,5 @@
 import { createStore } from "/js/AlpineStore.js";
+import { TIMING } from "/js/constants.js";
 
 const model = {
 
@@ -61,7 +62,7 @@ const model = {
         
         // continue polling
         this.permissionAttempts++;
-        this.permissionTimer = setTimeout(() => this.pollForDevices(), 1000);
+        this.permissionTimer = setTimeout(() => this.pollForDevices(), TIMING.POLL_INTERVAL);
     },
 
     async selectDevice(deviceId) {

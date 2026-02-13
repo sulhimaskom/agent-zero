@@ -1,4 +1,5 @@
 import { createStore } from "/js/AlpineStore.js";
+import { DEFAULTS, TIMING } from "/js/constants.js";
 
 // Global function references
 const sendJsonData = globalThis.sendJsonData;
@@ -169,7 +170,7 @@ const model = {
         clearTimeout(timeout);
         timeout = setTimeout(() => {
           this.updatePreview();
-        }, 1000);
+        }, TIMING.DEBOUNCE_INPUT);
       });
 
       this.backupEditor = editor;
@@ -509,7 +510,7 @@ const model = {
       const response = await sendJsonData("backup_test", {
         patterns: patternsString,
         include_hidden: metadata.include_hidden || false,
-        max_files: 10000
+        max_files: DEFAULTS.BACKUP_MAX_FILES
       });
 
       if (response.success) {

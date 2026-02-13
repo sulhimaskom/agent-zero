@@ -2,7 +2,7 @@ import * as msgs from "/js/messages.js";
 import * as api from "/js/api.js";
 import * as css from "/js/css.js";
 import { sleep } from "/js/sleep.js";
-import { STORAGE_KEYS } from "/js/constants.js";
+import { STORAGE_KEYS, TIMING } from "/js/constants.js";
 import { store as attachmentsStore } from "/components/chat/attachments/attachmentsStore.js";
 import { store as speechStore } from "/components/chat/speech/speech-store.js";
 import { store as notificationStore } from "/components/notifications/notification-store.js";
@@ -555,12 +555,12 @@ function removeClassFromElement(element, className) {
   element.classList.remove(className);
 }
 
-export function justToast(text, type = "info", timeout = 5000, group = "") {
+export function justToast(text, type = "info", timeout = TIMING.TOAST_DISPLAY, group = "") {
   notificationStore.addFrontendToastOnly(type, text, "", timeout / 1000, group);
 }
 globalThis.justToast = justToast;
 
-export function toast(text, type = "info", timeout = 5000) {
+export function toast(text, type = "info", timeout = TIMING.TOAST_DISPLAY) {
   // Convert timeout from milliseconds to seconds for new notification system
   const display_time = Math.max(timeout / 1000, 1); // Minimum 1 second
 

@@ -3,10 +3,10 @@ import { getContext } from "/index.js";
 import * as API from "/js/api.js";
 import { openModal, closeModal } from "/js/modals.js";
 import { store as notificationStore } from "/components/notifications/notification-store.js";
-import { LIMITS, STORAGE_KEYS, DEFAULTS } from "/js/constants.js";
+import { LIMITS, STORAGE_KEYS, DEFAULTS, TIMING } from "/js/constants.js";
 
 // Helper function for toasts
-function justToast(text, type = "info", timeout = 5000) {
+function justToast(text, type = "info", timeout = TIMING.TOAST_DISPLAY) {
   notificationStore.addFrontendToastOnly(type, text, "", timeout / 1000);
 }
 

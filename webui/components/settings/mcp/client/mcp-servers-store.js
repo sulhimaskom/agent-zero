@@ -2,6 +2,7 @@ import { createStore } from "/js/AlpineStore.js";
 import { scrollModal } from "/js/modals.js";
 import sleep from "/js/sleep.js";
 import * as API from "/js/api.js";
+import { TIMING } from "/js/constants.js";
 
 const model = {
   editor: null,
@@ -80,7 +81,7 @@ const model = {
         this.loading = false;
         firstLoad = false;
       }
-      await sleep(3000);
+      await sleep(TIMING.MCP_POLL_INTERVAL);
     }
   },
 
