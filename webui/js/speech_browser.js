@@ -284,6 +284,7 @@ class MicrophoneInput {
             ok = true
         }
         if (ok) return text
+        return null
     }
 }
 
