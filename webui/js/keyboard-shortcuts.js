@@ -51,6 +51,15 @@ const shortcuts = {
     },
     description: "Send Nudge",
   },
+  "?": {
+    handler: () => {
+      const kbStore = globalThis.Alpine?.store("keyboardShortcuts");
+      if (kbStore && typeof kbStore.open === 'function') {
+        kbStore.open();
+      }
+    },
+    description: "Show Keyboard Shortcuts",
+  },
 };
 
 function isInputField(element) {
