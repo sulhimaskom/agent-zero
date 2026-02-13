@@ -58,5 +58,5 @@ def get_version():
     try:
         git_info = get_git_info()
         return str(git_info.get("short_tag", "")).strip() or "unknown"
-    except (OSError, RuntimeError, KeyError):
+    except (OSError, RuntimeError, KeyError, ValueError):
         return "unknown"
