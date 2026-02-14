@@ -517,8 +517,8 @@ def _output_content_langchain(content: MessageContent):
         return content["raw_content"]  # type: ignore
     try:
         return _json_dumps(content)
-    except Exception as e:
-        raise e
+    except Exception:
+        raise
 
 
 def group_outputs_abab(outputs: list[OutputMessage]) -> list[OutputMessage]:

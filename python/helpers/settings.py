@@ -1723,7 +1723,7 @@ def get_runtime_config(set: Settings):
         if "//" in host:
             host = host.split("//")[1]
         if ":" in host:
-            host, port = host.split(":")
+            host, _port = host.split(":")
         if host.endswith("/"):
             host = host[:-1]
         return {

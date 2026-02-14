@@ -39,7 +39,7 @@ def load_plugin_variables(
     try:
         # Create filename and directories list
         plugin_filename = basename(file, ".md") + ".py"
-        directories = [dirname(file)] + backup_dirs
+        directories = [dirname(file), *backup_dirs]
         plugin_file = find_file_in_dirs(plugin_filename, directories)
     except FileNotFoundError:
         plugin_file = None
@@ -132,7 +132,7 @@ def read_prompt_file(
     if os.path.dirname(_file):
         folder_path = os.path.dirname(_file)
         _file = os.path.basename(_file)
-        _directories = [folder_path] + _directories
+        _directories = [folder_path, *_directories]
 
     # Find the file in the directories
     absolute_path = find_file_in_dirs(_file, _directories)
@@ -356,7 +356,7 @@ def delete_dir(relative_path: str):
                 # log warning for debugging purposes
                 import warnings
 
-                warnings.warn(f"Failed to remove directory {abs_path}: {e}")
+                warnings.warn(f"Failed to remove directory {abs_path}: {e}", stacklevel=2)
 
 
 def move_dir(old_path: str, new_path: str):
@@ -372,7 +372,7 @@ def move_dir(old_path: str, new_path: str):
         # log warning for debugging purposes
         import warnings
 
-        warnings.warn(f"Failed to move directory from {abs_old} to {abs_new}: {e}")
+        warnings.warn(f"Failed to move directory from {abs_old} to {abs_new}: {e}", stacklevel=2)
 
 
 # move dir safely, remove with number if needed
@@ -428,9 +428,8 @@ def fix_dev_path(path: str):
     """On dev environment, convert /a0/... paths to local absolute paths"""
     from python.helpers.runtime import is_development
 
-    if is_development():
-        if path.startswith("/a0/"):
-            path = path.replace("/a0/", "")
+    if is_development() and path.startswith("/a0/"):
+        path = path.replace("/a0/", "")
     return get_abs_path(path)
 
 
@@ -548,7 +547,7 @@ def list_files_in_dir_recursively(relative_path: str) -> list[str]:
     if not os.path.exists(abs_path):
         return []
     result = []
-    for root, dirs, files in os.walk(abs_path):
+    for root, _dirs, files in os.walk(abs_path):
         for file in files:
             file_path = os.path.join(root, file)
             # Return relative path from the base directory

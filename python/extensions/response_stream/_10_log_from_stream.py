@@ -14,10 +14,12 @@ class LogFromStream(Extension):
         self,
         loop_data: LoopData = LoopData(),
         text: str = "",
-        parsed: dict = {},
+        parsed: dict | None = None,
         **kwargs,
     ):
 
+        if parsed is None:
+            parsed = {}
         heading = build_default_heading(self.agent)
         if "headline" in parsed:
             heading = build_heading(self.agent, parsed["headline"])

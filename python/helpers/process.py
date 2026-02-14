@@ -34,7 +34,7 @@ def reload():
 def restart_process():
     PrintStyle.standard("Restarting process...")
     python = sys.executable
-    os.execv(python, [python] + sys.argv)
+    os.execv(python, [python, *sys.argv])
 
 
 def exit_process():

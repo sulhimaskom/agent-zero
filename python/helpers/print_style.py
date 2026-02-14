@@ -136,7 +136,7 @@ class PrintStyle:
         if not PrintStyle.last_endline:
             print()
             self._log_html("<br>")
-        plain_text, styled_text, html_text = self.get(*args, sep=sep, **kwargs)
+        _plain_text, styled_text, html_text = self.get(*args, sep=sep, **kwargs)
         if not self.log_only:
             print(styled_text, end="\n", flush=True)
         self._log_html(html_text + "<br>\n")
@@ -144,7 +144,7 @@ class PrintStyle:
 
     def stream(self, *args, sep=" ", **kwargs):
         self._add_padding_if_needed()
-        plain_text, styled_text, html_text = self.get(*args, sep=sep, **kwargs)
+        _plain_text, styled_text, html_text = self.get(*args, sep=sep, **kwargs)
         if not self.log_only:
             print(styled_text, end="", flush=True)
         self._log_html(html_text)

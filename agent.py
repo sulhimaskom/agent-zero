@@ -8,7 +8,7 @@ nest_asyncio.apply()
 
 import os  # noqa: E402
 from collections import OrderedDict  # noqa: E402
-from collections.abc import Awaitable, Callable, Coroutine
+from collections.abc import Awaitable, Callable, Coroutine  # noqa: E402
 from dataclasses import dataclass, field  # noqa: E402
 from datetime import UTC, datetime  # noqa: E402
 from enum import Enum  # noqa: E402
@@ -24,7 +24,7 @@ from langchain_core.prompts import (  # noqa: E402
 import models  # noqa: E402
 import python.helpers.log as Log  # noqa: E402
 from python.coordinators import HistoryCoordinator, StreamCoordinator, ToolCoordinator  # noqa: E402
-from python.helpers import context as context_helper
+from python.helpers import context as context_helper  # noqa: E402
 from python.helpers import (  # noqa: E402
     dirty_json,
     errors,
@@ -48,7 +48,6 @@ class AgentContextType(Enum):
 
 
 class AgentContext:
-
     _contexts: dict[str, "AgentContext"] = {}
     _counter: int = 0
     _notification_manager = None
@@ -123,7 +122,7 @@ class AgentContext:
     def first():
         if not AgentContext._contexts:
             return None
-        return list(AgentContext._contexts.values())[0]
+        return next(iter(AgentContext._contexts.values()))
 
     @staticmethod
     def all():
@@ -263,7 +262,8 @@ class AgentContext:
                 agent.hist_add_user_message(msg)  # type: ignore
             else:
                 agent.hist_add_tool_result(
-                    tool_name="call_subordinate", tool_result=msg  # type: ignore
+                    tool_name="call_subordinate",
+                    tool_result=msg,  # type: ignore
                 )
             response = await agent.monologue()  # type: ignore
             superior = agent.data.get(Agent.DATA_NAME_SUPERIOR, None)
@@ -337,7 +337,6 @@ class HandledException(Exception):
 
 
 class Agent:
-
     DATA_NAME_SUPERIOR = "_superior"
     DATA_NAME_SUBORDINATE = "_subordinate"
     DATA_NAME_CTX_WINDOW = "ctx_window"
@@ -374,7 +373,6 @@ class Agent:
 
                 # let the agent run message loop until he stops it with a response tool
                 while True:
-
                     self.context.streaming_agent = self  # mark self as current streamer
                     self.loop_data.iteration += 1
                     self.loop_data.params_temporary = {}  # clear temporary params

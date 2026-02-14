@@ -5,6 +5,7 @@ import platform
 import sys
 
 from python.helpers.constants import Limits, Timeouts
+import contextlib
 
 _IS_WIN = platform.system() == "Windows"
 if _IS_WIN:
@@ -35,10 +36,8 @@ class TTYSession:
 
         nest_asyncio.apply()
         if hasattr(self, "close"):
-            try:
+            with contextlib.suppress(Exception):
                 asyncio.run(self.close())
-            except Exception:
-                pass
 
     # ── user-facing coroutines ────────────────────────────────────────
     async def start(self):
@@ -54,10 +53,8 @@ class TTYSession:
         # Cancel the pump task if it exists
         if hasattr(self, "_pump_task") and self._pump_task:
             self._pump_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._pump_task
-            except asyncio.CancelledError:
-                pass
         # Terminate the process if it exists
         if self._proc:
             self._proc.terminate()
@@ -206,13 +203,12 @@ async def _spawn_posix_pty(cmd, cwd, env, echo):
 
 async def _spawn_winpty(cmd, cwd, env, echo):
     # Clean PowerShell startup: no logo, no profile, bypass execution policy for deterministic behavior
-    if cmd.strip().lower().startswith("powershell"):
-        if "-nolog" not in cmd.lower():
-            cmd = cmd.replace(
-                "powershell.exe",
-                "powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass",
-                1,
-            )
+    if cmd.strip().lower().startswith("powershell") and "-nolog" not in cmd.lower():
+        cmd = cmd.replace(
+            "powershell.exe",
+            "powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass",
+            1,
+        )
 
     cols, rows = Limits.TTY_DEFAULT_COLS, Limits.TTY_DEFAULT_ROWS
     child = winpty.PtyProcess.spawn(cmd, dimensions=(rows, cols), cwd=cwd or os.getcwd(), env=env)  # type: ignore

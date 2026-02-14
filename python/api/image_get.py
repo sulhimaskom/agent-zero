@@ -73,10 +73,7 @@ class ImageGet(ApiHandler):
                 else:
                     response = _send_fallback_icon("image")
             else:
-                if files.exists(path):
-                    response = send_file(path)
-                else:
-                    response = _send_fallback_icon("image")
+                response = send_file(path) if files.exists(path) else _send_fallback_icon("image")
 
             # Add cache headers for better device sync performance
             response.headers["Cache-Control"] = f"public, max-age={Timeouts.HTTP_CACHE_MAX_AGE}"

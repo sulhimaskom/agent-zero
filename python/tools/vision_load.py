@@ -13,8 +13,10 @@ TOKENS_ESTIMATE = Limits.VISION_TOKENS_ESTIMATE
 
 
 class VisionLoad(Tool):
-    async def execute(self, paths: list[str] = [], **kwargs) -> Response:
+    async def execute(self, paths: list[str] | None = None, **kwargs) -> Response:
 
+        if paths is None:
+            paths = []
         self.images_dict = {}
 
         for path in paths:

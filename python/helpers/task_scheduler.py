@@ -76,17 +76,20 @@ class TaskPlan(BaseModel):
     @classmethod
     def create(
         cls,
-        todo: list[datetime] = list(),
+        todo: list[datetime] | None = None,
         in_progress: datetime | None = None,
-        done: list[datetime] = list(),
+        done: list[datetime] | None = None,
     ):
+        if done is None:
+            done = list()
+        if todo is None:
+            todo = list()
         if todo:
             for idx, dt in enumerate(todo):
                 if dt.tzinfo is None:
                     todo[idx] = pytz.timezone("UTC").localize(dt)
-        if in_progress:
-            if in_progress.tzinfo is None:
-                in_progress = pytz.timezone("UTC").localize(in_progress)
+        if in_progress and in_progress.tzinfo is None:
+            in_progress = pytz.timezone("UTC").localize(in_progress)
         if done:
             for idx, dt in enumerate(done):
                 if dt.tzinfo is None:
@@ -268,11 +271,13 @@ class AdHocTask(BaseTask):
         system_prompt: str,
         prompt: str,
         token: str,
-        attachments: list[str] = list(),
+        attachments: list[str] | None = None,
         context_id: str | None = None,
         project_name: str | None = None,
         project_color: str | None = None,
     ):
+        if attachments is None:
+            attachments = list()
         return cls(
             name=name,
             system_prompt=system_prompt,
@@ -322,13 +327,15 @@ class ScheduledTask(BaseTask):
         system_prompt: str,
         prompt: str,
         schedule: TaskSchedule,
-        attachments: list[str] = list(),
+        attachments: list[str] | None = None,
         context_id: str | None = None,
         timezone: str | None = None,
         project_name: str | None = None,
         project_color: str | None = None,
     ):
         # Set timezone in schedule if provided
+        if attachments is None:
+            attachments = list()
         if timezone is not None:
             schedule.timezone = timezone
         else:
@@ -411,11 +418,13 @@ class PlannedTask(BaseTask):
         system_prompt: str,
         prompt: str,
         plan: TaskPlan,
-        attachments: list[str] = list(),
+        attachments: list[str] | None = None,
         context_id: str | None = None,
         project_name: str | None = None,
         project_color: str | None = None,
     ):
+        if attachments is None:
+            attachments = list()
         return cls(
             name=name,
             system_prompt=system_prompt,

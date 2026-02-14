@@ -536,7 +536,7 @@ def _read_directory_impl(dir_path: str) -> str:
 
         # Create zip archive
         with zipfile.ZipFile(temp_zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
-            for root, dirs, files in os.walk(dir_path):
+            for root, _dirs, files in os.walk(dir_path):
                 for file in files:
                     file_path = os.path.join(root, file)
                     arcname = os.path.relpath(file_path, dir_path)
@@ -583,10 +583,7 @@ def _write_file_from_base64_impl(file_path: str, content: str) -> bool:
     """
     try:
         # Ensure content is properly UTF-8 encoded before base64 decoding
-        if isinstance(content, str):
-            content_bytes = content.encode("utf-8")
-        else:
-            content_bytes = content
+        content_bytes = content.encode("utf-8") if isinstance(content, str) else content
 
         # Decode base64 content
         decoded_content = base64.b64decode(content_bytes)

@@ -78,7 +78,7 @@ class Memory:
                 type="util",
                 heading=f"Initializing VectorDB in '/{memory_subdir}'",
             )
-            db, created = Memory.initialize(
+            db, _created = Memory.initialize(
                 log_item,
                 agent.config.embeddings_model,
                 memory_subdir,
@@ -397,7 +397,9 @@ class Memory:
             self._save_db()  # persist
         return rem_docs
 
-    async def insert_text(self, text, metadata: dict = {}):
+    async def insert_text(self, text, metadata: dict | None = None):
+        if metadata is None:
+            metadata = {}
         doc = Document(text, metadata=metadata)
         ids = await self.insert_documents([doc])
         return ids[0]
@@ -407,7 +409,7 @@ class Memory:
         timestamp = self.get_timestamp()
 
         if ids:
-            for doc, id in zip(docs, ids):
+            for doc, id in zip(docs, ids, strict=False):
                 doc.metadata["id"] = id  # add ids to documents metadata
                 doc.metadata["timestamp"] = timestamp  # add timestamp
                 if not doc.metadata.get("area", ""):

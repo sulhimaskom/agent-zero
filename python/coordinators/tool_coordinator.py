@@ -5,6 +5,7 @@ from typing import Any
 from python.helpers import extract_tools
 from python.helpers.print_style import PrintStyle
 from python.helpers.tool import Tool
+import contextlib
 
 
 @dataclass
@@ -146,19 +147,15 @@ class ToolCoordinator(IToolExecutor):
         classes = []
 
         if self.agent.config.profile:
-            try:
+            with contextlib.suppress(ImportError, FileNotFoundError):
                 classes = extract_tools.load_classes_from_file(
                     "agents/" + self.agent.config.profile + "/tools/" + name + ".py",
                     Tool,
                 )
-            except (ImportError, FileNotFoundError):
-                pass
 
         if not classes:
-            try:
+            with contextlib.suppress(ImportError, FileNotFoundError):
                 classes = extract_tools.load_classes_from_file("python/tools/" + name + ".py", Tool)
-            except (ImportError, FileNotFoundError):
-                pass
 
         tool_class = classes[0] if classes else Unknown
         return tool_class(

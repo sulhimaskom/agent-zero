@@ -297,7 +297,7 @@ class BackupService:
             spec = PathSpec.from_lines(GitWildMatchPattern, pattern_lines)
 
             # Walk through base directories
-            for base_pattern_path, base_real_path in self.base_paths.items():
+            for base_real_path in self.base_paths.values():
                 if not os.path.exists(base_real_path):
                     continue
 

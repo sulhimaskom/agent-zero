@@ -29,13 +29,11 @@ def format_error(e: Exception, start_entries=6, end_entries=4):
         # If we found at least one "File" line, trim the middle if there are more than start_entries+end_entries lines
         if len(file_indices) > start_entries + end_entries:
             start_index = max(0, len(file_indices) - start_entries - end_entries)
-            trimmed_lines = (
-                lines[: file_indices[start_index]]
-                + [
-                    f"\n>>>  {len(file_indices) - start_entries - end_entries} stack lines skipped <<<\n"
-                ]
-                + lines[file_indices[start_index + end_entries] :]
-            )
+            trimmed_lines = [
+                *lines[: file_indices[start_index]],
+                f"\n>>>  {len(file_indices) - start_entries - end_entries} stack lines skipped <<<\n",
+                *lines[file_indices[start_index + end_entries] :],
+            ]
         else:
             # If no "File" lines found, or not enough to trim, just return the original traceback
             trimmed_lines = lines

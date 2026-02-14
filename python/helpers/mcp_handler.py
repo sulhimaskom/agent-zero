@@ -4,7 +4,7 @@ import re
 import threading
 from abc import ABC, abstractmethod
 from collections.abc import Awaitable, Callable
-from contextlib import AsyncExitStack
+from contextlib import AsyncExitStack, suppress
 from datetime import timedelta
 from shutil import which
 from typing import (
@@ -839,10 +839,7 @@ class MCPClientBase(ABC):
                 except Exception as e:
                     # Store the original exception and raise a dummy exception
                     excs = getattr(e, "exceptions", None)  # Python 3.11+ ExceptionGroup
-                    if excs:
-                        original_exception = excs[0]
-                    else:
-                        original_exception = e
+                    original_exception = excs[0] if excs else e
                     # Create a dummy exception to break out of the async block
                     raise RuntimeError("Dummy exception to break out of async block")
         except Exception:
@@ -982,10 +979,8 @@ class MCPClientLocal(MCPClientBase):
     def __del__(self):
         # close the log file if it exists
         if hasattr(self, "log_file") and self.log_file is not None:
-            try:
+            with suppress(Exception):
                 self.log_file.close()
-            except Exception:
-                pass
             self.log_file = None
 
     async def _create_stdio_transport(self, current_exit_stack: AsyncExitStack) -> tuple[

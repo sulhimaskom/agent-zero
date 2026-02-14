@@ -30,10 +30,7 @@ def get_git_info():
     try:
         tag = repo.git.describe(tags=True)
         tag_split = tag.split("-")
-        if len(tag_split) >= 3:
-            short_tag = "-".join(tag_split[:-1])
-        else:
-            short_tag = tag
+        short_tag = "-".join(tag_split[:-1]) if len(tag_split) >= 3 else tag
     except (ValueError, IndexError):
         tag = ""
 

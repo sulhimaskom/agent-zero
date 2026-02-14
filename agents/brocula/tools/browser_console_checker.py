@@ -26,7 +26,7 @@ class browser_console_checker(Tool):
     Navigates to a URL, captures console output, and reports any errors or warnings.
     """
 
-    async def execute(self, url: str = None, wait_time: int = 5, **kwargs) -> Response:
+    async def execute(self, url: str | None = None, wait_time: int = 5, **kwargs) -> Response:
         """
         Check browser console for errors and warnings.
 

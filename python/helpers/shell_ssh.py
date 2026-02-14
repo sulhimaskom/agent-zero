@@ -87,7 +87,7 @@ class SSHInteractiveSession:
                         return
                     time.sleep(Timeouts.SSH_SHELL_DELAY)
 
-            except Exception as e:
+            except Exception:
                 errors += 1
                 if errors < 3:
                     PrintStyle.standard(f"SSH Connection attempt {errors}...")
@@ -98,7 +98,7 @@ class SSHInteractiveSession:
                     )
                     time.sleep(Timeouts.SSH_CONNECTION_DELAY)
                 else:
-                    raise e
+                    raise
 
     async def close(self):
         if self.shell:

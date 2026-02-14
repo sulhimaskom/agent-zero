@@ -306,12 +306,11 @@ class Log:
         self.set_initial_progress()
 
     def _update_progress_from_item(self, item: LogItem):
-        if item.heading and item.update_progress != "none":
-            if item.no >= self.progress_no:
-                self.set_progress(
-                    item.heading,
-                    (item.no if item.update_progress == "persistent" else -1),
-                )
+        if item.heading and item.update_progress != "none" and item.no >= self.progress_no:
+            self.set_progress(
+                item.heading,
+                (item.no if item.update_progress == "persistent" else -1),
+            )
 
     def _mask_recursive(self, obj: T) -> T:
         """Recursively mask secrets in nested objects."""

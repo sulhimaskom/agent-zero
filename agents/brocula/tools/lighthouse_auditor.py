@@ -26,7 +26,7 @@ class lighthouse_auditor(Tool):
 
     async def execute(
         self,
-        url: str = None,
+        url: str | None = None,
         categories: str = "performance,accessibility,best-practices,seo",
         device: str = "desktop",
         **kwargs,
@@ -78,7 +78,8 @@ class lighthouse_auditor(Tool):
                 "--chrome-flags=--headless --no-sandbox --disable-gpu",
                 f"--preset={device}",
                 "--quiet",
-            ] + category_flags
+                *category_flags,
+            ]
 
             self.set_progress(f"Running Lighthouse audit on {url} ({device})...")
 

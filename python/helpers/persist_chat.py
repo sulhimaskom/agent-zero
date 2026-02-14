@@ -47,7 +47,7 @@ def save_tmp_chat(context: AgentContext):
 
 def save_tmp_chats():
     """Save all contexts to the chats folder"""
-    for _, context in AgentContext._contexts.items():
+    for context in AgentContext._contexts.values():
         # Skip BACKGROUND contexts as they should be ephemeral
         if hasattr(context, "type") and context.type == AgentContextType.BACKGROUND:
             continue
