@@ -7,11 +7,11 @@ const model = {
 
     // gets called when the store is created
     init(){
-        console.log("Example store initialized");
+        // Store initialized
     },
 
     clickHandler(event){
-        console.log(event)
+        // Handle click event
     }
 
 };
