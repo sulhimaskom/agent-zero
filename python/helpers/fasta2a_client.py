@@ -64,7 +64,9 @@ class AgentConnection:
                 self._agent_card = response.json()
                 _PRINTER.print(f"Retrieved agent card from {self.agent_url}")
                 _PRINTER.print(f"Agent: {self._agent_card.get('name', 'Unknown')}")  # type: ignore
-                _PRINTER.print(f"Description: {self._agent_card.get('description', 'No description')}")  # type: ignore
+                _PRINTER.print(
+                    f"Description: {self._agent_card.get('description', 'No description')}"
+                )  # type: ignore
             except Exception as e:
                 # Fallback: if URL contains '/a2a', try root path without it
                 if "/a2a" in self.agent_url:
@@ -122,7 +124,10 @@ class AgentConnection:
             response = await self._a2a_client.send_message(
                 message=a2a_message,  # type: ignore
                 metadata=metadata,
-                configuration={"accepted_output_modes": ["application/json", "text/plain"], "blocking": True},  # type: ignore
+                configuration={
+                    "accepted_output_modes": ["application/json", "text/plain"],
+                    "blocking": True,
+                },  # type: ignore
             )
 
             # Persist context id for subsequent calls

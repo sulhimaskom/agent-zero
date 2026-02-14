@@ -44,7 +44,7 @@ class AttachmentManager:
             return False
 
     def save_file(self, file, filename: str) -> tuple[str, dict]:
-        """Save file and return path and metadata"""
+        """Save file and return path and metadata."""
         try:
             filename = secure_filename(filename)
             if not filename:

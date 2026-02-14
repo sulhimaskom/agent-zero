@@ -3,7 +3,6 @@ from python.helpers.extension import Extension
 
 
 class LogForStream(Extension):
-
     async def execute(self, loop_data: LoopData = LoopData(), text: str = "", **kwargs):
         # create log message and store it in loop data temporary params
         if "log_item_generating" not in loop_data.params_temporary:

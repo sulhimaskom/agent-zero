@@ -45,7 +45,7 @@ def file_tree(
     ignore: str | None = None,
     output_mode: Literal["string", "flat", "nested"] = OUTPUT_MODE_STRING,
 ) -> str | list[dict]:
-    """Render a directory tree relative to the repository base path.
+    r"""Render a directory tree relative to the repository base path.
 
     Parameters:
         relative_path: Base directory (relative to project root) to scan with :func:`get_abs_path`.

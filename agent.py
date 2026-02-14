@@ -697,7 +697,7 @@ class Agent:
             await asyncio.sleep(0.1)
 
     async def process_tools(self, msg: str) -> str | None:
-        """Process tool usage requests in agent message"""
+        """Process tool usage requests in agent message."""
         return await self.tool_coordinator.process_tools(msg)
 
     async def handle_reasoning_stream(self, stream: str):
@@ -715,7 +715,7 @@ class Agent:
         loop_data: LoopData | None,
         **kwargs,
     ) -> Tool:
-        """Get tool instance by name"""
+        """Get tool instance by name."""
         return self.tool_coordinator.get_tool(
             name=name,
             method=method,

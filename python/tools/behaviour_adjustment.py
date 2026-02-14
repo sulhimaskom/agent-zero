@@ -5,7 +5,6 @@ from python.helpers.tool import Response, Tool
 
 
 class UpdateBehaviour(Tool):
-
     async def execute(self, adjustments="", **kwargs):
 
         # stringify adjustments if needed

@@ -10,7 +10,6 @@ DATA_NAME_ITER = "_recall_memories_iter"
 
 
 class RecallMemories(Extension):
-
     # INTERVAL = 3
     # HISTORY = 10000
     # MEMORIES_MAX_SEARCH = 12
@@ -29,7 +28,6 @@ class RecallMemories(Extension):
 
         # every X iterations (or the first one) recall memories
         if loop_data.iteration % set["memory_recall_interval"] == 0:
-
             # show util message right away
             log_item = self.agent.context.log.log(
                 type="util",

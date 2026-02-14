@@ -13,7 +13,6 @@ from python.tools.memory_load import (
 
 
 class MemorizeMemories(Extension):
-
     async def execute(self, loop_data: LoopData = LoopData(), **kwargs):
         # try:
 
@@ -105,7 +104,6 @@ class MemorizeMemories(Extension):
             txt = f"{memory}"
 
             if set["memory_memorize_consolidation"]:
-
                 try:
                     # Use intelligent consolidation system
                     from python.helpers.memory_consolidation import (
@@ -172,7 +170,6 @@ class MemorizeMemories(Extension):
                 )
 
             else:
-
                 # remove previous fragments too similiar to this one
                 if set["memory_memorize_replace_threshold"] > 0:
                     rem += await db.delete_documents_by_query(

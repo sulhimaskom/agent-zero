@@ -11,7 +11,6 @@ from python.helpers.tool import Response, Tool
 
 
 class DocumentQueryTool(Tool):
-
     async def execute(self, **kwargs):
         document_uri = kwargs.get("document")
         document_uris = []
@@ -30,7 +29,6 @@ class DocumentQueryTool(Tool):
             else ([kwargs["query"]] if (kwargs.get("query")) else [])
         )
         try:
-
             progress = []
 
             # logging callback

@@ -410,7 +410,7 @@ class DynamicMcpProxy:
         )
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
-        """Forward the ASGI calls to the appropriate app based on the URL path"""
+        """Forward the ASGI calls to the appropriate app based on the URL path."""
         with self._lock:
             sse_app = self.sse_app
             http_app = self.http_app

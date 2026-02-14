@@ -7,9 +7,7 @@ from python.helpers.task_scheduler import TaskScheduler, TaskState
 
 class SchedulerTaskDelete(ApiHandler):
     async def process(self, input: Input, request: Request) -> Output:
-        """
-        Delete a task from the scheduler by ID
-        """
+        """Delete a task from the scheduler by ID."""
         # Get timezone from input (do not set if not provided, we then rely on poll() to set it)
         if timezone := input.get("timezone", None):
             Localization.get().set_timezone(timezone)

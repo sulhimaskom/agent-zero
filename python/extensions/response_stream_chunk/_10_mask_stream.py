@@ -3,7 +3,6 @@ from python.helpers.secrets import get_secrets_manager
 
 
 class MaskResponseStreamChunk(Extension):
-
     async def execute(self, **kwargs):
         # Get stream data and agent from kwargs
         stream_data = kwargs.get("stream_data")

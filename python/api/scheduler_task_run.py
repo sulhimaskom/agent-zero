@@ -5,13 +5,10 @@ from python.helpers.task_scheduler import TaskScheduler, TaskState
 
 
 class SchedulerTaskRun(ApiHandler):
-
     _printer: PrintStyle = PrintStyle(italic=True, font_color="green", padding=False)
 
     async def process(self, input: Input, request: Request) -> Output:
-        """
-        Manually run a task from the scheduler by ID
-        """
+        """Manually run a task from the scheduler by ID."""
         # Get timezone from input (do not set if not provided, we then rely on poll() to set it)
         if timezone := input.get("timezone", None):
             Localization.get().set_timezone(timezone)

@@ -27,7 +27,6 @@ from python.helpers.tool import Response, Tool
 
 
 class SchedulerTool(Tool):
-
     async def execute(self, **kwargs):
         if self.method == "list_tasks":
             return await self.list_tasks(**kwargs)
@@ -305,7 +304,7 @@ class SchedulerTool(Tool):
 
         if task.context_id == self.agent.context.id:
             return Response(
-                message=("You can only wait for tasks running in their own " "dedicated context."),
+                message=("You can only wait for tasks running in their own dedicated context."),
                 break_loop=False,
             )
 

@@ -2,7 +2,6 @@ from python.helpers.tool import Response, Tool
 
 
 class ResponseTool(Tool):
-
     async def execute(self, **kwargs):
         message_text = self.args.get("text") or self.args.get("message", "")
         return Response(message=message_text, break_loop=True)

@@ -36,7 +36,7 @@ class BackupService:
         }
 
     def get_default_backup_metadata(self) -> dict[str, Any]:
-        """Get default backup patterns and metadata"""
+        """Get default backup patterns and metadata."""
         timestamp = datetime.datetime.now().isoformat()
 
         default_patterns = self._get_default_patterns()
@@ -83,7 +83,7 @@ class BackupService:
 """
 
     def _get_agent_zero_version(self) -> str:
-        """Get current Agent Zero version"""
+        """Get current Agent Zero version."""
         try:
             # Get version from git info (same as run_ui.py)
             gitinfo = git.get_git_info()
@@ -92,15 +92,15 @@ class BackupService:
             return "unknown"
 
     def _resolve_path(self, pattern_path: str) -> str:
-        """Resolve pattern path to absolute system path (now patterns are already absolute)"""
+        """Resolve pattern path to absolute system path (now patterns are already absolute)."""
         return pattern_path
 
     def _unresolve_path(self, abs_path: str) -> str:
-        """Convert absolute path back to pattern path (now patterns are already absolute)"""
+        """Convert absolute path back to pattern path (now patterns are already absolute)."""
         return abs_path
 
     def _parse_patterns(self, patterns: str) -> tuple[list[str], list[str]]:
-        """Parse patterns string into include and exclude pattern arrays"""
+        """Parse patterns string into include and exclude pattern arrays."""
         include_patterns = []
         exclude_patterns = []
 
@@ -119,7 +119,7 @@ class BackupService:
         return include_patterns, exclude_patterns
 
     def _patterns_to_string(self, include_patterns: list[str], exclude_patterns: list[str]) -> str:
-        """Convert pattern arrays back to patterns string for pathspec processing"""
+        """Convert pattern arrays back to patterns string for pathspec processing."""
         patterns = []
 
         # Add include patterns
@@ -133,7 +133,7 @@ class BackupService:
         return "\n".join(patterns)
 
     async def _get_system_info(self) -> dict[str, Any]:
-        """Collect system information for metadata"""
+        """Collect system information for metadata."""
         import psutil
 
         try:
@@ -155,7 +155,7 @@ class BackupService:
             return {"error": f"Failed to collect system info: {e!s}"}
 
     async def _get_environment_info(self) -> dict[str, Any]:
-        """Collect environment information for metadata"""
+        """Collect environment information for metadata."""
         try:
             return {
                 "user": os.environ.get("USER", "unknown"),
@@ -175,7 +175,7 @@ class BackupService:
             return {"error": f"Failed to collect environment info: {e!s}"}
 
     async def _get_backup_author(self) -> str:
-        """Get backup author/system identifier"""
+        """Get backup author/system identifier."""
         try:
             import getpass
 
@@ -186,7 +186,7 @@ class BackupService:
             return "unknown"
 
     def _count_directories(self, matched_files: list[dict[str, Any]]) -> int:
-        """Count unique directories in file list"""
+        """Count unique directories in file list."""
         directories = set()
         for file_info in matched_files:
             dir_path = os.path.dirname(file_info["path"])
@@ -195,7 +195,7 @@ class BackupService:
         return len(directories)
 
     def _get_explicit_patterns(self, include_patterns: list[str]) -> set[str]:
-        """Extract explicit (non-wildcard) patterns that should always be included"""
+        """Extract explicit (non-wildcard) patterns that should always be included."""
         explicit_patterns = set()
 
         for pattern in include_patterns:
@@ -213,7 +213,7 @@ class BackupService:
         return explicit_patterns
 
     def _is_explicitly_included(self, file_path: str, explicit_patterns: set[str]) -> bool:
-        """Check if a file/directory is explicitly included in patterns"""
+        """Check if a file/directory is explicitly included in patterns."""
         relative_path = file_path.lstrip("/")
         return relative_path in explicit_patterns
 
@@ -269,7 +269,7 @@ class BackupService:
         metadata: dict[str, Any],
         max_files: int = Limits.BACKUP_MAX_FILES_TEST,
     ) -> list[dict[str, Any]]:
-        """Test backup patterns and return list of matched files"""
+        """Test backup patterns and return list of matched files."""
         include_patterns = metadata.get("include_patterns", [])
         exclude_patterns = metadata.get("exclude_patterns", [])
         include_hidden = metadata.get("include_hidden", False)
@@ -368,7 +368,7 @@ class BackupService:
         include_hidden: bool = False,
         backup_name: str = "agent-zero-backup",
     ) -> str:
-        """Create backup archive and return path to created file"""
+        """Create backup archive and return path to created file."""
         # Create metadata for test_patterns
         metadata = {
             "include_patterns": include_patterns,
@@ -450,7 +450,7 @@ class BackupService:
             raise Exception(f"Error creating backup: {e!s}")
 
     async def inspect_backup(self, backup_file) -> dict[str, Any]:
-        """Inspect backup archive and return metadata"""
+        """Inspect backup archive and return metadata."""
         # Save uploaded file temporarily
         temp_dir = tempfile.mkdtemp()
         temp_file = os.path.join(temp_dir, "backup.zip")
@@ -492,7 +492,7 @@ class BackupService:
         clean_before_restore: bool = False,
         user_edited_metadata: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        """Preview which files would be restored based on patterns"""
+        """Preview which files would be restored based on patterns."""
         # Save uploaded file temporarily
         temp_dir = tempfile.mkdtemp()
         temp_file = os.path.join(temp_dir, "backup.zip")
@@ -646,7 +646,7 @@ class BackupService:
         clean_before_restore: bool = False,
         user_edited_metadata: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        """Restore files from backup archive"""
+        """Restore files from backup archive."""
         # Save uploaded file temporarily
         temp_dir = tempfile.mkdtemp()
         temp_file = os.path.join(temp_dir, "backup.zip")
@@ -884,7 +884,7 @@ class BackupService:
     async def _find_files_to_clean_with_user_metadata(
         self, user_metadata: dict[str, Any], original_metadata: dict[str, Any]
     ) -> list[dict[str, Any]]:
-        """Find existing files that match patterns from user-edited metadata for clean operations"""
+        """Find existing files that match patterns from user-edited metadata for clean operations."""
         # Use user-edited patterns for what to clean
         user_include_patterns = user_metadata.get("include_patterns", [])
         user_exclude_patterns = user_metadata.get("exclude_patterns", [])

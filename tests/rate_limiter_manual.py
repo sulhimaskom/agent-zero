@@ -30,9 +30,7 @@ model = models.get_chat_model(
 
 
 async def run():
-    response, reasoning = await model.unified_call(user_message="Tell me a joke")
-    print("Response: ", response)
-    print("Reasoning: ", reasoning)
+    _response, _reasoning = await model.unified_call(user_message="Tell me a joke")
 
 
 if __name__ == "__main__":

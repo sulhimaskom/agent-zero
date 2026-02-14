@@ -19,9 +19,7 @@ from python.helpers.task_scheduler import (
 
 class SchedulerTaskCreate(ApiHandler):
     async def process(self, input: Input, request: Request) -> Output:
-        """
-        Create a new task in the scheduler
-        """
+        """Create a new task in the scheduler."""
         printer = PrintStyle(italic=True, font_color="blue", padding=False)
 
         # Get timezone from input (do not set if not provided, we then rely on poll() to set it)

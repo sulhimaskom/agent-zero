@@ -84,7 +84,7 @@ class ImageGet(ApiHandler):
 
 
 def _send_file_type_icon(file_ext, filename=None):
-    """Return appropriate icon for file type"""
+    """Return appropriate icon for file type."""
     # Map file extensions to icon names
     icon_mapping = {
         # Archive files
@@ -142,7 +142,7 @@ def _send_file_type_icon(file_ext, filename=None):
 
 
 def _send_fallback_icon(icon_name):
-    """Return fallback icon from public directory"""
+    """Return fallback icon from public directory."""
     # Path to public icons
     icon_path = files.get_abs_path(f"webui/public/{icon_name}.svg")
 

@@ -75,32 +75,24 @@ def ensure_ignore_file(base_rel: str, content: str) -> None:
 
 
 def print_header(title: str, char: str = "=") -> None:
-    print(char * 80)
-    print(title)
-    print(char * 80)
+    pass
 
 
 def print_flat(items: list[dict[str, Any]]) -> None:
-    print("level  type     name                   text")
-    print("-" * 80)
     for item in items:
-        level = item["level"]
-        item_type = item["type"]
-        name = item["name"]
-        text = item["text"]
-        print(f"{level:<5}  {item_type:<7}  {name:<20}  {text}")
+        item["level"]
+        item["type"]
+        item["name"]
+        item["text"]
 
 
 def print_nested(items: list[dict[str, Any]], root_label: str) -> None:
-    print(root_label)
 
     def recurse(nodes: list[dict[str, Any]], prefix: str) -> None:
         total = len(nodes)
         for index, node in enumerate(nodes):
             is_last = index == total - 1
-            connector = "└── " if is_last else "├── "
-            label = node["name"] + ("/" if node["type"] == "folder" else "")
-            print(f"{prefix}{connector}{label}  [{node['type']}]")
+            node["name"] + ("/" if node["type"] == "folder" else "")
             children = node.get("items") or []
             if children:
                 child_prefix = prefix + ("    " if is_last else "│   ")
@@ -134,9 +126,8 @@ def _apply_timestamps(base_rel: str, paths: list[str], base_ts: float | None = N
 
 
 def list_scenarios(scenarios: list[Scenario]) -> None:
-    print("Available scenarios:")
-    for scenario in scenarios:
-        print(f"  - {scenario.name}: {scenario.description}")
+    for _scenario in scenarios:
+        pass
 
 
 def run_scenarios(selected: list[Scenario]) -> None:
@@ -165,29 +156,17 @@ def run_scenarios(selected: list[Scenario]) -> None:
                     **config.params,
                 }
                 output_mode = params.setdefault("output_mode", OUTPUT_MODE_STRING)
-                print("Parameters:")
-                print(f"  output_mode   : {output_mode}")
-                print(f"  folders_first : {params['folders_first']}")
-                sort_key, sort_dir = params["sort"]
-                print(f"  sort          : key={sort_key}, direction={sort_dir}")
-                print(f"  max_depth     : {params['max_depth']}")
-                print(f"  max_lines     : {params['max_lines']}")
-                print(f"  max_folders   : {params['max_folders']}")
-                print(f"  max_files     : {params['max_files']}")
-                print(f"  ignore        : {params.get('ignore')}")
-                print()
+                _sort_key, _sort_dir = params["sort"]
                 result = file_tree(**params)
 
                 if output_mode == OUTPUT_MODE_STRING:
-                    print(result)
+                    pass
                 elif output_mode == OUTPUT_MODE_FLAT:
                     print_flat(result)  # type: ignore[arg-type]
                 elif output_mode == OUTPUT_MODE_NESTED:
                     print_nested(result, f"{scenario.name}/")
                 else:
-                    print(f"(Unhandled output mode {output_mode!r})")
-
-        print()
+                    pass
 
 
 def build_scenarios() -> list[Scenario]:

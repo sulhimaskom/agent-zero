@@ -8,7 +8,6 @@ if TYPE_CHECKING:
 
 
 class Extension:
-
     def __init__(self, agent: "Agent|None", **kwargs):
         self.agent: Agent = agent  # type: ignore < here we ignore the type check as there are currently no extensions without an agent
         self.kwargs = kwargs

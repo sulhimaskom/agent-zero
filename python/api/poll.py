@@ -6,7 +6,6 @@ from python.helpers.task_scheduler import TaskScheduler
 
 
 class Poll(ApiHandler):
-
     async def process(self, input: dict, request: Request) -> dict | Response:
         ctxid = input.get("context", "")
         from_no = input.get("log_from", 0)

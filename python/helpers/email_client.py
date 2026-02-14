@@ -30,10 +30,7 @@ class Message:
 
 
 class EmailClient:
-    """
-    Async email client for reading messages from IMAP and Exchange servers.
-
-    """
+    """Async email client for reading messages from IMAP and Exchange servers."""
 
     def __init__(
         self,

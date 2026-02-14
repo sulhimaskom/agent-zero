@@ -85,7 +85,7 @@ class ChatChunk(TypedDict):
 
 
 class ChatGenerationResult:
-    """Chat generation result object"""
+    """Chat generation result object."""
 
     def __init__(self, chunk: ChatChunk | None = None):
         self.reasoning = ""
@@ -218,7 +218,7 @@ def get_rate_limiter(
 
 
 def _is_transient_litellm_error(exc: Exception) -> bool:
-    """Uses status_code when available, else falls back to exception types"""
+    """Uses status_code when available, else falls back to exception types."""
     # Prefer explicit status codes if present
     status_code = getattr(exc, "status_code", None)
     if isinstance(status_code, int):
@@ -693,7 +693,7 @@ class LiteLLMEmbeddingWrapper(Embeddings):
 
 
 class LocalSentenceTransformerWrapper(Embeddings):
-    """Local wrapper for sentence-transformers models to avoid HuggingFace API calls"""
+    """Local wrapper for sentence-transformers models to avoid HuggingFace API calls."""
 
     def __init__(
         self,

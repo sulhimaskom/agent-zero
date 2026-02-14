@@ -56,7 +56,7 @@ class FileBrowser:
             return False
 
     def save_files(self, files: list, current_path: str = "") -> tuple[list[str], list[str]]:
-        """Save uploaded files and return successful and failed filenames"""
+        """Save uploaded files and return successful and failed filenames."""
         successful = []
         failed = []
 
@@ -89,7 +89,7 @@ class FileBrowser:
             return successful, failed
 
     def delete_file(self, file_path: str) -> bool:
-        """Delete a file or empty directory"""
+        """Delete a file or empty directory."""
         try:
             # Resolve the full path while preventing directory traversal
             full_path = (self.base_dir / file_path).resolve()
@@ -127,7 +127,7 @@ class FileBrowser:
     def _get_files_via_ls(
         self, full_path: Path
     ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
-        """Get files and folders using ls command for better error handling"""
+        """Get files and folders using ls command for better error handling."""
         files: list[dict[str, Any]] = []
         folders: list[dict[str, Any]] = []
 
@@ -274,7 +274,7 @@ class FileBrowser:
             return {"entries": [], "current_path": "", "parent_path": ""}
 
     def get_full_path(self, file_path: str, allow_dir: bool = False) -> str:
-        """Get full file path if it exists and is within base_dir"""
+        """Get full file path if it exists and is within base_dir."""
         full_path = files.get_abs_path(self.base_dir, file_path)
         if not files.exists(full_path):
             raise ValueError(f"File {file_path} not found")

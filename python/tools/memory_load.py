@@ -7,7 +7,6 @@ DEFAULT_LIMIT = Limits.MEMORY_DEFAULT_LIMIT
 
 
 class MemoryLoad(Tool):
-
     async def execute(
         self, query="", threshold=DEFAULT_THRESHOLD, limit=DEFAULT_LIMIT, filter="", **kwargs
     ):

@@ -49,9 +49,7 @@ def get_frontend_config() -> dict[str, Any]:
 
 
 def get_env_config_js() -> str:
-    """
-    Generate JavaScript code to inject configuration into window.ENV_CONFIG
-    """
+    """Generate JavaScript code to inject configuration into window.ENV_CONFIG."""
     config = get_frontend_config()
     config_json = json.dumps(config, indent=2)
     return f"""<script>
@@ -60,9 +58,7 @@ def get_env_config_js() -> str:
 
 
 def inject_config_into_html(html_content: str) -> str:
-    """
-    Inject ENV_CONFIG script tag into HTML content before the closing </head> tag
-    """
+    """Inject ENV_CONFIG script tag into HTML content before the closing </head> tag."""
     config_script = get_env_config_js()
 
     # Find the </head> tag and insert config before it

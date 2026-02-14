@@ -7,7 +7,6 @@ from python.helpers.tool import Response, Tool
 
 
 class Delegation(Tool):
-
     async def execute(self, message="", reset="", **kwargs):
         # create subordinate agent using the data object on this agent and set superior agent to his data object
         if (
