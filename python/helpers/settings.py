@@ -6,19 +6,20 @@ import subprocess
 from typing import Any, Literal, TypedDict, cast
 
 import models
-from python.helpers import runtime, whisper, defer, git
-from . import files, dotenv
-from python.helpers.print_style import PrintStyle
-from python.helpers.providers import get_providers
-from python.helpers.secrets import get_default_secrets_manager
+from python.helpers import defer, git, runtime, whisper
 from python.helpers.constants import (
+    AgentDefaults,
+    Colors,
+    Config,
     Limits,
     Network,
     Timeouts,
-    Colors,
-    AgentDefaults,
-    Config,
 )
+from python.helpers.print_style import PrintStyle
+from python.helpers.providers import get_providers
+from python.helpers.secrets import get_default_secrets_manager
+
+from . import dotenv, files
 
 
 class Settings(TypedDict):
@@ -558,9 +559,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
             "description": "Set user password for web UI",
             "type": "password",
             "value": (
-                PASSWORD_PLACEHOLDER
-                if dotenv.get_dotenv_value(dotenv.KEY_AUTH_PASSWORD)
-                else ""
+                PASSWORD_PLACEHOLDER if dotenv.get_dotenv_value(dotenv.KEY_AUTH_PASSWORD) else ""
             ),
         }
     )
@@ -595,9 +594,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
             if pid_lower in providers_seen:
                 continue
             providers_seen.add(pid_lower)
-            api_keys_fields.append(
-                _get_api_key_field(settings, pid_lower, provider["label"])
-            )
+            api_keys_fields.append(_get_api_key_field(settings, pid_lower, provider["label"]))
 
     api_keys_section: SettingsSection = {
         "id": "api_keys",
@@ -656,9 +653,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
             "value": settings["agent_knowledge_subdir"],
             "options": [
                 {"value": subdir, "label": subdir}
-                for subdir in files.get_subdirectories(
-                    "knowledge", exclude="default"
-                )
+                for subdir in files.get_subdirectories("knowledge", exclude="default")
             ],
         }
     )
@@ -898,9 +893,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
             "description": "Password for remote function calls. Passwords must match on both instances. RFCs can not be used with empty password.",
             "type": "password",
             "value": (
-                PASSWORD_PLACEHOLDER
-                if dotenv.get_dotenv_value(dotenv.KEY_RFC_PASSWORD)
-                else ""
+                PASSWORD_PLACEHOLDER if dotenv.get_dotenv_value(dotenv.KEY_RFC_PASSWORD) else ""
             ),
         }
     )
@@ -1316,9 +1309,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
     return result
 
 
-def _get_api_key_field(
-    settings: Settings, provider: str, title: str
-) -> SettingsField:
+def _get_api_key_field(settings: Settings, provider: str, title: str) -> SettingsField:
     key = settings["api_keys"].get(provider, models.get_api_key(provider))
     # For API keys, use simple asterisk placeholder for existing keys
     return {
@@ -1336,15 +1327,12 @@ def convert_in(settings: dict) -> Settings:
             for field in section["fields"]:
                 # Skip saving if value is a placeholder
                 should_skip = (
-                    field["value"] == PASSWORD_PLACEHOLDER
-                    or field["value"] == API_KEY_PLACEHOLDER
+                    field["value"] == PASSWORD_PLACEHOLDER or field["value"] == API_KEY_PLACEHOLDER
                 )
 
                 if not should_skip:
                     # Special handling for browser_http_headers
-                    if field["id"] == "browser_http_headers" or field[
-                        "id"
-                    ].endswith("_kwargs"):
+                    if field["id"] == "browser_http_headers" or field["id"].endswith("_kwargs"):
                         current[field["id"]] = _env_to_dict(field["value"])
                     elif field["id"].startswith("api_key_"):
                         current["api_keys"][field["id"]] = field["value"]
@@ -1420,10 +1408,7 @@ def _adjust_to_version(settings: Settings, default: Settings):
     # starting with 0.9, the default prompt subfolder for agent no. 0 is agent0
     # switch to agent0 if the old default is used from v0.8
     if "version" not in settings or settings["version"].startswith("v0.8"):
-        if (
-            "agent_profile" not in settings
-            or settings["agent_profile"] == "default"
-        ):
+        if "agent_profile" not in settings or settings["agent_profile"] == "default":
             settings["agent_profile"] = AgentDefaults.PROFILE
 
 
@@ -1460,18 +1445,12 @@ def _write_sensitive_settings(settings: Settings):
 
     dotenv.save_dotenv_value(dotenv.KEY_AUTH_LOGIN, settings["auth_login"])
     if settings["auth_password"]:
-        dotenv.save_dotenv_value(
-            dotenv.KEY_AUTH_PASSWORD, settings["auth_password"]
-        )
+        dotenv.save_dotenv_value(dotenv.KEY_AUTH_PASSWORD, settings["auth_password"])
     if settings["rfc_password"]:
-        dotenv.save_dotenv_value(
-            dotenv.KEY_RFC_PASSWORD, settings["rfc_password"]
-        )
+        dotenv.save_dotenv_value(dotenv.KEY_RFC_PASSWORD, settings["rfc_password"])
 
     if settings["root_password"]:
-        dotenv.save_dotenv_value(
-            dotenv.KEY_ROOT_PASSWORD, settings["root_password"]
-        )
+        dotenv.save_dotenv_value(dotenv.KEY_ROOT_PASSWORD, settings["root_password"])
     if settings["root_password"]:
         set_root_password(settings["root_password"])
 
@@ -1571,9 +1550,7 @@ def _apply_settings(previous: Settings | None):
 
         config = initialize_agent()
         for ctx in AgentContext._contexts.values():
-            ctx.config = (
-                config  # reinitialize context config with new settings
-            )
+            ctx.config = config  # reinitialize context config with new settings
             # apply config to agents
             agent = ctx.agent0
             while agent:
@@ -1581,19 +1558,14 @@ def _apply_settings(previous: Settings | None):
                 agent = agent.get_data(agent.DATA_NAME_SUBORDINATE)
 
         # reload whisper model if necessary
-        if (
-            not previous
-            or _settings["stt_model_size"] != previous["stt_model_size"]
-        ):
+        if not previous or _settings["stt_model_size"] != previous["stt_model_size"]:
             _ = defer.run_in_background(whisper.preload(_settings["stt_model_size"]))
 
         # force memory reload on embedding model change
         if not previous or (
             _settings["embed_model_name"] != previous["embed_model_name"]
-            or _settings["embed_model_provider"]
-            != previous["embed_model_provider"]
-            or _settings["embed_model_kwargs"]
-            != previous["embed_model_kwargs"]
+            or _settings["embed_model_provider"] != previous["embed_model_provider"]
+            or _settings["embed_model_kwargs"] != previous["embed_model_kwargs"]
         ):
             from python.helpers.memory import reload as memory_reload
 
@@ -1604,12 +1576,10 @@ def _apply_settings(previous: Settings | None):
             from python.helpers.mcp_handler import MCPConfig
 
             async def update_mcp_settings(mcp_servers: str):
-                PrintStyle(
-                    background_color="black", font_color="white", padding=True
-                ).print("Updating MCP config...")
-                AgentContext.log_to_all(
-                    type="info", content="Updating MCP settings...", temp=True
+                PrintStyle(background_color="black", font_color="white", padding=True).print(
+                    "Updating MCP config..."
                 )
+                AgentContext.log_to_all(type="info", content="Updating MCP settings...", temp=True)
 
                 mcp_config = MCPConfig.get_instance()
                 try:
@@ -1728,9 +1698,7 @@ def _dict_to_env(data_dict):
 
 def set_root_password(password: str):
     if not runtime.is_dockerized():
-        raise Exception(
-            "root password can only be set in dockerized environments"
-        )
+        raise Exception("root password can only be set in dockerized environments")
     subprocess.run(
         ["chpasswd"],
         input=f"root:{password}".encode(),
@@ -1747,12 +1715,8 @@ def get_runtime_config(set: Settings):
             "code_exec_ssh_addr": dotenv.get_dotenv_value(
                 "CODE_EXEC_SSH_ADDR", Config.DEFAULT_HOSTNAME
             ),
-            "code_exec_ssh_port": int(
-                dotenv.get_dotenv_value("CODE_EXEC_SSH_PORT", "22")
-            ),
-            "code_exec_ssh_user": dotenv.get_dotenv_value(
-                "CODE_EXEC_SSH_USER", "root"
-            ),
+            "code_exec_ssh_port": int(dotenv.get_dotenv_value("CODE_EXEC_SSH_PORT", "22")),
+            "code_exec_ssh_user": dotenv.get_dotenv_value("CODE_EXEC_SSH_USER", "root"),
         }
     else:
         host = set["rfc_url"]
@@ -1766,9 +1730,7 @@ def get_runtime_config(set: Settings):
             "code_exec_ssh_enabled": set["shell_interface"] == "ssh",
             "code_exec_ssh_addr": host,
             "code_exec_ssh_port": set["rfc_port_ssh"],
-            "code_exec_ssh_user": dotenv.get_dotenv_value(
-                "CODE_EXEC_SSH_USER", "root"
-            ),
+            "code_exec_ssh_user": dotenv.get_dotenv_value("CODE_EXEC_SSH_USER", "root"),
         }
 
 
@@ -1777,9 +1739,7 @@ def create_auth_token() -> str:
     username = dotenv.get_dotenv_value(dotenv.KEY_AUTH_LOGIN) or ""
     password = dotenv.get_dotenv_value(dotenv.KEY_AUTH_PASSWORD) or ""
     # use base64 encoding for a more compact token with alphanumeric chars
-    hash_bytes = hashlib.sha256(
-        f"{runtime_id}:{username}:{password}".encode()
-    ).digest()
+    hash_bytes = hashlib.sha256(f"{runtime_id}:{username}:{password}".encode()).digest()
     # encode as base64 and remove any non-alphanumeric chars (like +, /, =)
     b64_token = base64.urlsafe_b64encode(hash_bytes).decode().replace("=", "")
     return b64_token[:16]

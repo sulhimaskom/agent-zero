@@ -2,7 +2,9 @@ import importlib
 import inspect
 import json
 from typing import Any, TypedDict
+
 import aiohttp
+
 from python.helpers import crypto
 
 # Remote Function Call library
@@ -45,17 +47,12 @@ async def call_rfc(
 
 
 async def handle_rfc(rfc_call: RFCCall, password: str):
-    if not crypto.verify_data(
-        rfc_call["rfc_input"], rfc_call["hash"], password
-    ):
+    if not crypto.verify_data(rfc_call["rfc_input"], rfc_call["hash"], password):
         raise Exception("Invalid RFC hash")
 
     input: RFCInput = json.loads(rfc_call["rfc_input"])
     return await _call_function(
-        input["module"],
-        input["function_name"],
-        *input["args"],
-        **input["kwargs"]
+        input["module"], input["function_name"], *input["args"], **input["kwargs"]
     )
 
 
@@ -76,14 +73,16 @@ def _get_function(module: str, function_name: str):
 
 
 async def _send_json_data(url: str, data):
-    async with aiohttp.ClientSession() as session:
-        async with session.post(
+    async with (
+        aiohttp.ClientSession() as session,
+        session.post(
             url,
             json=data,
-        ) as response:
-            if response.status == 200:
-                result = await response.json()
-                return result
-            else:
-                error = await response.text()
-                raise Exception(error)
+        ) as response,
+    ):
+        if response.status == 200:
+            result = await response.json()
+            return result
+        else:
+            error = await response.text()
+            raise Exception(error)

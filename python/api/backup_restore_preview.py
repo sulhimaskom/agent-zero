@@ -1,7 +1,9 @@
-from python.helpers.api import ApiHandler, Request, Response
-from werkzeug.datastructures import FileStorage
-from python.helpers.backup import BackupService
 import json
+
+from werkzeug.datastructures import FileStorage
+
+from python.helpers.api import ApiHandler, Request, Response
+from python.helpers.backup import BackupService
 
 
 class BackupRestorePreview(ApiHandler):
@@ -25,9 +27,7 @@ class BackupRestorePreview(ApiHandler):
         # Get restore patterns and options from form data
         metadata_json = request.form.get("metadata", "{}")
         overwrite_policy = request.form.get("overwrite_policy", "overwrite")
-        clean_before_restore = (
-            request.form.get("clean_before_restore", "false").lower() == "true"
-        )
+        clean_before_restore = request.form.get("clean_before_restore", "false").lower() == "true"
 
         try:
             metadata = json.loads(metadata_json)
@@ -58,12 +58,8 @@ class BackupRestorePreview(ApiHandler):
                 "restore_count": result.get("restore_count", 0),
                 "skipped_count": result["skipped_count"],
                 "backup_metadata": result["backup_metadata"],
-                "overwrite_policy": result.get(
-                    "overwrite_policy", "overwrite"
-                ),
-                "clean_before_restore": result.get(
-                    "clean_before_restore", False
-                ),
+                "overwrite_policy": result.get("overwrite_policy", "overwrite"),
+                "clean_before_restore": result.get("clean_before_restore", False),
             }
 
         except Exception as e:

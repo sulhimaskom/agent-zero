@@ -1,6 +1,7 @@
-from python.helpers.api import ApiHandler
 from flask import Request, Response
+
 from agent import AgentContext
+from python.helpers.api import ApiHandler
 
 
 class NotificationsMarkRead(ApiHandler):
@@ -29,10 +30,7 @@ class NotificationsMarkRead(ApiHandler):
         for notification_id in notification_ids:
             # Find notification by ID and mark as read
             for notification in notification_manager.notifications:
-                if (
-                    notification.id == notification_id
-                    and not notification.read
-                ):
+                if notification.id == notification_id and not notification.read:
                     notification.mark_read()
                     marked_count += 1
                     break

@@ -1,31 +1,30 @@
+import asyncio
+import json
 import mimetypes
 import os
-import asyncio
-import aiohttp
-import json
-from urllib.parse import urlparse
-from typing import Callable, Sequence, List, Optional, Tuple
+from collections.abc import Callable, Sequence
 from datetime import datetime
+from urllib.parse import urlparse
 
+import aiohttp
+from langchain.schema import HumanMessage, SystemMessage
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain_core.documents import Document
-from langchain.schema import SystemMessage, HumanMessage
 from langchain_community.document_loaders import AsyncHtmlLoader
-from langchain_community.document_loaders.pdf import PyMuPDFLoader
-from langchain_community.document_transformers import MarkdownifyTransformer
 from langchain_community.document_loaders.parsers.images import (
     TesseractBlobParser,
 )
+from langchain_community.document_loaders.pdf import PyMuPDFLoader
+from langchain_community.document_transformers import MarkdownifyTransformer
+from langchain_core.documents import Document
 
-from python.helpers.vector_db import VectorDB
-from python.helpers.constants import Limits
-from python.helpers.print_style import PrintStyle
-from python.helpers import files, errors
-from python.helpers.constants import Timeouts
 from agent import Agent
+from python.helpers import errors, files
+from python.helpers.constants import Limits, Timeouts
+from python.helpers.print_style import PrintStyle
+from python.helpers.vector_db import VectorDB
 
-os.environ["USER_AGENT"] = "@mixedbread-ai/unstructured"  # noqa: E402
-from langchain_unstructured import UnstructuredLoader  # noqa: E402
+os.environ["USER_AGENT"] = "@mixedbread-ai/unstructured"
+from langchain_unstructured import UnstructuredLoader
 
 DEFAULT_SEARCH_THRESHOLD = Limits.DOCUMENT_DEFAULT_THRESHOLD
 
@@ -81,9 +80,7 @@ class DocumentQueryStore:
 
         # Normalize based on scheme
         if scheme == "file":
-            path = files.fix_dev_path(
-                normalized.removeprefix("file://").removeprefix("file:")
-            )
+            path = files.fix_dev_path(normalized.removeprefix("file://").removeprefix("file:"))
             normalized = f"file://{path}"
 
         elif scheme in ["http", "https"]:
@@ -118,9 +115,7 @@ class DocumentQueryStore:
         # Initialize metadata
         doc_metadata = metadata or {}
         doc_metadata["document_uri"] = document_uri
-        doc_metadata["timestamp"] = datetime.now().strftime(
-            "%Y-%m-%d %H:%M:%S"
-        )
+        doc_metadata["timestamp"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         # Split text into chunks
         text_splitter = RecursiveCharacterTextSplitter(
@@ -147,18 +142,14 @@ class DocumentQueryStore:
                 self.vector_db = self.init_vector_db()
 
             ids = await self.vector_db.insert_documents(docs)
-            PrintStyle.standard(
-                f"Added document '{document_uri}' with {len(docs)} chunks"
-            )
+            PrintStyle.standard(f"Added document '{document_uri}' with {len(docs)} chunks")
             return True, ids
         except Exception as e:
             err_text = errors.format_error(e)
-            PrintStyle.error(
-                f"Error adding document '{document_uri}': {err_text}"
-            )
+            PrintStyle.error(f"Error adding document '{document_uri}': {err_text}")
             return False, []
 
-    async def get_document(self, document_uri: str) -> Optional[Document]:
+    async def get_document(self, document_uri: str) -> Document | None:
         """
         Retrieve a document by its URI.
 
@@ -168,7 +159,6 @@ class DocumentQueryStore:
         Returns:
             The complete document if found, None otherwise
         """
-
         # DB not initialized, no documents inside
         if not self.vector_db:
             return None
@@ -193,7 +183,7 @@ class DocumentQueryStore:
 
         return Document(page_content=full_content, metadata=metadata)
 
-    async def _get_document_chunks(self, document_uri: str) -> List[Document]:
+    async def _get_document_chunks(self, document_uri: str) -> list[Document]:
         """
         Get all chunks for a document.
 
@@ -203,7 +193,6 @@ class DocumentQueryStore:
         Returns:
             List of document chunks
         """
-
         # DB not initialized, no documents inside
         if not self.vector_db:
             return []
@@ -217,9 +206,7 @@ class DocumentQueryStore:
             filter=f"document_uri == '{document_uri}'",
         )
 
-        PrintStyle.standard(
-            f"Found {len(chunks)} chunks for document: {document_uri}"
-        )
+        PrintStyle.standard(f"Found {len(chunks)} chunks for document: {document_uri}")
         return chunks
 
     async def document_exists(self, document_uri: str) -> bool:
@@ -232,7 +219,6 @@ class DocumentQueryStore:
         Returns:
             True if the document exists, False otherwise
         """
-
         # DB not initialized, no documents inside
         if not self.vector_db:
             return False
@@ -253,7 +239,6 @@ class DocumentQueryStore:
         Returns:
             True if deleted, False if not found
         """
-
         # DB not initialized, no documents inside
         if not self.vector_db:
             return False
@@ -273,9 +258,7 @@ class DocumentQueryStore:
         # Delete from vector store
         if ids_to_delete:
             dels = await self.vector_db.delete_documents_by_ids(ids_to_delete)
-            PrintStyle.standard(
-                f"Deleted document '{document_uri}' with {len(dels)} chunks"
-            )
+            PrintStyle.standard(f"Deleted document '{document_uri}' with {len(dels)} chunks")
             return True
 
         return False
@@ -286,7 +269,7 @@ class DocumentQueryStore:
         limit: int = Limits.DOCUMENT_MAX_LIMIT,
         threshold: float = Limits.DOCUMENT_DEFAULT_THRESHOLD,
         filter: str = "",
-    ) -> List[Document]:
+    ) -> list[Document]:
         """
         Search for documents similar to the query across the entire store.
 
@@ -298,7 +281,6 @@ class DocumentQueryStore:
         Returns:
             List of matching documents
         """
-
         # DB not initialized, no documents inside
         if not self.vector_db:
             return []
@@ -313,12 +295,10 @@ class DocumentQueryStore:
                 query=query, limit=limit, threshold=threshold, filter=filter
             )
 
-            PrintStyle.standard(
-                f"Search '{query}' returned {len(results)} results"
-            )
+            PrintStyle.standard(f"Search '{query}' returned {len(results)} results")
             return results
         except Exception as e:
-            PrintStyle.error(f"Error searching documents: {str(e)}")
+            PrintStyle.error(f"Error searching documents: {e!s}")
             return []
 
     async def search_document(
@@ -327,7 +307,7 @@ class DocumentQueryStore:
         query: str,
         limit: int = 10,
         threshold: float = 0.5,
-    ) -> List[Document]:
+    ) -> list[Document]:
         """
         Search for content within a specific document.
 
@@ -344,7 +324,7 @@ class DocumentQueryStore:
             query, limit, threshold, f"document_uri == '{document_uri}'"
         )
 
-    async def list_documents(self) -> List[str]:
+    async def list_documents(self) -> list[str]:
         """
         Get a list of all document URIs in the store.
 
@@ -378,44 +358,30 @@ class DocumentQueryHelper:
         self.progress_callback = progress_callback or (lambda x: None)
 
     async def document_qa(
-        self, document_uris: List[str], questions: Sequence[str]
-    ) -> Tuple[bool, str]:
-        self.progress_callback(
-            f"Starting Q&A process for {len(document_uris)} documents"
-        )
+        self, document_uris: list[str], questions: Sequence[str]
+    ) -> tuple[bool, str]:
+        self.progress_callback(f"Starting Q&A process for {len(document_uris)} documents")
         await self.agent.handle_intervention()
 
         # index documents
-        await asyncio.gather(
-            *[self.document_get_content(uri, True) for uri in document_uris]
-        )
+        await asyncio.gather(*[self.document_get_content(uri, True) for uri in document_uris])
         await self.agent.handle_intervention()
         selected_chunks = {}
         for question in questions:
             self.progress_callback(f"Optimizing query: {question}")
             await self.agent.handle_intervention()
             human_content = f'Search Query: "{question}"'
-            system_content = self.agent.parse_prompt(
-                "fw.document_query.optmimize_query.md"
-            )
+            system_content = self.agent.parse_prompt("fw.document_query.optmimize_query.md")
 
             optimized_query = (
-                await self.agent.call_utility_model(
-                    system=system_content, message=human_content
-                )
+                await self.agent.call_utility_model(system=system_content, message=human_content)
             ).strip()
 
             await self.agent.handle_intervention()
-            self.progress_callback(
-                f"Searching documents with query: {optimized_query}"
-            )
+            self.progress_callback(f"Searching documents with query: {optimized_query}")
 
-            normalized_uris = [
-                self.store.normalize_uri(uri) for uri in document_uris
-            ]
-            doc_filter = " or ".join(
-                [f"document_uri == '{uri}'" for uri in normalized_uris]
-            )
+            normalized_uris = [self.store.normalize_uri(uri) for uri in document_uris]
+            doc_filter = " or ".join([f"document_uri == '{uri}'" for uri in normalized_uris])
 
             chunks = await self.store.search_documents(
                 query=optimized_query,
@@ -430,9 +396,7 @@ class DocumentQueryHelper:
                 selected_chunks[chunk.metadata["id"]] = chunk
 
         if not selected_chunks:
-            self.progress_callback(
-                "No relevant content found in the documents"
-            )
+            self.progress_callback("No relevant content found in the documents")
             content = f"!!! No content found for documents: {json.dumps(document_uris)} matching queries: {json.dumps(questions)}"
             return False, content
 
@@ -441,19 +405,11 @@ class DocumentQueryHelper:
         )
         await self.agent.handle_intervention()
 
-        questions_str = "\n".join(
-            [f" *  {question}" for question in questions]
-        )
-        content = "\n\n----\n\n".join(
-            [chunk.page_content for chunk in selected_chunks.values()]
-        )
+        questions_str = "\n".join([f" *  {question}" for question in questions])
+        content = "\n\n----\n\n".join([chunk.page_content for chunk in selected_chunks.values()])
 
-        qa_system_message = self.agent.parse_prompt(
-            "fw.document_query.system_prompt.md"
-        )
-        qa_user_message = (
-            f"# Document:\n{content}\n\n# Queries:\n{questions_str}"
-        )
+        qa_system_message = self.agent.parse_prompt("fw.document_query.system_prompt.md")
+        qa_user_message = f"# Document:\n{content}\n\n# Queries:\n{questions_str}"
 
         ai_response, _reasoning = await self.agent.call_chat_model(
             messages=[
@@ -466,9 +422,7 @@ class DocumentQueryHelper:
 
         return True, str(ai_response)
 
-    async def document_get_content(
-        self, document_uri: str, add_to_db: bool = False
-    ) -> str:
+    async def document_get_content(self, document_uri: str, add_to_db: bool = False) -> str:
         self.progress_callback("Fetching document content")
         await self.agent.handle_intervention()
         url = urlparse(document_uri)
@@ -505,9 +459,7 @@ class DocumentQueryHelper:
 
                 mimetype = response.headers["content-type"]
                 if "content-length" in response.headers:
-                    content_length = (
-                        float(response.headers["content-length"]) / 1024 / 1024
-                    )  # MB
+                    content_length = float(response.headers["content-length"]) / 1024 / 1024  # MB
                     if content_length > 50.0:
                         raise ValueError(
                             f"Document content length exceeds max. 50MB: {content_length} MB ({document_uri})"
@@ -522,14 +474,10 @@ class DocumentQueryHelper:
                 raise ValueError(f"Invalid document path '{url.path}'") from e
 
         if encoding:
-            raise ValueError(
-                f"Compressed documents are unsupported '{encoding}' ({document_uri})"
-            )
+            raise ValueError(f"Compressed documents are unsupported '{encoding}' ({document_uri})")
 
         if mimetype == "application/octet-stream":
-            raise ValueError(
-                f"Unsupported document mimetype '{mimetype}' ({document_uri})"
-            )
+            raise ValueError(f"Unsupported document mimetype '{mimetype}' ({document_uri})")
 
         # Use the store's normalization method
         document_uri_norm = self.store.normalize_uri(document_uri)
@@ -540,33 +488,19 @@ class DocumentQueryHelper:
         if not exists:
             await self.agent.handle_intervention()
             if mimetype.startswith("image/"):
-                document_content = self.handle_image_document(
-                    document_uri, scheme
-                )
+                document_content = self.handle_image_document(document_uri, scheme)
             elif mimetype == "text/html":
-                document_content = self.handle_html_document(
-                    document_uri, scheme
-                )
-            elif (
-                mimetype.startswith("text/") or mimetype == "application/json"
-            ):
-                document_content = self.handle_text_document(
-                    document_uri, scheme
-                )
+                document_content = self.handle_html_document(document_uri, scheme)
+            elif mimetype.startswith("text/") or mimetype == "application/json":
+                document_content = self.handle_text_document(document_uri, scheme)
             elif mimetype == "application/pdf":
-                document_content = self.handle_pdf_document(
-                    document_uri, scheme
-                )
+                document_content = self.handle_pdf_document(document_uri, scheme)
             else:
-                document_content = self.handle_unstructured_document(
-                    document_uri, scheme
-                )
+                document_content = self.handle_unstructured_document(document_uri, scheme)
             if add_to_db:
                 self.progress_callback("Indexing document")
                 await self.agent.handle_intervention()
-                success, ids = await self.store.add_document(
-                    document_content, document_uri_norm
-                )
+                success, ids = await self.store.add_document(document_content, document_uri_norm)
                 if not success:
                     self.progress_callback("Failed to index document")
                     raise ValueError(
@@ -596,20 +530,14 @@ class DocumentQueryHelper:
             file_content_bytes = files.read_file_bin(document)
             file_content = file_content_bytes.decode("utf-8")
             # Create Document manually since we're not using TextLoader
-            parts = [
-                Document(
-                    page_content=file_content, metadata={"source": document}
-                )
-            ]
+            parts = [Document(page_content=file_content, metadata={"source": document})]
         else:
             raise ValueError(f"Unsupported scheme: {scheme}")
 
         return "\n".join(
             [
                 element.page_content
-                for element in MarkdownifyTransformer().transform_documents(
-                    parts
-                )
+                for element in MarkdownifyTransformer().transform_documents(parts)
             ]
         )
 
@@ -622,11 +550,7 @@ class DocumentQueryHelper:
             file_content_bytes = files.read_file_bin(document)
             file_content = file_content_bytes.decode("utf-8")
             # Create Document manually since we're not using TextLoader
-            elements = [
-                Document(
-                    page_content=file_content, metadata={"source": document}
-                )
-            ]
+            elements = [Document(page_content=file_content, metadata={"source": document})]
         else:
             raise ValueError(f"Unsupported scheme: {scheme}")
 
@@ -640,22 +564,17 @@ class DocumentQueryHelper:
             # Create a temporary file for PyMuPDFLoader since it needs a file path
             import tempfile
 
-            with tempfile.NamedTemporaryFile(
-                delete=False, suffix=".pdf"
-            ) as temp_file:
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
                 temp_file.write(file_content_bytes)
                 temp_file_path = temp_file.name
         elif scheme in ["http", "https"]:
             # download the file from the web url to a temporary file using python libraries for downloading
-            import requests
             import tempfile
 
-            with tempfile.NamedTemporaryFile(
-                delete=False, suffix=".pdf"
-            ) as temp_file:
-                response = requests.get(
-                    document, timeout=Timeouts.DOCUMENT_DOWNLOAD_TIMEOUT
-                )
+            import requests
+
+            with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
+                response = requests.get(document, timeout=Timeouts.DOCUMENT_DOWNLOAD_TIMEOUT)
                 if response.status_code != 200:
                     raise ValueError(
                         f"DocumentQueryHelper::handle_pdf_document: Failed to download PDF from {document}: {response.status_code}"
@@ -682,9 +601,7 @@ class DocumentQueryHelper:
                     pages_delimiter="\n",
                 )
                 elements: list[Document] = loader.load()
-                contents = "\n".join(
-                    [element.page_content for element in elements]
-                )
+                contents = "\n".join([element.page_content for element in elements])
             except Exception as e:
                 PrintStyle.error(
                     f"DocumentQueryHelper::handle_pdf_document: Error loading with PyMuPDF: {e}"
@@ -724,14 +641,12 @@ class DocumentQueryHelper:
             # Use RFC file operations to read the file as binary
             file_content_bytes = files.read_file_bin(document)
             # Create a temporary file for UnstructuredLoader since it needs a file path
-            import tempfile
             import os
+            import tempfile
 
             # Get file extension to preserve it for proper processing
             _, ext = os.path.splitext(document)
-            with tempfile.NamedTemporaryFile(
-                delete=False, suffix=ext
-            ) as temp_file:
+            with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as temp_file:
                 temp_file.write(file_content_bytes)
                 temp_file_path = temp_file.name
 

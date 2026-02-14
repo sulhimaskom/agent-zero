@@ -1,10 +1,10 @@
 import base64
-from python.helpers.print_style import PrintStyle
-from python.helpers.tool import Tool, Response
-from python.helpers import runtime, files, images
 from mimetypes import guess_type
-from python.helpers import history
-from python.helpers.constants import Limits, Colors
+
+from python.helpers import files, history, images, runtime
+from python.helpers.constants import Colors, Limits
+from python.helpers.print_style import PrintStyle
+from python.helpers.tool import Response, Tool
 
 # image optimization and token estimation for context window
 MAX_PIXELS = Limits.VISION_MAX_PIXELS
@@ -18,9 +18,7 @@ class VisionLoad(Tool):
         self.images_dict = {}
 
         for path in paths:
-            if not await runtime.call_development_function(
-                files.exists, str(path)
-            ):
+            if not await runtime.call_development_function(files.exists, str(path)):
                 continue
 
             if path not in self.images_dict:
@@ -39,9 +37,7 @@ class VisionLoad(Tool):
                             quality=QUALITY,
                         )
                         # Encode as base64
-                        file_content_b64 = base64.b64encode(compressed).decode(
-                            "utf-8"
-                        )
+                        file_content_b64 = base64.b64encode(compressed).decode("utf-8")
 
                         # DEBUG: Save compressed image
                         # await runtime.call_development_function(
@@ -54,12 +50,8 @@ class VisionLoad(Tool):
                         self.images_dict[path] = file_content_b64
                     except Exception as e:
                         self.images_dict[path] = None
-                        PrintStyle().error(
-                            f"Error processing image {path}: {e}"
-                        )
-                        self.agent.context.log.log(
-                            "warning", f"Error processing image {path}: {e}"
-                        )
+                        PrintStyle().error(f"Error processing image {path}: {e}")
+                        self.agent.context.log.log("warning", f"Error processing image {path}: {e}")
 
         return Response(message="dummy", break_loop=False)
 
@@ -73,9 +65,7 @@ class VisionLoad(Tool):
                     content.append(
                         {
                             "type": "image_url",
-                            "image_url": {
-                                "url": f"data:image/jpeg;base64,{image}"
-                            },
+                            "image_url": {"url": f"data:image/jpeg;base64,{image}"},
                         }
                     )
                 else:
@@ -86,12 +76,8 @@ class VisionLoad(Tool):
                         }
                     )
             # append as raw message content for LLMs with vision tokens estimate
-            msg = history.RawMessage(
-                raw_content=content, preview="<Base64 encoded image data>"
-            )
-            self.agent.hist_add_message(
-                False, content=msg, tokens=TOKENS_ESTIMATE * len(content)
-            )
+            msg = history.RawMessage(raw_content=content, preview="<Base64 encoded image data>")
+            self.agent.hist_add_message(False, content=msg, tokens=TOKENS_ESTIMATE * len(content))
         else:
             self.agent.hist_add_tool_result(self.name, "No images processed")
 

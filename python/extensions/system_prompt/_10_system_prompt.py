@@ -1,18 +1,16 @@
 from typing import Any
+
+from agent import Agent, LoopData
+from python.helpers import projects
 from python.helpers.extension import Extension
 from python.helpers.mcp_handler import MCPConfig
-from agent import Agent, LoopData
 from python.helpers.settings import get_settings
-from python.helpers import projects
 
 
 class SystemPrompt(Extension):
 
     async def execute(
-        self,
-        system_prompt: list[str] = [],
-        loop_data: LoopData = LoopData(),
-        **kwargs: Any
+        self, system_prompt: list[str] = [], loop_data: LoopData = LoopData(), **kwargs: Any
     ):
         # append main system prompt and tools
         main = get_main_prompt(self.agent)
@@ -50,9 +48,7 @@ def get_mcp_tools_prompt(agent: Agent):
             "Collecting MCP tools"
         )  # MCP might be initializing, better inform via progress bar
         tools = MCPConfig.get_instance().get_tools_prompt()
-        agent.context.log.set_progress(
-            pre_progress
-        )  # return original progress
+        agent.context.log.set_progress(pre_progress)  # return original progress
         return tools
     return ""
 
@@ -65,9 +61,7 @@ def get_secrets_prompt(agent: Agent):
         secrets_manager = get_secrets_manager(agent.context)
         secrets = secrets_manager.get_secrets_for_prompt()
         vars = get_settings()["variables"]
-        return agent.read_prompt(
-            "agent.system.secrets.md", secrets=secrets, vars=vars
-        )
+        return agent.read_prompt("agent.system.secrets.md", secrets=secrets, vars=vars)
     except Exception:
         # If secrets module is not available or has issues, return empty string
         return ""
@@ -78,11 +72,7 @@ def get_project_prompt(agent: Agent):
     project_name = agent.context.get_data(projects.CONTEXT_DATA_KEY_PROJECT)
     if project_name:
         project_vars = projects.build_system_prompt_vars(project_name)
-        result += "\n\n" + agent.read_prompt(
-            "agent.system.projects.active.md", **project_vars
-        )
+        result += "\n\n" + agent.read_prompt("agent.system.projects.active.md", **project_vars)
     else:
-        result += "\n\n" + agent.read_prompt(
-            "agent.system.projects.inactive.md"
-        )
+        result += "\n\n" + agent.read_prompt("agent.system.projects.inactive.md")
     return result

@@ -1,5 +1,7 @@
 from typing import Literal
+
 import tiktoken
+
 from python.helpers.constants import Limits
 
 APPROX_BUFFER = Limits.TOKEN_APPROX_BUFFER
@@ -42,4 +44,4 @@ def trim_to_tokens(
 
     if direction == "start":
         return text[:approx_chars] + ellipsis
-    return ellipsis + text[chars - approx_chars: chars]
+    return ellipsis + text[chars - approx_chars : chars]

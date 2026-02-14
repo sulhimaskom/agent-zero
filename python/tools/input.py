@@ -33,15 +33,10 @@ class Input(Tool):
     def get_log_object(self):
         return self.agent.context.log.log(
             type="code_exe",
-            heading=(
-                f"icon://keyboard {self.agent.agent_name}: "
-                f"Using tool '{self.name}'"
-            ),
+            heading=(f"icon://keyboard {self.agent.agent_name}: " f"Using tool '{self.name}'"),
             content="",
             kvps=self.args,
         )
 
     async def after_execution(self, response, **kwargs):
-        self.agent.hist_add_tool_result(
-            self.name, response.message, **(response.additional or {})
-        )
+        self.agent.hist_add_tool_result(self.name, response.message, **(response.additional or {}))

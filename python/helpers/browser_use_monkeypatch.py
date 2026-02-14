@@ -1,5 +1,7 @@
 from typing import Any
+
 from browser_use.llm import ChatGoogle
+
 from python.helpers import dirty_json
 
 # ------------------------------------------------------------------------------
@@ -93,7 +95,6 @@ def _patched_fix_gemini_schema(self, schema: dict[str, Any]) -> dict[str, Any]:
     This function removes unsupported properties like 'additionalProperties' and resolves
     $ref references that Gemini doesn't support.
     """
-
     # Handle $defs and $ref resolution
     if "$defs" in schema:
         defs = schema.pop("$defs")
@@ -138,9 +139,7 @@ def _patched_fix_gemini_schema(self, schema: dict[str, Any]) -> dict[str, Any]:
                         and obj.get("type", "").upper() == "OBJECT"
                     ):
                         # Convert empty object to have at least one property
-                        cleaned["properties"] = {
-                            "_placeholder": {"type": "string"}
-                        }
+                        cleaned["properties"] = {"_placeholder": {"type": "string"}}
                     else:
                         cleaned[key] = cleaned_value
 
@@ -155,12 +154,8 @@ def _patched_fix_gemini_schema(self, schema: dict[str, Any]) -> dict[str, Any]:
                 cleaned["properties"] = {"_placeholder": {"type": "string"}}
 
             # PATCH: Also remove 'title' from the required list if it exists
-            if "required" in cleaned and isinstance(
-                cleaned.get("required"), list
-            ):
-                cleaned["required"] = [
-                    p for p in cleaned["required"] if p != "title"
-                ]
+            if "required" in cleaned and isinstance(cleaned.get("required"), list):
+                cleaned["required"] = [p for p in cleaned["required"] if p != "title"]
 
             return cleaned
         elif isinstance(obj, list):

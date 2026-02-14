@@ -1,6 +1,7 @@
-from python.helpers.api import ApiHandler
 from flask import Request, Response
+
 from agent import AgentContext
+from python.helpers.api import ApiHandler
 
 
 class NotificationsHistory(ApiHandler):
@@ -14,9 +15,7 @@ class NotificationsHistory(ApiHandler):
 
         # Return all notifications for history modal
         return {
-            "notifications": [
-                n.output() for n in notification_manager.notifications
-            ],
+            "notifications": [n.output() for n in notification_manager.notifications],
             "guid": notification_manager.guid,
             "count": len(notification_manager.notifications),
         }

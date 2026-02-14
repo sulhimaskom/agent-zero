@@ -1,28 +1,29 @@
 import asyncio
-from datetime import datetime
 import json
 import random
 import re
-from python.helpers.tool import Tool, Response
-from python.helpers.task_scheduler import (
-    TaskScheduler,
-    ScheduledTask,
-    AdHocTask,
-    PlannedTask,
-    serialize_task,
-    TaskState,
-    TaskSchedule,
-    TaskPlan,
-    parse_datetime,
-    serialize_datetime,
-)
+from datetime import datetime
+
 from agent import AgentContext
 from python.helpers import persist_chat
+from python.helpers.constants import Timeouts
 from python.helpers.projects import (
     get_context_project_name,
     load_basic_project_data,
 )
-from python.helpers.constants import Timeouts
+from python.helpers.task_scheduler import (
+    AdHocTask,
+    PlannedTask,
+    ScheduledTask,
+    TaskPlan,
+    TaskSchedule,
+    TaskScheduler,
+    TaskState,
+    parse_datetime,
+    serialize_datetime,
+    serialize_task,
+)
+from python.helpers.tool import Response, Tool
 
 
 class SchedulerTool(Tool):
@@ -67,16 +68,12 @@ class SchedulerTool(Tool):
         return project_slug, color
 
     async def list_tasks(self, **kwargs) -> Response:
-        state_filter: list[str] | None = kwargs.get("state", None)
-        type_filter: list[str] | None = kwargs.get("type", None)
-        next_run_within_filter: int | None = kwargs.get(
-            "next_run_within", None
-        )
-        next_run_after_filter: int | None = kwargs.get("next_run_after", None)
+        state_filter: list[str] | None = kwargs.get("state")
+        type_filter: list[str] | None = kwargs.get("type")
+        next_run_within_filter: int | None = kwargs.get("next_run_within")
+        next_run_after_filter: int | None = kwargs.get("next_run_after")
 
-        tasks: list[ScheduledTask | AdHocTask | PlannedTask] = (
-            TaskScheduler.get().get_tasks()
-        )
+        tasks: list[ScheduledTask | AdHocTask | PlannedTask] = TaskScheduler.get().get_tasks()
         filtered_tasks = []
         for task in tasks:
             if state_filter and task.state not in state_filter:
@@ -90,17 +87,11 @@ class SchedulerTool(Tool):
                 and next_run > next_run_within_filter
             ):
                 continue
-            if (
-                next_run_after_filter
-                and next_run is not None
-                and next_run < next_run_after_filter
-            ):
+            if next_run_after_filter and next_run is not None and next_run < next_run_after_filter:
                 continue
             filtered_tasks.append(serialize_task(task))
 
-        return Response(
-            message=json.dumps(filtered_tasks, indent=4), break_loop=False
-        )
+        return Response(message=json.dumps(filtered_tasks, indent=4), break_loop=False)
 
     async def find_task_by_name(self, **kwargs) -> Response:
         name: str = kwargs.get("name", "")
@@ -110,13 +101,9 @@ class SchedulerTool(Tool):
             TaskScheduler.get().find_task_by_name(name)
         )
         if not tasks:
-            return Response(
-                message=f"Task not found: {name}", break_loop=False
-            )
+            return Response(message=f"Task not found: {name}", break_loop=False)
         return Response(
-            message=json.dumps(
-                [serialize_task(task) for task in tasks], indent=4
-            ),
+            message=json.dumps([serialize_task(task) for task in tasks], indent=4),
             break_loop=False,
         )
 
@@ -124,13 +111,11 @@ class SchedulerTool(Tool):
         task_uuid: str = kwargs.get("uuid", "")
         if not task_uuid:
             return Response(message="Task UUID is required", break_loop=False)
-        task: ScheduledTask | AdHocTask | PlannedTask | None = (
-            TaskScheduler.get().get_task_by_uuid(task_uuid)
+        task: ScheduledTask | AdHocTask | PlannedTask | None = TaskScheduler.get().get_task_by_uuid(
+            task_uuid
         )
         if not task:
-            return Response(
-                message=f"Task not found: {task_uuid}", break_loop=False
-            )
+            return Response(message=f"Task not found: {task_uuid}", break_loop=False)
         return Response(
             message=json.dumps(serialize_task(task), indent=4),
             break_loop=False,
@@ -140,14 +125,12 @@ class SchedulerTool(Tool):
         task_uuid: str = kwargs.get("uuid", "")
         if not task_uuid:
             return Response(message="Task UUID is required", break_loop=False)
-        task_context: str | None = kwargs.get("context", None)
-        task: ScheduledTask | AdHocTask | PlannedTask | None = (
-            TaskScheduler.get().get_task_by_uuid(task_uuid)
+        task_context: str | None = kwargs.get("context")
+        task: ScheduledTask | AdHocTask | PlannedTask | None = TaskScheduler.get().get_task_by_uuid(
+            task_uuid
         )
         if not task:
-            return Response(
-                message=f"Task not found: {task_uuid}", break_loop=False
-            )
+            return Response(message=f"Task not found: {task_uuid}", break_loop=False)
         await TaskScheduler.get().run_task_by_uuid(task_uuid, task_context)
         if task.context_id == self.agent.context.id:
             # break loop if task is running in the same context,
@@ -155,22 +138,18 @@ class SchedulerTool(Tool):
             break_loop = True
         else:
             break_loop = False
-        return Response(
-            message=f"Task started: {task_uuid}", break_loop=break_loop
-        )
+        return Response(message=f"Task started: {task_uuid}", break_loop=break_loop)
 
     async def delete_task(self, **kwargs) -> Response:
         task_uuid: str = kwargs.get("uuid", "")
         if not task_uuid:
             return Response(message="Task UUID is required", break_loop=False)
 
-        task: ScheduledTask | AdHocTask | PlannedTask | None = (
-            TaskScheduler.get().get_task_by_uuid(task_uuid)
+        task: ScheduledTask | AdHocTask | PlannedTask | None = TaskScheduler.get().get_task_by_uuid(
+            task_uuid
         )
         if not task:
-            return Response(
-                message=f"Task not found: {task_uuid}", break_loop=False
-            )
+            return Response(message=f"Task not found: {task_uuid}", break_loop=False)
 
         context = None
         if task.context_id:
@@ -179,9 +158,7 @@ class SchedulerTool(Tool):
         if task.state == TaskState.RUNNING:
             if context:
                 context.reset()
-            await TaskScheduler.get().update_task(
-                task_uuid, state=TaskState.IDLE
-            )
+            await TaskScheduler.get().update_task(task_uuid, state=TaskState.IDLE)
             await TaskScheduler.get().save()
 
         if context and context.id == task.uuid:
@@ -190,13 +167,9 @@ class SchedulerTool(Tool):
 
         await TaskScheduler.get().remove_task_by_uuid(task_uuid)
         if TaskScheduler.get().get_task_by_uuid(task_uuid) is None:
-            return Response(
-                message=f"Task deleted: {task_uuid}", break_loop=False
-            )
+            return Response(message=f"Task deleted: {task_uuid}", break_loop=False)
         else:
-            return Response(
-                message=f"Task failed to delete: {task_uuid}", break_loop=False
-            )
+            return Response(message=f"Task failed to delete: {task_uuid}", break_loop=False)
 
     async def create_scheduled_task(self, **kwargs) -> Response:
         # "name": "XXX",
@@ -232,8 +205,7 @@ class SchedulerTool(Tool):
         )
         if not re.match(cron_regex, task_schedule.to_crontab()):
             return Response(
-                message="Invalid cron expression: "
-                + task_schedule.to_crontab(),
+                message="Invalid cron expression: " + task_schedule.to_crontab(),
                 break_loop=False,
             )
 
@@ -262,11 +234,7 @@ class SchedulerTool(Tool):
         attachments: list[str] = kwargs.get("attachments", [])
         from python.helpers.constants import Limits
 
-        token: str = str(
-            random.randint(
-                Limits.SCHEDULER_TOKEN_MIN, Limits.SCHEDULER_TOKEN_MAX
-            )
-        )
+        token: str = str(random.randint(Limits.SCHEDULER_TOKEN_MIN, Limits.SCHEDULER_TOKEN_MAX))
         dedicated_context: bool = kwargs.get("dedicated_context", False)
 
         project_slug, project_color = self._resolve_project_metadata()
@@ -300,9 +268,7 @@ class SchedulerTool(Tool):
         for item in plan:
             dt = parse_datetime(item)
             if dt is None:
-                return Response(
-                    message=f"Invalid datetime: {item}", break_loop=False
-                )
+                return Response(message=f"Invalid datetime: {item}", break_loop=False)
             todo.append(dt)
 
         # Create task plan with todo list
@@ -333,20 +299,13 @@ class SchedulerTool(Tool):
             return Response(message="Task UUID is required", break_loop=False)
 
         scheduler = TaskScheduler.get()
-        task: ScheduledTask | AdHocTask | PlannedTask | None = (
-            scheduler.get_task_by_uuid(task_uuid)
-        )
+        task: ScheduledTask | AdHocTask | PlannedTask | None = scheduler.get_task_by_uuid(task_uuid)
         if not task:
-            return Response(
-                message=f"Task not found: {task_uuid}", break_loop=False
-            )
+            return Response(message=f"Task not found: {task_uuid}", break_loop=False)
 
         if task.context_id == self.agent.context.id:
             return Response(
-                message=(
-                    "You can only wait for tasks running in their own "
-                    "dedicated context."
-                ),
+                message=("You can only wait for tasks running in their own " "dedicated context."),
                 break_loop=False,
             )
 
@@ -356,9 +315,7 @@ class SchedulerTool(Tool):
             await scheduler.reload()
             task = scheduler.get_task_by_uuid(task_uuid)
             if not task:
-                return Response(
-                    message=f"Task not found: {task_uuid}", break_loop=False
-                )
+                return Response(message=f"Task not found: {task_uuid}", break_loop=False)
 
             if task.state == TaskState.RUNNING:
                 await asyncio.sleep(1)

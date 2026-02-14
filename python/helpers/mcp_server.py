@@ -1,22 +1,23 @@
 import os
-from typing import Annotated, Literal, Union
+import threading
+from typing import Annotated, Literal
 from urllib.parse import urlparse
+
+from fastmcp import FastMCP
+from fastmcp.server.http import create_sse_app
 from openai import BaseModel
 from pydantic import Field
-from fastmcp import FastMCP
-
-from agent import AgentContext, AgentContextType, UserMessage
-from python.helpers.persist_chat import remove_chat
-from initialize import initialize_agent
-from python.helpers.print_style import PrintStyle
-from python.helpers import settings
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware import Middleware
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.exceptions import HTTPException as StarletteHTTPException
-from starlette.types import ASGIApp, Receive, Scope, Send
-from fastmcp.server.http import create_sse_app
 from starlette.requests import Request
-import threading
+from starlette.types import ASGIApp, Receive, Scope, Send
+
+from agent import AgentContext, AgentContextType, UserMessage
+from initialize import initialize_agent
+from python.helpers import settings
+from python.helpers.persist_chat import remove_chat
+from python.helpers.print_style import PrintStyle
 
 _PRINTER = PrintStyle(italic=True, font_color="green", padding=False)
 
@@ -33,27 +34,15 @@ mcp_server: FastMCP = FastMCP(
 
 
 class ToolResponse(BaseModel):
-    status: Literal["success"] = Field(
-        description="The status of the response", default="success"
-    )
-    response: str = Field(
-        description="The response from the remote Agent Zero Instance"
-    )
-    chat_id: str = Field(
-        description="The id of the chat this message belongs to."
-    )
+    status: Literal["success"] = Field(description="The status of the response", default="success")
+    response: str = Field(description="The response from the remote Agent Zero Instance")
+    chat_id: str = Field(description="The id of the chat this message belongs to.")
 
 
 class ToolError(BaseModel):
-    status: Literal["error"] = Field(
-        description="The status of the response", default="error"
-    )
-    error: str = Field(
-        description="The error message from the remote Agent Zero Instance"
-    )
-    chat_id: str = Field(
-        description="The id of the chat this message belongs to."
-    )
+    status: Literal["error"] = Field(description="The status of the response", default="error")
+    error: str = Field(description="The error message from the remote Agent Zero Instance")
+    chat_id: str = Field(description="The id of the chat this message belongs to.")
 
 
 SEND_MESSAGE_DESCRIPTION = """
@@ -126,7 +115,7 @@ async def send_message(
         | None
     ) = None,
 ) -> Annotated[
-    Union[ToolResponse, ToolError],
+    ToolResponse | ToolError,
     Field(
         description="The response from the remote Agent Zero Instance",
         title="response",
@@ -158,13 +147,9 @@ async def send_message(
             context.reset()
             AgentContext.remove(context.id)
             remove_chat(context.id)
-        return ToolResponse(
-            response=response, chat_id=context.id if persistent_chat else ""
-        )
+        return ToolResponse(response=response, chat_id=context.id if persistent_chat else "")
     except Exception as e:
-        return ToolError(
-            error=str(e), chat_id=context.id if persistent_chat else ""
-        )
+        return ToolError(error=str(e), chat_id=context.id if persistent_chat else "")
 
 
 FINISH_CHAT_DESCRIPTION = """
@@ -208,7 +193,7 @@ async def finish_chat(
         ),
     ],
 ) -> Annotated[
-    Union[ToolResponse, ToolError],
+    ToolResponse | ToolError,
     Field(
         description="The response from the remote Agent Zero Instance",
         title="response",
@@ -227,9 +212,7 @@ async def finish_chat(
         return ToolResponse(response="Chat finished", chat_id=chat_id)
 
 
-async def _run_chat(
-    context: AgentContext, message: str, attachments: list[str] | None = None
-):
+async def _run_chat(context: AgentContext, message: str, attachments: list[str] | None = None):
     try:
         _PRINTER.print("MCP Chat message received")
 
@@ -251,9 +234,7 @@ async def _run_chat(
                         ]:
                             attachment_filenames.append(attachment)
                         else:
-                            _PRINTER.print(
-                                f"Skipping attachment: [{attachment}]"
-                            )
+                            _PRINTER.print(f"Skipping attachment: [{attachment}]")
                     except Exception:
                         _PRINTER.print(f"Skipping attachment: [{attachment}]")
 
@@ -329,9 +310,7 @@ class DynamicMcpProxy:
                 auth_settings=mcp_server.settings.auth,
                 debug=mcp_server.settings.debug,
                 routes=mcp_server._additional_http_routes,
-                middleware=[
-                    Middleware(BaseHTTPMiddleware, dispatch=mcp_middleware)
-                ],
+                middleware=[Middleware(BaseHTTPMiddleware, dispatch=mcp_middleware)],
             )
 
             # For HTTP, we need to create a custom app since the lifespan manager
@@ -353,18 +332,18 @@ class DynamicMcpProxy:
         routes,
     ):
         """Create a custom HTTP app that manages the session manager manually."""
+        import anyio
         from fastmcp.server.http import (
-            setup_auth_middleware_and_routes,
             create_base_app,
+            setup_auth_middleware_and_routes,
+        )
+        from mcp.server.auth.middleware.bearer_auth import (
+            RequireAuthMiddleware,
         )
         from mcp.server.streamable_http_manager import (
             StreamableHTTPSessionManager,
         )
         from starlette.routing import Mount
-        from mcp.server.auth.middleware.bearer_auth import (
-            RequireAuthMiddleware,
-        )
-        import anyio
 
         server_routes = []
         server_middleware = []
@@ -387,20 +366,14 @@ class DynamicMcpProxy:
                 self.http_session_task_group = anyio.create_task_group()
                 await self.http_session_task_group.__aenter__()
                 if self.http_session_manager:
-                    self.http_session_manager._task_group = (
-                        self.http_session_task_group
-                    )
+                    self.http_session_manager._task_group = self.http_session_task_group
 
             if self.http_session_manager:
-                await self.http_session_manager.handle_request(
-                    scope, receive, send
-                )
+                await self.http_session_manager.handle_request(scope, receive, send)
 
         # Get auth middleware and routes
-        auth_middleware, auth_routes, required_scopes = (
-            setup_auth_middleware_and_routes(
-                auth_server_provider, auth_settings
-            )
+        auth_middleware, auth_routes, required_scopes = setup_auth_middleware_and_routes(
+            auth_server_provider, auth_settings
         )
 
         server_routes.extend(auth_routes)
@@ -411,9 +384,7 @@ class DynamicMcpProxy:
             server_routes.append(
                 Mount(
                     streamable_http_path,
-                    app=RequireAuthMiddleware(
-                        handle_streamable_http, required_scopes
-                    ),
+                    app=RequireAuthMiddleware(handle_streamable_http, required_scopes),
                 )
             )
         else:
@@ -429,9 +400,7 @@ class DynamicMcpProxy:
             server_routes.extend(routes)
 
         # Add middleware
-        server_middleware.append(
-            Middleware(BaseHTTPMiddleware, dispatch=mcp_middleware)
-        )
+        server_middleware.append(Middleware(BaseHTTPMiddleware, dispatch=mcp_middleware))
 
         # Create and return the app
         return create_base_app(
@@ -440,9 +409,7 @@ class DynamicMcpProxy:
             debug=debug,
         )
 
-    async def __call__(
-        self, scope: Scope, receive: Receive, send: Send
-    ) -> None:
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
         """Forward the ASGI calls to the appropriate app based on the URL path"""
         with self._lock:
             sse_app = self.sse_app
@@ -454,19 +421,14 @@ class DynamicMcpProxy:
         # Route based on path
         path = scope.get("path", "")
 
-        if (
-            f"/t-{self.token}/sse" in path
-            or f"t-{self.token}/messages" in path
-        ):
+        if f"/t-{self.token}/sse" in path or f"t-{self.token}/messages" in path:
             # Route to SSE app
             await sse_app(scope, receive, send)
         elif f"/t-{self.token}/http" in path:
             # Route to HTTP app
             await http_app(scope, receive, send)
         else:
-            raise StarletteHTTPException(
-                status_code=403, detail="MCP forbidden"
-            )
+            raise StarletteHTTPException(status_code=403, detail="MCP forbidden")
 
 
 async def mcp_middleware(request: Request, call_next):
@@ -474,11 +436,7 @@ async def mcp_middleware(request: Request, call_next):
     # check if MCP server is enabled
     cfg = settings.get_settings()
     if not cfg["mcp_server_enabled"]:
-        PrintStyle.error(
-            "[MCP] Access denied: MCP server is disabled in settings."
-        )
-        raise StarletteHTTPException(
-            status_code=403, detail="MCP server is disabled in settings."
-        )
+        PrintStyle.error("[MCP] Access denied: MCP server is disabled in settings.")
+        raise StarletteHTTPException(status_code=403, detail="MCP server is disabled in settings.")
 
     return await call_next(request)

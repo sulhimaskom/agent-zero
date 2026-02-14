@@ -1,11 +1,12 @@
 import asyncio
-import paramiko
-import time
 import re
-from typing import Tuple
+import time
+
+import paramiko
+
+from python.helpers.constants import Limits, Shell, Timeouts
 from python.helpers.log import Log
 from python.helpers.print_style import PrintStyle
-from python.helpers.constants import Shell, Timeouts, Limits
 
 # from python.helpers.strings import calculate_valid_match_lengths
 
@@ -119,7 +120,7 @@ class SSHInteractiveSession:
 
     async def read_output(
         self, timeout: float = 0, reset_full_output: bool = False
-    ) -> Tuple[str, str]:
+    ) -> tuple[str, str]:
         if not self.shell:
             raise Exception("Shell not connected")
 
@@ -128,9 +129,7 @@ class SSHInteractiveSession:
         partial_output = b""
         start_time = time.time()
 
-        while self.shell.recv_ready() and (
-            timeout <= 0 or time.time() - start_time < timeout
-        ):
+        while self.shell.recv_ready() and (timeout <= 0 or time.time() - start_time < timeout):
 
             # data = self.shell.recv(1024)
             data = self.receive_bytes()
@@ -167,12 +166,8 @@ class SSHInteractiveSession:
             await asyncio.sleep(0.1)  # Prevent busy waiting
 
         # Decode once at the end
-        decoded_partial_output = partial_output.decode(
-            "utf-8", errors="replace"
-        )
-        decoded_full_output = self.full_output.decode(
-            "utf-8", errors="replace"
-        )
+        decoded_partial_output = partial_output.decode("utf-8", errors="replace")
+        decoded_full_output = self.full_output.decode("utf-8", errors="replace")
 
         decoded_partial_output = clean_string(decoded_partial_output)
         decoded_full_output = clean_string(decoded_full_output)
@@ -201,31 +196,21 @@ class SSHInteractiveSession:
             last_byte = data[-1]
 
             # Check if the last byte is part of a multi-byte UTF-8 sequence (continuation byte)
-            if (
-                last_byte & 0b11000000
-            ) == 0b10000000:  # It's a continuation byte
+            if (last_byte & 0b11000000) == 0b10000000:  # It's a continuation byte
                 # Now, find the start of this sequence by checking earlier bytes
-                for i in range(
-                    2, 5
-                ):  # Look back up to 4 bytes (since UTF-8 is up to 4 bytes long)
+                for i in range(2, 5):  # Look back up to 4 bytes (since UTF-8 is up to 4 bytes long)
                     if len(data) - i < 0:
                         break
                     byte = data[-i]
 
                     # Detect the leading byte of a multi-byte sequence
-                    if (
-                        byte & 0b11100000
-                    ) == 0b11000000:  # 2-byte sequence (110xxxxx)
+                    if (byte & 0b11100000) == 0b11000000:  # 2-byte sequence (110xxxxx)
                         data += recv_all(1)  # Need 1 more byte to complete
                         break
-                    elif (
-                        byte & 0b11110000
-                    ) == 0b11100000:  # 3-byte sequence (1110xxxx)
+                    elif (byte & 0b11110000) == 0b11100000:  # 3-byte sequence (1110xxxx)
                         data += recv_all(2)  # Need 2 more bytes to complete
                         break
-                    elif (
-                        byte & 0b11111000
-                    ) == 0b11110000:  # 4-byte sequence (11110xxx)
+                    elif (byte & 0b11111000) == 0b11110000:  # 4-byte sequence (11110xxx)
                         data += recv_all(3)  # Need 3 more bytes to complete
                         break
 
@@ -258,8 +243,6 @@ def clean_string(input_string):
         # Handle carriage returns '\r' by splitting and taking the last part
         parts = [part for part in lines[i].split("\r") if part.strip()]
         if parts:
-            lines[i] = parts[
-                -1
-            ].rstrip()  # Overwrite with the last part after the last '\r'
+            lines[i] = parts[-1].rstrip()  # Overwrite with the last part after the last '\r'
 
     return "\n".join(lines)

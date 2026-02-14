@@ -1,9 +1,9 @@
-from python.helpers import notification
-from python.helpers.extension import Extension
-from agent import LoopData
-from python.helpers import settings, update_check
-from python.helpers.constants import Timeouts
 import datetime
+
+from agent import LoopData
+from python.helpers import notification, settings, update_check
+from python.helpers.constants import Timeouts
+from python.helpers.extension import Extension
 
 # check for newer versions of A0 available and send notification
 # check after user message is sent from UI, not API, MCP etc. (user is active and can see the notification)
@@ -11,9 +11,7 @@ import datetime
 # do not notify too often unless there's a different notification
 
 last_check = datetime.datetime.fromtimestamp(0)
-check_cooldown_seconds = (
-    Timeouts.UPDATE_CHECK_COOLDOWN_SECONDS
-)  # 1 minute cooldown between checks
+check_cooldown_seconds = Timeouts.UPDATE_CHECK_COOLDOWN_SECONDS  # 1 minute cooldown between checks
 last_notification_id = ""
 last_notification_time = datetime.datetime.fromtimestamp(0)
 notification_cooldown_seconds = (
@@ -23,9 +21,7 @@ notification_cooldown_seconds = (
 
 class UpdateCheck(Extension):
 
-    async def execute(
-        self, loop_data: LoopData = LoopData(), text: str = "", **kwargs
-    ):
+    async def execute(self, loop_data: LoopData = LoopData(), text: str = "", **kwargs):
         try:
             global last_check, last_notification_id, last_notification_time
 
@@ -35,9 +31,7 @@ class UpdateCheck(Extension):
                 return
 
             # check if cooldown has passed
-            if (
-                datetime.datetime.now() - last_check
-            ).total_seconds() < check_cooldown_seconds:
+            if (datetime.datetime.now() - last_check).total_seconds() < check_cooldown_seconds:
                 return
             last_check = datetime.datetime.now()
 
@@ -48,9 +42,7 @@ class UpdateCheck(Extension):
             if notif := version.get("notification"):
                 if (
                     notif.get("id") != last_notification_id
-                    or (
-                        datetime.datetime.now() - last_notification_time
-                    ).total_seconds()
+                    or (datetime.datetime.now() - last_notification_time).total_seconds()
                     > notification_cooldown_seconds
                 ):
                     last_notification_id = notif.get("id")
@@ -71,7 +63,5 @@ class UpdateCheck(Extension):
             detail=notif.get("detail", ""),
             display_time=notif.get("display_time", 10),
             group=notif.get("group", "update_check"),
-            priority=notif.get(
-                "priority", notification.NotificationPriority.NORMAL
-            ),
+            priority=notif.get("priority", notification.NotificationPriority.NORMAL),
         )

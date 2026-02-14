@@ -1,6 +1,6 @@
-from python.helpers.tool import Tool, Response
-from python.helpers.print_style import PrintStyle
 from python.helpers.fasta2a_client import connect_to_agent, is_client_available
+from python.helpers.print_style import PrintStyle
+from python.helpers.tool import Response, Tool
 
 
 class A2AChatTool(Tool):
@@ -15,16 +15,12 @@ class A2AChatTool(Tool):
 
         agent_url: str | None = kwargs.get("agent_url")  # required
         user_message: str | None = kwargs.get("message")  # required
-        attachments = kwargs.get("attachments", None)  # optional list[str]
+        attachments = kwargs.get("attachments")  # optional list[str]
         reset = bool(kwargs.get("reset", False))
         if not agent_url or not isinstance(agent_url, str):
-            return Response(
-                message="agent_url argument missing", break_loop=False
-            )
+            return Response(message="agent_url argument missing", break_loop=False)
         if not user_message or not isinstance(user_message, str):
-            return Response(
-                message="message argument missing", break_loop=False
-            )
+            return Response(message="message argument missing", break_loop=False)
 
         # Retrieve or create session cache on the Agent instance
         sessions: dict[str, str] = self.agent.get_data("_a2a_sessions") or {}
@@ -59,13 +55,9 @@ class A2AChatTool(Tool):
                 if history:
                     last_parts = history[-1].get("parts", [])
                     assistant_text = "\n".join(
-                        p.get("text", "")
-                        for p in last_parts
-                        if p.get("kind") == "text"
+                        p.get("text", "") for p in last_parts if p.get("kind") == "text"
                     )
-                return Response(
-                    message=assistant_text or "(no response)", break_loop=False
-                )
+                return Response(message=assistant_text or "(no response)", break_loop=False)
         except Exception as e:
             PrintStyle.error(f"A2A chat error: {e}")
             return Response(message=f"A2A chat error: {e}", break_loop=False)

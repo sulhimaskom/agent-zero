@@ -1,8 +1,9 @@
-from datetime import datetime, timedelta, timezone
-from python.helpers.tool import Tool, Response
-from python.helpers.print_style import PrintStyle
-from python.helpers.wait import managed_wait
+from datetime import UTC, datetime, timedelta
+
 from python.helpers.localization import Localization
+from python.helpers.print_style import PrintStyle
+from python.helpers.tool import Response, Tool
+from python.helpers.wait import managed_wait
 
 
 class WaitTool(Tool):
@@ -18,18 +19,14 @@ class WaitTool(Tool):
 
         is_duration_wait = not bool(until_timestamp_str)
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         target_time = None
 
         if until_timestamp_str:
             try:
-                target_time = Localization.get().localtime_str_to_utc_dt(
-                    until_timestamp_str
-                )
+                target_time = Localization.get().localtime_str_to_utc_dt(until_timestamp_str)
                 if not target_time:
-                    raise ValueError(
-                        f"Invalid timestamp format: {until_timestamp_str}"
-                    )
+                    raise ValueError(f"Invalid timestamp format: {until_timestamp_str}")
             except ValueError as e:
                 return Response(
                     message=str(e),
@@ -69,9 +66,7 @@ class WaitTool(Tool):
         if self.log:
             self.log.update(heading=self.get_heading("Done", done=True))
 
-        message = self.agent.read_prompt(
-            "fw.wait_complete.md", target_time=target_time.isoformat()
-        )
+        message = self.agent.read_prompt("fw.wait_complete.md", target_time=target_time.isoformat())
 
         return Response(
             message=message,

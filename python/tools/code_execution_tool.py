@@ -1,16 +1,17 @@
 import asyncio
-from dataclasses import dataclass
+import re
 import shlex
 import time
-from python.helpers.tool import Tool, Response
-from python.helpers import files, rfc_exchange, projects, runtime
+from dataclasses import dataclass
+
+from python.helpers import files, projects, rfc_exchange, runtime
+from python.helpers.constants import Colors, Limits, Paths, Timeouts
+from python.helpers.messages import truncate_text as truncate_text_agent
 from python.helpers.print_style import PrintStyle
 from python.helpers.shell_local import LocalInteractiveSession
 from python.helpers.shell_ssh import SSHInteractiveSession
 from python.helpers.strings import truncate_text as truncate_text_string
-from python.helpers.messages import truncate_text as truncate_text_agent
-from python.helpers.constants import Timeouts, Colors, Paths, Limits
-import re
+from python.helpers.tool import Response, Tool
 
 # Timeouts for python, nodejs, and terminal runtimes.
 CODE_EXEC_TIMEOUTS: dict[str, int] = {
@@ -49,9 +50,7 @@ class CodeExecution(Tool):
         re.compile(r"\\(venv\\).+[$#] ?$"),  # (venv) ...$ or (venv) ...#
         re.compile(r"root@[^:]+:[^#]+# ?$"),  # root@container:~#
         re.compile(r"[a-zA-Z0-9_.-]+@[^:]+:[^$#]+[$#] ?$"),  # user@host:~$
-        re.compile(
-            r"\(?.*\)?\s*PS\s+[^>]+> ?$"
-        ),  # PowerShell prompt like (base) PS C:\...>
+        re.compile(r"\(?.*\)?\s*PS\s+[^>]+> ?$"),  # PowerShell prompt like (base) PS C:\...>
     ]
     # potential dialog detection
     dialog_patterns = [
@@ -70,27 +69,19 @@ class CodeExecution(Tool):
         self.allow_running = bool(self.args.get("allow_running", False))
 
         if runtime == "python":
-            response = await self.execute_python_code(
-                code=self.args["code"], session=session
-            )
+            response = await self.execute_python_code(code=self.args["code"], session=session)
         elif runtime == "nodejs":
-            response = await self.execute_nodejs_code(
-                code=self.args["code"], session=session
-            )
+            response = await self.execute_nodejs_code(code=self.args["code"], session=session)
         elif runtime == "terminal":
             response = await self.execute_terminal_command(
                 command=self.args["code"], session=session
             )
         elif runtime == "output":
-            response = await self.get_terminal_output(
-                session=session, timeouts=OUTPUT_TIMEOUTS
-            )
+            response = await self.get_terminal_output(session=session, timeouts=OUTPUT_TIMEOUTS)
         elif runtime == "reset":
             response = await self.reset_terminal(session=session)
         else:
-            response = self.agent.read_prompt(
-                "fw.code.runtime_wrong.md", runtime=runtime
-            )
+            response = self.agent.read_prompt("fw.code.runtime_wrong.md", runtime=runtime)
 
         if not response:
             response = self.agent.read_prompt(
@@ -116,18 +107,12 @@ class CodeExecution(Tool):
         return f"icon://terminal {session_text}{text}"
 
     async def after_execution(self, response, **kwargs):
-        self.agent.hist_add_tool_result(
-            self.name, response.message, **(response.additional or {})
-        )
+        self.agent.hist_add_tool_result(self.name, response.message, **(response.additional or {}))
 
     async def prepare_state(self, reset=False, session: int | None = None):
         self.state: State | None = self.agent.get_data("_cet_state")
         # always reset state when ssh_enabled changes
-        if (
-            not self.state
-            or self.state.ssh_enabled
-            != self.agent.config.code_exec_ssh_enabled
-        ):
+        if not self.state or self.state.ssh_enabled != self.agent.config.code_exec_ssh_enabled:
             # initialize shells dictionary if not exists
             shells: dict[int, ShellWrap] = {}
         else:
@@ -162,41 +147,30 @@ class CodeExecution(Tool):
             else:
                 shell = LocalInteractiveSession(cwd=self.get_cwd())
 
-            shells[session] = ShellWrap(
-                id=session, session=shell, running=False
-            )
+            shells[session] = ShellWrap(id=session, session=shell, running=False)
             await shell.connect()
 
-        self.state = State(
-            shells=shells, ssh_enabled=self.agent.config.code_exec_ssh_enabled
-        )
+        self.state = State(shells=shells, ssh_enabled=self.agent.config.code_exec_ssh_enabled)
         self.agent.set_data("_cet_state", self.state)
         return self.state
 
-    async def execute_python_code(
-        self, session: int, code: str, reset: bool = False
-    ):
+    async def execute_python_code(self, session: int, code: str, reset: bool = False):
         escaped_code = shlex.quote(code)
         command = f"ipython -c {escaped_code}"
         prefix = "python> " + self.format_command_for_output(code) + "\n\n"
         return await self.terminal_session(session, command, reset, prefix)
 
-    async def execute_nodejs_code(
-        self, session: int, code: str, reset: bool = False
-    ):
+    async def execute_nodejs_code(self, session: int, code: str, reset: bool = False):
         escaped_code = shlex.quote(code)
         command = f"node {Paths.NODE_EVAL_SCRIPT} {escaped_code}"
         prefix = "node> " + self.format_command_for_output(code) + "\n\n"
         return await self.terminal_session(session, command, reset, prefix)
 
-    async def execute_terminal_command(
-        self, session: int, command: str, reset: bool = False
-    ):
+    async def execute_terminal_command(self, session: int, command: str, reset: bool = False):
         prefix = (
             (
                 "bash>"
-                if not runtime.is_windows()
-                or self.agent.config.code_exec_ssh_enabled
+                if not runtime.is_windows() or self.agent.config.code_exec_ssh_enabled
                 else "PS>"
             )
             + self.format_command_for_output(command)
@@ -267,7 +241,7 @@ class CodeExecution(Tool):
 
     def format_command_for_output(self, command: str):
         # truncate long commands
-        short_cmd = command[:Limits.COMMAND_TRUNCATION_PRIMARY]
+        short_cmd = command[: Limits.COMMAND_TRUNCATION_PRIMARY]
         # normalize whitespace for cleaner output
         short_cmd = " ".join(short_cmd.split())
         # replace any sequence of ', ", or ` with a single '
@@ -294,16 +268,10 @@ class CodeExecution(Tool):
 
         # Override timeouts if a dict is provided
         if timeouts:
-            first_output_timeout = timeouts.get(
-                "first_output_timeout", first_output_timeout
-            )
-            between_output_timeout = timeouts.get(
-                "between_output_timeout", between_output_timeout
-            )
+            first_output_timeout = timeouts.get("first_output_timeout", first_output_timeout)
+            between_output_timeout = timeouts.get("between_output_timeout", between_output_timeout)
             dialog_timeout = timeouts.get("dialog_timeout", dialog_timeout)
-            max_exec_timeout = timeouts.get(
-                "max_exec_timeout", max_exec_timeout
-            )
+            max_exec_timeout = timeouts.get("max_exec_timeout", max_exec_timeout)
 
         start_time = time.time()
         last_output_time = start_time
@@ -317,9 +285,7 @@ class CodeExecution(Tool):
 
         while True:
             await asyncio.sleep(sleep_time)
-            full_output, partial_output = await self.state.shells[
-                session
-            ].session.read_output(
+            full_output, partial_output = await self.state.shells[session].session.read_output(
                 timeout=Timeouts.TTY_READ_TIMEOUT,
                 reset_full_output=reset_full_output,
             )
@@ -329,25 +295,17 @@ class CodeExecution(Tool):
 
             now = time.time()
             if partial_output:
-                PrintStyle(font_color=Colors.PRIMARY_LIGHT_BLUE).stream(
-                    partial_output
-                )
+                PrintStyle(font_color=Colors.PRIMARY_LIGHT_BLUE).stream(partial_output)
                 # full_output += partial_output # Append new output
                 truncated_output = self.fix_full_output(full_output)
                 self.set_progress(truncated_output)
                 heading = self.get_heading_from_output(truncated_output, 0)
-                self.log.update(
-                    content=prefix + truncated_output, heading=heading
-                )
+                self.log.update(content=prefix + truncated_output, heading=heading)
                 last_output_time = now
                 got_output = True
 
                 # Check for shell prompt at the end of output
-                last_lines = (
-                    truncated_output.splitlines()[-3:]
-                    if truncated_output
-                    else []
-                )
+                last_lines = truncated_output.splitlines()[-3:] if truncated_output else []
                 last_lines.reverse()
                 for idx, line in enumerate(last_lines):
                     for pat in self.prompt_patterns:
@@ -364,12 +322,8 @@ class CodeExecution(Tool):
 
             # Check for max execution time
             if now - start_time > max_exec_timeout:
-                sysinfo = self.agent.read_prompt(
-                    "fw.code.max_time.md", timeout=max_exec_timeout
-                )
-                response = self.agent.read_prompt(
-                    "fw.code.info.md", info=sysinfo
-                )
+                sysinfo = self.agent.read_prompt("fw.code.max_time.md", timeout=max_exec_timeout)
+                response = self.agent.read_prompt("fw.code.info.md", info=sysinfo)
                 if truncated_output:
                     response = truncated_output + "\n\n" + response
                 PrintStyle.warning(sysinfo)
@@ -383,9 +337,7 @@ class CodeExecution(Tool):
                     sysinfo = self.agent.read_prompt(
                         "fw.code.no_out_time.md", timeout=first_output_timeout
                     )
-                    response = self.agent.read_prompt(
-                        "fw.code.info.md", info=sysinfo
-                    )
+                    response = self.agent.read_prompt("fw.code.info.md", info=sysinfo)
                     PrintStyle.warning(sysinfo)
                     self.log.update(content=prefix + response)
                     return response
@@ -395,9 +347,7 @@ class CodeExecution(Tool):
                     sysinfo = self.agent.read_prompt(
                         "fw.code.pause_time.md", timeout=between_output_timeout
                     )
-                    response = self.agent.read_prompt(
-                        "fw.code.info.md", info=sysinfo
-                    )
+                    response = self.agent.read_prompt("fw.code.info.md", info=sysinfo)
                     if truncated_output:
                         response = truncated_output + "\n\n" + response
                     PrintStyle.warning(sysinfo)
@@ -408,11 +358,7 @@ class CodeExecution(Tool):
                 # potential dialog detection
                 if now - last_output_time > dialog_timeout:
                     # Check for dialog prompt at the end of output
-                    last_lines = (
-                        truncated_output.splitlines()[-2:]
-                        if truncated_output
-                        else []
-                    )
+                    last_lines = truncated_output.splitlines()[-2:] if truncated_output else []
                     for line in last_lines:
                         for pat in self.dialog_patterns:
                             if pat.search(line.strip()):
@@ -423,25 +369,15 @@ class CodeExecution(Tool):
                                     "fw.code.pause_dialog.md",
                                     timeout=dialog_timeout,
                                 )
-                                response = self.agent.read_prompt(
-                                    "fw.code.info.md", info=sysinfo
-                                )
+                                response = self.agent.read_prompt("fw.code.info.md", info=sysinfo)
                                 if truncated_output:
-                                    response = (
-                                        truncated_output + "\n\n" + response
-                                    )
+                                    response = truncated_output + "\n\n" + response
                                 PrintStyle.warning(sysinfo)
-                                heading = self.get_heading_from_output(
-                                    truncated_output, 0
-                                )
-                                self.log.update(
-                                    content=prefix + response, heading=heading
-                                )
+                                heading = self.get_heading_from_output(truncated_output, 0)
+                                self.log.update(content=prefix + response, heading=heading)
                                 return response
 
-    async def handle_running_session(
-        self, session=0, reset_full_output=True, prefix=""
-    ):
+    async def handle_running_session(self, session=0, reset_full_output=True, prefix=""):
         if not self.state or session not in self.state.shells:
             return None
         if not self.state.shells[session].running:
@@ -455,16 +391,12 @@ class CodeExecution(Tool):
         self.set_progress(truncated_output)
         heading = self.get_heading_from_output(truncated_output, 0)
 
-        last_lines = (
-            truncated_output.splitlines()[-3:] if truncated_output else []
-        )
+        last_lines = truncated_output.splitlines()[-3:] if truncated_output else []
         last_lines.reverse()
         for idx, line in enumerate(last_lines):
             for pat in self.prompt_patterns:
                 if pat.search(line.strip()):
-                    PrintStyle.info(
-                        "Detected shell prompt, returning output early."
-                    )
+                    PrintStyle.info("Detected shell prompt, returning output early.")
                     self.mark_session_idle(session)
                     return None
 
@@ -482,9 +414,7 @@ class CodeExecution(Tool):
                 "fw.code.pause_dialog.md", timeout=Timeouts.MCP_SERVER_APPLY_DELAY
             )
         else:
-            sys_info = self.agent.read_prompt(
-                "fw.code.running.md", session=session
-            )
+            sys_info = self.agent.read_prompt("fw.code.running.md", session=session)
 
         response = self.agent.read_prompt("fw.code.info.md", info=sys_info)
         if truncated_output:

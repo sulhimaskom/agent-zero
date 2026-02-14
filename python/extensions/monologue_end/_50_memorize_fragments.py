@@ -1,11 +1,12 @@
 import asyncio
-from python.helpers import settings
-from python.helpers.extension import Extension
-from python.helpers.memory import Memory
-from python.helpers.dirty_json import DirtyJson
-from python.helpers.constants import Limits
+
 from agent import LoopData
+from python.helpers import settings
+from python.helpers.constants import Limits
+from python.helpers.dirty_json import DirtyJson
+from python.helpers.extension import Extension
 from python.helpers.log import LogItem
+from python.helpers.memory import Memory
 from python.tools.memory_load import (
     DEFAULT_THRESHOLD as DEFAULT_MEMORY_THRESHOLD,
 )
@@ -68,9 +69,7 @@ class MemorizeMemories(Extension):
         try:
             memories = DirtyJson.parse_string(memories_json)
         except Exception as e:
-            log_item.update(
-                heading=f"Failed to parse memories response: {str(e)}"
-            )
+            log_item.update(heading=f"Failed to parse memories response: {e!s}")
             return
 
         # Validate that memories is a list or convertible to one
@@ -90,9 +89,7 @@ class MemorizeMemories(Extension):
             log_item.update(heading="No useful information to memorize.")
             return
         else:
-            memories_txt = "\n\n".join(
-                [str(memory) for memory in memories]
-            ).strip()
+            memories_txt = "\n\n".join([str(memory) for memory in memories]).strip()
             log_item.update(
                 heading=f"{len(memories)} entries to memorize.",
                 memories=memories_txt,
@@ -123,9 +120,7 @@ class MemorizeMemories(Extension):
                     )
 
                     # Create memory item-specific log for detailed tracking
-                    memory_log = (
-                        None  # too many utility messages, skip log for now
-                    )
+                    memory_log = None  # too many utility messages, skip log for now
                     # memory_log = self.agent.context.log.log(
                     #     type="util",
                     #     heading=f"Processing memory fragment: {txt[:50]}...",
@@ -190,15 +185,11 @@ class MemorizeMemories(Extension):
                         log_item.update(replaced=rem_txt)
 
                 # insert new memory
-                await db.insert_text(
-                    text=txt, metadata={"area": Memory.Area.FRAGMENTS.value}
-                )
+                await db.insert_text(text=txt, metadata={"area": Memory.Area.FRAGMENTS.value})
 
                 log_item.update(
                     result=f"{len(memories)} entries memorized.",
                     heading=f"{len(memories)} entries memorized.",
                 )
                 if rem:
-                    log_item.stream(
-                        result=f"\nReplaced {len(rem)} previous memories."
-                    )
+                    log_item.stream(result=f"\nReplaced {len(rem)} previous memories.")

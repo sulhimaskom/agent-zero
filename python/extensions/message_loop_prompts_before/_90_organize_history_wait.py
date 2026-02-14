@@ -1,8 +1,8 @@
-from python.helpers.extension import Extension
 from agent import LoopData
 from python.extensions.message_loop_end._10_organize_history import (
     DATA_NAME_TASK,
 )
+from python.helpers.extension import Extension
 
 
 class OrganizeHistoryWait(Extension):
@@ -16,9 +16,7 @@ class OrganizeHistoryWait(Extension):
             # Check if the task is already done
             if task:
                 if not task.done():
-                    self.agent.context.log.set_progress(
-                        "Compressing history..."
-                    )
+                    self.agent.context.log.set_progress("Compressing history...")
 
                 # Wait for the task to complete
                 await task

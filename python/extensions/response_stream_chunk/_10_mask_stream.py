@@ -22,9 +22,7 @@ class MaskResponseStreamChunk(Extension):
                 agent.set_data(filter_key, filter_instance)
 
             # Process the chunk through the streaming filter
-            processed_chunk = filter_instance.process_chunk(
-                stream_data["chunk"]
-            )
+            processed_chunk = filter_instance.process_chunk(stream_data["chunk"])
 
             # Update the stream data with processed chunk
             stream_data["chunk"] = processed_chunk

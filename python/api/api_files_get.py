@@ -1,10 +1,11 @@
 import base64
-import os
-from python.helpers.api import ApiHandler, Request, Response
-from python.helpers import files
-from python.helpers.print_style import PrintStyle
-from python.helpers.constants import Colors, InternalPaths, HttpStatus
 import json
+import os
+
+from python.helpers import files
+from python.helpers.api import ApiHandler, Request, Response
+from python.helpers.constants import Colors, HttpStatus, InternalPaths
+from python.helpers.print_style import PrintStyle
 
 
 class ApiFilesGet(ApiHandler):
@@ -50,12 +51,8 @@ class ApiFilesGet(ApiHandler):
                     # Convert internal paths to external paths
                     if path.startswith(InternalPaths.A0_TMP_UPLOADS):
                         # Internal path - convert to external
-                        filename = path.replace(
-                            InternalPaths.A0_TMP_UPLOADS, ""
-                        )
-                        external_path = files.get_abs_path(
-                            "tmp/uploads", filename
-                        )
+                        filename = path.replace(InternalPaths.A0_TMP_UPLOADS, "")
+                        external_path = files.get_abs_path("tmp/uploads", filename)
                         filename = os.path.basename(external_path)
                     elif path.startswith("/a0/"):
                         # Other internal Agent Zero paths
@@ -75,17 +72,13 @@ class ApiFilesGet(ApiHandler):
                     # Read and encode file
                     with open(external_path, "rb") as f:
                         file_content = f.read()
-                        base64_content = base64.b64encode(file_content).decode(
-                            "utf-8"
-                        )
+                        base64_content = base64.b64encode(file_content).decode("utf-8")
                         result[filename] = base64_content
 
-                    PrintStyle().print(
-                        f"Retrieved file: {filename} ({len(file_content)} bytes)"
-                    )
+                    PrintStyle().print(f"Retrieved file: {filename} ({len(file_content)} bytes)")
 
                 except (OSError, ValueError) as e:
-                    PrintStyle.error(f"Failed to read file {path}: {str(e)}")
+                    PrintStyle.error(f"Failed to read file {path}: {e!s}")
                     continue
 
             # Log the retrieval
@@ -99,9 +92,9 @@ class ApiFilesGet(ApiHandler):
             return result
 
         except (RuntimeError, TypeError) as e:
-            PrintStyle.error(f"API files get error: {str(e)}")
+            PrintStyle.error(f"API files get error: {e!s}")
             return Response(
-                json.dumps({"error": f"Internal server error: {str(e)}"}),
+                json.dumps({"error": f"Internal server error: {e!s}"}),
                 status=HttpStatus.ERROR,
                 mimetype="application/json",
             )

@@ -4,27 +4,24 @@ BroCula Browser Optimization Loop
 Continuously monitors browser console and lighthouse scores, fixes issues automatically.
 """
 
+import json
 import subprocess
 import sys
-import json
 import time
 from pathlib import Path
-sys.path.insert(0, '/home/runner/work/agent-zero/agent-zero')
+
+sys.path.insert(0, "/home/runner/work/agent-zero/agent-zero")
 from python.helpers.constants import Network
+
 
 def run_command(cmd, timeout=60):
     """Run a shell command and return output"""
     try:
-        result = subprocess.run(
-            cmd,
-            shell=True,
-            capture_output=True,
-            text=True,
-            timeout=timeout
-        )
+        result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=timeout)
         return result.returncode, result.stdout, result.stderr
     except subprocess.TimeoutExpired:
         return -1, "", "Command timed out"
+
 
 def check_linter():
     """Check if there are any linting tools configured"""
@@ -57,6 +54,7 @@ def check_linter():
 
     return None
 
+
 def check_tests():
     """Check if there are test commands"""
     if Path("requirements.txt").exists():
@@ -72,6 +70,7 @@ def check_tests():
 
     return None
 
+
 def check_build():
     """Check if there's a build command"""
     if Path("package.json").exists():
@@ -81,6 +80,7 @@ def check_build():
                 return "npm run build"
 
     return None
+
 
 def main():
     """Main BroCula loop"""
@@ -151,7 +151,7 @@ def main():
         print("\n2️⃣  Running Lighthouse audit...")
         ret, stdout, stderr = run_command(
             f"lighthouse {target_url} --output=json --chrome-flags='--headless --no-sandbox' --quiet",
-            timeout=120
+            timeout=120,
         )
         if ret == 0:
             print("   ✅ Lighthouse completed")
@@ -205,6 +205,7 @@ def main():
         # Wait before next iteration
         print(f"\n⏳ Waiting {check_interval}s before next check...")
         time.sleep(check_interval)
+
 
 if __name__ == "__main__":
     try:

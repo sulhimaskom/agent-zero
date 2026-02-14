@@ -1,12 +1,12 @@
-import os
-import io
 import base64
+import io
+import os
+
 from PIL import Image
-from typing import Dict, Optional, Tuple
 from werkzeug.utils import secure_filename
 
-from python.helpers.print_style import PrintStyle
 from python.helpers.constants import Limits
+from python.helpers.print_style import PrintStyle
 
 
 class AttachmentManager:
@@ -43,7 +43,7 @@ class AttachmentManager:
         except AttributeError:
             return False
 
-    def save_file(self, file, filename: str) -> Tuple[str, Dict]:
+    def save_file(self, file, filename: str) -> tuple[str, dict]:
         """Save file and return path and metadata"""
         try:
             filename = secure_filename(filename)
@@ -75,7 +75,7 @@ class AttachmentManager:
 
     def generate_image_preview(
         self, image_path: str, max_size: int = Limits.IMAGE_PREVIEW_MAX_SIZE
-    ) -> Optional[str]:
+    ) -> str | None:
         try:
             with Image.open(image_path) as img:
                 # Convert image if needed

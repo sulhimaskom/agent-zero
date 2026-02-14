@@ -1,9 +1,9 @@
 from agent import Agent, UserMessage
-from python.helpers.tool import Tool, Response
 from initialize import initialize_agent
 from python.extensions.hist_add_tool_result import (
     _90_save_tool_call_file as save_tool_call_file,
 )
+from python.helpers.tool import Response, Tool
 
 
 class Delegation(Tool):
@@ -30,9 +30,7 @@ class Delegation(Tool):
 
         # add user message to subordinate agent
         subordinate: Agent = self.agent.get_data(Agent.DATA_NAME_SUBORDINATE)  # type: ignore
-        subordinate.hist_add_user_message(
-            UserMessage(message=message, attachments=[])
-        )
+        subordinate.hist_add_user_message(UserMessage(message=message, attachments=[]))
 
         # run subordinate monologue
         result = await subordinate.monologue()
@@ -45,9 +43,7 @@ class Delegation(Tool):
                 additional = {"hint": hint}
 
         # result
-        return Response(
-            message=result, break_loop=False, additional=additional
-        )
+        return Response(message=result, break_loop=False, additional=additional)
 
     def get_log_object(self):
         return self.agent.context.log.log(

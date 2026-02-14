@@ -1,10 +1,10 @@
 import time
+
 import docker
-from typing import Optional
-from python.helpers.errors import format_error
-from python.helpers.print_style import PrintStyle
-from python.helpers.log import Log
 from python.helpers.constants import Timeouts
+from python.helpers.errors import format_error
+from python.helpers.log import Log
+from python.helpers.print_style import PrintStyle
 
 
 class DockerContainerManager:
@@ -12,8 +12,8 @@ class DockerContainerManager:
         self,
         image: str,
         name: str,
-        ports: Optional[dict[str, int]] = None,
-        volumes: Optional[dict[str, dict[str, str]]] = None,
+        ports: dict[str, int] | None = None,
+        volumes: dict[str, dict[str, str]] | None = None,
         logger: Log | None = None,
     ):
         self.logger = logger
@@ -46,9 +46,7 @@ class DockerContainerManager:
                     PrintStyle.error(err)
                     if self.logger:
                         self.logger.log(type="error", content=err)
-                    time.sleep(
-                        Timeouts.DOCKER_RETRY_DELAY
-                    )  # try again in a few seconds
+                    time.sleep(Timeouts.DOCKER_RETRY_DELAY)  # try again in a few seconds
                 else:
                     raise
         return self.client
@@ -58,18 +56,14 @@ class DockerContainerManager:
             try:
                 self.container.stop()
                 self.container.remove()
-                PrintStyle.standard(
-                    f"Stopped and removed the container: {self.container.id}"
-                )
+                PrintStyle.standard(f"Stopped and removed the container: {self.container.id}")
                 if self.logger:
                     self.logger.log(
                         type="info",
                         content=f"Stopped and removed the container: {self.container.id}",
                     )
             except Exception as e:
-                PrintStyle.error(
-                    f"Failed to stop and remove the container: {e}"
-                )
+                PrintStyle.error(f"Failed to stop and remove the container: {e}")
                 if self.logger:
                     self.logger.log(
                         type="error",
@@ -79,9 +73,7 @@ class DockerContainerManager:
     def get_image_containers(self):
         if not self.client:
             self.client = self.init_docker()
-        containers = self.client.containers.list(
-            all=True, filters={"ancestor": self.image}
-        )
+        containers = self.client.containers.list(all=True, filters={"ancestor": self.image})
         infos = []
         for container in containers:
             infos.append(
@@ -91,12 +83,8 @@ class DockerContainerManager:
                     "status": container.status,
                     "image": container.image,
                     "ports": container.ports,
-                    "web_port": (container.ports.get("80/tcp") or [{}])[0].get(
-                        "HostPort"
-                    ),
-                    "ssh_port": (container.ports.get("22/tcp") or [{}])[0].get(
-                        "HostPort"
-                    ),
+                    "web_port": (container.ports.get("80/tcp") or [{}])[0].get("HostPort"),
+                    "ssh_port": (container.ports.get("22/tcp") or [{}])[0].get("HostPort"),
                     # "volumes": container.volumes,
                     # "data_folder": container.volumes["/a0"],
                 }
@@ -126,9 +114,7 @@ class DockerContainerManager:
 
                 existing_container.start()
                 self.container = existing_container
-                time.sleep(
-                    Timeouts.DOCKER_INIT_DELAY
-                )  # this helps to get SSH ready
+                time.sleep(Timeouts.DOCKER_INIT_DELAY)  # this helps to get SSH ready
 
             else:
                 self.container = existing_container
@@ -152,14 +138,10 @@ class DockerContainerManager:
                 volumes=self.volumes,  # type: ignore
             )
             # atexit.register(self.cleanup_container)
-            PrintStyle.standard(
-                f"Started container with ID: {self.container.id}"
-            )
+            PrintStyle.standard(f"Started container with ID: {self.container.id}")
             if self.logger:
                 self.logger.log(
                     type="info",
                     content=f"Started container with ID: {self.container.id}",
                 )
-            time.sleep(
-                Timeouts.DOCKER_STARTUP_DELAY
-            )  # this helps to get SSH ready
+            time.sleep(Timeouts.DOCKER_STARTUP_DELAY)  # this helps to get SSH ready

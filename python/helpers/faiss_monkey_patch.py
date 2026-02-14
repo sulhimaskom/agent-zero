@@ -13,8 +13,9 @@
 # faiss_monkey_patch.py  – import this before faiss -----------------
 import sys
 import types
-import numpy as np
 from types import SimpleNamespace
+
+import numpy as np
 
 # fake numpy.distutils and numpy.distutils.cpuinfo packages
 dist = types.ModuleType("numpy.distutils")

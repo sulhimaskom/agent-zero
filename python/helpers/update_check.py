@@ -1,15 +1,14 @@
+import hashlib
+
 from python.helpers import git, runtime
 from python.helpers.constants import Network
-import hashlib
 
 
 async def check_version():
     import httpx
 
     current_version = git.get_version()
-    anonymized_id = hashlib.sha256(
-        runtime.get_persistent_id().encode()
-    ).hexdigest()[:20]
+    anonymized_id = hashlib.sha256(runtime.get_persistent_id().encode()).hexdigest()[:20]
 
     url = Network.UPDATE_CHECK_URL
     payload = {
