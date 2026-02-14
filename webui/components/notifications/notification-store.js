@@ -154,6 +154,16 @@ const model = {
     this.removeFromToastStack(toastId, true);
   },
 
+  dismissNewestToast() {
+    if (this.toastStack.length === 0) return false;
+    const newestToast = this.toastStack[this.toastStack.length - 1];
+    if (newestToast?.toastId) {
+      this.removeFromToastStack(newestToast.toastId, true);
+      return true;
+    }
+    return false;
+  },
+
   pauseToastTimer(toastId) {
     const toast = this.toastStack.find((t) => t.toastId === toastId);
     if (!toast || toast.isPaused) return;
@@ -685,7 +695,7 @@ const model = {
         console.log("Backend disconnected, showing as frontend-only toast");
       }
     }
-    
+
     // Fallback to frontend-only toast
     return this.addFrontendToastOnly(
       type,
