@@ -1,9 +1,8 @@
 from typing import Any
 from python.helpers.extension import Extension
 from python.helpers import files, persist_chat
+from python.helpers.constants import Extensions
 import os
-
-LEN_MIN = 500
 
 
 class SaveToolCallFile(Extension):
@@ -17,7 +16,7 @@ class SaveToolCallFile(Extension):
             return
 
         # skip short results
-        if len(str(result)) < LEN_MIN:
+        if len(str(result)) < Extensions.TOOL_CALL_FILE_MIN_LENGTH:
             return
 
         # message files directory

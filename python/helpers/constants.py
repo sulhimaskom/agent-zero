@@ -617,6 +617,40 @@ class Browser:
 
 
 # =============================================================================
+# SEARCH ENGINE CONFIGURATION
+# =============================================================================
+
+
+class Search:
+    """Search engine configuration - All values configurable via environment variables"""
+
+    # Default number of search results to return
+    DEFAULT_RESULTS_COUNT: Final[int] = 10
+
+    # DuckDuckGo search defaults
+    DDG_DEFAULT_RESULTS: Final[int] = 5
+    DDG_DEFAULT_REGION: Final[str] = "wt-wt"  # Worldwide
+    DDG_DEFAULT_TIME_LIMIT: Final[str] = "y"  # Past year
+    DDG_DEFAULT_SAFESEARCH: Final[str] = "off"
+
+    # SearXNG search defaults
+    SEARXNG_DEFAULT_RESULTS: Final[int] = 10
+
+
+# =============================================================================
+# EXTENSION CONFIGURATION
+# =============================================================================
+
+
+class Extensions:
+    """Extension-specific configuration constants"""
+
+    # Tool call file saving threshold
+    # Minimum length of tool result to save as a file
+    TOOL_CALL_FILE_MIN_LENGTH: Final[int] = 500
+
+
+# =============================================================================
 # ENVIRONMENT OVERRIDES
 # Allow overriding constants via environment variables
 # =============================================================================
