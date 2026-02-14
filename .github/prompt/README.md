@@ -19,7 +19,7 @@ User Input → [00 Strategist] → feature.md + task.md
 gemini --system-prompt "$(cat 00-strategist.md)" "new feature request"
 gemini --system-prompt "$(cat 02-sanitizer.md)" "fix the build"
 
-# Example with Claude CLI  
+# Example with Claude CLI
 claude --system "$(cat 04-security.md)" "audit dependencies"
 ```
 

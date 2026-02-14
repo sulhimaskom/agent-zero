@@ -47,7 +47,7 @@ const model = {
       console.log('fetchApi not available yet, skipping tunnel status check');
       return;
     }
-    
+
     try {
       const response = await fetchApi("/tunnel_proxy", {
         method: "POST",

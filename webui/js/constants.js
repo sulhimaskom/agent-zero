@@ -25,16 +25,16 @@ export const API = {
   TUNNEL_API_PORT: getEnvConfig('TUNNEL_API_PORT', 55520),
   SEARXNG_PORT: getEnvConfig('SEARXNG_PORT', 55510),
   A2A_PORT: getEnvConfig('A2A_PORT', 50101),
-  
+
   // Hosts - Configurable via window.ENV_CONFIG
   LOCALHOST: getEnvConfig('LOCALHOST', "127.0.0.1"),
   HOSTNAME: getEnvConfig('HOSTNAME', "localhost"),
-  
+
   // Endpoints
   CSRF_TOKEN_ENDPOINT: "/csrf_token",
   POLL_ENDPOINT: "/poll",
   LOGIN_ENDPOINT: "/login",
-  
+
   // Status codes
   STATUS_OK: 200,
   STATUS_UNAUTHORIZED: 401,
@@ -160,7 +160,7 @@ export const COLORS = {
   // Primary colors
   PRIMARY_BLUE: "#1B4F72",
   PRIMARY_LIGHT_BLUE: "#85C1E9",
-  
+
   // Semantic colors
   SUCCESS: "#008000",
   WARNING: "#FFA500",
@@ -168,7 +168,7 @@ export const COLORS = {
   INFO: "#0000FF",
   DEBUG: "#808080",
   HINT: "#6C3483",
-  
+
   // Accent colors
   AGENT_PURPLE: "#6C3483",
   SETTINGS_PURPLE: "#6734C3",
@@ -177,7 +177,7 @@ export const COLORS = {
   MCP_ERROR_RED: "#AA4455",
   FILES_GREEN: "#2ECC71",
   STREAM_MINT: "#b3ffd9",
-  
+
   // Background
   BG_WHITE: "white",
 };
@@ -191,7 +191,7 @@ export const STORAGE_KEYS = {
   SETTINGS: "a0_settings",
   THEME: "a0_theme",
   LANGUAGE: "a0_language",
-  
+
   // UI state keys
   DARK_MODE: "darkMode",
   SPEECH: "speech",
@@ -201,16 +201,16 @@ export const STORAGE_KEYS = {
   SETTINGS_ACTIVE_TAB: "settingsActiveTab",
   SCHEDULER_VIEW_MODE: "scheduler_view_mode",
   BACKUP_PREVIEW_MODE: "backupPreviewMode",
-  
+
   // Device/Feature keys
   MICROPHONE_SELECTED_DEVICE: "microphoneSelectedDevice",
   MESSAGE_RESIZE_SETTINGS: "messageResizeSettings",
-  
+
   // Feature-specific keys
   TUNNEL_URL: "agent_zero_tunnel_url",
   MEMORY_DASHBOARD_THRESHOLD: "memoryDashboard_threshold",
   MEMORY_DASHBOARD_LIMIT: "memoryDashboard_limit",
-  
+
   // Debug keys
   DEBUG: "debug",
 };
@@ -224,12 +224,12 @@ export const EVENTS = {
   MESSAGE_RECEIVED: "message:received",
   MESSAGE_SENT: "message:sent",
   MESSAGE_UPDATED: "message:updated",
-  
+
   // System events
   CONNECTED: "system:connected",
   DISCONNECTED: "system:disconnected",
   ERROR: "system:error",
-  
+
   // UI events
   MODAL_OPEN: "ui:modal:open",
   MODAL_CLOSE: "ui:modal:close",
@@ -268,21 +268,21 @@ export const API_ENDPOINTS = {
   SETTINGS_GET: "/api/settings_get",
   SETTINGS_SAVE: "/api/settings_save",
   TEST_CONNECTION: "/api/test_connection",
-  
+
   // Chat endpoints
   MESSAGE_ASYNC: "/message_async",
   CHAT_LOAD: "/chat_load",
   CHAT_FILES_PATH_GET: "/chat_files_path_get",
-  
+
   // Poll endpoint
   POLL: "/poll",
-  
+
   // Scheduler endpoints
   SCHEDULER_TASKS_LIST: "/scheduler_tasks_list",
-  
+
   // Tunnel endpoints
   TUNNEL_PROXY: "/tunnel_proxy",
-  
+
   // Notification endpoints
   NOTIFICATION_CREATE: "/notification_create",
 };
@@ -339,10 +339,10 @@ export const MESSAGES = {
   CHATS_LOADED: "Chats loaded.",
   BACKUP_CREATED: "Backup created and downloaded successfully!",
   COPIED_TO_CLIPBOARD: "Copied to clipboard!",
-  
+
   // Progress messages
   CREATING_TUNNEL: "Creating tunnel...",
-  
+
   // Button labels
   SAVE: "Save",
   CANCEL: "Cancel",

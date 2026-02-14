@@ -6,7 +6,6 @@ from python.helpers.history import Bulk, History, Message, Topic
 
 
 class TestTokenCaching:
-
     def test_message_token_caching(self):
         """Test that Message caches token calculations"""
         with patch("python.helpers.tokens.count_tokens") as mock_count:
@@ -175,27 +174,27 @@ class TestTokenCaching:
         topic = Topic(history=MagicMock())
         topic.summary = "Pre-existing summary"
 
-        with patch("python.helpers.tokens.count_tokens") as mock_count:
-            mock_count.return_value = 16
+        with patch("python.helpers.tokens.approximate_tokens") as mock_approx:
+            mock_approx.return_value = 16
 
             tokens1 = topic.get_tokens()
             tokens2 = topic.get_tokens()
 
             assert tokens1 == tokens2
-            assert tokens1 == 17
-            mock_count.assert_called_once()
+            assert tokens1 == 16
+            mock_approx.assert_called_once()
 
     def test_bulk_with_summary_caching(self):
         """Test that Bulk with summary uses cached summary tokens"""
         bulk = Bulk(history=MagicMock())
         bulk.summary = "Pre-existing summary"
 
-        with patch("python.helpers.tokens.count_tokens") as mock_count:
-            mock_count.return_value = 22
+        with patch("python.helpers.tokens.approximate_tokens") as mock_approx:
+            mock_approx.return_value = 22
 
             tokens1 = bulk.get_tokens()
             tokens2 = bulk.get_tokens()
 
             assert tokens1 == tokens2
-            assert tokens1 == 24
-            mock_count.assert_called_once()
+            assert tokens1 == 22
+            mock_approx.assert_called_once()

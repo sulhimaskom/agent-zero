@@ -21,7 +21,7 @@
                         <!-- View Mode Buttons -->
                         <template x-if="!$store.memoryDashboardStore.editMode">
                             <div style="display: flex; gap: 0.5rem;">
-                                
+
                                 <button class="btn btn-action-header copy-all"
                                         :class="{ 'copied': $store.memoryDashboardStore.recentlyCopied[$store.memoryDashboardStore.detailMemory?.id + '_all'] }"
                                         @click="$store.memoryDashboardStore.copyToClipboard($store.memoryDashboardStore.formatMemoryForCopy($store.memoryDashboardStore.detailMemory), true, $store.memoryDashboardStore.detailMemory?.id + '_all')"
@@ -152,14 +152,14 @@
                 top: 0;
                 z-index: 100;
             }
-        
+
             .header-info {
                 display: flex;
                 align-items: center;
                 gap: 0.5rem;
                 font-size: 0.9rem;
             }
-        
+
             .timestamp-text,
             .source-text {
                 color: var(--color-text);
@@ -170,7 +170,7 @@
                 font-weight: 500;
                 border: 1px solid;
             }
-        
+
             .btn-action-header {
                 padding: 0.4rem 0.6rem;
                 display: flex;
@@ -179,23 +179,23 @@
                 background: var(--color-message-bg);
                 color: var(--color-text);
             }
-        
+
             .btn-action-header .material-symbols-outlined {
                 font-size: 18px;
             }
-        
+
             .btn-action-header.delete:hover {
                 border-color: var(--color-accent);
                 color: var(--color-accent);
             }
-        
+
             .btn-action-header.copy-all:hover,
             .btn-action-header.copy-content:hover,
             .btn-action-header.edit:hover {
                 border-color: var(--color-primary);
                 color: var(--color-primary);
             }
-        
+
             .btn-action-header.confirm:hover {
                 border-color: #4CAF50;
                 color: #4CAF50;
@@ -228,13 +228,13 @@
                 color: var(--color-accent);
                 background: var(--color-background);
             }
-        
+
             .modal-body {
                 display: flex;
                 min-height: 60vh;
                 max-height: 100%;
             }
-        
+
             .content-section-main {
                 flex: 1;
                 padding: 1.5rem;
@@ -243,21 +243,21 @@
                 display: flex;
                 flex-direction: column;
             }
-        
+
             .content-block {
                 /* margin-bottom: 3rem; */
                 display: flex;
                 flex-direction: column;
                 min-height: 0;
             }
-            
+
             /* Make the first content block (Memory Content) take all available space */
             .content-block:first-child {
                 flex: 1;
                 /* margin-bottom: 1.5rem; */
                 min-height: 0;
             }
-        
+
             .content-block h4 {
                 margin: 0 0 1rem 0;
                 color: var(--color-text);
@@ -266,7 +266,7 @@
                 /* border-bottom: 1px solid var(--color-border); */
                 /* padding-bottom: 0.5rem; */
             }
-        
+
             .memory-content-display {
                 border: 1px solid var(--color-border);
                 border-radius: 8px;
@@ -286,7 +286,7 @@
                 display: flex;
                 flex-direction: column;
             }
-            
+
             .memory-content-display p {
                 background: var(--color-panel);
                 margin: 0;
@@ -298,13 +298,13 @@
                 height: 0;
                 flex-grow: 1;
             }
-            
+
             textarea.memory-content-display {
                 padding: 1.5rem;
                 overflow-y: auto;
                 display: block;
             }
-        
+
             .tags-display {
                 display: flex;
                 flex-wrap: wrap;
@@ -314,7 +314,7 @@
                 border-radius: 8px;
                 border: 1px solid var(--color-border);
             }
-        
+
             .tag-display {
                 background: var(--color-primary);
                 color: white;
@@ -323,7 +323,7 @@
                 font-size: 0.75rem;
                 font-weight: 500;
             }
-        
+
             .metadata-sidebar {
                 min-width: 300px;
                 max-width: 350px;
@@ -333,18 +333,18 @@
                 overflow-y: auto;
                 max-height: 50em;
             }
-        
+
             .metadata-sidebar h4 {
                 margin: 0 0 1rem 0;
                 color: var(--color-text);
                 font-size: 1.1rem;
                 font-weight: 600;
             }
-        
+
             .metadata-group {
                 margin-bottom: 1.5rem;
             }
-        
+
             .metadata-group h5 {
                 margin: 0 0 0.75rem 0;
                 color: var(--color-text);
@@ -354,7 +354,7 @@
                 text-transform: uppercase;
                 letter-spacing: 0.5px;
             }
-        
+
             .metadata-item {
                 display: flex;
                 flex-direction: column;
@@ -365,7 +365,7 @@
                 border: 1px solid var(--color-border);
                 border-radius: 6px;
             }
-        
+
             .metadata-label {
                 font-size: 0.8rem;
                 font-weight: 600;
@@ -374,14 +374,14 @@
                 text-transform: uppercase;
                 letter-spacing: 0.3px;
             }
-        
+
             .metadata-value {
                 font-size: 0.9rem;
                 color: var(--color-text);
                 word-break: break-all;
                 line-height: 1.4;
             }
-        
+
             .source-file-display {
                 font-family: monospace;
                 background: var(--color-panel);
@@ -389,19 +389,19 @@
                 border-radius: 4px;
                 border: 1px solid var(--color-border);
             }
-        
+
             .memory-detail-container {
                 display: flex;
                 flex-direction: column;
                 height: 100%;
             }
-            
+
             /* Responsive design for modal */
             @media (max-width: 870px) {
                 .modal-body {
                     flex-direction: column;
                 }
-        
+
                 .metadata-sidebar {
                     min-width: unset;
                     max-width: unset;
@@ -413,17 +413,17 @@
                 .metadata-item {
                     display: block;
                 }
-        
+
                 .modal-header-compact {
                     padding: 0.75rem 1rem;
                     flex-wrap: wrap;
                     gap: 0.75rem;
                 }
-        
+
                 .header-info {
                     flex-wrap: wrap;
                 }
-        
+
                 .content-section-main,
                 .metadata-sidebar {
                     padding: 1rem;

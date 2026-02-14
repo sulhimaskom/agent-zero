@@ -9,7 +9,7 @@
   <div x-data>
     <template x-if="$store.context">
       <div class="context-modal-root">
-        
+
         <!-- Loading State -->
         <template x-if="$store.context.isLoading">
           <div class="loading-state">
@@ -17,19 +17,19 @@
             <p>Loading context window…</p>
           </div>
         </template>
-        
+
         <!-- Error State -->
         <template x-if="$store.context.error">
           <div class="error-state">
             <p class="error-message" x-text="$store.context.error"></p>
           </div>
         </template>
-        
+
         <!-- Content (ACE Editor) -->
         <template x-if="!$store.context.isLoading && !$store.context.error">
           <div id="context-viewer-container"></div>
         </template>
-        
+
       </div>
     </template>
   </div>

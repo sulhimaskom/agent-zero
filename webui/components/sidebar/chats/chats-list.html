@@ -43,7 +43,7 @@
                     x-text="context.name ? context.name : 'Chat #' + context.no"></span>
                 </div>
                 <div class="delete-wrapper" x-data="{ confirmDelete: false }" @click.outside="confirmDelete = false">
-                  <button 
+                  <button
                     :class="{'edit-button': true, 'confirm-delete': confirmDelete}"
                     @click.stop="if (confirmDelete) { $store.chats.killChat(context.id); confirmDelete = false; } else { confirmDelete = true; }"
                     :aria-label="confirmDelete ? 'Click again to confirm delete' : 'Delete chat'">

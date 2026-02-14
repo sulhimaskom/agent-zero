@@ -6,10 +6,10 @@ export async function sleep(miliseconds = 0, seconds = 0, minutes = 0, hours = 0
   minutes += hours * 60;
   seconds += minutes * 60;
   miliseconds += seconds * 1000;
-  
+
   // Maximum safe timeout from constants
   const MAX_TIMEOUT = TIMING.SLEEP_MAX_TIMEOUT;
-  
+
   // if miliseconds is 0, wait at least one frame
   if (miliseconds === 0) {
     await new Promise((resolve) => setTimeout(resolve, 0));
@@ -20,10 +20,10 @@ export async function sleep(miliseconds = 0, seconds = 0, minutes = 0, hours = 0
   while (miliseconds > 0) {
     // Calculate the current chunk duration (1 hour max)
     const chunkDuration = Math.min(miliseconds, MAX_TIMEOUT);
-    
+
     // Wait for the current chunk
     await new Promise((resolve) => setTimeout(resolve, chunkDuration));
-    
+
     // Subtract the time we've waited
     miliseconds -= chunkDuration;
   }

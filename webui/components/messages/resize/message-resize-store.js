@@ -70,35 +70,35 @@ const model = {
     if (!event || !event.target) {
       return;
     }
-    
+
     // Store the element reference to avoid issues with event being modified
     const targetElement = event.target;
     const clickY = event.clientY;
-    
+
     // Use requestAnimationFrame for smoother timing with browser rendering
     // requestAnimationFrame(() => {
         try {
           // Get fresh measurements after potential re-renders
           const rect = targetElement.getBoundingClientRect();
           const viewHeight = window.innerHeight || document.documentElement.clientHeight;
-          
+
           // Get chat history element
           const chatHistory = document.getElementById('chat-history');
           if (!chatHistory) {
             return;
           }
-          
+
           // Get chat history position
           const chatRect = chatHistory.getBoundingClientRect();
-          
+
           // Calculate element's middle position relative to chat history
           const elementHeight = rect.height;
           const elementMiddle = rect.top + (elementHeight / 2);
           const relativeMiddle = elementMiddle - chatRect.top;
-          
+
           // Calculate target scroll position
           let scrollTop;
-          
+
           if (typeof clickY === 'number') {
             // Calculate based on click position
             const clickRelativeToChat = clickY - chatRect.top;
@@ -109,7 +109,7 @@ const model = {
             const targetPosition = chatHistory.clientHeight * 0.5;
             scrollTop = chatHistory.scrollTop + relativeMiddle - targetPosition;
           }
-          
+
           // Apply scroll with instant behavior
           chatHistory.scrollTo({
             top: scrollTop,

@@ -14,21 +14,21 @@
             <div id="image-viewer-wrapper" class="image-modal-container">
                 <!-- Image display area -->
                 <div class="image-display-wrapper">
-                    <img 
-                        x-show="$store.imageViewer.currentImageUrl" 
-                        :src="$store.imageViewer.currentImageUrl" 
+                    <img
+                        x-show="$store.imageViewer.currentImageUrl"
+                        :src="$store.imageViewer.currentImageUrl"
                         :alt="$store.imageViewer.currentImageName || 'Image'"
                         class="modal-image"
                         @load="$store.imageViewer.imageLoaded = true"
                         @error="$store.imageViewer.imageError = true"
                     />
-                    
+
                     <!-- Loading indicator -->
                     <div x-show="!$store.imageViewer.imageLoaded && !$store.imageViewer.imageError" class="loading-indicator">
                         <div class="loading-spinner"></div>
                         <p>Loading image...</p>
                     </div>
-                    
+
                     <!-- Error indicator -->
                     <div x-show="$store.imageViewer.imageError" class="error-indicator">
                         <p>Failed to load image</p>

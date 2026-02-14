@@ -30,7 +30,7 @@
                     <a x-show="$store.chats.selectedContext.project?.name" href="#" @click.prevent="$store.projects.editActiveProject(); open = false;" class="project-dropdown-item"><span class="icon material-symbols-outlined">edit</span> <span class="project-selector-item-text">Edit <span x-text="$store.chats.selectedContext.project?.title"></span></span></a>
                     <a x-show="$store.chats.selectedContext.project?.name" href="#" @click.prevent="$store.projects.deactivateProject(); open = false;" class="project-dropdown-item"><span class="icon material-symbols-outlined">close</span> <span class="project-selector-item-text">Deactivate</span></a>
                     <!-- <a href="#" @click.prevent="$store.projects.openProjectsModal(); $store.projects.openCreateModal(); open = false;" class="project-dropdown-item">Create Project</a> -->
-                    
+
                     <hr x-show=" $store.projects.projectList.length > 0" class="project-dropdown-divider">
                     <template x-for="project in $store.projects.projectList" :key="project.name">
                         <a href="#" @click.prevent="$store.projects.activateProject(project.name); open = false;" class="project-dropdown-item">

@@ -34,14 +34,14 @@ const model = {
     requestingPermission: false,
     permissionTimer: null,
     permissionAttempts: 0,
-    
+
     // request microphone permission and poll for devices
     async requestPermission() {
         // set flag first so UI can update immediately
         clearTimeout(this.permissionTimer);
         this.requestingPermission = true;
         this.permissionAttempts = 0;
-        
+
         // request permission in next tick to allow UI to update
         setTimeout(async () => {
             try {
@@ -54,17 +54,17 @@ const model = {
             }
         }, 0);
     },
-    
+
     // poll for devices until found or timeout (60s)
     async pollForDevices() {
         await this.loadDevices();
-        
+
         // check if we found devices with valid IDs
         if (this.devices.some(d => d.deviceId && d.deviceId !== "") || this.permissionAttempts >= 60) {
             this.requestingPermission = false;
             return;
         }
-        
+
         // continue polling
         this.permissionAttempts++;
         this.permissionTimer = setTimeout(() => this.pollForDevices(), TIMING.POLL_INTERVAL);
