@@ -47,7 +47,7 @@ self.addEventListener('install', (event) => {
         // Failed to cache static assets - silent fail
       })
   );
-  
+
   // Skip waiting to activate immediately
   self.skipWaiting();
 });
@@ -65,7 +65,7 @@ self.addEventListener('activate', (event) => {
       );
     })
   );
-  
+
   // Take control of all clients immediately
   self.clients.claim();
 });
@@ -74,14 +74,14 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
-  
+
   // Skip non-GET requests
   if (request.method !== 'GET') {
     return;
   }
-  
+
   // Skip API requests - let them go to network
-  if (url.pathname.startsWith('/api/') || 
+  if (url.pathname.startsWith('/api/') ||
       url.pathname.startsWith('/message') ||
       url.pathname.startsWith('/poll') ||
       url.pathname.startsWith('/settings') ||
@@ -94,7 +94,7 @@ self.addEventListener('fetch', (event) => {
       url.pathname.startsWith('/history')) {
     return;
   }
-  
+
   // Stale-while-revalidate strategy for static assets
   event.respondWith(
     caches.match(request).then((cachedResponse) => {
@@ -113,7 +113,7 @@ self.addEventListener('fetch', (event) => {
           // Return cached response if available
           return cachedResponse;
         });
-      
+
       // Return cached response immediately, or wait for network
       return cachedResponse || fetchPromise;
     })

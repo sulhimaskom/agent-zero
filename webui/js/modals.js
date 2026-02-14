@@ -65,36 +65,36 @@ function createModalElement(path) {
   // Create modal structure using safe DOM manipulation
   const modalInner = document.createElement('div');
   modalInner.className = 'modal-inner';
-  
+
   const modalHeader = document.createElement('div');
   modalHeader.className = 'modal-header';
-  
+
   const modalTitle = document.createElement('h2');
   modalTitle.className = 'modal-title';
-  
+
   const closeButton = document.createElement('button');
   closeButton.className = 'modal-close';
   closeButton.innerHTML = '&times;'; // Static HTML entity, safe
-  
+
   modalHeader.appendChild(modalTitle);
   modalHeader.appendChild(closeButton);
-  
+
   const modalScroll = document.createElement('div');
   modalScroll.className = 'modal-scroll';
-  
+
   const modalBody = document.createElement('div');
   modalBody.className = 'modal-bd';
-  
+
   modalScroll.appendChild(modalBody);
-  
+
   const modalFooter = document.createElement('div');
   modalFooter.className = 'modal-footer-slot';
   modalFooter.style.display = 'none';
-  
+
   modalInner.appendChild(modalHeader);
   modalInner.appendChild(modalScroll);
   modalInner.appendChild(modalFooter);
-  
+
   newModal.appendChild(modalInner);
 
   // Setup close button handler for this specific modal
@@ -162,7 +162,7 @@ export function openModal(modalPath) {
           if (doc.body && doc.body.classList) {
             modal.body.classList.add(...doc.body.classList);
           }
-          
+
           // Some modals have a footer. Check if it exists and move it to footer slot
           // Use requestAnimationFrame to let Alpine mount the component first
           requestAnimationFrame(() => {

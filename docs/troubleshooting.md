@@ -28,7 +28,7 @@ Modify the `rate_limit_seconds` and `rate_limit_requests` parameters in the `Age
 -   Verify that the Docker image is updated.
 
 **8. Can Agent Zero interact with external APIs or services (e.g., WhatsApp)?**
-Extending Agent Zero to interact with external APIs is possible by creating custom tools or solutions. Refer to the documentation on creating them. 
+Extending Agent Zero to interact with external APIs is possible by creating custom tools or solutions. Refer to the documentation on creating them.
 
 ## Troubleshooting
 

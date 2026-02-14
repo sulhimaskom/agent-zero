@@ -86,23 +86,25 @@ class TestToolCoordinator:
             loop_data=mock_agent.loop_data,
         )
 
-        with patch.object(tool_coordinator, "get_tool", return_value=mock_tool):
-            with patch("python.coordinators.tool_coordinator.extract_tools") as mock_extract:
-                mock_extract.json_parse_dirty.return_value = {
-                    "tool_name": "test_tool",
-                    "tool_args": {"param1": "value1"},
-                }
+        with patch("python.helpers.mcp_handler.MCPConfig") as mock_mcp_config:
+            mock_mcp_config.get_instance.return_value.get_tool.return_value = None
+            with patch.object(tool_coordinator, "get_tool", return_value=mock_tool):
+                with patch("python.coordinators.tool_coordinator.extract_tools") as mock_extract:
+                    mock_extract.json_parse_dirty.return_value = {
+                        "tool_name": "test_tool",
+                        "tool_args": {"param1": "value1"},
+                    }
 
-                # Act: Process the tool request
-                result = await tool_coordinator.process_tools(valid_tool_request)
+                    # Act: Process the tool request
+                    result = await tool_coordinator.process_tools(valid_tool_request)
 
-                # Assert: Tool lifecycle executed correctly
-                assert mock_tool.before_called is True
-                assert mock_tool.executed is True
-                assert mock_tool.after_called is True
-                assert result is None
-                assert mock_agent.call_extensions.called
-                assert mock_agent.handle_intervention.called
+                    # Assert: Tool lifecycle executed correctly
+                    assert mock_tool.before_called is True
+                    assert mock_tool.executed is True
+                    assert mock_tool.after_called is True
+                    assert result is None
+                    assert mock_agent.call_extensions.called
+                    assert mock_agent.handle_intervention.called
 
     @pytest.mark.asyncio
     async def test_process_tools_with_break_loop(
@@ -123,18 +125,20 @@ class TestToolCoordinator:
             loop_data=mock_agent.loop_data,
         )
 
-        with patch.object(tool_coordinator, "get_tool", return_value=mock_tool):
-            with patch("python.coordinators.tool_coordinator.extract_tools") as mock_extract:
-                mock_extract.json_parse_dirty.return_value = {
-                    "tool_name": "test_tool",
-                    "tool_args": {},
-                }
+        with patch("python.helpers.mcp_handler.MCPConfig") as mock_mcp_config:
+            mock_mcp_config.get_instance.return_value.get_tool.return_value = None
+            with patch.object(tool_coordinator, "get_tool", return_value=mock_tool):
+                with patch("python.coordinators.tool_coordinator.extract_tools") as mock_extract:
+                    mock_extract.json_parse_dirty.return_value = {
+                        "tool_name": "test_tool",
+                        "tool_args": {},
+                    }
 
-                # Act: Process the tool
-                result = await tool_coordinator.process_tools(valid_tool_request)
+                    # Act: Process the tool
+                    result = await tool_coordinator.process_tools(valid_tool_request)
 
-                # Assert: Returns message to break loop
-                assert result == "Stopping"
+                    # Assert: Returns message to break loop
+                    assert result == "Stopping"
 
     @pytest.mark.asyncio
     async def test_process_tools_with_malformed_request(self, tool_coordinator, mock_agent):
@@ -157,18 +161,20 @@ class TestToolCoordinator:
         self, tool_coordinator, mock_agent, valid_tool_request
     ):
         """Arrange: Tool not found, returns Unknown tool"""
-        with patch("python.coordinators.tool_coordinator.extract_tools") as mock_extract:
-            mock_extract.json_parse_dirty.return_value = {
-                "tool_name": "nonexistent_tool",
-                "tool_args": {},
-            }
-            mock_extract.load_classes_from_file.return_value = []
+        with patch("python.helpers.mcp_handler.MCPConfig") as mock_mcp_config:
+            mock_mcp_config.get_instance.return_value.get_tool.return_value = None
+            with patch("python.coordinators.tool_coordinator.extract_tools") as mock_extract:
+                mock_extract.json_parse_dirty.return_value = {
+                    "tool_name": "nonexistent_tool",
+                    "tool_args": {},
+                }
+                mock_extract.load_classes_from_file.return_value = []
 
-            # Act: Process request for non-existent tool
-            result = await tool_coordinator.process_tools(valid_tool_request)
+                # Act: Process request for non-existent tool
+                result = await tool_coordinator.process_tools(valid_tool_request)
 
-            # Assert: Unknown tool executed, no error
-            assert result is None
+                # Assert: Unknown tool executed, no error
+                assert result is None
 
     @pytest.mark.asyncio
     async def test_process_tools_with_tool_method(
@@ -184,19 +190,21 @@ class TestToolCoordinator:
             loop_data=mock_agent.loop_data,
         )
 
-        with patch.object(tool_coordinator, "get_tool", return_value=mock_tool):
-            with patch("python.coordinators.tool_coordinator.extract_tools") as mock_extract:
-                mock_extract.json_parse_dirty.return_value = {
-                    "tool_name": "test_tool:custom_method",
-                    "tool_args": {"param1": "value1"},
-                }
+        with patch("python.helpers.mcp_handler.MCPConfig") as mock_mcp_config:
+            mock_mcp_config.get_instance.return_value.get_tool.return_value = None
+            with patch.object(tool_coordinator, "get_tool", return_value=mock_tool):
+                with patch("python.coordinators.tool_coordinator.extract_tools") as mock_extract:
+                    mock_extract.json_parse_dirty.return_value = {
+                        "tool_name": "test_tool:custom_method",
+                        "tool_args": {"param1": "value1"},
+                    }
 
-                # Act: Process tool with method
-                _ = await tool_coordinator.process_tools(tool_with_method)
+                    # Act: Process tool with method
+                    _ = await tool_coordinator.process_tools(tool_with_method)
 
-                # Assert: Tool executed with method
-                assert mock_tool.method == "custom_method"
-                assert mock_tool.executed is True
+                    # Assert: Tool executed with method
+                    assert mock_tool.method == "custom_method"
+                    assert mock_tool.executed is True
 
     @pytest.mark.asyncio
     async def test_process_tools_handles_execution_error(
@@ -217,19 +225,21 @@ class TestToolCoordinator:
             loop_data=mock_agent.loop_data,
         )
 
-        with patch.object(tool_coordinator, "get_tool", return_value=mock_tool):
-            with patch("python.coordinators.tool_coordinator.extract_tools") as mock_extract:
-                mock_extract.json_parse_dirty.return_value = {
-                    "tool_name": "test_tool",
-                    "tool_args": {},
-                }
+        with patch("python.helpers.mcp_handler.MCPConfig") as mock_mcp_config:
+            mock_mcp_config.get_instance.return_value.get_tool.return_value = None
+            with patch.object(tool_coordinator, "get_tool", return_value=mock_tool):
+                with patch("python.coordinators.tool_coordinator.extract_tools") as mock_extract:
+                    mock_extract.json_parse_dirty.return_value = {
+                        "tool_name": "test_tool",
+                        "tool_args": {},
+                    }
 
-                # Act & Assert: Exception propagated
-                with pytest.raises(ValueError, match="Tool execution failed"):
-                    await tool_coordinator.process_tools(valid_tool_request)
+                    # Act & Assert: Exception propagated
+                    with pytest.raises(ValueError, match="Tool execution failed"):
+                        await tool_coordinator.process_tools(valid_tool_request)
 
-                # Assert: Current tool cleaned up even on error
-                assert mock_agent.loop_data.current_tool is None
+                    # Assert: Current tool cleaned up even on error
+                    assert mock_agent.loop_data.current_tool is None
 
     @pytest.mark.asyncio
     async def test_process_tools_cleanup_current_tool_after_execution(
@@ -245,18 +255,20 @@ class TestToolCoordinator:
             loop_data=mock_agent.loop_data,
         )
 
-        with patch.object(tool_coordinator, "get_tool", return_value=mock_tool):
-            with patch("python.coordinators.tool_coordinator.extract_tools") as mock_extract:
-                mock_extract.json_parse_dirty.return_value = {
-                    "tool_name": "test_tool",
-                    "tool_args": {},
-                }
+        with patch("python.helpers.mcp_handler.MCPConfig") as mock_mcp_config:
+            mock_mcp_config.get_instance.return_value.get_tool.return_value = None
+            with patch.object(tool_coordinator, "get_tool", return_value=mock_tool):
+                with patch("python.coordinators.tool_coordinator.extract_tools") as mock_extract:
+                    mock_extract.json_parse_dirty.return_value = {
+                        "tool_name": "test_tool",
+                        "tool_args": {},
+                    }
 
-                # Act: Process tool
-                await tool_coordinator.process_tools(valid_tool_request)
+                    # Act: Process tool
+                    await tool_coordinator.process_tools(valid_tool_request)
 
-                # Assert: Current tool cleaned up
-                assert mock_agent.loop_data.current_tool is None
+                    # Assert: Current tool cleaned up
+                    assert mock_agent.loop_data.current_tool is None
 
     @pytest.mark.asyncio
     async def test_process_tools_with_empty_args(self, tool_coordinator, mock_agent):
@@ -271,19 +283,21 @@ class TestToolCoordinator:
             loop_data=mock_agent.loop_data,
         )
 
-        with patch.object(tool_coordinator, "get_tool", return_value=mock_tool):
-            with patch("python.coordinators.tool_coordinator.extract_tools") as mock_extract:
-                mock_extract.json_parse_dirty.return_value = {
-                    "tool_name": "test_tool",
-                    "tool_args": {},
-                }
+        with patch("python.helpers.mcp_handler.MCPConfig") as mock_mcp_config:
+            mock_mcp_config.get_instance.return_value.get_tool.return_value = None
+            with patch.object(tool_coordinator, "get_tool", return_value=mock_tool):
+                with patch("python.coordinators.tool_coordinator.extract_tools") as mock_extract:
+                    mock_extract.json_parse_dirty.return_value = {
+                        "tool_name": "test_tool",
+                        "tool_args": {},
+                    }
 
-                # Act: Process tool with empty args
-                result = await tool_coordinator.process_tools(empty_args_request)
+                    # Act: Process tool with empty args
+                    result = await tool_coordinator.process_tools(empty_args_request)
 
-                # Assert: Tool executed successfully
-                assert mock_tool.executed is True
-                assert result is None
+                    # Assert: Tool executed successfully
+                    assert mock_tool.executed is True
+                    assert result is None
 
     def test_get_tool_loads_from_profile_directory(self, tool_coordinator, mock_agent):
         """Arrange: Agent with profile, tool exists in profile directory"""
@@ -402,24 +416,28 @@ class TestToolCoordinator:
             loop_data=mock_agent.loop_data,
         )
 
-        with patch.object(tool_coordinator, "get_tool", return_value=mock_tool):
-            with patch("python.coordinators.tool_coordinator.extract_tools") as mock_extract:
-                mock_extract.json_parse_dirty.return_value = {
-                    "tool_name": "test_tool",
-                    "tool_args": {"param1": "value1"},
-                }
+        with patch("python.helpers.mcp_handler.MCPConfig") as mock_mcp_config:
+            mock_mcp_config.get_instance.return_value.get_tool.return_value = None
+            with patch.object(tool_coordinator, "get_tool", return_value=mock_tool):
+                with patch("python.coordinators.tool_coordinator.extract_tools") as mock_extract:
+                    mock_extract.json_parse_dirty.return_value = {
+                        "tool_name": "test_tool",
+                        "tool_args": {"param1": "value1"},
+                    }
 
-                # Act: Process tool
-                await tool_coordinator.process_tools(valid_tool_request)
+                    # Act: Process tool
+                    await tool_coordinator.process_tools(valid_tool_request)
 
-                # Assert: Extensions called in correct order
-                calls = mock_agent.call_extensions.call_args_list
+                    # Assert: Extensions called in correct order
+                    calls = mock_agent.call_extensions.call_args_list
 
-                tool_execute_before_call = [c for c in calls if c[0][0] == "tool_execute_before"]
-                tool_execute_after_call = [c for c in calls if c[0][0] == "tool_execute_after"]
+                    tool_execute_before_call = [
+                        c for c in calls if c[0][0] == "tool_execute_before"
+                    ]
+                    tool_execute_after_call = [c for c in calls if c[0][0] == "tool_execute_after"]
 
-                assert len(tool_execute_before_call) == 1
-                assert len(tool_execute_after_call) == 1
+                    assert len(tool_execute_before_call) == 1
+                    assert len(tool_execute_after_call) == 1
 
 
 class TestIToolExecutorInterface:

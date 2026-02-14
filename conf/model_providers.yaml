@@ -19,7 +19,7 @@
 # MODULAR CONFIGURATION:
 #   Default API endpoints can be overridden via environment variables:
 #   - A0_VENICE_API_BASE: Override Venice.ai API base URL
-#   - A0_A0_VENICE_API_BASE: Override Agent Zero Venice API base URL  
+#   - A0_A0_VENICE_API_BASE: Override Agent Zero Venice API base URL
 #   - A0_OPENROUTER_API_BASE: Override OpenRouter API base URL
 #   - A0_OPENROUTER_HTTP_REFERER: Override OpenRouter HTTP Referer header
 #   - A0_OPENROUTER_X_TITLE: Override OpenRouter X-Title header

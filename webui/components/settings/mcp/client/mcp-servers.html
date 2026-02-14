@@ -33,8 +33,8 @@
                                 <!-- Status indicator -->
                                 <div class="status-dot" x-data="{ connected: server.connected }">
                                     <svg viewBox="0 0 16 16" width="12" height="12">
-                                        <circle cx="8" cy="8" r="6" x-bind:fill="server.connected 
-                                                ? (server.error ? '#e40138' : (server.tool_count > 0 ? '#00c340' : '#e40138')) 
+                                        <circle cx="8" cy="8" r="6" x-bind:fill="server.connected
+                                                ? (server.error ? '#e40138' : (server.tool_count > 0 ? '#00c340' : '#e40138'))
                                                 : 'none'" x-bind:opacity="server.connected ? 1 : 0" />
                                         <circle cx="8" cy="8" r="6" fill="none" stroke="#e40138" stroke-width="2"
                                             x-bind:opacity="server.connected ? 0 : 1" />

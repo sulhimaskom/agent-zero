@@ -11,16 +11,16 @@ const importLocks = new Map();
 export async function importComponent(path, targetElement) {
   // Create a unique key for this import based on the target element
   const lockKey = targetElement.id || targetElement.getAttribute('data-component-id') || targetElement;
-  
+
   // If this component is already being loaded, return early
   if (importLocks.get(lockKey)) {
     // Component already loading, skip duplicate request
     return;
   }
-  
+
   // Set the lock
   importLocks.set(lockKey, true);
-  
+
   try {
     if (!targetElement) {
       throw new Error("Target element is required");
@@ -202,7 +202,7 @@ export async function loadComponents(roots = [document.documentElement]) {
     if (components.length === 0) return;
 
     await Promise.all(
-      components.map(async (component) => {   
+      components.map(async (component) => {
         const path = component.getAttribute("path");
         if (!path) {
           console.error("x-component missing path attribute:", component);

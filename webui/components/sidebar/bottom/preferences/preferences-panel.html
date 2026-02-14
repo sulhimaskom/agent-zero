@@ -9,7 +9,7 @@
     <template x-if="$store.preferences">
       <div class="pref-section">
         <span>
-          <h3 class="pref-header" 
+          <h3 class="pref-header"
               data-bs-toggle="collapse"
               @click="$store.sidebar.toggleSection('preferences')"
               x-effect="!$store.sidebar.isSectionOpen('preferences') ? $el.classList.add('collapsed') : $el.classList.remove('collapsed')">

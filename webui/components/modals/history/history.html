@@ -9,7 +9,7 @@
   <div x-data>
     <template x-if="$store.history">
       <div class="history-modal-root">
-        
+
         <!-- Loading State -->
         <template x-if="$store.history.isLoading">
           <div class="loading-state">
@@ -17,19 +17,19 @@
             <p>Loading history…</p>
           </div>
         </template>
-        
+
         <!-- Error State -->
         <template x-if="$store.history.error">
           <div class="error-state">
             <p class="error-message" x-text="$store.history.error"></p>
           </div>
         </template>
-        
+
         <!-- Content (ACE Editor) -->
         <template x-if="!$store.history.isLoading && !$store.history.error">
           <div id="history-viewer-container"></div>
         </template>
-        
+
       </div>
     </template>
   </div>

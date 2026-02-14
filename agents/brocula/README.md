@@ -112,7 +112,7 @@ BroCula provides detailed reports:
 - **Accessibility**: 100/100
 - **Best Practices**: 100/100
 - **SEO**: 98/100 (↑2)
-- **Opportunities**: 
+- **Opportunities**:
   1. Eliminate render-blocking resources
   2. Optimize images (WebP format)
   3. Enable text compression
@@ -181,7 +181,7 @@ Add to `.opencode/oh-my-opencode.json`:
 # Via OpenCode CLI
 opencode run "ultrawork
 
-Act as BroCula. Monitor browser console at http://localhost:3000, 
+Act as BroCula. Monitor browser console at http://localhost:3000,
 fix any errors, run Lighthouse audit, and create PR if needed." \
   --model opencode/kimi-k2.5-free
 ```

@@ -548,7 +548,7 @@ It provides two endpoint types:
 
 ### Example MCP Server Configuration
 
-Below is an example of a `mcp.json` configuration file that a client could use to connect to the Agent Zero MCP server. 
+Below is an example of a `mcp.json` configuration file that a client could use to connect to the Agent Zero MCP server.
 
 **Note:** You can find your personalized connection URLs under `Settings > MCP Server > MCP Server`.
 
@@ -576,7 +576,7 @@ Agent Zero's A2A Server enables communication with other agents using the FastA2
 
 ### A2A Connection URL
 
-To connect another agent to your Agent Zero instance, use the following URL format. 
+To connect another agent to your Agent Zero instance, use the following URL format.
 
 **Note:** You can find your specific A2A connection URL under `Settings > External Services > A2A Connection`.
 

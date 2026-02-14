@@ -657,7 +657,7 @@ const fullComponentImplementation = function() {
             const destroyFlatpickr = (inputId) => {
                 const input = document.getElementById(inputId);
                 if (input && input._flatpickr) {
-    
+
                     input._flatpickr.destroy();
 
                     // Also remove any wrapper elements that might have been created

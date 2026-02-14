@@ -10,7 +10,7 @@ The following user guide provides instructions for installing and running Agent 
 ## Windows, macOS and Linux Setup Guide
 
 
-1. **Install Docker Desktop:** 
+1. **Install Docker Desktop:**
 - Docker Desktop provides the runtime environment for Agent Zero, ensuring consistent behavior and security across platforms
 - The entire framework runs within a Docker container, providing isolation and easy deployment
 - Available as a user-friendly GUI application for all major operating systems
@@ -23,8 +23,8 @@ The following user guide provides instructions for installing and running Agent 
 <br><br>
 
 > [!NOTE]
-> **Linux Users:** You can install either Docker Desktop or docker-ce (Community Edition). 
-> For Docker Desktop, follow the instructions for your specific Linux distribution [here](https://docs.docker.com/desktop/install/linux-install/). 
+> **Linux Users:** You can install either Docker Desktop or docker-ce (Community Edition).
+> For Docker Desktop, follow the instructions for your specific Linux distribution [here](https://docs.docker.com/desktop/install/linux-install/).
 > For docker-ce, follow the instructions [here](https://docs.docker.com/engine/install/).
 >
 > If you're using docker-ce, you'll need to add your user to the `docker` group:
@@ -44,14 +44,14 @@ The following user guide provides instructions for installing and running Agent 
 <img src="res/setup/image-12.png" alt="docker install" width="300"/>
 <br><br>
 
-1.4. Once installed, launch Docker Desktop: 
+1.4. Once installed, launch Docker Desktop:
 
 <img src="res/setup/image-11.png" alt="docker installed" height="100"/>
 <img src="res/setup/image-13.png" alt="docker installed" height="100"/>
 <br><br>
 
-> [!IMPORTANT]  
-> **macOS Configuration:** In Docker Desktop's preferences (Docker menu) → Settings → 
+> [!IMPORTANT]
+> **macOS Configuration:** In Docker Desktop's preferences (Docker menu) → Settings →
 > Advanced, enable "Allow the default Docker socket to be used (requires password)."
 
 ![docker socket macOS](res/setup/macsocket.png)
@@ -87,7 +87,7 @@ The following user guide provides instructions for installing and running Agent 
   - `settings.json` - Your Agent Zero settings
 
 > [!TIP]
-> Choose a location that's easy to access and backup. All your Agent Zero data 
+> Choose a location that's easy to access and backup. All your Agent Zero data
 > will be directly accessible in this directory.
 
 2.3. Run the container:
@@ -131,8 +131,8 @@ Optionally you can map local folders for file persistence:
 > You can also access the Web UI by clicking the ports right under the container ID in Docker Desktop.
 
 > [!NOTE]
-> After starting the container, you'll find all Agent Zero files in your chosen 
-> directory. You can access and edit these files directly on your machine, and 
+> After starting the container, you'll find all Agent Zero files in your chosen
+> directory. You can access and edit these files directly on your machine, and
 > the changes will be immediately reflected in the running container.
 
 3. Configure Agent Zero
@@ -206,8 +206,8 @@ The Settings page is the control center for selecting the Large Language Models 
 ## Important Considerations
 
 > [!CAUTION]
-> Changing the `embedding_llm` will re-index all the memory and knowledge, and 
-> requires clearing the `memory` folder to avoid errors, as the embeddings can't be 
+> Changing the `embedding_llm` will re-index all the memory and knowledge, and
+> requires clearing the `memory` folder to avoid errors, as the embeddings can't be
 > mixed in the vector database. Note that this will DELETE ALL of Agent Zero's memory.
 
 ## Installing and Using Ollama (Local Models)
@@ -245,7 +245,7 @@ ollama pull <model-name>
 2. A CLI message should confirm the model download on your system
 
 #### Selecting your model within Agent Zero
-1. Once you've downloaded your model(s), you must select it in the Settings page of the GUI. 
+1. Once you've downloaded your model(s), you must select it in the Settings page of the GUI.
 
 2. Within the Chat model, Utility model, or Embedding model section, choose Ollama as provider.
 
@@ -258,7 +258,7 @@ ollama pull <model-name>
 #### Managing your downloaded models
 Once you've downloaded some models, you might want to check which ones you have available or remove any you no longer need.
 
-- **Listing downloaded models:** 
+- **Listing downloaded models:**
   To see a list of all the models you've downloaded, use the command:
   ```
   ollama list
@@ -289,7 +289,7 @@ Agent Zero's Web UI is accessible from any device on your network through the Do
 > - The port is automatically assigned by Docker unless you specify one
 
 > [!NOTE]
-> If you're running Agent Zero directly on your system (legacy approach) instead of 
+> If you're running Agent Zero directly on your system (legacy approach) instead of
 > using Docker, you'll need to configure the host manually in `run_ui.py` to run on all interfaces using `host="0.0.0.0"`.
 
 For developers or users who need to run Agent Zero directly on their system,see the [In-Depth Guide for Full Binaries Installation](#in-depth-guide-for-full-binaries-installation).
@@ -348,11 +348,11 @@ For developers or users who need to run Agent Zero directly on their system,see 
 > ```
 
 3. **Full Binaries**
-- Using Git/GitHub: Pull the latest version of the Agent Zero repository. 
+- Using Git/GitHub: Pull the latest version of the Agent Zero repository.
 - The custom knowledge, solutions, memory, and other data will get ignored, so you don't need to worry about losing any of your custom data. The same goes for your .env file with all of your API keys and settings.json.
 
-> [!WARNING]  
-> - If you update manually, beware: save your .env file with the API keys, and look for new dependencies in requirements.txt. 
+> [!WARNING]
+> - If you update manually, beware: save your .env file with the API keys, and look for new dependencies in requirements.txt.
 > - If any changes are made to the requirements of the updated version, you have to execute this command inside the a0 conda env after activating it:
 > ```bash
 > pip install -r requirements.txt
@@ -371,13 +371,13 @@ For developers or users who need to run Agent Zero directly on their system,see 
 5. Docker is not mandatory for the full binaries installation, since the framework will run on your machine connecting to the Docker container through the Web UI RFC functionality.
 6. Running Agent Zero without Docker makes the process more complicated and it's thought for developers and contributors.
 
-> [!IMPORTANT]  
+> [!IMPORTANT]
 > Linux instructions are provided as general instructions for any Linux distribution. If you're using a distribution other than Debian/Ubuntu, you may need to adjust the instructions accordingly.
 >
 > For Debian/Ubuntu, just follow the macOS instructions, as they are the same.
 
 ## 1. Install Conda (miniconda)
-- Conda is a Python environment manager, it will help you keep your projects and installations separated. 
+- Conda is a Python environment manager, it will help you keep your projects and installations separated.
 - It's a lightweight version of Anaconda that includes only conda, Python, the packages they depend on, and a small number of other useful packages, including pip, zlib and a few others.
 
 1. Go to the download page of miniconda [here](https://docs.anaconda.com/miniconda/#miniconda-latest-installer-links). If the link does not work, just search the web for "miniconda download".
@@ -442,8 +442,8 @@ And you should see that the **(base)** on the left has changed to **(a0)**. This
 <img src="res/setup/image-18.png" alt="conda env" height="200"/>
 <br><br>
 
-> [!IMPORTANT]  
-> If you open a new terminal window, you will need to activate the environment with 
+> [!IMPORTANT]
+> If you open a new terminal window, you will need to activate the environment with
 > "conda activate a0" again for that window.
 
 5. Install requirements using **"pip"**. Pip is a Python package manager. We can install all required packages from requirements.txt file using command:
@@ -475,7 +475,7 @@ Simply put, Docker is a way of running virtual computers on your machine. These 
 <br><br>
 
 
-4. Once installed, you should see Docker Desktop application on your Windows/Mac machine. 
+4. Once installed, you should see Docker Desktop application on your Windows/Mac machine.
 
 <img src="res/setup/image-11.png" alt="docker installed" height="100"/>
 <img src="res/setup/image-13.png" alt="docker installed" height="100"/>
@@ -484,17 +484,17 @@ Simply put, Docker is a way of running virtual computers on your machine. These 
 5. Create account in the application.
 - It's required to be signed in to the Docker Hub, so create a free account in the Docker Desktop application, you will be prompted when the application first runs.
 
-> [!IMPORTANT]  
-> **Important macOS-only Docker Configuration:** In Docker Desktop's preferences 
-> (Docker menu) go to Settings, navigate to "Advanced" and check "Allow the default 
-> Docker socket to be used (requires password)."  This allows Agent Zero to 
+> [!IMPORTANT]
+> **Important macOS-only Docker Configuration:** In Docker Desktop's preferences
+> (Docker menu) go to Settings, navigate to "Advanced" and check "Allow the default
+> Docker socket to be used (requires password)."  This allows Agent Zero to
 > communicate with the Docker daemon.
 
 ![docker socket macOS](res/setup/macsocket.png)
 
 > [!NOTE]
-> **Linux Users:** You can install both Docker Desktop or docker-ce (Community Edition). 
-> For Docker Desktop, follow the instructions for your specific Linux distribution [here](https://docs.docker.com/desktop/install/linux-install/). 
+> **Linux Users:** You can install both Docker Desktop or docker-ce (Community Edition).
+> For Docker Desktop, follow the instructions for your specific Linux distribution [here](https://docs.docker.com/desktop/install/linux-install/).
 > For docker-ce, follow the instructions [here](https://docs.docker.com/engine/install/).
 >
 > If you're using docker-ce, you will need to add your user to the `docker` group to be able to run docker commands without sudo. You can do this by running the following command in your terminal: `sudo usermod -aG docker $USER`. Then log out and log back in for the changes to take effect.
@@ -546,9 +546,9 @@ Agent Zero needs to be configured further to redirect some functions to the Dock
 <img src="res/setup/image-23-1.png" alt="run ui" width="400"/>
 <br><br>
 
-      
+
 ### Conclusion
-After following the instructions for your specific operating system, you should have Agent Zero successfully installed and running. You can now start exploring the framework's capabilities and experimenting with creating your own intelligent agents. 
+After following the instructions for your specific operating system, you should have Agent Zero successfully installed and running. You can now start exploring the framework's capabilities and experimenting with creating your own intelligent agents.
 
 If you encounter any issues during the installation process, please consult the [Troubleshooting section](troubleshooting.md) of this documentation or refer to the Agent Zero [Skool](https://www.skool.com/agent-zero) or [Discord](https://discord.gg/B8KZKNsPpj) community for assistance.
 

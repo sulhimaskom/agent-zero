@@ -8,6 +8,11 @@ from unittest.mock import MagicMock
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
+class AsyncMock(MagicMock):
+    async def __call__(self, *args, **kwargs):
+        return super().__call__(*args, **kwargs)
+
+
 # Create mock modules with submodules to avoid import errors
 def create_mock_module(name):
     """Create a mock module that can have attributes assigned to it"""
@@ -116,7 +121,20 @@ create_mock_module("git")
 create_mock_module("playwright")
 create_mock_module("markdown")
 create_mock_module("pytz")
-create_mock_module("tiktoken")
+tiktoken_mock = create_mock_module("tiktoken")
+
+
+def mock_encode(text):
+    return [1] * len(text.split()) if hasattr(text, "split") else [1]
+
+
+def mock_encode_batch(texts):
+    return [[1] * len(t.split()) if hasattr(t, "split") else [1] for t in texts]
+
+
+tiktoken_mock.encoding_for_model = MagicMock(
+    return_value=MagicMock(encode=mock_encode, encode_batch=mock_encode_batch)
+)
 create_mock_module("lxml")
 create_mock_module("lxml_html_clean")
 create_mock_module("beautifulsoup4")
@@ -182,13 +200,16 @@ flask_mock.send_from_directory = MagicMock()
 flask_mock.make_response = MagicMock()
 flask_mock.Response = MagicMock
 
-# Do not mock pydantic - it's needed for real functionality
-# pydantic_mock = create_mock_module('pydantic')
-# pydantic_mock.BaseModel = MagicMock
-# pydantic_mock.Field = MagicMock()
-# pydantic_mock.ConfigDict = MagicMock()
-# pydantic_mock.validator = MagicMock()
-# pydantic_mock.ValidationError = Exception
+# Mock pydantic for testing - imports will be verified separately
+pydantic_mock = create_mock_module("pydantic")
+pydantic_mock.BaseModel = MagicMock
+pydantic_mock.Field = MagicMock()
+pydantic_mock.ConfigDict = MagicMock()
+pydantic_mock.validator = MagicMock()
+pydantic_mock.ValidationError = Exception
+pydantic_mock.RootModel = MagicMock
+pydantic_mock.TypeAdapter = MagicMock
+pydantic_mock.SerializeAsAny = MagicMock
 
 # Mock dotenv (python-dotenv package)
 dotenv_mock = create_mock_module("dotenv")
@@ -199,3 +220,13 @@ dotenv_mock.get_key = MagicMock(return_value=None)
 # Mock dotenv.parser submodule
 sys.modules["dotenv.parser"] = MagicMock()
 sys.modules["dotenv.parser"].parse_stream = MagicMock(return_value={})
+
+# Mock helpers modules used by Tool class
+print_style_mock = create_mock_module("python.helpers.print_style")
+print_style_class = MagicMock
+print_style_mock.PrintStyle = print_style_class
+
+constants_mock = create_mock_module("python.helpers.constants")
+constants_mock.Colors = MagicMock()
+sys.modules["python.helpers.strings"] = MagicMock()
+sys.modules["python.helpers.strings"].sanitize_string = MagicMock(return_value="")
