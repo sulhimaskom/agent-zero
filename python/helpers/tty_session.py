@@ -1,11 +1,11 @@
 import asyncio
+import contextlib
 import errno
 import os
 import platform
 import sys
 
 from python.helpers.constants import Limits, Timeouts
-import contextlib
 
 _IS_WIN = platform.system() == "Windows"
 if _IS_WIN:
@@ -281,45 +281,31 @@ if __name__ == "__main__":
 
         timeout = Timeouts.TTY_READ_TIMEOUT
 
-        print(f"Connected to {shell_cmd}.")
-        print("Type commands for the shell.")
-        print("• /t=<seconds>  → change idle timeout")
-        print("• /exit         → quit helper\n")
-
         await term.sendline(" ")
-        print(
-            await term.read_full_until_idle(timeout, timeout),
-            end="",
-            flush=True,
-        )
 
         while True:
             try:
                 user = input(f"(timeout={timeout}) {prompt_hint} ")
             except (EOFError, KeyboardInterrupt):
-                print("\nLeaving…")
                 break
 
             if user.lower() == "/exit":
                 break
             if user.startswith("/t="):
-                try:
+                with contextlib.suppress(ValueError):
                     timeout = float(user.split("=", 1)[1])
-                    print(f"[helper] idle timeout set to {timeout}s")
-                except ValueError:
-                    print("[helper] invalid number")
                 continue
 
             idle_timeout = timeout
             total_timeout = 10 * idle_timeout
             if user == "":
                 # Just read output, do not send empty line
-                async for chunk in term.read_chunks_until_idle(idle_timeout, total_timeout):
-                    print(chunk, end="", flush=True)
+                async for _chunk in term.read_chunks_until_idle(idle_timeout, total_timeout):
+                    pass
             else:
                 await term.sendline(user)
-                async for chunk in term.read_chunks_until_idle(idle_timeout, total_timeout):
-                    print(chunk, end="", flush=True)
+                async for _chunk in term.read_chunks_until_idle(idle_timeout, total_timeout):
+                    pass
 
         await term.sendline("exit")
         await term.wait()

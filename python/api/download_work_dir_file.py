@@ -76,7 +76,6 @@ def stream_file_download(file_source, download_name, chunk_size=8192):
 
 
 class DownloadFile(ApiHandler):
-
     @classmethod
     def get_methods(cls):
         return ["GET"]

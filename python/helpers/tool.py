@@ -20,7 +20,6 @@ class Response:
 
 
 class Tool:
-
     def __init__(
         self,
         agent: Agent,

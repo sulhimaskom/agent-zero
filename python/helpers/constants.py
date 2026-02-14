@@ -12,7 +12,7 @@ from typing import Final
 
 
 class Timeouts:
-    """Timeout values in seconds"""
+    """Timeout values in seconds."""
 
     # Code execution timeouts
     CODE_EXEC_FIRST_OUTPUT: Final[int] = 30
@@ -116,7 +116,7 @@ class Timeouts:
 
 
 class Limits:
-    """Size limits, thresholds, and count limits"""
+    """Size limits, thresholds, and count limits."""
 
     # Model context lengths (default values)
     DEFAULT_CHAT_MODEL_CTX_LENGTH: Final[int] = 100000
@@ -296,7 +296,7 @@ class Limits:
 
 
 class Network:
-    """Network-related constants"""
+    """Network-related constants."""
 
     # Default hosts
     DEFAULT_LOCALHOST: Final[str] = "127.0.0.1"
@@ -331,7 +331,7 @@ class Network:
 
 
 class Paths:
-    """File system paths and directories"""
+    """File system paths and directories."""
 
     # Project structure
     PROJECTS_PARENT_DIR: Final[str] = "usr/projects"
@@ -384,7 +384,7 @@ class Paths:
 
 
 class FileExtensions:
-    """File extensions used throughout the system"""
+    """File extensions used throughout the system."""
 
     MARKDOWN: Final[str] = ".md"
     PYTHON: Final[str] = ".py"
@@ -399,7 +399,7 @@ class FileExtensions:
 
 
 class AgentDefaults:
-    """Default values for agent configuration"""
+    """Default values for agent configuration."""
 
     PROFILE: Final[str] = "agent0"
     MEMORY_SUBDIR: Final[str] = "default"
@@ -412,7 +412,7 @@ class AgentDefaults:
 
 
 class FilePatterns:
-    """File search patterns used throughout the system"""
+    """File search patterns used throughout the system."""
 
     KNOWLEDGE_MARKDOWN: Final[str] = "**/*.md"
 
@@ -423,7 +423,7 @@ class FilePatterns:
 
 
 class Shell:
-    """Shell-related constants"""
+    """Shell-related constants."""
 
     # Shell executables
     SHELL_BASH: Final[str] = "/bin/bash"
@@ -442,7 +442,7 @@ class Shell:
 
 
 class HttpStatus:
-    """HTTP status codes used in the application"""
+    """HTTP status codes used in the application."""
 
     OK: Final[int] = 200
     BAD_REQUEST: Final[int] = 400
@@ -459,7 +459,7 @@ class HttpStatus:
 
 
 class Colors:
-    """Color constants for terminal and UI output"""
+    """Color constants for terminal and UI output."""
 
     # Primary UI colors
     PRIMARY_BLUE: Final[str] = "#1B4F72"  # Dark blue - tool headers
@@ -493,7 +493,7 @@ class Colors:
 
 
 class UITiming:
-    """UI animation and timing constants (in milliseconds)"""
+    """UI animation and timing constants (in milliseconds)."""
 
     # Notification display times
     NOTIFICATION_DISPLAY_TIME: Final[int] = 3000
@@ -512,7 +512,7 @@ class UITiming:
 
 
 def get_env_int(key: str, default: int) -> int:
-    """Get integer value from environment variable or return default"""
+    """Get integer value from environment variable or return default."""
     try:
         return int(os.getenv(key, default))
     except (ValueError, TypeError):
@@ -520,7 +520,7 @@ def get_env_int(key: str, default: int) -> int:
 
 
 def get_env_float(key: str, default: float) -> float:
-    """Get float value from environment variable or return default"""
+    """Get float value from environment variable or return default."""
     try:
         return float(os.getenv(key, default))
     except (ValueError, TypeError):
@@ -528,7 +528,7 @@ def get_env_float(key: str, default: float) -> float:
 
 
 def get_env_str(key: str, default: str) -> str:
-    """Get string value from environment variable or return default"""
+    """Get string value from environment variable or return default."""
     return os.getenv(key, default)
 
 
@@ -538,7 +538,7 @@ def get_env_str(key: str, default: str) -> str:
 
 
 class Protocols:
-    """Protocol strings for URL construction"""
+    """Protocol strings for URL construction."""
 
     HTTP: Final[str] = "http://"
     HTTPS: Final[str] = "https://"
@@ -550,7 +550,7 @@ class Protocols:
 
 
 class TmpPaths:
-    """Temporary path patterns used throughout the system"""
+    """Temporary path patterns used throughout the system."""
 
     # Individual files
     SETTINGS_JSON: Final[str] = "tmp/settings.json"
@@ -568,7 +568,7 @@ class TmpPaths:
 
 
 class InternalPaths:
-    """Internal path prefixes for file mapping"""
+    """Internal path prefixes for file mapping."""
 
     A0_TMP_UPLOADS: Final[str] = "/a0/tmp/uploads/"
 
@@ -579,7 +579,7 @@ class InternalPaths:
 
 
 class ExternalUrls:
-    """External URLs used in the application - All configurable via environment variables"""
+    """External URLs used in the application - All configurable via environment variables."""
 
     # Repository URL
     AGENT_ZERO_REPO: Final[str] = "https://github.com/frdel/agent-zero"
@@ -609,7 +609,7 @@ class ExternalUrls:
 
 
 class Browser:
-    """Browser agent configuration - All values configurable via environment variables"""
+    """Browser agent configuration - All values configurable via environment variables."""
 
     # Default allowed domains for browser agent (wildcard allows all)
     ALLOWED_DOMAINS: Final[list[str]] = ["*", "http://*", "https://*"]
@@ -621,7 +621,7 @@ class Browser:
 
 
 class Search:
-    """Search engine configuration - All values configurable via environment variables"""
+    """Search engine configuration - All values configurable via environment variables."""
 
     # Default number of search results to return
     DEFAULT_RESULTS_COUNT: Final[int] = 10
@@ -642,7 +642,7 @@ class Search:
 
 
 class Extensions:
-    """Extension-specific configuration constants"""
+    """Extension-specific configuration constants."""
 
     # Tool call file saving threshold
     # Minimum length of tool result to save as a file
@@ -656,7 +656,7 @@ class Extensions:
 
 
 class Config:
-    """Runtime configuration with environment variable support"""
+    """Runtime configuration with environment variable support."""
 
     # Timeouts
     CODE_EXEC_TIMEOUT = get_env_int("A0_CODE_EXEC_TIMEOUT", Timeouts.CODE_EXEC_MAX)

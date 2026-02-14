@@ -91,7 +91,7 @@ def import_module(file_path: str) -> ModuleType:
     return module
 
 
-def load_classes_from_folder(
+def load_classes_from_folder[T](
     folder: str,
     name_pattern: str,
     base_class: type[T],
@@ -129,7 +129,7 @@ def load_classes_from_folder(
     return classes
 
 
-def load_classes_from_file(
+def load_classes_from_file[T](
     file: str, base_class: type[T], one_per_file: bool = True
 ) -> list[type[T]]:
     classes = []

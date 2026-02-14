@@ -13,7 +13,6 @@ class ExampleTool(Tool):
         test_input = kwargs.get("test_input", "")
 
         # do something
-        print("Example tool executed with test_input: " + test_input)
 
         # return response
         return Response(

@@ -343,11 +343,10 @@ class DocumentQueryStore:
                 if uri:
                     uris.add(uri)
 
-        return sorted(list(uris))
+        return sorted(uris)
 
 
 class DocumentQueryHelper:
-
     def __init__(
         self,
         agent: Agent,

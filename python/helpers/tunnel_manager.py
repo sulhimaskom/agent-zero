@@ -24,7 +24,7 @@ class TunnelManager:
         self.provider = None
 
     def start_tunnel(self, port=Network.TUNNEL_DEFAULT_PORT, provider="serveo"):
-        """Start a new tunnel or return the existing one's URL"""
+        """Start a new tunnel or return the existing one's URL."""
         if self.is_running and self.tunnel_url:
             return self.tunnel_url
 
@@ -44,8 +44,8 @@ class TunnelManager:
                     self.tunnel.start()
                     self.tunnel_url = self.tunnel.tunnel_url
                     self.is_running = True
-                except Exception as e:
-                    print(f"Error in tunnel thread: {e!s}")
+                except Exception:
+                    pass
 
             tunnel_thread = threading.Thread(target=run_tunnel)
             tunnel_thread.daemon = True
@@ -60,12 +60,11 @@ class TunnelManager:
                 time.sleep(Timeouts.TUNNEL_STARTUP_DELAY)
 
             return self.tunnel_url
-        except Exception as e:
-            print(f"Error starting tunnel: {e!s}")
+        except Exception:
             return None
 
     def stop_tunnel(self):
-        """Stop the running tunnel"""
+        """Stop the running tunnel."""
         if self.tunnel and self.is_running:
             try:
                 self.tunnel.stop()
@@ -78,5 +77,5 @@ class TunnelManager:
         return False
 
     def get_tunnel_url(self):
-        """Get the current tunnel URL if available"""
+        """Get the current tunnel URL if available."""
         return self.tunnel_url if self.is_running else None

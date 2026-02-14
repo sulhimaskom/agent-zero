@@ -152,7 +152,7 @@ class ApiMessage(ApiHandler):
 
     @classmethod
     def _cleanup_expired_chats(cls):
-        """Clean up expired chats"""
+        """Clean up expired chats."""
         with cls._cleanup_lock:
             now = datetime.now()
             expired_contexts = [

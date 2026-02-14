@@ -3,7 +3,6 @@ from python.helpers.secrets import get_secrets_manager
 
 
 class MaskToolSecrets(Extension):
-
     async def execute(self, **kwargs):
         # model call data
         call_data: dict = kwargs.get("call_data", {})

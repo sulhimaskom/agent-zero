@@ -33,7 +33,7 @@ def get_chat_msg_files_folder(ctxid: str):
 
 
 def save_tmp_chat(context: AgentContext):
-    """Save context to the chats folder"""
+    """Save context to the chats folder."""
     # Skip saving BACKGROUND contexts as they should be ephemeral
     if hasattr(context, "type") and context.type == AgentContextType.BACKGROUND:
         return
@@ -46,7 +46,7 @@ def save_tmp_chat(context: AgentContext):
 
 
 def save_tmp_chats():
-    """Save all contexts to the chats folder"""
+    """Save all contexts to the chats folder."""
     for context in AgentContext._contexts.values():
         # Skip BACKGROUND contexts as they should be ephemeral
         if hasattr(context, "type") and context.type == AgentContextType.BACKGROUND:
@@ -55,7 +55,7 @@ def save_tmp_chats():
 
 
 def load_tmp_chats():
-    """Load all contexts from the chats folder"""
+    """Load all contexts from the chats folder."""
     _convert_v080_chats()
     folders = files.list_files(CHATS_FOLDER, "*")
     json_files = []
@@ -69,8 +69,8 @@ def load_tmp_chats():
             data = json.loads(js)
             ctx = _deserialize_context(data)
             ctxids.append(ctx.id)
-        except Exception as e:
-            print(f"Error loading chat {file}: {e}")
+        except Exception:
+            pass
     return ctxids
 
 
@@ -88,7 +88,7 @@ def _convert_v080_chats():
 
 
 def load_json_chats(jsons: list[str]):
-    """Load contexts from JSON strings"""
+    """Load contexts from JSON strings."""
     ctxids = []
     for js in jsons:
         data = json.loads(js)
@@ -100,20 +100,20 @@ def load_json_chats(jsons: list[str]):
 
 
 def export_json_chat(context: AgentContext):
-    """Export context as JSON string"""
+    """Export context as JSON string."""
     data = _serialize_context(context)
     js = _safe_json_serialize(data, ensure_ascii=False)
     return js
 
 
 def remove_chat(ctxid):
-    """Remove a chat or task context"""
+    """Remove a chat or task context."""
     path = get_chat_folder_path(ctxid)
     files.delete_dir(path)
 
 
 def remove_msg_files(ctxid):
-    """Remove all message files for a chat or task context"""
+    """Remove all message files for a chat or task context."""
     path = get_chat_msg_files_folder(ctxid)
     files.delete_dir(path)
 

@@ -179,7 +179,7 @@ class SecretsManager:
         files.write_file(self._files[0], content)
 
     def load_secrets(self) -> dict[str, str]:
-        """Load secrets from file, return key-value dict"""
+        """Load secrets from file, return key-value dict."""
         with self._lock:
             if self._secrets_cache is not None:
                 return self._secrets_cache
@@ -195,7 +195,7 @@ class SecretsManager:
             return merged_secrets
 
     def save_secrets(self, secrets_content: str):
-        """Save secrets content to file and update cache"""
+        """Save secrets content to file and update cache."""
         if len(self._files) != 1:
             raise RuntimeError("Saving secrets is disabled when multiple files are configured")
         with self._lock:
@@ -233,12 +233,12 @@ class SecretsManager:
         self._invalidate_all_caches()
 
     def get_keys(self) -> list[str]:
-        """Get list of secret keys"""
+        """Get list of secret keys."""
         secrets = self.load_secrets()
         return list(secrets.keys())
 
     def get_secrets_for_prompt(self) -> str:
-        """Get formatted string of secret keys for system prompt"""
+        """Get formatted string of secret keys for system prompt."""
         content = self.read_secrets_raw()
         if not content:
             return ""
@@ -258,7 +258,7 @@ class SecretsManager:
         return StreamingSecretsFilter(self.load_secrets())
 
     def replace_placeholders(self, text: str) -> str:
-        """Replace secret placeholders with actual values"""
+        """Replace secret placeholders with actual values."""
         if not text:
             return text
 
@@ -281,7 +281,7 @@ class SecretsManager:
         return re.sub(self.PLACEHOLDER_PATTERN, replacer, text)
 
     def change_placeholders(self, text: str, new_format: str) -> str:
-        """Substitute secret placeholders with a different placeholder format"""
+        """Substitute secret placeholders with a different placeholder format."""
         if not text:
             return text
 
@@ -300,7 +300,7 @@ class SecretsManager:
         min_length: int = 4,
         placeholder: str = "§§secret({key})",
     ) -> str:
-        """Replace actual secret values with placeholders in text"""
+        """Replace actual secret values with placeholders in text."""
         if not text:
             return text
 
@@ -315,7 +315,7 @@ class SecretsManager:
         return result
 
     def get_masked_secrets(self) -> str:
-        """Get content with values masked for frontend display (preserves comments and unrecognized lines)"""
+        """Get content with values masked for frontend display (preserves comments and unrecognized lines)."""
         content = self.read_secrets_raw()
         if not content:
             return ""
@@ -346,7 +346,7 @@ class SecretsManager:
         return self.parse_env_content(content)
 
     def clear_cache(self):
-        """Clear the secrets cache"""
+        """Clear the secrets cache."""
         with self._lock:
             self._secrets_cache = None
             self._raw_snapshots = {}

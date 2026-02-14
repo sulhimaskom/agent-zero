@@ -104,7 +104,7 @@ def initialize_mcp(mcp_servers_config: str):
 
 
 class MCPTool(Tool):
-    """MCP Tool wrapper"""
+    """MCP Tool wrapper."""
 
     async def execute(self, **kwargs: Any):
         error = ""
@@ -247,17 +247,17 @@ class MCPServerRemote(BaseModel):
             return self.__client.get_log()  # type: ignore
 
     def get_tools(self) -> list[dict[str, Any]]:
-        """Get all tools from the server"""
+        """Get all tools from the server."""
         with self.__lock:
             return self.__client.tools  # type: ignore
 
     def has_tool(self, tool_name: str) -> bool:
-        """Check if a tool is available"""
+        """Check if a tool is available."""
         with self.__lock:
             return self.__client.has_tool(tool_name)  # type: ignore
 
     async def call_tool(self, tool_name: str, input_data: dict[str, Any]) -> CallToolResult:
-        """Call a tool with the given input data"""
+        """Call a tool with the given input data."""
         with self.__lock:
             # We already run in an event loop, dont believe Pylance
             return await self.__client.call_tool(tool_name, input_data)  # type: ignore
@@ -322,17 +322,17 @@ class MCPServerLocal(BaseModel):
             return self.__client.get_log()  # type: ignore
 
     def get_tools(self) -> list[dict[str, Any]]:
-        """Get all tools from the server"""
+        """Get all tools from the server."""
         with self.__lock:
             return self.__client.tools  # type: ignore
 
     def has_tool(self, tool_name: str) -> bool:
-        """Check if a tool is available"""
+        """Check if a tool is available."""
         with self.__lock:
             return self.__client.has_tool(tool_name)  # type: ignore
 
     async def call_tool(self, tool_name: str, input_data: dict[str, Any]) -> CallToolResult:
-        """Call a tool with the given input data"""
+        """Call a tool with the given input data."""
         with self.__lock:
             # We already run in an event loop, dont believe Pylance
             return await self.__client.call_tool(tool_name, input_data)  # type: ignore
@@ -619,7 +619,7 @@ class MCPConfig(BaseModel):
             return ""
 
     def get_servers_status(self) -> list[dict[str, Any]]:
-        """Get status of all servers"""
+        """Get status of all servers."""
         result = []
         with self.__lock:
             # add connected/working servers
@@ -676,12 +676,12 @@ class MCPConfig(BaseModel):
             return {}
 
     def is_initialized(self) -> bool:
-        """Check if the client is initialized"""
+        """Check if the client is initialized."""
         with self.__lock:
             return self.__initialized
 
     def get_tools(self) -> list[dict[str, dict[str, Any]]]:
-        """Get all tools from all servers"""
+        """Get all tools from all servers."""
         with self.__lock:
             tools = []
             for server in self.servers:
@@ -692,7 +692,7 @@ class MCPConfig(BaseModel):
             return tools
 
     def get_tools_prompt(self, server_name: str = "") -> str:
-        """Get a prompt for all tools"""
+        """Get a prompt for all tools."""
         # just to wait for pending initialization
         with self.__lock:
             pass
@@ -742,7 +742,7 @@ class MCPConfig(BaseModel):
         return prompt
 
     def has_tool(self, tool_name: str) -> bool:
-        """Check if a tool is available"""
+        """Check if a tool is available."""
         if "." not in tool_name:
             return False
         server_name_part, tool_name_part = tool_name.split(".")
@@ -765,7 +765,7 @@ class MCPConfig(BaseModel):
         )
 
     async def call_tool(self, tool_name: str, input_data: dict[str, Any]) -> CallToolResult:
-        """Call a tool with the given input data"""
+        """Call a tool with the given input data."""
         if "." not in tool_name:
             raise ValueError(f"Tool {tool_name} not found")
         server_name_part, tool_name_part = tool_name.split(".")
@@ -905,7 +905,7 @@ class MCPClientBase(ABC):
         return self
 
     def has_tool(self, tool_name: str) -> bool:
-        """Check if a tool is available (uses cached tools)"""
+        """Check if a tool is available (uses cached tools)."""
         with self.__lock:
             for tool in self.tools:
                 if tool["name"] == tool_name:
@@ -913,7 +913,7 @@ class MCPClientBase(ABC):
         return False
 
     def get_tools(self) -> list[dict[str, Any]]:
-        """Get all tools from the server (uses cached tools)"""
+        """Get all tools from the server (uses cached tools)."""
         with self.__lock:
             return self.tools
 
@@ -987,7 +987,7 @@ class MCPClientLocal(MCPClientBase):
         MemoryObjectReceiveStream[SessionMessage | Exception],
         MemoryObjectSendStream[SessionMessage],
     ]:
-        """Connect to an MCP server, init client and save stdio/write streams"""
+        """Connect to an MCP server, init client and save stdio/write streams."""
         server: MCPServerLocal = cast(MCPServerLocal, self.server)
 
         if not server.command:
@@ -1061,7 +1061,7 @@ class MCPClientRemote(MCPClientBase):
         MemoryObjectReceiveStream[SessionMessage | Exception],
         MemoryObjectSendStream[SessionMessage],
     ]:
-        """Connect to an MCP server, init client and save stdio/write streams"""
+        """Connect to an MCP server, init client and save stdio/write streams."""
         server: MCPServerRemote = cast(MCPServerRemote, self.server)
         set = settings.get_settings()
 

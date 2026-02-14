@@ -1,3 +1,4 @@
+import contextlib
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Any
@@ -5,7 +6,6 @@ from typing import Any
 from python.helpers import extract_tools
 from python.helpers.print_style import PrintStyle
 from python.helpers.tool import Tool
-import contextlib
 
 
 @dataclass
@@ -15,11 +15,11 @@ class ToolResult:
 
 
 class IToolExecutor(ABC):
-    """Interface for tool execution"""
+    """Interface for tool execution."""
 
     @abstractmethod
     async def process_tools(self, msg: str) -> str | None:
-        """Process tool usage requests in agent message"""
+        """Process tool usage requests in agent message."""
         pass
 
     @abstractmethod
@@ -32,19 +32,19 @@ class IToolExecutor(ABC):
         loop_data: Any,
         **kwargs,
     ) -> Tool:
-        """Get tool instance by name"""
+        """Get tool instance by name."""
         pass
 
 
 class ToolCoordinator(IToolExecutor):
-    """Coordinates tool discovery and execution"""
+    """Coordinates tool discovery and execution."""
 
     def __init__(self, agent):
         self.agent = agent
         self.history_manager = agent.history_coordinator
 
     async def process_tools(self, msg: str) -> str | None:
-        """Process tool usage requests in agent message"""
+        """Process tool usage requests in agent message."""
         tool_request = extract_tools.json_parse_dirty(msg)
 
         if tool_request is not None:
@@ -141,7 +141,7 @@ class ToolCoordinator(IToolExecutor):
         loop_data: Any,
         **kwargs,
     ) -> Tool:
-        """Get tool instance by name"""
+        """Get tool instance by name."""
         from python.tools.unknown import Unknown
 
         classes = []

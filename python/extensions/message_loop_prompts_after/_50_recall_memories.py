@@ -10,7 +10,6 @@ DATA_NAME_ITER = "_recall_memories_iter"
 
 
 class RecallMemories(Extension):
-
     # INTERVAL = 3
     # HISTORY = 10000
     # MEMORIES_MAX_SEARCH = 12
@@ -19,7 +18,9 @@ class RecallMemories(Extension):
     # SOLUTIONS_MAX_RESULT = 3
     # THRESHOLD = DEFAULT_MEMORY_THRESHOLD
 
-    async def execute(self, loop_data: LoopData = LoopData(), **kwargs):
+    async def execute(self, loop_data: LoopData | None = None, **kwargs):
+        if loop_data is None:
+            loop_data = LoopData()
 
         set = settings.get_settings()
 
@@ -29,7 +30,6 @@ class RecallMemories(Extension):
 
         # every X iterations (or the first one) recall memories
         if loop_data.iteration % set["memory_recall_interval"] == 0:
-
             # show util message right away
             log_item = self.agent.context.log.log(
                 type="util",

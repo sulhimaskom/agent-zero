@@ -6,9 +6,7 @@ from python.helpers.tool import Response, Tool
 
 
 class ResponseTool(Tool):
-
     async def execute(self, **kwargs):
-        print("Redefined response tool executed")
         return Response(
             message=self.args["text"] if "text" in self.args else self.args["message"],
             break_loop=True,

@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """
 BroCula - Browser Console & Lighthouse Optimization Specialist
-Local execution script for manual runs
+Local execution script for manual runs.
 """
 
+import contextlib
 import json
 import subprocess
 import sys
@@ -88,46 +89,34 @@ Remember: You are BroCula. You love working in the browser console. You fix erro
 
 
 def check_dependencies():
-    """Check if required tools are available"""
-    print("🔍 Checking dependencies...")
-
+    """Check if required tools are available."""
     # Check Node.js
     try:
-        result = subprocess.run(["node", "--version"], capture_output=True, text=True)
-        print(f"  ✅ Node.js: {result.stdout.strip()}")
+        subprocess.run(["node", "--version"], capture_output=True, text=True)
     except FileNotFoundError:
-        print("  ❌ Node.js not found")
         return False
 
     # Check npm
     try:
-        result = subprocess.run(["npm", "--version"], capture_output=True, text=True)
-        print(f"  ✅ npm: {result.stdout.strip()}")
+        subprocess.run(["npm", "--version"], capture_output=True, text=True)
     except FileNotFoundError:
-        print("  ❌ npm not found")
         return False
 
     # Check Python
     try:
-        result = subprocess.run(["python3", "--version"], capture_output=True, text=True)
-        print(f"  ✅ Python: {result.stdout.strip()}")
+        subprocess.run(["python3", "--version"], capture_output=True, text=True)
     except FileNotFoundError:
-        print("  ❌ Python not found")
         return False
 
     # Check opencode CLI
-    try:
-        result = subprocess.run(["opencode", "--version"], capture_output=True, text=True)
-        print(f"  ✅ OpenCode CLI: {result.stdout.strip()}")
-    except FileNotFoundError:
-        print("  ⚠️  OpenCode CLI not found. Install from: https://opencode.ai")
-        print("     Continuing anyway...")
+    with contextlib.suppress(FileNotFoundError):
+        subprocess.run(["opencode", "--version"], capture_output=True, text=True)
 
     return True
 
 
 def get_project_info():
-    """Get information about the project"""
+    """Get information about the project."""
     project_root = Path.cwd()
 
     info = {
@@ -160,18 +149,11 @@ def get_project_info():
 
 
 def run_brocula():
-    """Run BroCula agent with OpenCode"""
-    print("\n🧛 Starting BroCula - Browser Console & Lighthouse Specialist...")
-    print("=" * 60)
-
+    """Run BroCula agent with OpenCode."""
     # Save prompt to temp file
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     prompt_file = Path(f"/tmp/brocula_prompt_{timestamp}.txt")
     prompt_file.write_text(BROCULA_PROMPT)
-
-    print(f"\n📄 Prompt saved to: {prompt_file}")
-    print("\n🚀 Executing BroCula workflow...")
-    print("-" * 60)
 
     # Run opencode with the prompt
     try:
@@ -183,64 +165,35 @@ def run_brocula():
         )
         return result.returncode == 0
     except subprocess.TimeoutExpired:
-        print("\n⏰ BroCula workflow timed out after 2 hours")
         return False
-    except Exception as e:
-        print(f"\n❌ Error running BroCula: {e}")
+    except Exception:
         return False
 
 
 def main():
-    """Main entry point"""
-    print("""
-╔══════════════════════════════════════════════════════════════╗
-║                                                              ║
-║  🧛 BroCula - Browser Console & Lighthouse Specialist       ║
-║                                                              ║
-║  Workflow:                                                   ║
-║  1. Monitor browser console for errors/warnings              ║
-║  2. Run Lighthouse audits & optimize                         ║
-║  3. Validate build & lint (FATAL on errors)                  ║
-║  4. Create PR with fixes                                     ║
-║                                                              ║
-║  Rules:                                                      ║
-║  • Console errors are FATAL - fix immediately               ║
-║  • Branch must sync with main before PR                     ║
-║  • Build/lint errors block everything                       ║
-║                                                              ║
-╚══════════════════════════════════════════════════════════════╝
-""")
-
+    """Main entry point."""
     # Check dependencies
     if not check_dependencies():
-        print("\n❌ Missing required dependencies. Please install them first.")
         sys.exit(1)
 
     # Get project info
-    print("\n📋 Project Information:")
     info = get_project_info()
-    for key, value in info.items():
-        icon = "✅" if value else "❌"
+    for value in info.values():
         if value is None:
-            icon = "⚠️ "
-        print(f"  {icon} {key}: {value}")
+            pass
 
     # Confirm execution
-    print("\n" + "=" * 60)
     response = input("\n🚀 Start BroCula workflow? (yes/no): ").lower().strip()
 
     if response not in ["yes", "y"]:
-        print("\n👋 BroCula workflow cancelled.")
         sys.exit(0)
 
     # Run BroCula
     success = run_brocula()
 
     if success:
-        print("\n✅ BroCula workflow completed successfully!")
         sys.exit(0)
     else:
-        print("\n❌ BroCula workflow encountered issues.")
         sys.exit(1)
 
 

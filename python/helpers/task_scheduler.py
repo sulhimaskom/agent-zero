@@ -5,7 +5,7 @@ import threading
 import uuid
 from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
-from enum import Enum
+from enum import StrEnum
 from os.path import exists
 from typing import (
     Annotated,
@@ -43,14 +43,14 @@ DEFAULT_WAIT_TIMEOUT = Timeouts.SCHEDULER_DEFAULT_WAIT
 # ----------------------
 
 
-class TaskState(str, Enum):
+class TaskState(StrEnum):
     IDLE = "idle"
     RUNNING = "running"
     DISABLED = "disabled"
     ERROR = "error"
 
 
-class TaskType(str, Enum):
+class TaskType(StrEnum):
     AD_HOC = "adhoc"
     SCHEDULED = "scheduled"
     PLANNED = "planned"
@@ -81,9 +81,9 @@ class TaskPlan(BaseModel):
         done: list[datetime] | None = None,
     ):
         if done is None:
-            done = list()
+            done = []
         if todo is None:
-            todo = list()
+            todo = []
         if todo:
             for idx, dt in enumerate(todo):
                 if dt.tzinfo is None:
@@ -277,7 +277,7 @@ class AdHocTask(BaseTask):
         project_color: str | None = None,
     ):
         if attachments is None:
-            attachments = list()
+            attachments = []
         return cls(
             name=name,
             system_prompt=system_prompt,
@@ -335,7 +335,7 @@ class ScheduledTask(BaseTask):
     ):
         # Set timezone in schedule if provided
         if attachments is None:
-            attachments = list()
+            attachments = []
         if timezone is not None:
             schedule.timezone = timezone
         else:
@@ -424,7 +424,7 @@ class PlannedTask(BaseTask):
         project_color: str | None = None,
     ):
         if attachments is None:
-            attachments = list()
+            attachments = []
         return cls(
             name=name,
             system_prompt=system_prompt,
@@ -1013,9 +1013,7 @@ class TaskScheduler:
         asyncio.create_task(asyncio.sleep(0.1))
 
     def serialize_all_tasks(self) -> list[dict[str, Any]]:
-        """
-        Serialize all tasks in the scheduler to a list of dictionaries.
-        """
+        """Serialize all tasks in the scheduler to a list of dictionaries."""
         return serialize_tasks(self.get_tasks())
 
     def serialize_task(self, task_id: str) -> dict[str, Any] | None:
@@ -1163,9 +1161,7 @@ T = TypeVar("T", bound=ScheduledTask | AdHocTask | PlannedTask)
 def serialize_task(
     task: ScheduledTask | AdHocTask | PlannedTask,
 ) -> dict[str, Any]:
-    """
-    Standardized serialization for task objects with proper handling of all complex types.
-    """
+    """Standardized serialization for task objects with proper handling of all complex types."""
     # Start with a basic dictionary
     task_dict = {
         "uuid": task.uuid,
@@ -1208,13 +1204,13 @@ def serialize_task(
 def serialize_tasks(
     tasks: list[ScheduledTask | AdHocTask | PlannedTask],
 ) -> list[dict[str, Any]]:
-    """
-    Serialize a list of tasks to a list of dictionaries.
-    """
+    """Serialize a list of tasks to a list of dictionaries."""
     return [serialize_task(task) for task in tasks]
 
 
-def deserialize_task(task_data: dict[str, Any], task_class: type[T] | None = None) -> T:
+def deserialize_task[T: ScheduledTask | AdHocTask | PlannedTask](
+    task_data: dict[str, Any], task_class: type[T] | None = None
+) -> T:
     """
     Deserialize dictionary into appropriate task object with validation.
     If task_class is provided, uses that type. Otherwise determines type from data.

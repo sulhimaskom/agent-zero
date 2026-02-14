@@ -10,7 +10,6 @@ from python.helpers.constants import Network
 
 
 class GetCsrfToken(ApiHandler):
-
     @classmethod
     def get_methods(cls) -> list[str]:
         return ["GET"]

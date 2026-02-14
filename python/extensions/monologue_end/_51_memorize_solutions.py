@@ -13,7 +13,6 @@ from python.tools.memory_load import (
 
 
 class MemorizeSolutions(Extension):
-
     async def execute(self, loop_data: LoopData = LoopData(), **kwargs):
         # try:
 

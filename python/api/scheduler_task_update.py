@@ -14,9 +14,7 @@ from python.helpers.task_scheduler import (
 
 class SchedulerTaskUpdate(ApiHandler):
     async def process(self, input: Input, request: Request) -> Output:
-        """
-        Update an existing task in the scheduler
-        """
+        """Update an existing task in the scheduler."""
         # Get timezone from input (do not set if not provided, we then rely on poll() to set it)
         if timezone := input.get("timezone", None):
             Localization.get().set_timezone(timezone)

@@ -6,7 +6,6 @@ from python.helpers.extension import Extension
 
 
 class RenameChat(Extension):
-
     async def execute(self, loop_data: LoopData = LoopData(), **kwargs):
         asyncio.create_task(self.change_name())
 

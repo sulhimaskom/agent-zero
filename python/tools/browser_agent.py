@@ -171,7 +171,6 @@ class State:
         model = self.agent.get_browser_model()
 
         try:
-
             secrets_manager = get_secrets_manager(self.agent.context)
             secrets_dict = secrets_manager.load_secrets()
 
@@ -246,7 +245,6 @@ class State:
 
 
 class BrowserAgent(Tool):
-
     async def execute(self, message="", reset="", **kwargs):
         self.guid = self.agent.context.generate_id()  # short random id
         reset = str(reset).lower().strip() == "true"

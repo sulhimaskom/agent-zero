@@ -16,10 +16,7 @@ def test_example(example: str):
     res = models.ChatGenerationResult()
     for i in range(len(example)):
         char = example[i]
-        chunk = res.add_chunk({"response_delta": char, "reasoning_delta": ""})
-        print(i, ":", chunk)
-
-    print("output", res.output())
+        res.add_chunk({"response_delta": char, "reasoning_delta": ""})
 
 
 if __name__ == "__main__":

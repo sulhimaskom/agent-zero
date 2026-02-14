@@ -369,9 +369,7 @@ def _write_file_binary_impl(file_path: str, b64_content: str) -> bool:
 
 
 def _delete_file_impl(file_path: str) -> bool:
-    """
-    Implementation function to delete a file.
-    """
+    """Implementation function to delete a file."""
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"File not found: {file_path}")
 
@@ -386,9 +384,7 @@ def _delete_file_impl(file_path: str) -> bool:
 
 
 def _delete_folder_impl(folder_path: str) -> bool:
-    """
-    Implementation function to delete a folder recursively.
-    """
+    """Implementation function to delete a folder recursively."""
     if not os.path.exists(folder_path):
         raise FileNotFoundError(f"Folder not found: {folder_path}")
 
@@ -403,9 +399,7 @@ def _delete_folder_impl(folder_path: str) -> bool:
 
 
 def _list_folder_impl(folder_path: str, include_hidden: bool = False) -> list:
-    """
-    Implementation function to list folder contents.
-    """
+    """Implementation function to list folder contents."""
     if not os.path.exists(folder_path):
         raise FileNotFoundError(f"Folder not found: {folder_path}")
 
@@ -441,9 +435,7 @@ def _list_folder_impl(folder_path: str, include_hidden: bool = False) -> list:
 
 
 def _make_dirs_impl(folder_path: str) -> bool:
-    """
-    Implementation function to create directories.
-    """
+    """Implementation function to create directories."""
     try:
         os.makedirs(folder_path, exist_ok=True)
         return True
@@ -469,9 +461,7 @@ def _folder_exists_impl(folder_path: str) -> bool:
 def _get_subdirectories_impl(
     folder_path: str, include: str | list[str], exclude: str | list[str] | None
 ) -> list[str]:
-    """
-    Implementation function to get subdirectories.
-    """
+    """Implementation function to get subdirectories."""
     if not os.path.exists(folder_path):
         return []
 
@@ -490,9 +480,7 @@ def _get_subdirectories_impl(
 
 
 def _zip_dir_impl(folder_path: str) -> str:
-    """
-    Implementation function to create a zip archive of a directory.
-    """
+    """Implementation function to create a zip archive of a directory."""
     zip_file_path = tempfile.NamedTemporaryFile(suffix=".zip", delete=False).name
     base_name = os.path.basename(folder_path)
 
@@ -507,9 +495,7 @@ def _zip_dir_impl(folder_path: str) -> str:
 
 
 def _move_file_impl(source_path: str, destination_path: str) -> bool:
-    """
-    Implementation function to move a file.
-    """
+    """Implementation function to move a file."""
     try:
         os.makedirs(os.path.dirname(destination_path), exist_ok=True)
         os.rename(source_path, destination_path)
@@ -519,9 +505,7 @@ def _move_file_impl(source_path: str, destination_path: str) -> bool:
 
 
 def _read_directory_impl(dir_path: str) -> str:
-    """
-    Implementation function to zip a directory and return base64 encoded zip.
-    """
+    """Implementation function to zip a directory and return base64 encoded zip."""
     if not os.path.exists(dir_path):
         raise FileNotFoundError(f"Directory not found: {dir_path}")
 
@@ -560,9 +544,7 @@ def _read_directory_impl(dir_path: str) -> str:
 
 
 def _read_file_as_base64_impl(file_path: str) -> str:
-    """
-    Implementation function to read a file and return its content as base64.
-    """
+    """Implementation function to read a file and return its content as base64."""
     if not os.path.exists(file_path):
         raise FileNotFoundError(f"File not found: {file_path}")
 
@@ -578,9 +560,7 @@ def _read_file_as_base64_impl(file_path: str) -> str:
 
 
 def _write_file_from_base64_impl(file_path: str, content: str) -> bool:
-    """
-    Implementation function to write base64 content to a file.
-    """
+    """Implementation function to write base64 content to a file."""
     try:
         # Ensure content is properly UTF-8 encoded before base64 decoding
         content_bytes = content.encode("utf-8") if isinstance(content, str) else content

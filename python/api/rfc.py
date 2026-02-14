@@ -3,7 +3,6 @@ from python.helpers.api import ApiHandler, Request, Response
 
 
 class RFC(ApiHandler):
-
     @classmethod
     def requires_csrf(cls) -> bool:
         return False

@@ -7,7 +7,6 @@ from python.helpers.wait import managed_wait
 
 
 class WaitTool(Tool):
-
     async def execute(self, **kwargs) -> Response:
         await self.agent.handle_intervention()
 

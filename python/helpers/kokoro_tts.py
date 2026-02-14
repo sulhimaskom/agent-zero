@@ -98,7 +98,7 @@ def _is_downloaded():
 
 
 async def synthesize_sentences(sentences: list[str]):
-    """Generate audio for multiple sentences and return concatenated base64 audio"""
+    """Generate audio for multiple sentences and return concatenated base64 audio."""
     try:
         # return await runtime.call_development_function(_synthesize_sentences, sentences)
         return await _synthesize_sentences(sentences)

@@ -88,14 +88,14 @@ def get_persistent_id() -> str:
 
 
 @overload
-async def call_development_function(func: Callable[..., Awaitable[T]], *args, **kwargs) -> T: ...
+async def call_development_function[T](func: Callable[..., Awaitable[T]], *args, **kwargs) -> T: ...
 
 
 @overload
-async def call_development_function(func: Callable[..., T], *args, **kwargs) -> T: ...
+async def call_development_function[T](func: Callable[..., T], *args, **kwargs) -> T: ...
 
 
-async def call_development_function(
+async def call_development_function[T](
     func: Callable[..., T] | Callable[..., Awaitable[T]], *args, **kwargs
 ) -> T:
     if is_development():
@@ -143,7 +143,7 @@ def _get_rfc_url() -> str:
     return url
 
 
-def call_development_function_sync(
+def call_development_function_sync[T](
     func: Callable[..., T] | Callable[..., Awaitable[T]], *args, **kwargs
 ) -> T:
     # run async function in sync manner
