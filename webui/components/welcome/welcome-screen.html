@@ -23,81 +23,81 @@
 
                 <!-- Action Cards -->
                 <div class="welcome-actions">
-                    <div class="welcome-action-card" 
+                    <div class="welcome-action-card"
                          @click="executeAction('new-chat')"
                          @keydown.enter.prevent="executeAction('new-chat')"
                          @keydown.space.prevent="executeAction('new-chat')"
                          tabindex="0"
                          role="button"
-                         aria-label="Start a new chat conversation">
+                         aria-label="New Chat - Start a new conversation">
                         <span class="material-symbols-outlined welcome-action-icon">add_circle</span>
-                        <h3 class="welcome-action-title">New Chat</h3>
+                        <h2 class="welcome-action-title">New Chat</h2>
                         <p class="welcome-action-description">
                             Start a new conversation
                         </p>
                     </div>
 
-                    <div class="welcome-action-card" 
+                    <div class="welcome-action-card"
                          @click="executeAction('projects')"
                          @keydown.enter.prevent="executeAction('projects')"
                          @keydown.space.prevent="executeAction('projects')"
                          tabindex="0"
                          role="button"
-                         aria-label="Manage your projects">
+                         aria-label="Projects - Manage your projects">
                         <span class="material-symbols-outlined welcome-action-icon">folder</span>
-                        <h3 class="welcome-action-title">Projects</h3>
+                        <h2 class="welcome-action-title">Projects</h2>
                         <p class="welcome-action-description">
                             Manage your projects
                         </p>
                     </div>
-                    <div class="welcome-action-card" 
+                    <div class="welcome-action-card"
                          @click="executeAction('memory')"
                          @keydown.enter.prevent="executeAction('memory')"
                          @keydown.space.prevent="executeAction('memory')"
                          tabindex="0"
                          role="button"
-                         aria-label="Open Memory Dashboard">
+                         aria-label="Memory - Open Memory Dashboard">
                         <span class="material-symbols-outlined welcome-action-icon">memory</span>
-                        <h3 class="welcome-action-title">Memory</h3>
+                        <h2 class="welcome-action-title">Memory</h2>
                         <p class="welcome-action-description">
                             Open Memory Dashboard
                         </p>
                     </div>
-                    <div class="welcome-action-card" 
+                    <div class="welcome-action-card"
                          @click="executeAction('settings')"
                          @keydown.enter.prevent="executeAction('settings')"
                          @keydown.space.prevent="executeAction('settings')"
                          tabindex="0"
                          role="button"
-                         aria-label="Configure Agent Zero settings">
+                         aria-label="Settings - Configure Agent Zero settings">
                         <span class="material-symbols-outlined welcome-action-icon">settings</span>
-                        <h3 class="welcome-action-title">Settings</h3>
+                        <h2 class="welcome-action-title">Settings</h2>
                         <p class="welcome-action-description">
                             Configure Agent Zero
                         </p>
                     </div>
-                    <div class="welcome-action-card" 
+                    <div class="welcome-action-card"
                          @click="executeAction('website')"
                          @keydown.enter.prevent="executeAction('website')"
                          @keydown.space.prevent="executeAction('website')"
                          tabindex="0"
                          role="button"
-                         aria-label="Visit Agent Zero website">
+                         aria-label="Visit Website - Learn more about Agent Zero">
                         <span class="material-symbols-outlined welcome-action-icon">language</span>
-                        <h3 class="welcome-action-title">Visit Website</h3>
+                        <h2 class="welcome-action-title">Visit Website</h2>
                          <p class="welcome-action-description">
                             Learn more about Agent Zero
                         </p>
                     </div>
-                    <div class="welcome-action-card" 
+                    <div class="welcome-action-card"
                          @click="executeAction('github')"
                          @keydown.enter.prevent="executeAction('github')"
                          @keydown.space.prevent="executeAction('github')"
                          tabindex="0"
                          role="button"
-                         aria-label="View source code on GitHub">
+                         aria-label="Visit GitHub - View source code and documentation">
                         <span class="material-symbols-outlined welcome-action-icon">code</span>
-                        <h3 class="welcome-action-title">Visit GitHub</h3>
+                        <h2 class="welcome-action-title">Visit GitHub</h2>
                         <p class="welcome-action-description">
                             View source code and documentation
                         </p>
@@ -161,6 +161,11 @@
             line-height: 1.5;
         }
 
+        /* Dark mode contrast fix - use lighter color for better accessibility */
+        .dark-mode .welcome-subtitle {
+            color: #a0a0a0;
+        }
+
         .welcome-actions {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -213,6 +218,11 @@
             font-size: 0.8rem;
             color: var(--color-secondary);
             line-height: 1.3;
+        }
+
+        /* Dark mode contrast fix - use lighter color for better accessibility */
+        .dark-mode .welcome-action-description {
+            color: #a0a0a0;
         }
 
         /* Light mode adjustments */
