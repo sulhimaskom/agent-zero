@@ -510,7 +510,7 @@ def get_use_agent_log(use_agent: browser_use.Agent | None):
             else:
                 text = item.extracted_content
                 if text:
-                    first_line = text.split("\n", 1)[0][:200]
+                    first_line = text.split("\n", 1)[0][:Limits.BROWSER_FIRST_LINE_TRUNCATION]
                     short_log.append(first_line)
         result.extend(short_log)
     return result

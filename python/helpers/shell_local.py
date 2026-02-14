@@ -1,6 +1,7 @@
 from typing import Optional, Tuple
 from python.helpers import tty_session, runtime
 from python.helpers.shell_ssh import clean_string
+from python.helpers.constants import Timeouts
 
 
 class LocalInteractiveSession:
@@ -15,7 +16,7 @@ class LocalInteractiveSession:
         )
         await self.session.start()
         await self.session.read_full_until_idle(
-            idle_timeout=1, total_timeout=1
+            idle_timeout=Timeouts.IDLE_TIMEOUT, total_timeout=Timeouts.IDLE_TIMEOUT
         )
 
     async def close(self):
@@ -40,7 +41,7 @@ class LocalInteractiveSession:
 
         # get output from terminal
         partial_output = await self.session.read_full_until_idle(
-            idle_timeout=0.01, total_timeout=timeout
+            idle_timeout=Timeouts.SHORT_IDLE_TIMEOUT, total_timeout=timeout
         )
         self.full_output += partial_output
 

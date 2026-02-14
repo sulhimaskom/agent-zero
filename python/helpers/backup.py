@@ -170,8 +170,8 @@ class BackupService:
                 "home": os.environ.get("HOME", "unknown"),
                 "shell": os.environ.get("SHELL", "unknown"),
                 "path": (
-                    os.environ.get("PATH", "")[:200] + "..."
-                    if len(os.environ.get("PATH", "")) > 200
+                    os.environ.get("PATH", "")[:Limits.COMMAND_TRUNCATION_PRIMARY] + "..."
+                    if len(os.environ.get("PATH", "")) > Limits.COMMAND_TRUNCATION_PRIMARY
                     else os.environ.get("PATH", "")
                 ),
                 "timezone": str(datetime.datetime.now().astimezone().tzinfo),

@@ -2,7 +2,7 @@ from agent import AgentContext
 from python.helpers.api import ApiHandler, Request, Response
 from python.helpers.persist_chat import remove_chat
 from python.helpers.print_style import PrintStyle
-from python.helpers.constants import Colors
+from python.helpers.constants import Colors, HttpStatus
 import json
 
 
@@ -31,7 +31,7 @@ class ApiTerminateChat(ApiHandler):
             if not context_id:
                 return Response(
                     '{"error": "context_id is required"}',
-                    status=400,
+                    status=HttpStatus.BAD_REQUEST,
                     mimetype="application/json",
                 )
 
@@ -40,7 +40,7 @@ class ApiTerminateChat(ApiHandler):
             if not context:
                 return Response(
                     '{"error": "Chat context not found"}',
-                    status=404,
+                    status=HttpStatus.NOT_FOUND,
                     mimetype="application/json",
                 )
 
@@ -67,6 +67,6 @@ class ApiTerminateChat(ApiHandler):
             PrintStyle.error(f"API terminate chat error: {str(e)}")
             return Response(
                 json.dumps({"error": f"Internal server error: {str(e)}"}),
-                status=500,
+                status=HttpStatus.ERROR,
                 mimetype="application/json",
             )

@@ -1,5 +1,6 @@
 from agent import AgentContext
 from python.helpers.api import ApiHandler, Request, Response
+from python.helpers.constants import HttpStatus
 
 
 class ApiLogGet(ApiHandler):
@@ -31,7 +32,7 @@ class ApiLogGet(ApiHandler):
         if not context_id:
             return Response(
                 '{"error": "context_id is required"}',
-                status=400,
+                status=HttpStatus.BAD_REQUEST,
                 mimetype="application/json",
             )
 
@@ -40,7 +41,7 @@ class ApiLogGet(ApiHandler):
         if not context:
             return Response(
                 '{"error": "Context not found"}',
-                status=404,
+                status=HttpStatus.NOT_FOUND,
                 mimetype="application/json",
             )
 
@@ -71,6 +72,6 @@ class ApiLogGet(ApiHandler):
         except (AttributeError, RuntimeError) as e:
             return Response(
                 f'{{"error": "{str(e)}"}}',
-                status=500,
+                status=HttpStatus.ERROR,
                 mimetype="application/json",
             )

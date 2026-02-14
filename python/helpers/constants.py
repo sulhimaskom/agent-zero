@@ -41,6 +41,8 @@ class Timeouts:
     # TTY session timeouts
     TTY_READ_TIMEOUT: Final[float] = 1.0
     TTY_TOTAL_TIMEOUT_MULTIPLIER: Final[int] = 10
+    IDLE_TIMEOUT: Final[float] = 1.0
+    SHORT_IDLE_TIMEOUT: Final[float] = 0.01
 
     # Scheduler timeouts
     SCHEDULER_DEFAULT_WAIT: Final[int] = 300
@@ -447,6 +449,7 @@ class HttpStatus:
     """HTTP status codes used in the application"""
 
     OK: Final[int] = 200
+    BAD_REQUEST: Final[int] = 400
     UNAUTHORIZED: Final[int] = 401
     FORBIDDEN: Final[int] = 403
     NOT_FOUND: Final[int] = 404

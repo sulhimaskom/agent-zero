@@ -11,7 +11,7 @@ from agent import AgentContext, UserMessage, AgentContextType
 from python.helpers.api import ApiHandler, Request, Response
 from python.helpers import files
 from python.helpers.print_style import PrintStyle
-from python.helpers.constants import Colors, Paths, Timeouts
+from python.helpers.constants import Colors, Paths, Timeouts, HttpStatus
 from werkzeug.utils import secure_filename
 from initialize import initialize_agent
 import threading
@@ -46,7 +46,7 @@ class ApiMessage(ApiHandler):
         if not message:
             return Response(
                 '{"error": "Message is required"}',
-                status=400,
+                status=HttpStatus.BAD_REQUEST,
                 mimetype="application/json",
             )
 
@@ -93,7 +93,7 @@ class ApiMessage(ApiHandler):
             if not context:
                 return Response(
                     '{"error": "Context not found"}',
-                    status=404,
+                    status=HttpStatus.NOT_FOUND,
                     mimetype="application/json",
                 )
         else:
@@ -156,7 +156,7 @@ class ApiMessage(ApiHandler):
             PrintStyle.error(f"External API error: {e}")
             return Response(
                 f'{{"error": "{str(e)}"}}',
-                status=500,
+                status=HttpStatus.ERROR,
                 mimetype="application/json",
             )
 

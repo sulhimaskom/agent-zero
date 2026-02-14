@@ -23,7 +23,7 @@ from datetime import timedelta
 import json
 from python.helpers import errors
 from python.helpers import settings
-from python.helpers.constants import Timeouts
+from python.helpers.constants import Timeouts, Limits
 
 import httpx
 
@@ -962,7 +962,7 @@ class MCPClientBase(ABC):
             )
             with self.__lock:
                 self.tools = []  # Ensure tools are cleared on failure
-                self.error = f"Failed to initialize. {error_text[:200]}{'...' if len(error_text) > 200 else ''}"  # store error from tools fetch
+                self.error = f"Failed to initialize. {error_text[:Limits.COMMAND_TRUNCATION_PRIMARY]}{'...' if len(error_text) > Limits.COMMAND_TRUNCATION_PRIMARY else ''}"  # store error from tools fetch
         return self
 
     def has_tool(self, tool_name: str) -> bool:
