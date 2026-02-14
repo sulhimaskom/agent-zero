@@ -418,46 +418,26 @@ const model = {
   copyToClipboard() {
     if (!this.tunnelLink) return;
 
-    const copyButton = document.querySelector("#tunnel-settings-section .copy-link-button");
-    const originalContent = copyButton.innerHTML;
-
     navigator.clipboard
       .writeText(this.tunnelLink)
       .then(() => {
-        // Update button to show success state
-        copyButton.innerHTML =
-          '<span class="icon material-symbols-outlined">check</span> Copied!';
-        copyButton.classList.add("copy-success");
-
-        // Show toast notification
+        window.dispatchEvent(new CustomEvent('copy-success', {
+          detail: { component: 'tunnel' }
+        }));
         window.toastFrontendInfo(
           "Tunnel URL copied to clipboard!",
           "Clipboard"
         );
-
-        // Reset button after 2 seconds
-        setTimeout(() => {
-          copyButton.innerHTML = originalContent;
-          copyButton.classList.remove("copy-success");
-        }, 2000);
       })
       .catch((err) => {
         console.error("Failed to copy URL: ", err);
+        window.dispatchEvent(new CustomEvent('copy-error', {
+          detail: { component: 'tunnel' }
+        }));
         window.toastFrontendError(
           "Failed to copy tunnel URL",
           "Clipboard Error"
         );
-
-        // Show error state
-        copyButton.innerHTML =
-          '<span class="icon material-symbols-outlined">close</span> Failed';
-        copyButton.classList.add("copy-error");
-
-        // Reset button after 2 seconds
-        setTimeout(() => {
-          copyButton.innerHTML = originalContent;
-          copyButton.classList.remove("copy-error");
-        }, 2000);
       });
   },
 };

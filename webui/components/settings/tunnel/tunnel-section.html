@@ -48,10 +48,16 @@
                             <div class="tunnel-link-field">
                                 <input type="text" class="tunnel-link-input" :value="$store.tunnelStore.tunnelLink"
                                     readonly>
-                                <div class="buttons-row">
-                                    <button class="copy-link-button" @click="$store.tunnelStore.copyToClipboard()"
+                                <div class="buttons-row" x-data="{ copyState: 'idle', copyTimeout: null }" @copy-success.window="if ($event.detail?.component === 'tunnel') { copyState = 'success'; if (copyTimeout) clearTimeout(copyTimeout); copyTimeout = setTimeout(() => copyState = 'idle', 2000); }" @copy-error.window="if ($event.detail?.component === 'tunnel') { copyState = 'error'; if (copyTimeout) clearTimeout(copyTimeout); copyTimeout = setTimeout(() => copyState = 'idle', 2000); }">
+                                    <button class="copy-link-button"
+                                        @click="$store.tunnelStore.copyToClipboard()"
+                                        :class="{ 'copy-success': copyState === 'success', 'copy-error': copyState === 'error' }"
+                                        :aria-label="copyState === 'success' ? 'Copied to clipboard!' : copyState === 'error' ? 'Copy failed' : 'Copy tunnel URL to clipboard'"
                                         title="Copy to clipboard">
-                                        <span class="icon material-symbols-outlined">content_copy</span> Copy
+                                        <span class="icon material-symbols-outlined" x-show="copyState === 'idle'">content_copy</span>
+                                        <span class="icon material-symbols-outlined check-icon" x-show="copyState === 'success'">check</span>
+                                        <span class="icon material-symbols-outlined error-icon" x-show="copyState === 'error'">close</span>
+                                        <span x-text="copyState === 'success' ? 'Copied!' : copyState === 'error' ? 'Failed' : 'Copy'"></span>
                                     </button>
                                     <button class="refresh-link-button" @click="$store.tunnelStore.refreshLink()"
                                         title="Generate new URL">
@@ -226,38 +232,126 @@
         }
 
         /* Copy button states */
+        .copy-link-button {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .copy-link-button::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.4s ease-out, height 0.4s ease-out, opacity 0.4s ease-out;
+            pointer-events: none;
+        }
+
+        .copy-link-button:active::after {
+            width: 150%;
+            height: 150%;
+            opacity: 0;
+        }
+
         .copy-success {
-            background-color: rgba(40, 167, 69, 0.15) !important;
+            background-color: rgba(40, 167, 69, 0.2) !important;
             color: #28a745 !important;
-            border-left: 1px solid rgba(40, 167, 69, 0.5) !important;
-            transition: all 0.3s ease-in-out;
+            border-left: 1px solid rgba(40, 167, 69, 0.6) !important;
         }
 
         .copy-error {
-            background-color: rgba(220, 53, 69, 0.15) !important;
+            background-color: rgba(220, 53, 69, 0.2) !important;
             color: #dc3545 !important;
-            border-left: 1px solid rgba(220, 53, 69, 0.5) !important;
-            transition: all 0.3s ease-in-out;
+            border-left: 1px solid rgba(220, 53, 69, 0.6) !important;
         }
 
-        /* Animation for copy button */
-        @keyframes pulse {
+        /* Icon animations */
+        .check-icon {
+            animation: checkmark-pop 0.3s ease;
+        }
+
+        .error-icon {
+            animation: error-shake 0.4s ease;
+        }
+
+        @keyframes checkmark-pop {
             0% {
-                transform: scale(1);
+                transform: scale(0) rotate(-45deg);
+                opacity: 0;
             }
-
             50% {
-                transform: scale(1.05);
+                transform: scale(1.2) rotate(0deg);
             }
-
             100% {
-                transform: scale(1);
+                transform: scale(1) rotate(0deg);
+                opacity: 1;
             }
         }
 
-        .copy-success,
+        @keyframes error-shake {
+            0%, 100% {
+                transform: translateX(0);
+            }
+            20%, 60% {
+                transform: translateX(-3px);
+            }
+            40%, 80% {
+                transform: translateX(3px);
+            }
+        }
+
+        /* Pulse animation for feedback */
+        @keyframes pulse-feedback {
+            0% {
+                box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 8px rgba(40, 167, 69, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+            }
+        }
+
+        @keyframes pulse-error {
+            0% {
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 8px rgba(220, 53, 69, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+            }
+        }
+
+        .copy-success {
+            animation: pulse-feedback 0.6s ease-out;
+        }
+
         .copy-error {
-            animation: pulse 0.5s;
+            animation: pulse-error 0.6s ease-out;
+        }
+
+        /* Accessibility: respect reduced motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+            .copy-link-button,
+            .copy-link-button::after {
+                transition: none;
+            }
+            .check-icon,
+            .error-icon {
+                animation: none;
+            }
+            .copy-success,
+            .copy-error {
+                animation: none;
+            }
         }
 
         /* Refresh button state */
