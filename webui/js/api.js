@@ -1,5 +1,40 @@
 import Logger from './logger.js';
 
+// Track if we're in static file mode (no backend)
+let isStaticMode = false;
+let staticModeChecked = false;
+
+/**
+ * Detect if we're running in static file mode (no backend API available)
+ * Checks if the current page is served as a static file without the Flask backend
+ * @returns {boolean} True if running in static mode
+ */
+function detectStaticMode() {
+  // Check for indicators that we're in static file mode:
+  // 1. URL contains file:// protocol
+  // 2. Page is served from localhost:8080 (our static server port)
+  // 3. URL port is 8080 (common static server port)
+  const url = new URL(window.location.href);
+  if (url.protocol === 'file:') return true;
+  if (url.port === '8080') return true;
+  
+  // Check if we're on a static file server by looking at the response headers
+  // Static servers typically don't set the same headers as Flask
+  return false;
+}
+
+/**
+ * Get whether we're in static mode (cached)
+ * @returns {boolean}
+ */
+function isStaticFileMode() {
+  if (!staticModeChecked) {
+    isStaticMode = detectStaticMode();
+    staticModeChecked = true;
+  }
+  return isStaticMode;
+}
+
 /**
  * Call a JSON-in JSON-out API endpoint
  * Data is automatically serialized
@@ -83,23 +118,32 @@ let csrfTokenErrorLogged = false;
  */
 async function getCsrfToken() {
   if (csrfToken) return csrfToken;
-  
+
   // Prevent repeated failed requests that spam the console
   if (csrfTokenFailed) {
     throw new Error("CSRF token unavailable - backend not running");
   }
-  
+
+  // Check if we're in static file mode to avoid unnecessary network errors
+  if (isStaticFileMode()) {
+    csrfTokenFailed = true;
+    Logger.once('static_mode_skip', () => {
+      Logger.debug("Static file mode detected - skipping CSRF token fetch");
+    });
+    throw new Error("Static file mode - no backend available");
+  }
+
   try {
     const response = await fetch("/csrf_token", {
       credentials: "same-origin",
     });
-    
+
     if (response.redirected && response.url.endsWith("/login")) {
       // redirect to login
       window.location.href = response.url;
       return;
     }
-    
+
     // Check for 404 or other error status
     if (!response.ok) {
       csrfTokenFailed = true;
@@ -109,7 +153,7 @@ async function getCsrfToken() {
       });
       throw new Error(`CSRF token endpoint returned ${response.status}`);
     }
-    
+
     // Try to parse JSON, but handle non-JSON responses gracefully
     let json;
     try {
@@ -121,7 +165,7 @@ async function getCsrfToken() {
       });
       throw new Error("Invalid JSON response from CSRF endpoint");
     }
-    
+
     if (json.ok) {
       csrfToken = json.token;
       document.cookie = `csrf_token_${json.runtime_id}=${csrfToken}; SameSite=Strict; Path=/`;
