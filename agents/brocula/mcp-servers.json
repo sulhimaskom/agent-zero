@@ -12,7 +12,7 @@
         "playwright-mcp"
       ],
       "env": {
-        "PLAYWRIGHT_BROWSERS_PATH": "0"
+        "PLAYWRIGHT_BROWSERS_PATH": "/home/runner/.cache/ms-playwright"
       },
       "disabled": false
     },
