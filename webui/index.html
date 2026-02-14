@@ -587,10 +587,7 @@
                                                             <!-- Create Task Form Add Time Button -->
                                                             <button @click.prevent="
                                                                 const input = $refs.plannedTimeCreate;
-                                                                if (!input) {
-                                                                    console.error('Input reference not found for plannedTimeCreate');
-                                                                    return;
-                                                                }
+                                                                if (!input) return;
 
                                                                 // Ensure plan structure exists
                                                                 if (!editingTask.plan) {
@@ -866,10 +863,7 @@
                                                             <!-- Edit Task Form Add Time Button -->
                                                             <button @click.prevent="
                                                                 const input = $refs.plannedTimeEdit;
-                                                                if (!input) {
-                                                                    console.error('Input reference not found for plannedTimeEdit');
-                                                                    return;
-                                                                }
+                                                                if (!input) return;
 
                                                                 // Ensure plan structure exists
                                                                 if (!editingTask.plan) {
@@ -1285,9 +1279,9 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('js/sw.js').then(registration => {
-                    console.log('SW registered: ', registration);
+                    // Service worker registered successfully
                 }).catch(registrationError => {
-                    console.log('SW registration failed: ', registrationError);
+                    // Service worker registration failed - silent fail
                 });
             });
         }
