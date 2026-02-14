@@ -121,7 +121,20 @@ create_mock_module("git")
 create_mock_module("playwright")
 create_mock_module("markdown")
 create_mock_module("pytz")
-create_mock_module("tiktoken")
+tiktoken_mock = create_mock_module("tiktoken")
+
+
+def mock_encode(text):
+    return [1] * len(text.split()) if hasattr(text, "split") else [1]
+
+
+def mock_encode_batch(texts):
+    return [[1] * len(t.split()) if hasattr(t, "split") else [1] for t in texts]
+
+
+tiktoken_mock.encoding_for_model = MagicMock(
+    return_value=MagicMock(encode=mock_encode, encode_batch=mock_encode_batch)
+)
 create_mock_module("lxml")
 create_mock_module("lxml_html_clean")
 create_mock_module("beautifulsoup4")
