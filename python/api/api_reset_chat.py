@@ -64,7 +64,7 @@ class ApiResetChat(ApiHandler):
                 "context_id": context_id,
             }
 
-        except Exception as e:
+        except (RuntimeError, KeyError, TypeError) as e:
             PrintStyle.error(f"API reset chat error: {str(e)}")
             return Response(
                 json.dumps({"error": f"Internal server error: {str(e)}"}),

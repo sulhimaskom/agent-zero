@@ -81,7 +81,7 @@ class ApiMessage(ApiHandler):
                     attachment_paths.append(
                         os.path.join(upload_folder_int, filename)
                     )
-                except Exception as e:
+                except (ValueError, OSError) as e:
                     PrintStyle.error(
                         f"Failed to process attachment {attachment.get('filename', 'unknown')}: {e}"
                     )
@@ -152,7 +152,7 @@ class ApiMessage(ApiHandler):
 
             return {"context_id": context_id, "response": result}
 
-        except Exception as e:
+        except (RuntimeError, ValueError, KeyError) as e:
             PrintStyle.error(f"External API error: {e}")
             return Response(
                 f'{{"error": "{str(e)}"}}',
@@ -181,7 +181,7 @@ class ApiMessage(ApiHandler):
                     PrintStyle().print(
                         f"Cleaned up expired chat: {context_id}"
                     )
-                except Exception as e:
+                except (RuntimeError, KeyError) as e:
                     PrintStyle.error(
                         f"Failed to cleanup chat {context_id}: {e}"
                     )

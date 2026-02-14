@@ -14,6 +14,7 @@ from python.helpers import files, git, mcp_server, fasta2a_server
 from python.helpers.files import get_abs_path
 from python.helpers import runtime, dotenv, process
 from python.helpers.constants import Config
+from python.helpers.config import inject_config_into_html
 from python.helpers.extract_tools import load_classes_from_folder
 from python.helpers.api import ApiHandler
 from python.helpers.print_style import PrintStyle
@@ -208,6 +209,8 @@ async def serve_index():
         version_no=gitinfo["version"],
         version_time=gitinfo["commit_time"]
     )
+    # Inject frontend configuration into HTML
+    index = inject_config_into_html(index)
     response = Response(index, mimetype='text/html')
     # Don't cache index.html to ensure fresh content on reload
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'

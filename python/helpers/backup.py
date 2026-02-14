@@ -92,7 +92,7 @@ class BackupService:
             # Get version from git info (same as run_ui.py)
             gitinfo = git.get_git_info()
             return gitinfo.get("version", "development")
-        except Exception:
+        except (OSError, ValueError, KeyError):
             return "unknown"
 
     def _resolve_path(self, pattern_path: str) -> str:
@@ -159,7 +159,7 @@ class BackupService:
                     psutil.disk_usage("/").total if os.path.exists("/") else 0
                 ),
             }
-        except Exception as e:
+        except (OSError, ValueError, RuntimeError) as e:
             return {"error": f"Failed to collect system info: {str(e)}"}
 
     async def _get_environment_info(self) -> Dict[str, Any]:
@@ -181,7 +181,7 @@ class BackupService:
                     "development" if runtime.is_development() else "production"
                 ),
             }
-        except Exception as e:
+        except (OSError, ValueError) as e:
             return {"error": f"Failed to collect environment info: {str(e)}"}
 
     async def _get_backup_author(self) -> str:
@@ -192,7 +192,7 @@ class BackupService:
             username = getpass.getuser()
             hostname = platform.node()
             return f"{username}@{hostname}"
-        except Exception:
+        except (OSError, ImportError):
             return "unknown"
 
     def _count_directories(self, matched_files: List[Dict[str, Any]]) -> int:

@@ -97,7 +97,7 @@ def initialize_mcp(mcp_servers_config: str):
     if not MCPConfig.get_instance().is_initialized():
         try:
             MCPConfig.update(mcp_servers_config)
-        except Exception as e:
+        except (ValueError, RuntimeError, KeyError) as e:
             from agent import AgentContext
 
             AgentContext.log_to_all(
