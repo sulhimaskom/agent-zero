@@ -1,8 +1,7 @@
 from python.helpers.tool import Tool, Response
 from python.helpers.errors import handle_error
 from python.helpers.searxng import search as searxng
-
-SEARCH_ENGINE_RESULTS = 10
+from python.helpers.constants import Search
 
 
 class SearchEngine(Tool):
@@ -31,4 +30,4 @@ class SearchEngine(Tool):
                 f"{item['title']}\n{item['url']}\n{item['content']}"
             )
 
-        return "\n\n".join(outputs[:SEARCH_ENGINE_RESULTS]).strip()
+        return "\n\n".join(outputs[:Search.DEFAULT_RESULTS_COUNT]).strip()
