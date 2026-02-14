@@ -289,6 +289,10 @@ export async function poll() {
 
     // Check if the response is valid
     if (!response) {
+      // Silently skip in static file mode to prevent console errors
+      if (window.location.port === '8080' || window.location.protocol === 'file:') {
+        return false;
+      }
       Logger.error("Invalid response from poll endpoint");
       return false;
     }
@@ -402,11 +406,14 @@ export async function poll() {
   } catch (error) {
     // Silently handle connection errors to prevent console spam
     // Only log if it's not a common connection/backend unavailable error
-    const isConnectionError = error.message?.includes('fetch') || 
+    const isConnectionError = error.message?.includes('fetch') ||
                               error.message?.includes('network') ||
                               error.message?.includes('CSRF') ||
-                              error.message?.includes('JSON');
-    
+                              error.message?.includes('JSON') ||
+                              error.message?.includes('Static file mode') ||
+                              error.message?.includes('backend') ||
+                              error.message?.includes('backend not running');
+
     if (!isConnectionError) {
       Logger.error("Poll error:", error);
     }
