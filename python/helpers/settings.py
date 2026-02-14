@@ -1688,7 +1688,7 @@ def _dict_to_env(data_dict):
             lines.append(f'{key}="{escaped_value}"')
         elif isinstance(value, (dict, list, bool)) or value is None:
             # Serialize as unquoted JSON
-            lines.append(f'{key}={json.dumps(value, separators=(",", ":"))}')
+            lines.append(f"{key}={json.dumps(value, separators=(',', ':'))}")
         else:
             # Numbers and other types as unquoted strings
             lines.append(f"{key}={value}")
@@ -1723,7 +1723,7 @@ def get_runtime_config(set: Settings):
         if "//" in host:
             host = host.split("//")[1]
         if ":" in host:
-            host, port = host.split(":")
+            host, _port = host.split(":")
         if host.endswith("/"):
             host = host[:-1]
         return {

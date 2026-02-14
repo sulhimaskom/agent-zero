@@ -11,7 +11,6 @@ from python.helpers.memory import (
 
 
 class MemoryDashboard(ApiHandler):
-
     async def process(self, input: dict, request: Request) -> dict | Response:
         try:
             action = input.get("action", "search")
@@ -185,7 +184,7 @@ class MemoryDashboard(ApiHandler):
             else:
                 # If no search query, get all memories from specified area(s)
                 all_docs = memory.db.get_all_docs()
-                for doc_id, doc in all_docs.items():
+                for doc in all_docs.values():
                     # Apply area filter if specified
                     if area_filter and doc.metadata.get("area", "") != area_filter:
                         continue

@@ -160,10 +160,7 @@ class Localization:
 
         try:
             # Ensure datetime is timezone aware in UTC
-            if utc_dt.tzinfo is None:
-                utc_dt = utc_dt.replace(tzinfo=UTC)
-            else:
-                utc_dt = utc_dt.astimezone(UTC)
+            utc_dt = utc_dt.replace(tzinfo=UTC) if utc_dt.tzinfo is None else utc_dt.astimezone(UTC)
 
             # Convert to local time using fixed offset
             local_tz = dt_timezone(timedelta(minutes=self._offset_minutes))

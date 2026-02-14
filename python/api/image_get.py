@@ -11,7 +11,6 @@ from python.helpers.constants import Timeouts
 
 
 class ImageGet(ApiHandler):
-
     @classmethod
     def get_methods(cls) -> list[str]:
         return ["GET"]
@@ -51,7 +50,6 @@ class ImageGet(ApiHandler):
         #     return _get_file_metadata(path, filename, file_ext, image_extensions)
 
         if file_ext in image_extensions:
-
             # in development environment, try to serve the image from local file system if exists, otherwise from docker
             if runtime.is_development():
                 if files.exists(path):
@@ -73,10 +71,7 @@ class ImageGet(ApiHandler):
                 else:
                     response = _send_fallback_icon("image")
             else:
-                if files.exists(path):
-                    response = send_file(path)
-                else:
-                    response = _send_fallback_icon("image")
+                response = send_file(path) if files.exists(path) else _send_fallback_icon("image")
 
             # Add cache headers for better device sync performance
             response.headers["Cache-Control"] = f"public, max-age={Timeouts.HTTP_CACHE_MAX_AGE}"

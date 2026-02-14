@@ -167,19 +167,13 @@ class ChatGenerationResult:
         return ChatChunk(response_delta=response, reasoning_delta=reasoning)
 
     def _is_partial_opening_tag(self, text: str, opening_tag: str) -> bool:
-        for i in range(1, len(opening_tag)):
-            if text == opening_tag[:i]:
-                return True
-        return False
+        return any(text == opening_tag[:i] for i in range(1, len(opening_tag)))
 
     def _is_partial_closing_tag(self, text: str) -> bool:
         if not self.thinking_tag or not text:
             return False
         max_check = min(len(text), len(self.thinking_tag) - 1)
-        for i in range(1, max_check + 1):
-            if text.endswith(self.thinking_tag[:i]):
-                return True
-        return False
+        return any(text.endswith(self.thinking_tag[:i]) for i in range(1, max_check + 1))
 
     def output(self) -> ChatChunk:
         response = self.response
@@ -231,9 +225,7 @@ def _is_transient_litellm_error(exc: Exception) -> bool:
         if status_code in (408, 429, 500, 502, 503, 504):
             return True
         # Treat other 5xx as retriable
-        if status_code >= 500:
-            return True
-        return False
+        return status_code >= 500
 
     # Fallback to exception classes mapped by LiteLLM/OpenAI
     transient_types = tuple(
@@ -646,15 +638,17 @@ class BrowserCompatibleChatWrapper(ChatOpenRouter):
             except (AttributeError, TypeError):
                 pass
 
-        except Exception as e:
-            raise e
+        except Exception:
+            raise
 
         # another hack for browser-use post process invalid jsons
         try:
             if (
                 "response_format" in kwrgs and "json_schema" in kwrgs["response_format"]
             ) or "json_object" in kwrgs["response_format"]:
-                if resp.choices[0].message.content is not None and not resp.choices[0].message.content.startswith("{"):  # type: ignore
+                if resp.choices[0].message.content is not None and not resp.choices[
+                    0
+                ].message.content.startswith("{"):  # type: ignore
                     js = dirty_json.parse(resp.choices[0].message.content)  # type: ignore
                     resp.choices[0].message.content = dirty_json.stringify(js)  # type: ignore
         except (KeyError, IndexError, AttributeError):

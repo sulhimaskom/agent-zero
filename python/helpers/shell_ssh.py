@@ -12,7 +12,6 @@ from python.helpers.print_style import PrintStyle
 
 
 class SSHInteractiveSession:
-
     # end_comment = "# @@==>> SSHInteractiveSession End-of-Command  <<==@@"
     # ps1_label = "SSHInteractiveSession CLI>"
 
@@ -87,7 +86,7 @@ class SSHInteractiveSession:
                         return
                     time.sleep(Timeouts.SSH_SHELL_DELAY)
 
-            except Exception as e:
+            except Exception:
                 errors += 1
                 if errors < 3:
                     PrintStyle.standard(f"SSH Connection attempt {errors}...")
@@ -98,7 +97,7 @@ class SSHInteractiveSession:
                     )
                     time.sleep(Timeouts.SSH_CONNECTION_DELAY)
                 else:
-                    raise e
+                    raise
 
     async def close(self):
         if self.shell:
@@ -130,7 +129,6 @@ class SSHInteractiveSession:
         start_time = time.time()
 
         while self.shell.recv_ready() and (timeout <= 0 or time.time() - start_time < timeout):
-
             # data = self.shell.recv(1024)
             data = self.receive_bytes()
 

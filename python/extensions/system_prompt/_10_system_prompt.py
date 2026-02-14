@@ -8,11 +8,15 @@ from python.helpers.settings import get_settings
 
 
 class SystemPrompt(Extension):
-
     async def execute(
-        self, system_prompt: list[str] = [], loop_data: LoopData = LoopData(), **kwargs: Any
+        self,
+        system_prompt: list[str] | None = None,
+        loop_data: LoopData = LoopData(),
+        **kwargs: Any,
     ):
         # append main system prompt and tools
+        if system_prompt is None:
+            system_prompt = []
         main = get_main_prompt(self.agent)
         tools = get_tools_prompt(self.agent)
         mcp_tools = get_mcp_tools_prompt(self.agent)

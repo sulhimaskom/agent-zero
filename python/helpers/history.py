@@ -488,7 +488,7 @@ def _get_ctx_size_for_history() -> int:
 
 
 def _stringify_output(output: OutputMessage, ai_label="ai", human_label="human"):
-    return f'{ai_label if output["ai"] else human_label}: {_stringify_content(output["content"])}'
+    return f"{ai_label if output['ai'] else human_label}: {_stringify_content(output['content'])}"
 
 
 def _stringify_content(content: MessageContent) -> str:
@@ -517,8 +517,8 @@ def _output_content_langchain(content: MessageContent):
         return content["raw_content"]  # type: ignore
     try:
         return _json_dumps(content)
-    except Exception as e:
-        raise e
+    except Exception:
+        raise
 
 
 def group_outputs_abab(outputs: list[OutputMessage]) -> list[OutputMessage]:

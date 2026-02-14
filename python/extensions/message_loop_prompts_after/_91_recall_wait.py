@@ -20,14 +20,12 @@ class RecallWait(Extension):
         iter = self.agent.get_data(DATA_NAME_ITER_MEMORIES) or 0
 
         if task and not task.done():
-
             # if memory recall is set to delayed mode, do not await on the iteration it was called
-            if set["memory_recall_delayed"]:
-                if iter == loop_data.iteration:
-                    # insert info about delayed memory to extras
-                    delay_text = self.agent.read_prompt("memory.recall_delay_msg.md")
-                    loop_data.extras_temporary["memory_recall_delayed"] = delay_text
-                    return
+            if set["memory_recall_delayed"] and iter == loop_data.iteration:
+                # insert info about delayed memory to extras
+                delay_text = self.agent.read_prompt("memory.recall_delay_msg.md")
+                loop_data.extras_temporary["memory_recall_delayed"] = delay_text
+                return
 
             # otherwise await the task
             await task

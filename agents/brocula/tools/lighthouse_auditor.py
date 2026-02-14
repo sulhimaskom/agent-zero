@@ -26,7 +26,7 @@ class lighthouse_auditor(Tool):
 
     async def execute(
         self,
-        url: str = None,
+        url: str | None = None,
         categories: str = "performance,accessibility,best-practices,seo",
         device: str = "desktop",
         **kwargs,
@@ -78,7 +78,8 @@ class lighthouse_auditor(Tool):
                 "--chrome-flags=--headless --no-sandbox --disable-gpu",
                 f"--preset={device}",
                 "--quiet",
-            ] + category_flags
+                *category_flags,
+            ]
 
             self.set_progress(f"Running Lighthouse audit on {url} ({device})...")
 
@@ -151,7 +152,9 @@ class lighthouse_auditor(Tool):
                     priority = (
                         "🔴 HIGH"
                         if opp["score"] < 0.5
-                        else "🟡 MEDIUM" if opp["score"] < 0.9 else "🟢 LOW"
+                        else "🟡 MEDIUM"
+                        if opp["score"] < 0.9
+                        else "🟢 LOW"
                     )
                     report_lines.append(f"\n  {i}. [{priority}] {opp['title']}")
                     report_lines.append(f"     Impact: {opp.get('display_value', 'N/A')}")

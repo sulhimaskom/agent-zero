@@ -26,9 +26,9 @@ async def preload(model_name: str):
     try:
         # return await runtime.call_development_function(_preload, model_name)
         return await _preload(model_name)
-    except Exception as e:
+    except Exception:
         # if not runtime.is_development():
-        raise e
+        raise
 
 
 async def _preload(model_name: str):
@@ -48,7 +48,9 @@ async def _preload(model_name: str):
                 group="whisper-preload",
             )
             PrintStyle.standard(f"Loading Whisper model: {model_name}")
-            _model = whisper.load_model(name=model_name, download_root=files.get_abs_path(Paths.WHISPER_MODEL_ROOT))  # type: ignore
+            _model = whisper.load_model(
+                name=model_name, download_root=files.get_abs_path(Paths.WHISPER_MODEL_ROOT)
+            )  # type: ignore
             _model_name = model_name
             NotificationManager.send_notification(
                 NotificationType.INFO,
@@ -74,9 +76,9 @@ async def is_downloaded():
     try:
         # return await runtime.call_development_function(_is_downloaded)
         return _is_downloaded()
-    except Exception as e:
+    except Exception:
         # if not runtime.is_development():
-        raise e
+        raise
         # Fallback to direct execution if RFC fails in development
         # return _is_downloaded()
 

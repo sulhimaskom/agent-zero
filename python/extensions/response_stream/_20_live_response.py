@@ -3,14 +3,15 @@ from python.helpers.extension import Extension
 
 
 class LiveResponse(Extension):
-
     async def execute(
         self,
         loop_data: LoopData = LoopData(),
         text: str = "",
-        parsed: dict = {},
+        parsed: dict | None = None,
         **kwargs,
     ):
+        if parsed is None:
+            parsed = {}
         try:
             if (
                 "tool_name" not in parsed

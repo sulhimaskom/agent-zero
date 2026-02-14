@@ -56,7 +56,7 @@ class StreamingSecretsFilter:
             v: k for k, v in key_to_value.items() if isinstance(v, str) and v
         }
         # Only keep non-empty values
-        self.secret_values: list[str] = [v for v in self.value_to_key.keys() if v]
+        self.secret_values: list[str] = [v for v in self.value_to_key if v]
         # Precompute all prefixes for quick suffix matching
         self.prefixes: set[str] = set()
         for v in self.secret_values:
@@ -372,7 +372,7 @@ class SecretsManager:
                 line_text = raw.rstrip("\n")
                 # Fallback to composed key_part if original not available
                 if "=" in line_text:
-                    left, right = line_text.split("=", 1)
+                    _left, right = line_text.split("=", 1)
                 else:
                     right = ""
                 # Try to extract inline comment by scanning right side to comment start, respecting quotes

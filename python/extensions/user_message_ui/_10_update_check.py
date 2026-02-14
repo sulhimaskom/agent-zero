@@ -20,7 +20,6 @@ notification_cooldown_seconds = (
 
 
 class UpdateCheck(Extension):
-
     async def execute(self, loop_data: LoopData = LoopData(), text: str = "", **kwargs):
         try:
             global last_check, last_notification_id, last_notification_time
@@ -39,15 +38,14 @@ class UpdateCheck(Extension):
             version = await update_check.check_version()
 
             # if the user should update, send notification
-            if notif := version.get("notification"):
-                if (
-                    notif.get("id") != last_notification_id
-                    or (datetime.datetime.now() - last_notification_time).total_seconds()
-                    > notification_cooldown_seconds
-                ):
-                    last_notification_id = notif.get("id")
-                    last_notification_time = datetime.datetime.now()
-                    self.send_notification(notif)
+            if (notif := version.get("notification")) and (
+                notif.get("id") != last_notification_id
+                or (datetime.datetime.now() - last_notification_time).total_seconds()
+                > notification_cooldown_seconds
+            ):
+                last_notification_id = notif.get("id")
+                last_notification_time = datetime.datetime.now()
+                self.send_notification(notif)
         except Exception:
             pass  # no need to log if the update server is inaccessible
 
