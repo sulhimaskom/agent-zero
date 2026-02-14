@@ -121,11 +121,49 @@
             min-height: 100vh;
         }
 
+        /* Entrance Animations */
+        @keyframes welcome-fade-in-up {
+            0% {
+                opacity: 0;
+                transform: translateY(20px) scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes welcome-logo-pulse {
+            0% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes welcome-text-fade {
+            0% {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
         /* Welcome container styles */
         .welcome-logo-container {
             display: flex;
             justify-content: center;
             align-items: center;
+            animation: welcome-logo-pulse 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
         }
 
         .welcome-logo {
@@ -133,20 +171,14 @@
             height: 7rem;
         }
 
-        /* Themes adjustments for logo */
-        .light-mode .welcome-logo {
-            filter: invert(0.5);
-        }
-
-        .dark-mode .welcome-logo {
-            filter: invert(0.8);
-        }
-
+        /* Title and subtitle entrance */
         .welcome-title {
             font-size: 2rem;
             font-weight: 400;
             margin: var(--spacing-xs) 0 0 0;
             color: var(--color-text);
+            animation: welcome-text-fade 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.2s forwards;
+            opacity: 0;
         }
 
         .welcome-action-title {
@@ -159,6 +191,17 @@
             color: var(--color-secondary);
             max-width: 600px;
             line-height: 1.5;
+            animation: welcome-text-fade 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.35s forwards;
+            opacity: 0;
+        }
+
+        /* Themes adjustments for logo */
+        .light-mode .welcome-logo {
+            filter: invert(0.5);
+        }
+
+        .dark-mode .welcome-logo {
+            filter: invert(0.8);
         }
 
         /* Dark mode contrast fix - use lighter color for better accessibility */
@@ -190,11 +233,23 @@
             text-align: center;
             min-height: 10rem;
             justify-content: center;
+            opacity: 0;
+            animation: welcome-fade-in-up 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
+
+        /* Staggered entrance animation for cards */
+        .welcome-action-card:nth-child(1) { animation-delay: 0.5s; }
+        .welcome-action-card:nth-child(2) { animation-delay: 0.6s; }
+        .welcome-action-card:nth-child(3) { animation-delay: 0.7s; }
+        .welcome-action-card:nth-child(4) { animation-delay: 0.8s; }
+        .welcome-action-card:nth-child(5) { animation-delay: 0.9s; }
+        .welcome-action-card:nth-child(6) { animation-delay: 1.0s; }
 
         .welcome-action-card:hover {
             border-color: var(--color-primary);
             background: var(--color-message-bg);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
         }
 
         .welcome-action-card:focus-visible {
@@ -205,7 +260,7 @@
         }
 
         .welcome-action-card:active {
-            transform: scale(0.98);
+            transform: scale(0.98) translateY(-2px);
         }
 
         .welcome-action-icon {
@@ -244,6 +299,27 @@
 
         .light-mode .welcome-footer {
             color: #666;
+        }
+
+        /* Accessibility: Respect reduced motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+            .welcome-logo-container,
+            .welcome-title,
+            .welcome-subtitle,
+            .welcome-action-card {
+                animation: none;
+                opacity: 1;
+                transform: none;
+            }
+
+            .welcome-action-card:hover {
+                transform: none;
+                box-shadow: none;
+            }
+
+            .welcome-action-card:active {
+                transform: scale(0.98);
+            }
         }
 
         /* Responsive design */
