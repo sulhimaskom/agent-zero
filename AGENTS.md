@@ -11,7 +11,7 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 ## STRUCTURE
 ```
 ./
-├── agents/              # Agent profiles (agent0, developer, hacker, researcher) with custom prompts/tools/extensions
+├── agents/              # Agent profiles (_example, agent0, brocula, default, developer, hacker, researcher) with custom prompts/tools/extensions
 ├── prompts/             # 98 system prompts defining framework behavior (fw.* = framework, agent.system.* = agent behavior)
 ├── python/
 │   ├── api/            # 61 Flask API endpoints (auto-registered via ApiHandler base class)

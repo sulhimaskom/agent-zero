@@ -29,33 +29,33 @@ venv/
 env/
 ENV/
 
-# Handle memory directory
+# Handle memory directory - ignore all contents but keep directory structure
 memory/**
-!memory/**/
+!memory/**/.gitkeep
 
-# Handle logs directory
-logs/*
+# Handle logs directory - ignore all contents recursively
+logs/**
+!logs/**/.gitkeep
 
 # Handle tmp and usr directory
-tmp/*
-usr/*
+tmp/**
+!tmp/**/.gitkeep
+usr/**
+!usr/**/.gitkeep
 
-# Handle knowledge directory
+# Handle knowledge directory - ignore all contents but keep directory structure
 knowledge/**
-!knowledge/**/
+!knowledge/**/.gitkeep
 # Explicitly allow the default folder in knowledge
 !knowledge/default/
 !knowledge/default/**
 
-# Handle instruments directory
+# Handle instruments directory - ignore all contents but keep directory structure
 instruments/**
-!instruments/**/
+!instruments/**/.gitkeep
 # Explicitly allow the default folder in instruments
 !instruments/default/
 !instruments/default/**
-
-# Global rule to include .gitkeep files anywhere
-!**/.gitkeep
 
 # for browser-use
 agent_history.gif
