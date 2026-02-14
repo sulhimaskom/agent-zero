@@ -131,12 +131,12 @@
         };
     </script>
 
-    <!-- Load module scripts first -->
-    <script type="module" src="js/scheduler.js"></script>
-    <script type="module" src="js/keyboard-shortcuts.js"></script>
-    <script type="module" src="components/modals/keyboard-shortcuts/keyboard-shortcuts-store.js"></script>
+    <!-- Load module scripts first (minified versions) -->
+    <script type="module" src="js/scheduler.min.js"></script>
+    <script type="module" src="js/keyboard-shortcuts.min.js"></script>
+    <script type="module" src="components/modals/keyboard-shortcuts/keyboard-shortcuts-store.min.js"></script>
 
-    <script type="module" src="index.js"></script>
+    <script type="module" src="index.min.js"></script>
 
     <!-- Bootstrap JS (only for logic, importing bundled CSS => UI conflicts) - deferred loading -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
@@ -144,11 +144,11 @@
         crossorigin="anonymous" defer></script>
 
     <!-- Settings must load before Alpine.js for settingsModalProxy to be available -->
-    <script type="module" src="js/settings.js"></script>
+    <script type="module" src="js/settings.min.js"></script>
 
     <!-- Then load Alpine.js -->
     <!-- <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.3/dist/cdn.min.js"></script> -->
-    <script type="module" src="js/initFw.js"></script>
+    <script type="module" src="js/initFw.min.js"></script>
 
     <!-- ACE Editor - deferred loading -->
     <script src="vendor/ace-min/ace.js" defer></script>

@@ -103,8 +103,9 @@ async function getCsrfToken() {
     // Check for 404 or other error status
     if (!response.ok) {
       csrfTokenFailed = true;
+      // Log as debug instead of warn to keep console clean in static file mode
       Logger.once('csrf_error', () => {
-        Logger.warn("Backend API not available - CSRF token endpoint returned", response.status);
+        Logger.debug("Backend API not available - CSRF token endpoint returned", response.status);
       });
       throw new Error(`CSRF token endpoint returned ${response.status}`);
     }
@@ -132,8 +133,9 @@ async function getCsrfToken() {
   } catch (error) {
     csrfTokenFailed = true;
     // Only log the first error to prevent console spam
+    // Log as debug instead of warn to keep console clean in static file mode
     Logger.once('backend_connection_error', () => {
-      Logger.warn("Backend connection failed - API calls will not work:", error.message);
+      Logger.debug("Backend connection not available - API calls will not work:", error.message);
     });
     throw error;
   }
