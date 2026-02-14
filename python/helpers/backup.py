@@ -1,17 +1,17 @@
-import zipfile
+import datetime
 import json
 import os
-import tempfile
-import datetime
 import platform
-from typing import List, Dict, Any, Optional
+import tempfile
+import zipfile
+from typing import Any
 
 from pathspec import PathSpec
 from pathspec.patterns.gitwildmatch import GitWildMatchPattern
 
-from python.helpers import files, runtime, git
-from python.helpers.print_style import PrintStyle
+from python.helpers import files, git, runtime
 from python.helpers.constants import Limits, TmpPaths
+from python.helpers.print_style import PrintStyle
 
 
 class BackupService:
@@ -28,23 +28,19 @@ class BackupService:
 
     def __init__(self):
         self.agent_zero_version = self._get_agent_zero_version()
-        self.agent_zero_root = files.get_abs_path(
-            ""
-        )  # Resolved Agent Zero root
+        self.agent_zero_root = files.get_abs_path("")  # Resolved Agent Zero root
 
         # Build base paths map for pattern resolution
         self.base_paths = {
             self.agent_zero_root: self.agent_zero_root,
         }
 
-    def get_default_backup_metadata(self) -> Dict[str, Any]:
+    def get_default_backup_metadata(self) -> dict[str, Any]:
         """Get default backup patterns and metadata"""
         timestamp = datetime.datetime.now().isoformat()
 
         default_patterns = self._get_default_patterns()
-        include_patterns, exclude_patterns = self._parse_patterns(
-            default_patterns
-        )
+        include_patterns, exclude_patterns = self._parse_patterns(default_patterns)
 
         return {
             "backup_name": f"agent-zero-backup-{timestamp[:10]}",
@@ -122,9 +118,7 @@ class BackupService:
 
         return include_patterns, exclude_patterns
 
-    def _patterns_to_string(
-        self, include_patterns: list[str], exclude_patterns: list[str]
-    ) -> str:
+    def _patterns_to_string(self, include_patterns: list[str], exclude_patterns: list[str]) -> str:
         """Convert pattern arrays back to patterns string for pathspec processing"""
         patterns = []
 
@@ -138,7 +132,7 @@ class BackupService:
 
         return "\n".join(patterns)
 
-    async def _get_system_info(self) -> Dict[str, Any]:
+    async def _get_system_info(self) -> dict[str, Any]:
         """Collect system information for metadata"""
         import psutil
 
@@ -155,14 +149,12 @@ class BackupService:
                 "python_version": platform.python_version(),
                 "cpu_count": str(psutil.cpu_count()),
                 "memory_total": str(psutil.virtual_memory().total),
-                "disk_usage": str(
-                    psutil.disk_usage("/").total if os.path.exists("/") else 0
-                ),
+                "disk_usage": str(psutil.disk_usage("/").total if os.path.exists("/") else 0),
             }
         except (OSError, ValueError, RuntimeError) as e:
-            return {"error": f"Failed to collect system info: {str(e)}"}
+            return {"error": f"Failed to collect system info: {e!s}"}
 
-    async def _get_environment_info(self) -> Dict[str, Any]:
+    async def _get_environment_info(self) -> dict[str, Any]:
         """Collect environment information for metadata"""
         try:
             return {
@@ -170,19 +162,17 @@ class BackupService:
                 "home": os.environ.get("HOME", "unknown"),
                 "shell": os.environ.get("SHELL", "unknown"),
                 "path": (
-                    os.environ.get("PATH", "")[:Limits.COMMAND_TRUNCATION_PRIMARY] + "..."
+                    os.environ.get("PATH", "")[: Limits.COMMAND_TRUNCATION_PRIMARY] + "..."
                     if len(os.environ.get("PATH", "")) > Limits.COMMAND_TRUNCATION_PRIMARY
                     else os.environ.get("PATH", "")
                 ),
                 "timezone": str(datetime.datetime.now().astimezone().tzinfo),
                 "working_directory": os.getcwd(),
                 "agent_zero_root": files.get_abs_path(""),
-                "runtime_mode": (
-                    "development" if runtime.is_development() else "production"
-                ),
+                "runtime_mode": ("development" if runtime.is_development() else "production"),
             }
         except (OSError, ValueError) as e:
-            return {"error": f"Failed to collect environment info: {str(e)}"}
+            return {"error": f"Failed to collect environment info: {e!s}"}
 
     async def _get_backup_author(self) -> str:
         """Get backup author/system identifier"""
@@ -195,7 +185,7 @@ class BackupService:
         except (OSError, ImportError):
             return "unknown"
 
-    def _count_directories(self, matched_files: List[Dict[str, Any]]) -> int:
+    def _count_directories(self, matched_files: list[dict[str, Any]]) -> int:
         """Count unique directories in file list"""
         directories = set()
         for file_info in matched_files:
@@ -204,7 +194,7 @@ class BackupService:
                 directories.add(dir_path)
         return len(directories)
 
-    def _get_explicit_patterns(self, include_patterns: List[str]) -> set[str]:
+    def _get_explicit_patterns(self, include_patterns: list[str]) -> set[str]:
         """Extract explicit (non-wildcard) patterns that should always be included"""
         explicit_patterns = set()
 
@@ -222,16 +212,14 @@ class BackupService:
 
         return explicit_patterns
 
-    def _is_explicitly_included(
-        self, file_path: str, explicit_patterns: set[str]
-    ) -> bool:
+    def _is_explicitly_included(self, file_path: str, explicit_patterns: set[str]) -> bool:
         """Check if a file/directory is explicitly included in patterns"""
         relative_path = file_path.lstrip("/")
         return relative_path in explicit_patterns
 
     def _translate_patterns(
-        self, patterns: List[str], backup_metadata: Dict[str, Any]
-    ) -> List[str]:
+        self, patterns: list[str], backup_metadata: dict[str, Any]
+    ) -> list[str]:
         """Translate patterns from backed up system to current system.
 
         Replaces the backed up Agent Zero root path with the current Agent Zero root path
@@ -262,18 +250,11 @@ class BackupService:
         translated_patterns = []
         for pattern in patterns:
             # Check if the pattern starts with the backed up agent zero root
-            if (
-                pattern.startswith(backed_up_agent_root + "/")
-                or pattern == backed_up_agent_root
-            ):
+            if pattern.startswith(backed_up_agent_root + "/") or pattern == backed_up_agent_root:
                 # Replace the backed up root with the current root
-                relative_pattern = pattern[len(backed_up_agent_root):].lstrip(
-                    "/"
-                )
+                relative_pattern = pattern[len(backed_up_agent_root) :].lstrip("/")
                 if relative_pattern:
-                    translated_pattern = (
-                        current_agent_root + "/" + relative_pattern
-                    )
+                    translated_pattern = current_agent_root + "/" + relative_pattern
                 else:
                     translated_pattern = current_agent_root
                 translated_patterns.append(translated_pattern)
@@ -285,18 +266,16 @@ class BackupService:
 
     async def test_patterns(
         self,
-        metadata: Dict[str, Any],
+        metadata: dict[str, Any],
         max_files: int = Limits.BACKUP_MAX_FILES_TEST,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Test backup patterns and return list of matched files"""
         include_patterns = metadata.get("include_patterns", [])
         exclude_patterns = metadata.get("exclude_patterns", [])
         include_hidden = metadata.get("include_hidden", False)
 
         # Convert to patterns string for pathspec
-        patterns_string = self._patterns_to_string(
-            include_patterns, exclude_patterns
-        )
+        patterns_string = self._patterns_to_string(include_patterns, exclude_patterns)
 
         # Parse patterns using pathspec
         pattern_lines = [
@@ -333,9 +312,7 @@ class BackupService:
                                 # Check if this hidden directory is explicitly included
                                 dir_path = os.path.join(root, d)
                                 pattern_path = self._unresolve_path(dir_path)
-                                if self._is_explicitly_included(
-                                    pattern_path, explicit_patterns
-                                ):
+                                if self._is_explicitly_included(pattern_path, explicit_patterns):
                                     dirs_to_keep.append(d)
                         dirs[:] = dirs_to_keep
 
@@ -348,9 +325,7 @@ class BackupService:
 
                         # Skip hidden files if not included, BUT allow explicit ones
                         if not include_hidden and file.startswith("."):
-                            if not self._is_explicitly_included(
-                                pattern_path, explicit_patterns
-                            ):
+                            if not self._is_explicitly_included(pattern_path, explicit_patterns):
                                 continue
 
                         # Remove leading slash for pathspec matching
@@ -371,7 +346,7 @@ class BackupService:
                                     }
                                 )
                                 processed_count += 1
-                            except (OSError, IOError):
+                            except OSError:
                                 # Skip files we can't access
                                 continue
 
@@ -382,19 +357,18 @@ class BackupService:
                     break
 
         except Exception as e:
-            raise Exception(f"Error processing patterns: {str(e)}")
+            raise Exception(f"Error processing patterns: {e!s}")
 
         return matched_files
 
     async def create_backup(
         self,
-        include_patterns: List[str],
-        exclude_patterns: List[str],
+        include_patterns: list[str],
+        exclude_patterns: list[str],
         include_hidden: bool = False,
         backup_name: str = "agent-zero-backup",
     ) -> str:
         """Create backup archive and return path to created file"""
-
         # Create metadata for test_patterns
         metadata = {
             "include_patterns": include_patterns,
@@ -403,9 +377,7 @@ class BackupService:
         }
 
         # Get matched files
-        matched_files = await self.test_patterns(
-            metadata, max_files=Limits.BACKUP_MAX_FILES_FULL
-        )
+        matched_files = await self.test_patterns(metadata, max_files=Limits.BACKUP_MAX_FILES_FULL)
 
         if not matched_files:
             raise Exception("No files matched the backup patterns")
@@ -462,15 +434,11 @@ class BackupService:
                     archive_path = file_info["path"].lstrip("/")
 
                     try:
-                        if os.path.exists(real_path) and os.path.isfile(
-                            real_path
-                        ):
+                        if os.path.exists(real_path) and os.path.isfile(real_path):
                             zipf.write(real_path, archive_path)
-                    except (OSError, IOError) as e:
+                    except OSError as e:
                         # Log error but continue with other files
-                        PrintStyle().warning(
-                            f"Warning: Could not backup file {real_path}: {e}"
-                        )
+                        PrintStyle().warning(f"Warning: Could not backup file {real_path}: {e}")
                         continue
 
             return zip_path
@@ -479,11 +447,10 @@ class BackupService:
             # Cleanup on error
             if os.path.exists(zip_path):
                 os.remove(zip_path)
-            raise Exception(f"Error creating backup: {str(e)}")
+            raise Exception(f"Error creating backup: {e!s}")
 
-    async def inspect_backup(self, backup_file) -> Dict[str, Any]:
+    async def inspect_backup(self, backup_file) -> dict[str, Any]:
         """Inspect backup archive and return metadata"""
-
         # Save uploaded file temporarily
         temp_dir = tempfile.mkdtemp()
         temp_file = os.path.join(temp_dir, "backup.zip")
@@ -494,17 +461,13 @@ class BackupService:
             with zipfile.ZipFile(temp_file, "r") as zipf:
                 # Read metadata
                 if "metadata.json" not in zipf.namelist():
-                    raise Exception(
-                        "Invalid backup file: missing metadata.json"
-                    )
+                    raise Exception("Invalid backup file: missing metadata.json")
 
                 metadata_content = zipf.read("metadata.json").decode("utf-8")
                 metadata = json.loads(metadata_content)
 
                 # Add file list from archive
-                files_in_archive = [
-                    name for name in zipf.namelist() if name != "metadata.json"
-                ]
+                files_in_archive = [name for name in zipf.namelist() if name != "metadata.json"]
                 metadata["files_in_archive"] = files_in_archive
 
                 return metadata
@@ -523,14 +486,13 @@ class BackupService:
     async def preview_restore(
         self,
         backup_file,
-        restore_include_patterns: Optional[List[str]] = None,
-        restore_exclude_patterns: Optional[List[str]] = None,
+        restore_include_patterns: list[str] | None = None,
+        restore_exclude_patterns: list[str] | None = None,
         overwrite_policy: str = "overwrite",
         clean_before_restore: bool = False,
-        user_edited_metadata: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+        user_edited_metadata: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """Preview which files would be restored based on patterns"""
-
         # Save uploaded file temporarily
         temp_dir = tempfile.mkdtemp()
         temp_file = os.path.join(temp_dir, "backup.zip")
@@ -545,16 +507,12 @@ class BackupService:
                 # Read backup metadata from archive
                 original_backup_metadata = {}
                 if "metadata.json" in zipf.namelist():
-                    metadata_content = zipf.read("metadata.json").decode(
-                        "utf-8"
-                    )
+                    metadata_content = zipf.read("metadata.json").decode("utf-8")
                     original_backup_metadata = json.loads(metadata_content)
 
                 # Use user-edited metadata if provided, otherwise fall back to original
                 backup_metadata = (
-                    user_edited_metadata
-                    if user_edited_metadata
-                    else original_backup_metadata
+                    user_edited_metadata if user_edited_metadata else original_backup_metadata
                 )
 
                 # Get files from archive (excluding metadata files)
@@ -591,9 +549,7 @@ class BackupService:
                             GitWildMatchPattern,
                         )
 
-                        restore_spec = PathSpec.from_lines(
-                            GitWildMatchPattern, pattern_lines
-                        )
+                        restore_spec = PathSpec.from_lines(GitWildMatchPattern, pattern_lines)
 
                 # Process each file in archive
                 for archive_path in archive_files:
@@ -611,9 +567,7 @@ class BackupService:
                     translated_path_for_matching = target_path.lstrip("/")
 
                     # Check if file matches restore patterns
-                    if restore_spec and not restore_spec.match_file(
-                        translated_path_for_matching
-                    ):
+                    if restore_spec and not restore_spec.match_file(translated_path_for_matching):
                         skipped_files.append(
                             {
                                 "archive_path": archive_path,
@@ -649,10 +603,8 @@ class BackupService:
                 files_to_delete = []
                 if clean_before_restore:
                     # Use user-edited metadata for clean operations so patterns from ACE editor are used
-                    files_to_delete = (
-                        await self._find_files_to_clean_with_user_metadata(
-                            backup_metadata, original_backup_metadata
-                        )
+                    files_to_delete = await self._find_files_to_clean_with_user_metadata(
+                        backup_metadata, original_backup_metadata
                     )
 
                 # Combine delete and restore operations for preview
@@ -677,7 +629,7 @@ class BackupService:
         except json.JSONDecodeError:
             raise Exception("Invalid backup file: corrupted metadata")
         except Exception as e:
-            raise Exception(f"Error previewing restore: {str(e)}")
+            raise Exception(f"Error previewing restore: {e!s}")
         finally:
             # Cleanup
             if os.path.exists(temp_file):
@@ -688,14 +640,13 @@ class BackupService:
     async def restore_backup(
         self,
         backup_file,
-        restore_include_patterns: Optional[List[str]] = None,
-        restore_exclude_patterns: Optional[List[str]] = None,
+        restore_include_patterns: list[str] | None = None,
+        restore_exclude_patterns: list[str] | None = None,
         overwrite_policy: str = "overwrite",
         clean_before_restore: bool = False,
-        user_edited_metadata: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+        user_edited_metadata: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """Restore files from backup archive"""
-
         # Save uploaded file temporarily
         temp_dir = tempfile.mkdtemp()
         temp_file = os.path.join(temp_dir, "backup.zip")
@@ -712,32 +663,24 @@ class BackupService:
                 # Read backup metadata from archive
                 original_backup_metadata = {}
                 if "metadata.json" in zipf.namelist():
-                    metadata_content = zipf.read("metadata.json").decode(
-                        "utf-8"
-                    )
+                    metadata_content = zipf.read("metadata.json").decode("utf-8")
                     original_backup_metadata = json.loads(metadata_content)
 
                 # Use user-edited metadata if provided, otherwise fall back to original
                 backup_metadata = (
-                    user_edited_metadata
-                    if user_edited_metadata
-                    else original_backup_metadata
+                    user_edited_metadata if user_edited_metadata else original_backup_metadata
                 )
 
                 # Perform clean before restore if requested
                 if clean_before_restore:
                     # Use user-edited metadata for clean operations so patterns from ACE editor are used
-                    files_to_delete = (
-                        await self._find_files_to_clean_with_user_metadata(
-                            backup_metadata, original_backup_metadata
-                        )
+                    files_to_delete = await self._find_files_to_clean_with_user_metadata(
+                        backup_metadata, original_backup_metadata
                     )
                     for delete_info in files_to_delete:
                         try:
                             real_path = delete_info["real_path"]
-                            if os.path.exists(real_path) and os.path.isfile(
-                                real_path
-                            ):
+                            if os.path.exists(real_path) and os.path.isfile(real_path):
                                 os.remove(real_path)
                                 deleted_files.append(
                                     {
@@ -751,10 +694,8 @@ class BackupService:
                             errors.append(
                                 {
                                     "path": delete_info["path"],
-                                    "real_path": delete_info.get(
-                                        "real_path", "unknown"
-                                    ),
-                                    "error": f"Failed to delete: {str(e)}",
+                                    "real_path": delete_info.get("real_path", "unknown"),
+                                    "error": f"Failed to delete: {e!s}",
                                 }
                             )
 
@@ -792,9 +733,7 @@ class BackupService:
                             GitWildMatchPattern,
                         )
 
-                        restore_spec = PathSpec.from_lines(
-                            GitWildMatchPattern, pattern_lines
-                        )
+                        restore_spec = PathSpec.from_lines(GitWildMatchPattern, pattern_lines)
 
                 # Process each file in archive
                 for archive_path in archive_files:
@@ -812,9 +751,7 @@ class BackupService:
                     translated_path_for_matching = target_path.lstrip("/")
 
                     # Check if file matches restore patterns
-                    if restore_spec and not restore_spec.match_file(
-                        translated_path_for_matching
-                    ):
+                    if restore_spec and not restore_spec.match_file(translated_path_for_matching):
                         skipped_files.append(
                             {
                                 "archive_path": archive_path,
@@ -837,12 +774,8 @@ class BackupService:
                                 )
                                 continue
                             elif overwrite_policy == "backup":
-                                timestamp = datetime.datetime.now().strftime(
-                                    "%Y%m%d_%H%M%S"
-                                )
-                                backup_path = (
-                                    f"{target_path}.backup.{timestamp}"
-                                )
+                                timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                                backup_path = f"{target_path}.backup.{timestamp}"
                                 import shutil
 
                                 shutil.move(target_path, backup_path)
@@ -855,9 +788,7 @@ class BackupService:
                         # Extract file
                         import shutil
 
-                        with zipf.open(archive_path) as source, open(
-                            target_path, "wb"
-                        ) as target:
+                        with zipf.open(archive_path) as source, open(target_path, "wb") as target:
                             shutil.copyfileobj(source, target)
 
                         restored_files.append(
@@ -892,7 +823,7 @@ class BackupService:
         except json.JSONDecodeError:
             raise Exception("Invalid backup file: corrupted metadata")
         except Exception as e:
-            raise Exception(f"Error restoring backup: {str(e)}")
+            raise Exception(f"Error restoring backup: {e!s}")
         finally:
             # Cleanup
             if os.path.exists(temp_file):
@@ -900,9 +831,7 @@ class BackupService:
             if os.path.exists(temp_dir):
                 os.rmdir(temp_dir)
 
-    def _translate_restore_path(
-        self, archive_path: str, backup_metadata: Dict[str, Any]
-    ) -> str:
+    def _translate_restore_path(self, archive_path: str, backup_metadata: dict[str, Any]) -> str:
         """Translate file path from backed up system to current system.
 
         Replaces the backed up Agent Zero root path with the current Agent Zero root path
@@ -942,9 +871,7 @@ class BackupService:
             or absolute_archive_path == backed_up_agent_root
         ):
             # Replace the backed up root with the current root
-            relative_path = absolute_archive_path[
-                len(backed_up_agent_root):
-            ].lstrip("/")
+            relative_path = absolute_archive_path[len(backed_up_agent_root) :].lstrip("/")
             if relative_path:
                 translated_path = current_agent_root + "/" + relative_path
             else:
@@ -955,8 +882,8 @@ class BackupService:
             return absolute_archive_path
 
     async def _find_files_to_clean_with_user_metadata(
-        self, user_metadata: Dict[str, Any], original_metadata: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+        self, user_metadata: dict[str, Any], original_metadata: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """Find existing files that match patterns from user-edited metadata for clean operations"""
         # Use user-edited patterns for what to clean
         user_include_patterns = user_metadata.get("include_patterns", [])

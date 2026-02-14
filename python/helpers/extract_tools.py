@@ -1,14 +1,16 @@
-import re
-import os
 import importlib
 import importlib.util
 import inspect
+import os
+import re
+from fnmatch import fnmatch
 from types import ModuleType
-from typing import Any, Type, TypeVar
+from typing import Any, TypeVar
+
+import regex
+
 from .dirty_json import DirtyJson
 from .files import get_abs_path
-import regex
-from fnmatch import fnmatch
 
 
 def json_parse_dirty(json: str) -> dict[str, Any] | None:
@@ -39,7 +41,7 @@ def extract_json_object_string(content):
         return content[start:]
     else:
         # If there's a closing '}', return the substring from start to end
-        return content[start: end + 1]
+        return content[start : end + 1]
 
 
 def extract_json_string(content):
@@ -92,9 +94,9 @@ def import_module(file_path: str) -> ModuleType:
 def load_classes_from_folder(
     folder: str,
     name_pattern: str,
-    base_class: Type[T],
+    base_class: type[T],
     one_per_file: bool = True,
-) -> list[Type[T]]:
+) -> list[type[T]]:
     classes = []
     abs_folder = get_abs_path(folder)
 

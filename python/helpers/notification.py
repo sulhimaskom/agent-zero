@@ -1,7 +1,8 @@
-from dataclasses import dataclass
 import uuid
-from datetime import datetime, timezone, timedelta
+from dataclasses import dataclass
+from datetime import UTC, datetime, timedelta
 from enum import Enum
+
 from python.helpers.constants import Limits
 
 
@@ -50,11 +51,7 @@ class NotificationItem:
         return {
             "no": self.no,
             "id": self.id,
-            "type": (
-                self.type.value
-                if isinstance(self.type, NotificationType)
-                else self.type
-            ),
+            "type": (self.type.value if isinstance(self.type, NotificationType) else self.type),
             "priority": (
                 self.priority.value
                 if isinstance(self.priority, NotificationPriority)
@@ -112,7 +109,7 @@ class NotificationManager:
             title=title,
             message=message,
             detail=detail,
-            timestamp=datetime.now(timezone.utc),
+            timestamp=datetime.now(UTC),
             display_time=display_time,
             group=group,
         )
@@ -135,19 +132,15 @@ class NotificationManager:
             for i, notification in enumerate(self.notifications):
                 notification.no = i
             # Adjust updates list
-            self.updates = [
-                no - to_remove for no in self.updates if no >= to_remove
-            ]
+            self.updates = [no - to_remove for no in self.updates if no >= to_remove]
 
     def get_recent_notifications(
         self, seconds: int = Limits.NOTIFICATION_RECENT_SECONDS
     ) -> list[NotificationItem]:
-        cutoff = datetime.now(timezone.utc) - timedelta(seconds=seconds)
+        cutoff = datetime.now(UTC) - timedelta(seconds=seconds)
         return [n for n in self.notifications if n.timestamp >= cutoff]
 
-    def output(
-        self, start: int | None = None, end: int | None = None
-    ) -> list[dict]:
+    def output(self, start: int | None = None, end: int | None = None) -> list[dict]:
         if start is None:
             start = 0
         if end is None:
@@ -179,7 +172,5 @@ class NotificationManager:
         self.updates = []
         self.guid = str(uuid.uuid4())
 
-    def get_notifications_by_type(
-        self, type: NotificationType
-    ) -> list[NotificationItem]:
+    def get_notifications_by_type(self, type: NotificationType) -> list[NotificationItem]:
         return [n for n in self.notifications if n.type == type]

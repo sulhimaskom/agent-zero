@@ -1,7 +1,7 @@
-from python.helpers.tool import Tool, Response
+from python.helpers.constants import Search
 from python.helpers.errors import handle_error
 from python.helpers.searxng import search as searxng
-from python.helpers.constants import Search
+from python.helpers.tool import Response, Tool
 
 
 class SearchEngine(Tool):
@@ -22,12 +22,10 @@ class SearchEngine(Tool):
     def format_result_searxng(self, result, source):
         if isinstance(result, Exception):
             handle_error(result)
-            return f"{source} search failed: {str(result)}"
+            return f"{source} search failed: {result!s}"
 
         outputs = []
         for item in result["results"]:
-            outputs.append(
-                f"{item['title']}\n{item['url']}\n{item['content']}"
-            )
+            outputs.append(f"{item['title']}\n{item['url']}\n{item['content']}")
 
-        return "\n\n".join(outputs[:Search.DEFAULT_RESULTS_COUNT]).strip()
+        return "\n\n".join(outputs[: Search.DEFAULT_RESULTS_COUNT]).strip()

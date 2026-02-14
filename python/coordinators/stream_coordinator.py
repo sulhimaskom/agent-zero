@@ -1,25 +1,22 @@
 from abc import ABC, abstractmethod
-from typing import Any, Callable
+from collections.abc import Callable
+from typing import Any
 
-from python.helpers.print_style import PrintStyle
-from python.helpers.dirty_json import DirtyJson
 from python.helpers.constants import Colors
+from python.helpers.dirty_json import DirtyJson
+from python.helpers.print_style import PrintStyle
 
 
 class IStreamHandler(ABC):
     """Interface for stream handling"""
 
     @abstractmethod
-    def create_reasoning_callback(
-        self, loop_data: Any
-    ) -> Callable[[str, str], Any]:
+    def create_reasoning_callback(self, loop_data: Any) -> Callable[[str, str], Any]:
         """Create callback for handling reasoning stream chunks"""
         pass
 
     @abstractmethod
-    def create_response_callback(
-        self, loop_data: Any
-    ) -> Callable[[str, str], Any]:
+    def create_response_callback(self, loop_data: Any) -> Callable[[str, str], Any]:
         """Create callback for handling response stream chunks"""
         pass
 
@@ -44,13 +41,9 @@ class StreamCoordinator(IStreamHandler):
 
     def __init__(self, agent):
         self.agent = agent
-        self.printer = PrintStyle(
-            italic=True, font_color=Colors.STREAM_MINT, padding=False
-        )
+        self.printer = PrintStyle(italic=True, font_color=Colors.STREAM_MINT, padding=False)
 
-    def create_reasoning_callback(
-        self, loop_data: Any
-    ) -> Callable[[str, str], Any]:
+    def create_reasoning_callback(self, loop_data: Any) -> Callable[[str, str], Any]:
         """Create callback for handling reasoning stream chunks"""
 
         async def reasoning_callback(chunk: str, full: str):
@@ -69,9 +62,7 @@ class StreamCoordinator(IStreamHandler):
 
         return reasoning_callback
 
-    def create_response_callback(
-        self, loop_data: Any
-    ) -> Callable[[str, str], Any]:
+    def create_response_callback(self, loop_data: Any) -> Callable[[str, str], Any]:
         """Create callback for handling response stream chunks"""
 
         async def stream_callback(chunk: str, full: str):
@@ -122,9 +113,5 @@ class StreamCoordinator(IStreamHandler):
 
     async def finalize_streams(self, loop_data: Any):
         """Finalize stream processing after LLM call completes"""
-        await self.agent.call_extensions(
-            "reasoning_stream_end", loop_data=loop_data
-        )
-        await self.agent.call_extensions(
-            "response_stream_end", loop_data=loop_data
-        )
+        await self.agent.call_extensions("reasoning_stream_end", loop_data=loop_data)
+        await self.agent.call_extensions("response_stream_end", loop_data=loop_data)

@@ -1,7 +1,7 @@
-from python.helpers import files, memory
-from python.helpers.tool import Tool, Response
 from agent import Agent
+from python.helpers import files, memory
 from python.helpers.log import LogItem
+from python.helpers.tool import Response, Tool
 
 
 class UpdateBehaviour(Tool):
@@ -55,9 +55,7 @@ async def update_behaviour(agent: Agent, log_item: LogItem, adjustments: str):
 
 
 def get_custom_rules_file(agent: Agent):
-    return files.get_abs_path(
-        memory.get_memory_subdir_abs(agent), "behaviour.md"
-    )
+    return files.get_abs_path(memory.get_memory_subdir_abs(agent), "behaviour.md")
 
 
 def read_rules(agent: Agent):

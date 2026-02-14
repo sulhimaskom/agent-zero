@@ -1,15 +1,15 @@
 from python.helpers.api import ApiHandler, Input, Output, Request
+from python.helpers.localization import Localization
 from python.helpers.task_scheduler import (
-    TaskScheduler,
-    ScheduledTask,
     AdHocTask,
     PlannedTask,
+    ScheduledTask,
+    TaskScheduler,
     TaskState,
-    serialize_task,
-    parse_task_schedule,
     parse_task_plan,
+    parse_task_schedule,
+    serialize_task,
 )
-from python.helpers.localization import Localization
 
 
 class SchedulerTaskUpdate(ApiHandler):
@@ -43,9 +43,7 @@ class SchedulerTaskUpdate(ApiHandler):
             update_params["name"] = input.get("name", "")
 
         if "state" in input:
-            update_params["state"] = TaskState(
-                input.get("state", TaskState.IDLE)
-            )
+            update_params["state"] = TaskState(input.get("state", TaskState.IDLE))
 
         if "system_prompt" in input:
             update_params["system_prompt"] = input.get("system_prompt", "")
@@ -72,7 +70,7 @@ class SchedulerTaskUpdate(ApiHandler):
 
                 update_params["schedule"] = task_schedule
             except ValueError as e:
-                return {"error": f"Invalid schedule format: {str(e)}"}
+                return {"error": f"Invalid schedule format: {e!s}"}
         elif isinstance(task, AdHocTask) and "token" in input:
             token_value = input.get("token", "")
             if token_value:  # Only update if non-empty
@@ -84,15 +82,13 @@ class SchedulerTaskUpdate(ApiHandler):
                 task_plan = parse_task_plan(plan_data)
                 update_params["plan"] = task_plan
             except ValueError as e:
-                return {"error": f"Invalid plan format: {str(e)}"}
+                return {"error": f"Invalid plan format: {e!s}"}
 
         # Use atomic update method to apply changes
         updated_task = await scheduler.update_task(task_id, **update_params)
 
         if not updated_task:
-            return {
-                "error": f"Task with ID {task_id} not found or could not be updated"
-            }
+            return {"error": f"Task with ID {task_id} not found or could not be updated"}
 
         # Return the updated task using our standardized serialization function
         task_dict = serialize_task(updated_task)

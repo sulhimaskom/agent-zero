@@ -1,15 +1,12 @@
 from typing import Any
+
 from python.helpers.extension import Extension
 from python.helpers.strings import replace_file_includes
 
 
 class ReplaceIncludeAlias(Extension):
     async def execute(
-        self,
-        loop_data=None,
-        text: str = "",
-        parsed: dict[str, Any] | None = None,
-        **kwargs
+        self, loop_data=None, text: str = "", parsed: dict[str, Any] | None = None, **kwargs
     ):
         if not parsed or not isinstance(parsed, dict):
             return
@@ -17,9 +14,7 @@ class ReplaceIncludeAlias(Extension):
         def replace_placeholders(value: Any) -> Any:
             if isinstance(value, str):
                 new_val = value
-                new_val = replace_file_includes(
-                    new_val, r"§§include\(([^)]+)\)"
-                )
+                new_val = replace_file_includes(new_val, r"§§include\(([^)]+)\)")
                 return new_val
             if isinstance(value, dict):
                 return {k: replace_placeholders(v) for k, v in value.items()}

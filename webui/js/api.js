@@ -12,12 +12,13 @@ let staticModeChecked = false;
 function detectStaticMode() {
   // Check for indicators that we're in static file mode:
   // 1. URL contains file:// protocol
-  // 2. Page is served from localhost:8080 (our static server port)
-  // 3. URL port is 8080 (common static server port)
+  // 2. Page is served from common static server ports
   const url = new URL(window.location.href);
   if (url.protocol === 'file:') return true;
-  if (url.port === '8080') return true;
-  
+  // Common static server ports to detect
+  const staticPorts = ['8080', '5002', '3000', '5000', '8000', '5500', '3001'];
+  if (staticPorts.includes(url.port)) return true;
+
   // Check if we're on a static file server by looking at the response headers
   // Static servers typically don't set the same headers as Flask
   return false;

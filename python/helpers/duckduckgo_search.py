@@ -1,4 +1,5 @@
 from duckduckgo_search import DDGS
+
 from python.helpers.constants import Search
 
 

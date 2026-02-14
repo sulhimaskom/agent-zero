@@ -1,5 +1,6 @@
-from python.helpers.api import ApiHandler, Request, Response
 from flask import send_file
+
+from python.helpers.api import ApiHandler, Request, Response
 from python.helpers.backup import BackupService
 from python.helpers.persist_chat import save_tmp_chats
 
@@ -23,11 +24,7 @@ class BackupCreate(ApiHandler):
 
             # Support legacy string patterns format for backward compatibility
             patterns_string = input.get("patterns", "")
-            if (
-                patterns_string
-                and not include_patterns
-                and not exclude_patterns
-            ):
+            if patterns_string and not include_patterns and not exclude_patterns:
                 # Parse legacy format
                 lines = [
                     line.strip()

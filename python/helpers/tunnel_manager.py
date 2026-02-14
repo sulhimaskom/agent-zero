@@ -1,6 +1,8 @@
-from flaredantic import FlareTunnel, FlareConfig, ServeoConfig, ServeoTunnel
 import threading
-from python.helpers.constants import Timeouts, Network
+
+from flaredantic import FlareConfig, FlareTunnel, ServeoConfig, ServeoTunnel
+
+from python.helpers.constants import Network, Timeouts
 
 
 # Singleton to manage the tunnel instance
@@ -21,9 +23,7 @@ class TunnelManager:
         self.is_running = False
         self.provider = None
 
-    def start_tunnel(
-        self, port=Network.TUNNEL_DEFAULT_PORT, provider="serveo"
-    ):
+    def start_tunnel(self, port=Network.TUNNEL_DEFAULT_PORT, provider="serveo"):
         """Start a new tunnel or return the existing one's URL"""
         if self.is_running and self.tunnel_url:
             return self.tunnel_url
@@ -45,7 +45,7 @@ class TunnelManager:
                     self.tunnel_url = self.tunnel.tunnel_url
                     self.is_running = True
                 except Exception as e:
-                    print(f"Error in tunnel thread: {str(e)}")
+                    print(f"Error in tunnel thread: {e!s}")
 
             tunnel_thread = threading.Thread(target=run_tunnel)
             tunnel_thread.daemon = True
@@ -61,7 +61,7 @@ class TunnelManager:
 
             return self.tunnel_url
         except Exception as e:
-            print(f"Error starting tunnel: {str(e)}")
+            print(f"Error starting tunnel: {e!s}")
             return None
 
     def stop_tunnel(self):

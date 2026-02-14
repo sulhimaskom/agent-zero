@@ -1,12 +1,13 @@
-from dataclasses import dataclass
+import copy
 import json
-from typing import Literal, Optional, TypeVar, TYPE_CHECKING
 import uuid
 from collections import OrderedDict  # Import OrderedDict
-import copy
-from python.helpers.strings import truncate_text_by_ratio
-from python.helpers.secrets import get_secrets_manager
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, Literal, TypeVar
+
 from python.helpers.constants import Limits
+from python.helpers.secrets import get_secrets_manager
+from python.helpers.strings import truncate_text_by_ratio
 
 if TYPE_CHECKING:
     from agent import AgentContext
@@ -49,9 +50,7 @@ def _truncate_heading(text: str | None) -> str:
 def _truncate_progress(text: str | None) -> str:
     if text is None:
         return ""
-    return truncate_text_by_ratio(
-        str(text), PROGRESS_MAX_LEN, "...", ratio=1.0
-    )
+    return truncate_text_by_ratio(str(text), PROGRESS_MAX_LEN, "...", ratio=1.0)
 
 
 def _truncate_key(text: str) -> str:
@@ -89,17 +88,13 @@ def _truncate_value(val: T) -> T:
     # Do a single truncation calculation
     removed = len(raw) - VALUE_MAX_LEN
     replacement = f"\n\n<< {removed} Characters hidden >>\n\n"
-    truncated = truncate_text_by_ratio(
-        raw, VALUE_MAX_LEN, replacement, ratio=0.3
-    )
+    truncated = truncate_text_by_ratio(raw, VALUE_MAX_LEN, replacement, ratio=0.3)
     return truncated
 
 
 def _truncate_content(text: str | None, type: Type) -> str:
 
-    max_len = (
-        CONTENT_MAX_LEN if type != "response" else RESPONSE_CONTENT_MAX_LEN
-    )
+    max_len = CONTENT_MAX_LEN if type != "response" else RESPONSE_CONTENT_MAX_LEN
 
     if text is None:
         return ""
@@ -111,9 +106,7 @@ def _truncate_content(text: str | None, type: Type) -> str:
     removed = len(raw) - max_len
     while True:
         replacement = f"\n\n<< {removed} Characters hidden >>\n\n"
-        truncated = truncate_text_by_ratio(
-            raw, max_len, replacement, ratio=0.3
-        )
+        truncated = truncate_text_by_ratio(raw, max_len, replacement, ratio=0.3)
         new_removed = len(raw) - (len(truncated) - len(replacement))
         if new_removed == removed:
             break
@@ -129,9 +122,9 @@ class LogItem:
     heading: str = ""
     content: str = ""
     temp: bool = False
-    update_progress: Optional[ProgressUpdate] = "persistent"
-    kvps: Optional[OrderedDict] = None  # Use OrderedDict for kvps
-    id: Optional[str] = None  # Add id field
+    update_progress: ProgressUpdate | None = "persistent"
+    kvps: OrderedDict | None = None  # Use OrderedDict for kvps
+    id: str | None = None  # Add id field
     guid: str = ""
 
     def __post_init__(self):
@@ -189,7 +182,7 @@ class LogItem:
 class Log:
 
     def __init__(self):
-        self.context: "AgentContext|None" = None  # set from outside
+        self.context: AgentContext | None = None  # set from outside
         self.guid: str = str(uuid.uuid4())
         self.updates: list[int] = []
         self.logs: list[LogItem] = []
@@ -203,7 +196,7 @@ class Log:
         kvps: dict | None = None,
         temp: bool | None = None,
         update_progress: ProgressUpdate | None = None,
-        id: Optional[str] = None,
+        id: str | None = None,
         **kwargs,
     ) -> LogItem:
 
@@ -238,7 +231,7 @@ class Log:
         kvps: dict | None = None,
         temp: bool | None = None,
         update_progress: ProgressUpdate | None = None,
-        id: Optional[str] = None,
+        id: str | None = None,
         **kwargs,
     ):
         item = self.logs[no]
@@ -325,9 +318,7 @@ class Log:
         try:
             from agent import AgentContext
 
-            secrets_mgr = get_secrets_manager(
-                self.context or AgentContext.current()
-            )
+            secrets_mgr = get_secrets_manager(self.context or AgentContext.current())
 
             # debug helper to identify context mismatch
             # self_id = self.context.id if self.context else None

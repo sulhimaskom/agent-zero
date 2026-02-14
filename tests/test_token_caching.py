@@ -1,13 +1,15 @@
-import pytest
 from unittest.mock import MagicMock, patch
-from python.helpers.history import History, Topic, Bulk, Message
+
+import pytest
+
+from python.helpers.history import Bulk, History, Message, Topic
 
 
 class TestTokenCaching:
 
     def test_message_token_caching(self):
         """Test that Message caches token calculations"""
-        with patch('python.helpers.tokens.count_tokens') as mock_count:
+        with patch("python.helpers.tokens.count_tokens") as mock_count:
             mock_count.return_value = 10
 
             # Create message after patching
@@ -27,7 +29,7 @@ class TestTokenCaching:
         """Test that Topic caches token calculations"""
         topic = Topic(history=MagicMock())
 
-        with patch('python.helpers.tokens.count_tokens') as mock_count:
+        with patch("python.helpers.tokens.count_tokens") as mock_count:
             mock_count.return_value = 5
 
             # Add messages after patching
@@ -45,7 +47,7 @@ class TestTokenCaching:
         """Test that Topic cache is invalidated when message is added"""
         topic = Topic(history=MagicMock())
 
-        with patch('python.helpers.tokens.count_tokens') as mock_count:
+        with patch("python.helpers.tokens.count_tokens") as mock_count:
             mock_count.return_value = 5
 
             topic.add_message(ai=True, content="Initial message")
@@ -62,7 +64,7 @@ class TestTokenCaching:
         """Test that Topic cache is invalidated when summary is set"""
         topic = Topic(history=MagicMock())
 
-        with patch('python.helpers.tokens.count_tokens') as mock_count:
+        with patch("python.helpers.tokens.count_tokens") as mock_count:
             mock_count.return_value = 5
 
             topic.add_message(ai=True, content="Message 1")
@@ -79,7 +81,7 @@ class TestTokenCaching:
         """Test that Bulk caches token calculations"""
         bulk = Bulk(history=MagicMock())
 
-        with patch('python.helpers.tokens.count_tokens') as mock_count:
+        with patch("python.helpers.tokens.count_tokens") as mock_count:
             mock_count.return_value = 5
 
             # Add messages with pre-calculated tokens
@@ -99,7 +101,7 @@ class TestTokenCaching:
         """Test that Bulk cache is invalidated when summarized"""
         bulk = Bulk(history=MagicMock())
 
-        with patch('python.helpers.tokens.count_tokens') as mock_count:
+        with patch("python.helpers.tokens.count_tokens") as mock_count:
             mock_count.return_value = 5
 
             bulk.records.append(Message(ai=True, content="Message 1", tokens=5))
@@ -120,7 +122,7 @@ class TestTokenCaching:
         """Test that History caches token calculations"""
         history = History(agent=MagicMock())
 
-        with patch('python.helpers.tokens.count_tokens') as mock_count:
+        with patch("python.helpers.tokens.count_tokens") as mock_count:
             mock_count.return_value = 10
 
             # Add message with pre-calculated tokens
@@ -138,7 +140,7 @@ class TestTokenCaching:
         """Test that History cache is invalidated when message is added"""
         history = History(agent=MagicMock())
 
-        with patch('python.helpers.tokens.count_tokens') as mock_count:
+        with patch("python.helpers.tokens.count_tokens") as mock_count:
             mock_count.return_value = 10
 
             history.current.add_message(ai=True, content="Initial", tokens=10)
@@ -155,7 +157,7 @@ class TestTokenCaching:
         """Test that History cache is invalidated when new topic is created"""
         history = History(agent=MagicMock())
 
-        with patch('python.helpers.tokens.count_tokens') as mock_count:
+        with patch("python.helpers.tokens.count_tokens") as mock_count:
             mock_count.return_value = 10
 
             history.current.add_message(ai=True, content="Message 1", tokens=10)
@@ -173,7 +175,7 @@ class TestTokenCaching:
         topic = Topic(history=MagicMock())
         topic.summary = "Pre-existing summary"
 
-        with patch('python.helpers.tokens.count_tokens') as mock_count:
+        with patch("python.helpers.tokens.count_tokens") as mock_count:
             mock_count.return_value = 16
 
             tokens1 = topic.get_tokens()
@@ -188,7 +190,7 @@ class TestTokenCaching:
         bulk = Bulk(history=MagicMock())
         bulk.summary = "Pre-existing summary"
 
-        with patch('python.helpers.tokens.count_tokens') as mock_count:
+        with patch("python.helpers.tokens.count_tokens") as mock_count:
             mock_count.return_value = 22
 
             tokens1 = bulk.get_tokens()

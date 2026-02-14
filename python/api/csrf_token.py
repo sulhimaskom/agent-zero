@@ -1,10 +1,12 @@
+import fnmatch
 import secrets
 from urllib.parse import urlparse
-from python.helpers.api import ApiHandler, Input, Output
+
 from flask import Request, session
-from python.helpers import runtime, dotenv, login
+
+from python.helpers import dotenv, login, runtime
+from python.helpers.api import ApiHandler, Input, Output
 from python.helpers.constants import Network
-import fnmatch
 
 
 class GetCsrfToken(ApiHandler):
@@ -61,10 +63,7 @@ class GetCsrfToken(ApiHandler):
         allowed_origins = await self.get_allowed_origins()
 
         # check if the origin is allowed
-        match = any(
-            fnmatch.fnmatch(origin, allowed_origin)
-            for allowed_origin in allowed_origins
-        )
+        match = any(fnmatch.fnmatch(origin, allowed_origin) for allowed_origin in allowed_origins)
         return {
             "ok": match,
             "origin": origin,
@@ -93,9 +92,7 @@ class GetCsrfToken(ApiHandler):
         # get the allowed origins from the environment
         allowed_origins = [
             origin.strip()
-            for origin in (
-                dotenv.get_dotenv_value("ALLOWED_ORIGINS") or ""
-            ).split(",")
+            for origin in (dotenv.get_dotenv_value("ALLOWED_ORIGINS") or "").split(",")
             if origin.strip()
         ]
 

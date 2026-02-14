@@ -1,9 +1,11 @@
-import os
-import webcolors
-import html
-import sys
 import atexit
+import html
+import os
+import sys
 from datetime import datetime
+
+import webcolors
+
 from . import files
 from .constants import Colors
 
@@ -71,9 +73,7 @@ class PrintStyle:
         if self.underline:
             start += "\033[4m"
         font_color_code, _ = self._get_rgb_color_code(self.font_color)
-        background_color_code, _ = self._get_rgb_color_code(
-            self.background_color, True
-        )
+        background_color_code, _ = self._get_rgb_color_code(self.background_color, True)
         start += font_color_code
         start += background_color_code
         return start + text + end
@@ -87,15 +87,11 @@ class PrintStyle:
         if self.underline:
             styles.append("text-decoration: underline;")
         _, font_color_code = self._get_rgb_color_code(self.font_color)
-        _, background_color_code = self._get_rgb_color_code(
-            self.background_color, True
-        )
+        _, background_color_code = self._get_rgb_color_code(self.background_color, True)
         styles.append(font_color_code)
         styles.append(background_color_code)
         style_attr = " ".join(styles)
-        escaped_text = html.escape(text).replace(
-            "\n", "<br>"
-        )  # Escape HTML special characters
+        escaped_text = html.escape(text).replace("\n", "<br>")  # Escape HTML special characters
         return f'<span style="{style_attr}">{escaped_text}</span>'
 
     def _add_padding_if_needed(self):
@@ -172,21 +168,15 @@ class PrintStyle:
 
     @staticmethod
     def success(text: str):
-        PrintStyle(font_color=Colors.SUCCESS, padding=True).print(
-            "Success: " + text
-        )
+        PrintStyle(font_color=Colors.SUCCESS, padding=True).print("Success: " + text)
 
     @staticmethod
     def warning(text: str):
-        PrintStyle(font_color=Colors.WARNING, padding=True).print(
-            "Warning: " + text
-        )
+        PrintStyle(font_color=Colors.WARNING, padding=True).print("Warning: " + text)
 
     @staticmethod
     def debug(text: str):
-        PrintStyle(font_color=Colors.DEBUG, padding=True).print(
-            "Debug: " + text
-        )
+        PrintStyle(font_color=Colors.DEBUG, padding=True).print("Debug: " + text)
 
     @staticmethod
     def error(text: str):

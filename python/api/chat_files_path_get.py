@@ -1,5 +1,5 @@
-from python.helpers.api import ApiHandler, Request, Response
 from python.helpers import files, projects
+from python.helpers.api import ApiHandler, Request, Response
 
 
 class GetChatFilesPath(ApiHandler):
@@ -11,9 +11,7 @@ class GetChatFilesPath(ApiHandler):
 
         project_name = projects.get_context_project_name(context)
         if project_name:
-            folder = files.normalize_a0_path(
-                projects.get_project_folder(project_name)
-            )
+            folder = files.normalize_a0_path(projects.get_project_folder(project_name))
         else:
             folder = "/root"  # root in container
 

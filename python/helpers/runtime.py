@@ -5,16 +5,18 @@ Docker operations, and runtime configuration.
 """
 
 import argparse
-import inspect
-import secrets
-from pathlib import Path
-from typing import TypeVar, Callable, Awaitable, Union, overload, cast
-from python.helpers import dotenv, rfc, settings, files
-from python.helpers.constants import Network, Timeouts, Shell, Protocols
 import asyncio
-import threading
+import inspect
 import queue
+import secrets
 import sys
+import threading
+from collections.abc import Awaitable, Callable
+from pathlib import Path
+from typing import TypeVar, cast, overload
+
+from python.helpers import dotenv, files, rfc, settings
+from python.helpers.constants import Network, Protocols, Shell, Timeouts
 
 T = TypeVar("T")
 R = TypeVar("R")
@@ -37,9 +39,7 @@ def initialize():
         default=False,
         help="Use cloudflare tunnel for public URL",
     )
-    parser.add_argument(
-        "--development", type=bool, default=False, help="Development mode"
-    )
+    parser.add_argument("--development", type=bool, default=False, help="Development mode")
 
     known, unknown = parser.parse_known_args()
     args = vars(known)
@@ -51,7 +51,7 @@ def initialize():
 
 
 def get_arg(name: str):
-    return args.get(name, None)
+    return args.get(name)
 
 
 def has_arg(name: str):
@@ -88,29 +88,21 @@ def get_persistent_id() -> str:
 
 
 @overload
-async def call_development_function(
-    func: Callable[..., Awaitable[T]], *args, **kwargs
-) -> T:
-    ...
+async def call_development_function(func: Callable[..., Awaitable[T]], *args, **kwargs) -> T: ...
 
 
 @overload
-async def call_development_function(
-    func: Callable[..., T], *args, **kwargs
-) -> T:
-    ...
+async def call_development_function(func: Callable[..., T], *args, **kwargs) -> T: ...
 
 
 async def call_development_function(
-    func: Union[Callable[..., T], Callable[..., Awaitable[T]]], *args, **kwargs
+    func: Callable[..., T] | Callable[..., Awaitable[T]], *args, **kwargs
 ) -> T:
     if is_development():
         url = _get_rfc_url()
         password = _get_rfc_password()
         # Normalize path components to build a valid Python module path across OSes
-        module_path = Path(
-            files.deabsolute_path(func.__code__.co_filename)
-        ).with_suffix("")
+        module_path = Path(files.deabsolute_path(func.__code__.co_filename)).with_suffix("")
         module = ".".join(module_path.parts)  # __module__ is not reliable
         result = await rfc.call_rfc(
             url=url,
@@ -129,9 +121,7 @@ async def call_development_function(
 
 
 async def handle_rfc(rfc_call: rfc.RFCCall):
-    return await rfc.handle_rfc(
-        rfc_call=rfc_call, password=_get_rfc_password()
-    )
+    return await rfc.handle_rfc(rfc_call=rfc_call, password=_get_rfc_password())
 
 
 def _get_rfc_password() -> str:
@@ -154,7 +144,7 @@ def _get_rfc_url() -> str:
 
 
 def call_development_function_sync(
-    func: Union[Callable[..., T], Callable[..., Awaitable[T]]], *args, **kwargs
+    func: Callable[..., T] | Callable[..., Awaitable[T]], *args, **kwargs
 ) -> T:
     # run async function in sync manner
     result_queue = queue.Queue()
@@ -165,14 +155,10 @@ def call_development_function_sync(
 
     thread = threading.Thread(target=run_in_thread)
     thread.start()
-    thread.join(
-        timeout=Timeouts.RFC_FUNCTION_TIMEOUT
-    )  # wait for thread with timeout
+    thread.join(timeout=Timeouts.RFC_FUNCTION_TIMEOUT)  # wait for thread with timeout
 
     if thread.is_alive():
-        raise TimeoutError(
-            f"Function call timed out after {Timeouts.RFC_FUNCTION_TIMEOUT} seconds"
-        )
+        raise TimeoutError(f"Function call timed out after {Timeouts.RFC_FUNCTION_TIMEOUT} seconds")
 
     result = result_queue.get_nowait()
     return cast(T, result)

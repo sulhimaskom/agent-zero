@@ -1,4 +1,5 @@
 from openai import OpenAI
+
 import models
 from python.helpers.constants import Network
 

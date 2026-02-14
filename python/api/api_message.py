@@ -6,15 +6,17 @@ for file attachments, context management, and authentication.
 
 import base64
 import os
-from datetime import datetime, timedelta
-from agent import AgentContext, UserMessage, AgentContextType
-from python.helpers.api import ApiHandler, Request, Response
-from python.helpers import files
-from python.helpers.print_style import PrintStyle
-from python.helpers.constants import Colors, Paths, Timeouts, HttpStatus
-from werkzeug.utils import secure_filename
-from initialize import initialize_agent
 import threading
+from datetime import datetime, timedelta
+
+from werkzeug.utils import secure_filename
+
+from agent import AgentContext, AgentContextType, UserMessage
+from initialize import initialize_agent
+from python.helpers import files
+from python.helpers.api import ApiHandler, Request, Response
+from python.helpers.constants import Colors, HttpStatus, Paths, Timeouts
+from python.helpers.print_style import PrintStyle
 
 
 class ApiMessage(ApiHandler):
@@ -78,9 +80,7 @@ class ApiMessage(ApiHandler):
                     with open(save_path, "wb") as f:
                         f.write(file_content)
 
-                    attachment_paths.append(
-                        os.path.join(upload_folder_int, filename)
-                    )
+                    attachment_paths.append(os.path.join(upload_folder_int, filename))
                 except (ValueError, OSError) as e:
                     PrintStyle.error(
                         f"Failed to process attachment {attachment.get('filename', 'unknown')}: {e}"
@@ -104,17 +104,13 @@ class ApiMessage(ApiHandler):
 
         # Update chat lifetime
         with self._cleanup_lock:
-            self._chat_lifetimes[context_id] = datetime.now() + timedelta(
-                hours=lifetime_hours
-            )
+            self._chat_lifetimes[context_id] = datetime.now() + timedelta(hours=lifetime_hours)
 
         # Process message
         try:
             # Log the message
             attachment_filenames = (
-                [os.path.basename(path) for path in attachment_paths]
-                if attachment_paths
-                else []
+                [os.path.basename(path) for path in attachment_paths] if attachment_paths else []
             )
 
             PrintStyle(
@@ -123,17 +119,11 @@ class ApiMessage(ApiHandler):
                 bold=True,
                 padding=True,
             ).print("External API message:")
-            PrintStyle(font_color=Colors.BG_WHITE, padding=False).print(
-                f"> {message}"
-            )
+            PrintStyle(font_color=Colors.BG_WHITE, padding=False).print(f"> {message}")
             if attachment_filenames:
-                PrintStyle(font_color="white", padding=False).print(
-                    "Attachments:"
-                )
+                PrintStyle(font_color="white", padding=False).print("Attachments:")
                 for filename in attachment_filenames:
-                    PrintStyle(font_color="white", padding=False).print(
-                        f"- {filename}"
-                    )
+                    PrintStyle(font_color="white", padding=False).print(f"- {filename}")
 
             # Add user message to chat history so it's visible in the UI
             context.log.log(
@@ -155,7 +145,7 @@ class ApiMessage(ApiHandler):
         except (RuntimeError, ValueError, KeyError) as e:
             PrintStyle.error(f"External API error: {e}")
             return Response(
-                f'{{"error": "{str(e)}"}}',
+                f'{{"error": "{e!s}"}}',
                 status=HttpStatus.ERROR,
                 mimetype="application/json",
             )
@@ -166,9 +156,7 @@ class ApiMessage(ApiHandler):
         with cls._cleanup_lock:
             now = datetime.now()
             expired_contexts = [
-                context_id
-                for context_id, expiry in cls._chat_lifetimes.items()
-                if now > expiry
+                context_id for context_id, expiry in cls._chat_lifetimes.items() if now > expiry
             ]
 
             for context_id in expired_contexts:
@@ -178,10 +166,6 @@ class ApiMessage(ApiHandler):
                         context.reset()
                         AgentContext.remove(context_id)
                     del cls._chat_lifetimes[context_id]
-                    PrintStyle().print(
-                        f"Cleaned up expired chat: {context_id}"
-                    )
+                    PrintStyle().print(f"Cleaned up expired chat: {context_id}")
                 except (RuntimeError, KeyError) as e:
-                    PrintStyle.error(
-                        f"Failed to cleanup chat {context_id}: {e}"
-                    )
+                    PrintStyle.error(f"Failed to cleanup chat {context_id}: {e}")

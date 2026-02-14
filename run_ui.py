@@ -1,27 +1,27 @@
-from datetime import timedelta
-import os
-import secrets
-import time
-import socket
-import struct
-from functools import wraps
-import threading
-from flask import Flask, request, Response, session, redirect, url_for, render_template_string
-from flask_compress import Compress
-from werkzeug.wrappers.response import Response as BaseResponse
-import initialize
-from python.helpers import files, git, mcp_server, fasta2a_server
-from python.helpers.files import get_abs_path
-from python.helpers import runtime, dotenv, process
-from python.helpers.constants import Config
-from python.helpers.config import inject_config_into_html
-from python.helpers.extract_tools import load_classes_from_folder
-from python.helpers.api import ApiHandler
-from python.helpers.print_style import PrintStyle
-from python.helpers import login
-
 # disable logging
 import logging
+import os
+import secrets
+import socket
+import struct
+import threading
+import time
+from datetime import timedelta
+from functools import wraps
+
+from flask import Flask, Response, redirect, render_template_string, request, session, url_for
+from flask_compress import Compress
+from werkzeug.wrappers.response import Response as BaseResponse
+
+import initialize
+from python.helpers import dotenv, fasta2a_server, files, git, login, mcp_server, process, runtime
+from python.helpers.api import ApiHandler
+from python.helpers.config import inject_config_into_html
+from python.helpers.constants import Config
+from python.helpers.extract_tools import load_classes_from_folder
+from python.helpers.files import get_abs_path
+from python.helpers.print_style import PrintStyle
+
 logging.getLogger().setLevel(logging.WARNING)
 
 
@@ -29,7 +29,7 @@ logging.getLogger().setLevel(logging.WARNING)
 os.environ["TZ"] = "UTC"
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 # Apply the timezone change
-if hasattr(time, 'tzset'):
+if hasattr(time, "tzset"):
     time.tzset()
 
 # initialize the internal Flask server
@@ -37,24 +37,25 @@ webapp = Flask("app", static_folder=get_abs_path("./webui"), static_url_path="/"
 webapp.secret_key = os.getenv("FLASK_SECRET_KEY") or secrets.token_hex(32)
 webapp.config.update(
     JSON_SORT_KEYS=False,
-    SESSION_COOKIE_NAME="session_" + runtime.get_runtime_id(),  # bind the session cookie name to runtime id to prevent session collision on same host
+    SESSION_COOKIE_NAME="session_"
+    + runtime.get_runtime_id(),  # bind the session cookie name to runtime id to prevent session collision on same host
     SESSION_COOKIE_SAMESITE="Strict",
     SESSION_PERMANENT=True,
     PERMANENT_SESSION_LIFETIME=timedelta(days=1),
     COMPRESS_MIMETYPES=[
-        'text/html',
-        'text/css',
-        'text/javascript',
-        'text/plain',
-        'text/xml',
-        'application/json',
-        'application/javascript',
-        'application/x-javascript',
-        'application/xml',
-        'text/x-component',
+        "text/html",
+        "text/css",
+        "text/javascript",
+        "text/plain",
+        "text/xml",
+        "application/json",
+        "application/javascript",
+        "application/x-javascript",
+        "application/xml",
+        "text/x-component",
     ],
     COMPRESS_LEVEL=6,
-    COMPRESS_MIN_SIZE=500
+    COMPRESS_MIN_SIZE=500,
 )
 
 # Enable gzip compression for static assets
@@ -68,20 +69,18 @@ lock = threading.Lock()
 
 def is_loopback_address(address):
     loopback_checker = {
-        socket.AF_INET: lambda x: struct.unpack("!I", socket.inet_aton(x))[0]
-        >> (32 - 8)
-        == 127,
+        socket.AF_INET: lambda x: struct.unpack("!I", socket.inet_aton(x))[0] >> (32 - 8) == 127,
         socket.AF_INET6: lambda x: x == "::1",
     }
     address_type = "hostname"
     try:
         socket.inet_pton(socket.AF_INET6, address)
         address_type = "ipv6"
-    except socket.error:
+    except OSError:
         try:
             socket.inet_pton(socket.AF_INET, address)
             address_type = "ipv4"
-        except socket.error:
+        except OSError:
             address_type = "hostname"
 
     if address_type == "ipv4":
@@ -105,6 +104,7 @@ def requires_api_key(f):
     async def decorated(*args, **kwargs):
         # Use the auth token from settings (same as MCP server)
         from python.helpers.settings import get_settings
+
         valid_api_key = get_settings()["mcp_server_token"]
 
         if api_key := request.headers.get("X-API-KEY"):
@@ -145,8 +145,8 @@ def requires_auth(f):
         if not user_pass_hash:
             return await f(*args, **kwargs)
 
-        if session.get('authentication') != user_pass_hash:
-            return redirect(url_for('login_handler'))
+        if session.get("authentication") != user_pass_hash:
+            return redirect(url_for("login_handler"))
 
         return await f(*args, **kwargs)
 
@@ -170,15 +170,15 @@ def csrf_protect(f):
 @webapp.route("/login", methods=["GET", "POST"])
 async def login_handler():
     error = None
-    if request.method == 'POST':
+    if request.method == "POST":
         user = dotenv.get_dotenv_value("AUTH_LOGIN")
         password = dotenv.get_dotenv_value("AUTH_PASSWORD")
 
-        if request.form['username'] == user and request.form['password'] == password:
-            session['authentication'] = login.get_credentials_hash()
-            return redirect(url_for('serve_index'))
+        if request.form["username"] == user and request.form["password"] == password:
+            session["authentication"] = login.get_credentials_hash()
+            return redirect(url_for("serve_index"))
         else:
-            error = 'Invalid Credentials. Please try again.'
+            error = "Invalid Credentials. Please try again."
 
     login_page_content = files.read_file("webui/login.html")
     return render_template_string(login_page_content, error=error)
@@ -186,8 +186,9 @@ async def login_handler():
 
 @webapp.route("/logout")
 async def logout_handler():
-    session.pop('authentication', None)
-    return redirect(url_for('login_handler'))
+    session.pop("authentication", None)
+    return redirect(url_for("login_handler"))
+
 
 # handle default address, load index
 
@@ -205,51 +206,51 @@ async def serve_index():
         }
     index = files.read_file("webui/index.html")
     index = files.replace_placeholders_text(
-        _content=index,
-        version_no=gitinfo["version"],
-        version_time=gitinfo["commit_time"]
+        _content=index, version_no=gitinfo["version"], version_time=gitinfo["commit_time"]
     )
     # Inject frontend configuration into HTML
     index = inject_config_into_html(index)
-    response = Response(index, mimetype='text/html')
+    response = Response(index, mimetype="text/html")
     # Don't cache index.html to ensure fresh content on reload
-    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-    response.headers['Pragma'] = 'no-cache'
-    response.headers['Expires'] = '0'
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
     return response
+
 
 # Serve static files with cache headers for better performance
 
 
-@webapp.route('/<path:filename>')
+@webapp.route("/<path:filename>")
 async def serve_static(filename):
     # Only serve files from webui folder
-    if '..' in filename or filename.startswith('/'):
+    if ".." in filename or filename.startswith("/"):
         return Response("Invalid path", 403)
 
     # Determine cache duration based on file type
     cache_max_age = 3600  # Default 1 hour
 
     # Long cache for vendor files (they rarely change)
-    if filename.startswith('vendor/'):
+    if filename.startswith("vendor/"):
         cache_max_age = 31536000  # 1 year
     # Medium cache for CSS/JS files
-    elif filename.endswith(('.css', '.js')):
+    elif filename.endswith((".css", ".js")):
         cache_max_age = 86400  # 24 hours
     # Short cache for images and other assets
-    elif filename.endswith(('.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico')):
+    elif filename.endswith((".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico")):
         cache_max_age = 604800  # 7 days
 
     try:
         file_path = os.path.join(get_abs_path("./webui"), filename)
         if os.path.exists(file_path) and os.path.isfile(file_path):
             from flask import send_file
+
             response = send_file(file_path)
-            response.headers['Cache-Control'] = f'public, max-age={cache_max_age}'
+            response.headers["Cache-Control"] = f"public, max-age={cache_max_age}"
             return response
         else:
             return Response("File not found", 404)
-    except (OSError, IOError):
+    except OSError:
         return Response("Error serving file", 500)
 
 
@@ -257,10 +258,9 @@ def run():
     PrintStyle().print("Initializing framework...")
 
     # Suppress only request logs but keep the startup messages
-    from werkzeug.serving import WSGIRequestHandler
-    from werkzeug.serving import make_server
-    from werkzeug.middleware.dispatcher import DispatcherMiddleware
     from a2wsgi import ASGIMiddleware
+    from werkzeug.middleware.dispatcher import DispatcherMiddleware
+    from werkzeug.serving import WSGIRequestHandler, make_server
 
     PrintStyle().print("Starting server...")
 

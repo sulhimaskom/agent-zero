@@ -1,5 +1,7 @@
-from git import Repo
 from datetime import datetime
+
+from git import Repo
+
 from python.helpers import files
 
 
@@ -12,9 +14,7 @@ def get_git_info():
 
     # Ensure the repository is not bare
     if repo.bare:
-        raise ValueError(
-            f"Repository at {repo_path} is bare and cannot be used."
-        )
+        raise ValueError(f"Repository at {repo_path} is bare and cannot be used.")
 
     # Get the current branch name
     branch = repo.active_branch.name if repo.head.is_detached is False else ""
@@ -23,9 +23,7 @@ def get_git_info():
     commit_hash = repo.head.commit.hexsha
 
     # Get the commit date (ISO 8601 format)
-    commit_time = datetime.fromtimestamp(
-        repo.head.commit.committed_date
-    ).strftime("%y-%m-%d %H:%M")
+    commit_time = datetime.fromtimestamp(repo.head.commit.committed_date).strftime("%y-%m-%d %H:%M")
 
     # Get the latest tag description (if available)
     short_tag = ""

@@ -1,15 +1,17 @@
-from abc import abstractmethod
 import json
 import threading
-from typing import Union, TypedDict, Dict, Any
-from flask import Request, Response, Flask
+from abc import abstractmethod
+from typing import Any, TypedDict, Union
+
+from flask import Flask, Request, Response
+
 from agent import AgentContext
 from initialize import initialize_agent
-from python.helpers.print_style import PrintStyle
 from python.helpers.errors import format_error
+from python.helpers.print_style import PrintStyle
 
 Input = dict
-Output = Union[Dict[str, Any], Response, TypedDict]  # type: ignore
+Output = Union[dict[str, Any], Response, TypedDict]  # type: ignore
 
 
 class ApiHandler:
@@ -52,7 +54,7 @@ class ApiHandler:
                     # If empty or not valid JSON, use empty dict
                 except Exception as e:
                     # Just log the error and continue with empty input
-                    PrintStyle().print(f"Error parsing JSON: {str(e)}")
+                    PrintStyle().print(f"Error parsing JSON: {e!s}")
                     input_data = {}
             else:
                 # input_data = {"data": request.get_data(as_text=True)}
@@ -86,17 +88,13 @@ class ApiHandler:
                 if first:
                     AgentContext.use(first.id)
                     return first
-                context = AgentContext(
-                    config=initialize_agent(), set_current=True
-                )
+                context = AgentContext(config=initialize_agent(), set_current=True)
                 return context
             got = AgentContext.use(ctxid)
             if got:
                 return got
             if create_if_not_exists:
-                context = AgentContext(
-                    config=initialize_agent(), id=ctxid, set_current=True
-                )
+                context = AgentContext(config=initialize_agent(), id=ctxid, set_current=True)
                 return context
             else:
                 raise Exception(f"Context {ctxid} not found")

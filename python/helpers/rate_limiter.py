@@ -1,6 +1,7 @@
 import asyncio
 import time
-from typing import Callable, Awaitable
+from collections.abc import Awaitable, Callable
+
 from python.helpers.constants import Timeouts
 
 
@@ -30,9 +31,7 @@ class RateLimiter:
             now = time.time()
             cutoff = now - self.timeframe
             for key in self.values:
-                self.values[key] = [
-                    (t, v) for t, v in self.values[key] if t > cutoff
-                ]
+                self.values[key] = [(t, v) for t, v in self.values[key] if t > cutoff]
 
     async def get_total(self, key: str) -> int:
         async with self._lock:
@@ -42,9 +41,7 @@ class RateLimiter:
 
     async def wait(
         self,
-        callback: (
-            Callable[[str, str, int, int], Awaitable[bool]] | None
-        ) = None,
+        callback: Callable[[str, str, int, int], Awaitable[bool]] | None = None,
     ):
         while True:
             await self.cleanup()
@@ -58,9 +55,7 @@ class RateLimiter:
                 if total > limit:
                     if callback:
                         msg = f"Rate limit exceeded for {key} ({total}/{limit}), waiting..."
-                        should_wait = not await callback(
-                            msg, key, total, limit
-                        )
+                        should_wait = not await callback(msg, key, total, limit)
                     else:
                         should_wait = True
                     break

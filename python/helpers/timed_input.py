@@ -5,7 +5,9 @@ falling back gracefully when input times out.
 """
 
 import sys
-from inputimeout import inputimeout, TimeoutOccurred
+
+from inputimeout import TimeoutOccurred, inputimeout
+
 from python.helpers.constants import Timeouts
 
 

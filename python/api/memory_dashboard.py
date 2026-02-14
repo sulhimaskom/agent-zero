@@ -1,12 +1,13 @@
+from langchain_core.documents import Document
+
+from agent import AgentContext
 from python.helpers.api import ApiHandler, Request, Response
+from python.helpers.constants import Limits
 from python.helpers.memory import (
     Memory,
-    get_existing_memory_subdirs,
     get_context_memory_subdir,
+    get_existing_memory_subdirs,
 )
-from python.helpers.constants import Limits
-from langchain_core.documents import Document
-from agent import AgentContext
 
 
 class MemoryDashboard(ApiHandler):
@@ -54,9 +55,7 @@ class MemoryDashboard(ApiHandler):
                     "error": "Memory ID is required for deletion",
                 }
 
-            memory = await Memory.get_by_subdir(
-                memory_subdir, preload_knowledge=False
-            )
+            memory = await Memory.get_by_subdir(memory_subdir, preload_knowledge=False)
 
             rem = await memory.delete_documents_by_ids([memory_id])
 
@@ -74,7 +73,7 @@ class MemoryDashboard(ApiHandler):
         except Exception as e:
             return {
                 "success": False,
-                "error": f"Failed to delete memory: {str(e)}",
+                "error": f"Failed to delete memory: {e!s}",
             }
 
     async def _bulk_delete_memories(self, input: dict) -> dict:
@@ -96,9 +95,7 @@ class MemoryDashboard(ApiHandler):
                 }
 
             # delete
-            memory = await Memory.get_by_subdir(
-                memory_subdir, preload_knowledge=False
-            )
+            memory = await Memory.get_by_subdir(memory_subdir, preload_knowledge=False)
             rem = await memory.delete_documents_by_ids(memory_ids)
 
             if len(rem) == len(memory_ids):
@@ -120,14 +117,14 @@ class MemoryDashboard(ApiHandler):
         except Exception as e:
             return {
                 "success": False,
-                "error": f"Failed to bulk delete memories: {str(e)}",
+                "error": f"Failed to bulk delete memories: {e!s}",
             }
 
     async def _get_current_memory_subdir(self, input: dict) -> dict:
         """Get the current memory subdirectory from the active context."""
         try:
             # Try to get the context from the request
-            context_id = input.get("context_id", None)
+            context_id = input.get("context_id")
             if not context_id:
                 # Fallback to default if no context available
                 return {"success": True, "memory_subdir": "default"}
@@ -157,7 +154,7 @@ class MemoryDashboard(ApiHandler):
         except Exception as e:
             return {
                 "success": False,
-                "error": f"Failed to get memory subdirectories: {str(e)}",
+                "error": f"Failed to get memory subdirectories: {e!s}",
                 "subdirs": ["default"],
             }
 
@@ -173,9 +170,7 @@ class MemoryDashboard(ApiHandler):
             )  # Number of results to return from constants
             threshold = input.get("threshold", 0.6)  # Similarity threshold
 
-            memory = await Memory.get_by_subdir(
-                memory_subdir, preload_knowledge=False
-            )
+            memory = await Memory.get_by_subdir(memory_subdir, preload_knowledge=False)
 
             memories = []
 
@@ -192,18 +187,13 @@ class MemoryDashboard(ApiHandler):
                 all_docs = memory.db.get_all_docs()
                 for doc_id, doc in all_docs.items():
                     # Apply area filter if specified
-                    if (
-                        area_filter
-                        and doc.metadata.get("area", "") != area_filter
-                    ):
+                    if area_filter and doc.metadata.get("area", "") != area_filter:
                         continue
                     memories.append(doc)
 
                 # sort by timestamp
                 def get_sort_key(m):
-                    timestamp = m.metadata.get(
-                        "timestamp", Limits.DEFAULT_TIMESTAMP
-                    )
+                    timestamp = m.metadata.get("timestamp", Limits.DEFAULT_TIMESTAMP)
                     return timestamp
 
                 memories.sort(key=get_sort_key, reverse=True)
@@ -213,15 +203,11 @@ class MemoryDashboard(ApiHandler):
                     memories = memories[:limit]
 
             # Format memories for the dashboard
-            formatted_memories = [
-                self._format_memory_for_dashboard(m) for m in memories
-            ]
+            formatted_memories = [self._format_memory_for_dashboard(m) for m in memories]
 
             # Get summary statistics
             total_memories = len(formatted_memories)
-            knowledge_count = sum(
-                1 for m in formatted_memories if m["knowledge_source"]
-            )
+            knowledge_count = sum(1 for m in formatted_memories if m["knowledge_source"])
             conversation_count = total_memories - knowledge_count
 
             # Get total count of all memories in database (unfiltered)
@@ -282,14 +268,10 @@ class MemoryDashboard(ApiHandler):
                 metadata=edited["metadata"],
             )
 
-            memory = await Memory.get_by_subdir(
-                memory_subdir, preload_knowledge=False
-            )
+            memory = await Memory.get_by_subdir(memory_subdir, preload_knowledge=False)
             id = (await memory.update_documents([doc]))[0]
             doc = memory.get_document_by_id(id)
-            formatted_doc = (
-                self._format_memory_for_dashboard(doc) if doc else None
-            )
+            formatted_doc = self._format_memory_for_dashboard(doc) if doc else None
 
             return {
                 "success": formatted_doc is not None,

@@ -1,13 +1,15 @@
 import glob
-import os
 import hashlib
-from typing import Any, Dict, Literal, TypedDict
+import os
+from typing import Any, Literal, TypedDict
+
 from langchain_community.document_loaders import (
     CSVLoader,
     PyPDFLoader,
     TextLoader,
     UnstructuredHTMLLoader,
 )
+
 from python.helpers.log import LogItem
 from python.helpers.print_style import PrintStyle
 
@@ -33,18 +35,17 @@ def calculate_checksum(file_path: str) -> str:
 def load_knowledge(
     log_item: LogItem | None,
     knowledge_dir: str,
-    index: Dict[str, KnowledgeImport],
+    index: dict[str, KnowledgeImport],
     metadata: dict[str, Any] = {},
     filename_pattern: str = "**/*",
     recursive: bool = True,
-) -> Dict[str, KnowledgeImport]:
+) -> dict[str, KnowledgeImport]:
     """
     Load knowledge files from a directory with change detection and metadata enhancement.
 
     This function now includes enhanced error handling and compatibility with the
     intelligent memory consolidation system.
     """
-
     # Mapping file extensions to corresponding loader classes
     # Note: Using TextLoader for JSON and MD to avoid parsing issues with consolidation
     file_types_loaders = {
@@ -63,18 +64,14 @@ def load_knowledge(
     if not knowledge_dir:
         if log_item:
             log_item.stream(progress="\nNo knowledge directory specified")
-        PrintStyle(font_color="yellow").print(
-            "No knowledge directory specified"
-        )
+        PrintStyle(font_color="yellow").print("No knowledge directory specified")
         return index
 
     if not os.path.exists(knowledge_dir):
         try:
             os.makedirs(knowledge_dir, exist_ok=True)
             # Verify the directory was actually created and is accessible
-            if not os.path.exists(knowledge_dir) or not os.access(
-                knowledge_dir, os.R_OK
-            ):
+            if not os.path.exists(knowledge_dir) or not os.access(knowledge_dir, os.R_OK):
                 error_msg = f"Knowledge directory {knowledge_dir} was created but is not accessible"
                 if log_item:
                     log_item.stream(progress=f"\n{error_msg}")
@@ -82,16 +79,10 @@ def load_knowledge(
                 return index
 
             if log_item:
-                log_item.stream(
-                    progress=f"\nCreated knowledge directory: {knowledge_dir}"
-                )
-            PrintStyle(font_color="green").print(
-                f"Created knowledge directory: {knowledge_dir}"
-            )
+                log_item.stream(progress=f"\nCreated knowledge directory: {knowledge_dir}")
+            PrintStyle(font_color="green").print(f"Created knowledge directory: {knowledge_dir}")
         except (OSError, PermissionError) as e:
-            error_msg = (
-                f"Failed to create knowledge directory {knowledge_dir}: {e}"
-            )
+            error_msg = f"Failed to create knowledge directory {knowledge_dir}: {e}"
             if log_item:
                 log_item.stream(progress=f"\n{error_msg}")
             PrintStyle(font_color="red").print(error_msg)
@@ -99,9 +90,7 @@ def load_knowledge(
 
     # Final accessibility check for existing directories
     if not os.access(knowledge_dir, os.R_OK):
-        error_msg = (
-            f"Knowledge directory {knowledge_dir} exists but is not readable"
-        )
+        error_msg = f"Knowledge directory {knowledge_dir} exists but is not readable"
         if log_item:
             log_item.stream(progress=f"\n{error_msg}")
         PrintStyle(font_color="red").print(error_msg)
@@ -109,13 +98,9 @@ def load_knowledge(
 
     # Fetch all files in the directory with specified extensions
     try:
-        kn_files = glob.glob(
-            os.path.join(knowledge_dir, filename_pattern), recursive=recursive
-        )
+        kn_files = glob.glob(os.path.join(knowledge_dir, filename_pattern), recursive=recursive)
         kn_files = [
-            f
-            for f in kn_files
-            if os.path.isfile(f) and not os.path.basename(f).startswith(".")
+            f for f in kn_files if os.path.isfile(f) and not os.path.basename(f).startswith(".")
         ]
     except Exception as e:
         PrintStyle(font_color="red").print(
@@ -177,11 +162,7 @@ def load_knowledge(
                 try:
                     loader = loader_cls(
                         file_path,
-                        **(
-                            text_loader_kwargs
-                            if ext in ["txt", "csv", "html", "md"]
-                            else {}
-                        ),
+                        **(text_loader_kwargs if ext in ["txt", "csv", "html", "md"] else {}),
                     )
                     documents = loader.load_and_split()
 
@@ -204,9 +185,7 @@ def load_knowledge(
                     cnt_docs += len(documents)
 
                 except Exception as e:
-                    PrintStyle(font_color="red").print(
-                        f"Error loading {file_path}: {e}"
-                    )
+                    PrintStyle(font_color="red").print(f"Error loading {file_path}: {e}")
                     if log_item:
                         log_item.stream(
                             progress=f"\nError loading {os.path.basename(file_path)}: {e}"
@@ -217,9 +196,7 @@ def load_knowledge(
             index[file_key] = file_data
 
         except Exception as e:
-            PrintStyle(font_color="red").print(
-                f"Error processing {file_path}: {e}"
-            )
+            PrintStyle(font_color="red").print(f"Error processing {file_path}: {e}")
             continue
 
     # Mark removed files
@@ -230,12 +207,8 @@ def load_knowledge(
 
     # Log results
     if cnt_files > 0 or cnt_docs > 0:
-        PrintStyle.standard(
-            f"Processed {cnt_docs} documents from {cnt_files} files."
-        )
+        PrintStyle.standard(f"Processed {cnt_docs} documents from {cnt_files} files.")
         if log_item:
-            log_item.stream(
-                progress=f"\nProcessed {cnt_docs} documents from {cnt_files} files."
-            )
+            log_item.stream(progress=f"\nProcessed {cnt_docs} documents from {cnt_files} files.")
 
     return index
