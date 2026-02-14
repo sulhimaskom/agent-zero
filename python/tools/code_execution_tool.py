@@ -267,7 +267,7 @@ class CodeExecution(Tool):
 
     def format_command_for_output(self, command: str):
         # truncate long commands
-        short_cmd = command[:200]
+        short_cmd = command[:Limits.COMMAND_TRUNCATION_PRIMARY]
         # normalize whitespace for cleaner output
         short_cmd = " ".join(short_cmd.split())
         # replace any sequence of ', ", or ` with a single '
@@ -479,7 +479,7 @@ class CodeExecution(Tool):
 
         if has_dialog:
             sys_info = self.agent.read_prompt(
-                "fw.code.pause_dialog.md", timeout=1
+                "fw.code.pause_dialog.md", timeout=Timeouts.MCP_SERVER_APPLY_DELAY
             )
         else:
             sys_info = self.agent.read_prompt(

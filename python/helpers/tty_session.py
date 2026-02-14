@@ -4,7 +4,7 @@ import os
 import platform
 import sys
 
-from python.helpers.constants import Limits
+from python.helpers.constants import Limits, Timeouts
 
 _IS_WIN = platform.system() == "Windows"
 if _IS_WIN:
@@ -298,7 +298,7 @@ if __name__ == "__main__":
         term = TTYSession(shell_cmd)
         await term.start()
 
-        timeout = 1.0
+        timeout = Timeouts.TTY_READ_TIMEOUT
 
         print(f"Connected to {shell_cmd}.")
         print("Type commands for the shell.")

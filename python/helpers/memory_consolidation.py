@@ -517,15 +517,15 @@ class MemoryConsolidator:
         except Exception as e:
             PrintStyle().warning(f"Keyword extraction failed: {str(e)}")
             # Fallback: use intelligent truncation for search
-            # Take first 200 chars if short, or first sentence if longer, but cap at 200 chars
-            if len(new_memory) <= 200:
+            # Take first chars if short, or first sentence if longer, but cap at MEMORY_CONTENT_PREVIEW_TRUNCATION chars
+            if len(new_memory) <= Limits.MEMORY_CONTENT_PREVIEW_TRUNCATION:
                 fallback_content = new_memory
             else:
                 first_sentence = new_memory.split(".")[0]
                 fallback_content = (
-                    first_sentence[:200]
-                    if len(first_sentence) <= 200
-                    else new_memory[:200]
+                    first_sentence[:Limits.MEMORY_CONTENT_PREVIEW_TRUNCATION]
+                    if len(first_sentence) <= Limits.MEMORY_CONTENT_PREVIEW_TRUNCATION
+                    else new_memory[:Limits.MEMORY_CONTENT_PREVIEW_TRUNCATION]
                 )
             return [fallback_content.strip()]
 
