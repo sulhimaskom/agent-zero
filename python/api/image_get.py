@@ -1,11 +1,13 @@
 import base64
-import os
-from python.helpers.api import ApiHandler
-from flask import Request, Response, send_file
-from python.helpers import files, runtime
-from python.helpers.constants import Timeouts
 import io
+import os
 from mimetypes import guess_type
+
+from flask import Request, Response, send_file
+
+from python.helpers import files, runtime
+from python.helpers.api import ApiHandler
+from python.helpers.constants import Timeouts
 
 
 class ImageGet(ApiHandler):
@@ -54,9 +56,7 @@ class ImageGet(ApiHandler):
             if runtime.is_development():
                 if files.exists(path):
                     response = send_file(path)
-                elif await runtime.call_development_function(
-                    files.exists, path
-                ):
+                elif await runtime.call_development_function(files.exists, path):
                     b64_content = await runtime.call_development_function(
                         files.read_file_base64, path
                     )
@@ -79,9 +79,7 @@ class ImageGet(ApiHandler):
                     response = _send_fallback_icon("image")
 
             # Add cache headers for better device sync performance
-            response.headers["Cache-Control"] = (
-                f"public, max-age={Timeouts.HTTP_CACHE_MAX_AGE}"
-            )
+            response.headers["Cache-Control"] = f"public, max-age={Timeouts.HTTP_CACHE_MAX_AGE}"
             response.headers["X-File-Type"] = "image"
             response.headers["X-File-Name"] = filename
             return response
@@ -92,7 +90,6 @@ class ImageGet(ApiHandler):
 
 def _send_file_type_icon(file_ext, filename=None):
     """Return appropriate icon for file type"""
-
     # Map file extensions to icon names
     icon_mapping = {
         # Archive files
@@ -151,7 +148,6 @@ def _send_file_type_icon(file_ext, filename=None):
 
 def _send_fallback_icon(icon_name):
     """Return fallback icon from public directory"""
-
     # Path to public icons
     icon_path = files.get_abs_path(f"webui/public/{icon_name}.svg")
 

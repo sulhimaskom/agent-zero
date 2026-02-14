@@ -1,18 +1,17 @@
-from typing import Any, List, Sequence
 import uuid
-from langchain_community.vectorstores import FAISS
+from collections.abc import Sequence
+from typing import Any
 
 # faiss needs to be patched for python 3.12 on arm #TODO remove once not needed
 import faiss
-
-
-from langchain_core.documents import Document
+from langchain.embeddings import CacheBackedEmbeddings
 from langchain.storage import InMemoryByteStore
 from langchain_community.docstore.in_memory import InMemoryDocstore
+from langchain_community.vectorstores import FAISS
 from langchain_community.vectorstores.utils import (
     DistanceStrategy,
 )
-from langchain.embeddings import CacheBackedEmbeddings
+from langchain_core.documents import Document
 from simpleeval import simple_eval
 
 from agent import Agent
@@ -20,11 +19,11 @@ from agent import Agent
 
 class MyFaiss(FAISS):
     # override aget_by_ids
-    def get_by_ids(self, ids: Sequence[str], /) -> List[Document]:
+    def get_by_ids(self, ids: Sequence[str], /) -> list[Document]:
         # return all self.docstore._dict[id] in ids
         return [self.docstore._dict[id] for id in (ids if isinstance(ids, list) else [ids]) if id in self.docstore._dict]  # type: ignore
 
-    async def aget_by_ids(self, ids: Sequence[str], /) -> List[Document]:
+    async def aget_by_ids(self, ids: Sequence[str], /) -> list[Document]:
         return self.get_by_ids(ids)
 
     def get_all_docs(self) -> dict[str, Document]:
@@ -47,12 +46,10 @@ class VectorDB:
         )
         if namespace not in VectorDB._cached_embeddings:
             store = InMemoryByteStore()
-            VectorDB._cached_embeddings[namespace] = (
-                CacheBackedEmbeddings.from_bytes_store(
-                    model,
-                    store,
-                    namespace=namespace,
-                )
+            VectorDB._cached_embeddings[namespace] = CacheBackedEmbeddings.from_bytes_store(
+                model,
+                store,
+                namespace=namespace,
             )
         return VectorDB._cached_embeddings[namespace]
 
@@ -60,9 +57,7 @@ class VectorDB:
         self.agent = agent
         self.cache = cache  # store cache preference
         self.embeddings = self._get_embeddings(agent, cache=cache)
-        self.index = faiss.IndexFlatIP(
-            len(self.embeddings.embed_query("example"))
-        )
+        self.index = faiss.IndexFlatIP(len(self.embeddings.embed_query("example")))
 
         self.db = MyFaiss(
             embedding_function=self.embeddings,
@@ -87,9 +82,7 @@ class VectorDB:
             filter=comparator,
         )
 
-    async def search_by_metadata(
-        self, filter: str, limit: int = 0
-    ) -> list[Document]:
+    async def search_by_metadata(self, filter: str, limit: int = 0) -> list[Document]:
         comparator = get_comparator(filter)
         all_docs = self.db.get_all_docs()
         result = []
@@ -113,9 +106,7 @@ class VectorDB:
 
     async def delete_documents_by_ids(self, ids: list[str]):
         # aget_by_ids is not yet implemented in faiss, need to do a workaround
-        rem_docs = await self.db.aget_by_ids(
-            ids
-        )  # existing docs to remove (prevents error)
+        rem_docs = await self.db.aget_by_ids(ids)  # existing docs to remove (prevents error)
         if rem_docs:
             rem_ids = [doc.metadata["id"] for doc in rem_docs]  # ids to remove
             await self.db.adelete(ids=rem_ids)
@@ -135,9 +126,7 @@ def format_docs_plain(docs: list[Document]) -> list[str]:
 
 def cosine_normalizer(val: float) -> float:
     res = (1 + val) / 2
-    res = max(
-        0, min(1, res)
-    )  # float precision can cause values like 1.0000000596046448
+    res = max(0, min(1, res))  # float precision can cause values like 1.0000000596046448
     return res
 
 

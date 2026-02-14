@@ -1,19 +1,20 @@
+import random
+
 from python.helpers.api import ApiHandler, Input, Output, Request
-from python.helpers.task_scheduler import (
-    TaskScheduler,
-    ScheduledTask,
-    AdHocTask,
-    PlannedTask,
-    TaskSchedule,
-    serialize_task,
-    parse_task_schedule,
-    parse_task_plan,
-    TaskType,
-)
-from python.helpers.projects import load_basic_project_data
 from python.helpers.localization import Localization
 from python.helpers.print_style import PrintStyle
-import random
+from python.helpers.projects import load_basic_project_data
+from python.helpers.task_scheduler import (
+    AdHocTask,
+    PlannedTask,
+    ScheduledTask,
+    TaskSchedule,
+    TaskScheduler,
+    TaskType,
+    parse_task_plan,
+    parse_task_schedule,
+    serialize_task,
+)
 
 
 class SchedulerTaskCreate(ApiHandler):
@@ -71,11 +72,7 @@ class SchedulerTaskCreate(ApiHandler):
         if not token:
             from python.helpers.constants import Limits
 
-            token = str(
-                random.randint(
-                    Limits.SCHEDULER_TOKEN_MIN, Limits.SCHEDULER_TOKEN_MAX
-                )
-            )
+            token = str(random.randint(Limits.SCHEDULER_TOKEN_MIN, Limits.SCHEDULER_TOKEN_MAX))
             printer.print(f"Generated new token: '{token}'")
 
         plan = input.get("plan", {})
@@ -83,9 +80,7 @@ class SchedulerTaskCreate(ApiHandler):
         # Validate required fields
         if not name or not prompt:
             # return {"error": "Missing required fields: name, system_prompt, prompt"}
-            raise ValueError(
-                "Missing required fields: name, system_prompt, prompt"
-            )
+            raise ValueError("Missing required fields: name, system_prompt, prompt")
 
         task = None
         if schedule:
@@ -108,9 +103,7 @@ class SchedulerTaskCreate(ApiHandler):
                 except ValueError as e:
                     raise ValueError(str(e))
             else:
-                raise ValueError(
-                    "Invalid schedule format. Must be string or object."
-                )
+                raise ValueError("Invalid schedule format. Must be string or object.")
 
             task = ScheduledTask.create(
                 name=name,
@@ -164,12 +157,8 @@ class SchedulerTaskCreate(ApiHandler):
         # Verify the task was added correctly - retrieve by UUID to check persistence
         saved_task = scheduler.get_task_by_uuid(task.uuid)
         if saved_task:
-            if saved_task.type == TaskType.AD_HOC and isinstance(
-                saved_task, AdHocTask
-            ):
-                printer.print(
-                    f"Task verified after save, token: '{saved_task.token}'"
-                )
+            if saved_task.type == TaskType.AD_HOC and isinstance(saved_task, AdHocTask):
+                printer.print(f"Task verified after save, token: '{saved_task.token}'")
             else:
                 printer.print("Task verified after save, not an adhoc task")
         else:
@@ -180,8 +169,6 @@ class SchedulerTaskCreate(ApiHandler):
 
         # Debug log the serialized task
         if task_dict and task_dict.get("type") == "adhoc":
-            printer.print(
-                f"Serialized adhoc task, token in response: '{task_dict.get('token')}'"
-            )
+            printer.print(f"Serialized adhoc task, token in response: '{task_dict.get('token')}'")
 
         return {"ok": True, "task": task_dict}

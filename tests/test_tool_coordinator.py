@@ -1,13 +1,16 @@
 """Tests for ToolCoordinator"""
 
-import sys
 import os
+import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from unittest.mock import AsyncMock, Mock, patch
+
 import pytest
-from unittest.mock import Mock, AsyncMock, patch
-from python.coordinators.tool_coordinator import ToolCoordinator, IToolExecutor
-from python.helpers.tool import Tool, Response
+
+from python.coordinators.tool_coordinator import IToolExecutor, ToolCoordinator
+from python.helpers.tool import Response, Tool
 
 
 class MockTool(Tool):
@@ -70,7 +73,9 @@ class TestToolCoordinator:
         return '{"tool_name": "test_tool:custom_method", "tool_args": {"param1": "value1"}}'
 
     @pytest.mark.asyncio
-    async def test_process_tools_executes_tool_successfully(self, tool_coordinator, mock_agent, valid_tool_request):
+    async def test_process_tools_executes_tool_successfully(
+        self, tool_coordinator, mock_agent, valid_tool_request
+    ):
         """Arrange: Valid tool request, mock tool set up"""
         mock_tool = MockTool(
             agent=mock_agent,
@@ -78,14 +83,14 @@ class TestToolCoordinator:
             method=None,
             args={"param1": "value1"},
             message=valid_tool_request,
-            loop_data=mock_agent.loop_data
+            loop_data=mock_agent.loop_data,
         )
 
-        with patch.object(tool_coordinator, 'get_tool', return_value=mock_tool):
-            with patch('python.coordinators.tool_coordinator.extract_tools') as mock_extract:
+        with patch.object(tool_coordinator, "get_tool", return_value=mock_tool):
+            with patch("python.coordinators.tool_coordinator.extract_tools") as mock_extract:
                 mock_extract.json_parse_dirty.return_value = {
                     "tool_name": "test_tool",
-                    "tool_args": {"param1": "value1"}
+                    "tool_args": {"param1": "value1"},
                 }
 
                 # Act: Process the tool request
@@ -100,8 +105,11 @@ class TestToolCoordinator:
                 assert mock_agent.handle_intervention.called
 
     @pytest.mark.asyncio
-    async def test_process_tools_with_break_loop(self, tool_coordinator, mock_agent, valid_tool_request):
+    async def test_process_tools_with_break_loop(
+        self, tool_coordinator, mock_agent, valid_tool_request
+    ):
         """Arrange: Tool configured to break loop"""
+
         class BreakLoopTool(Tool):
             async def execute(self, **kwargs) -> Response:
                 return Response(message="Stopping", break_loop=True)
@@ -112,14 +120,14 @@ class TestToolCoordinator:
             method=None,
             args={},
             message=valid_tool_request,
-            loop_data=mock_agent.loop_data
+            loop_data=mock_agent.loop_data,
         )
 
-        with patch.object(tool_coordinator, 'get_tool', return_value=mock_tool):
-            with patch('python.coordinators.tool_coordinator.extract_tools') as mock_extract:
+        with patch.object(tool_coordinator, "get_tool", return_value=mock_tool):
+            with patch("python.coordinators.tool_coordinator.extract_tools") as mock_extract:
                 mock_extract.json_parse_dirty.return_value = {
                     "tool_name": "test_tool",
-                    "tool_args": {}
+                    "tool_args": {},
                 }
 
                 # Act: Process the tool
@@ -133,7 +141,7 @@ class TestToolCoordinator:
         """Arrange: Malformed tool request"""
         malformed_request = "invalid json"
 
-        with patch('python.coordinators.tool_coordinator.extract_tools') as mock_extract:
+        with patch("python.coordinators.tool_coordinator.extract_tools") as mock_extract:
             mock_extract.json_parse_dirty.return_value = None
 
             # Act: Process malformed request
@@ -145,12 +153,14 @@ class TestToolCoordinator:
             assert mock_agent.context.log.log.called
 
     @pytest.mark.asyncio
-    async def test_process_tools_tool_not_found(self, tool_coordinator, mock_agent, valid_tool_request):
+    async def test_process_tools_tool_not_found(
+        self, tool_coordinator, mock_agent, valid_tool_request
+    ):
         """Arrange: Tool not found, returns Unknown tool"""
-        with patch('python.coordinators.tool_coordinator.extract_tools') as mock_extract:
+        with patch("python.coordinators.tool_coordinator.extract_tools") as mock_extract:
             mock_extract.json_parse_dirty.return_value = {
                 "tool_name": "nonexistent_tool",
-                "tool_args": {}
+                "tool_args": {},
             }
             mock_extract.load_classes_from_file.return_value = []
 
@@ -161,7 +171,9 @@ class TestToolCoordinator:
             assert result is None
 
     @pytest.mark.asyncio
-    async def test_process_tools_with_tool_method(self, tool_coordinator, mock_agent, tool_with_method):
+    async def test_process_tools_with_tool_method(
+        self, tool_coordinator, mock_agent, tool_with_method
+    ):
         """Arrange: Tool request with method specified"""
         mock_tool = MockTool(
             agent=mock_agent,
@@ -169,14 +181,14 @@ class TestToolCoordinator:
             method="custom_method",
             args={"param1": "value1"},
             message=tool_with_method,
-            loop_data=mock_agent.loop_data
+            loop_data=mock_agent.loop_data,
         )
 
-        with patch.object(tool_coordinator, 'get_tool', return_value=mock_tool):
-            with patch('python.coordinators.tool_coordinator.extract_tools') as mock_extract:
+        with patch.object(tool_coordinator, "get_tool", return_value=mock_tool):
+            with patch("python.coordinators.tool_coordinator.extract_tools") as mock_extract:
                 mock_extract.json_parse_dirty.return_value = {
                     "tool_name": "test_tool:custom_method",
-                    "tool_args": {"param1": "value1"}
+                    "tool_args": {"param1": "value1"},
                 }
 
                 # Act: Process tool with method
@@ -187,8 +199,11 @@ class TestToolCoordinator:
                 assert mock_tool.executed is True
 
     @pytest.mark.asyncio
-    async def test_process_tools_handles_execution_error(self, tool_coordinator, mock_agent, valid_tool_request):
+    async def test_process_tools_handles_execution_error(
+        self, tool_coordinator, mock_agent, valid_tool_request
+    ):
         """Arrange: Tool raises exception during execution"""
+
         class FailingTool(Tool):
             async def execute(self, **kwargs) -> Response:
                 raise ValueError("Tool execution failed")
@@ -199,14 +214,14 @@ class TestToolCoordinator:
             method=None,
             args={},
             message=valid_tool_request,
-            loop_data=mock_agent.loop_data
+            loop_data=mock_agent.loop_data,
         )
 
-        with patch.object(tool_coordinator, 'get_tool', return_value=mock_tool):
-            with patch('python.coordinators.tool_coordinator.extract_tools') as mock_extract:
+        with patch.object(tool_coordinator, "get_tool", return_value=mock_tool):
+            with patch("python.coordinators.tool_coordinator.extract_tools") as mock_extract:
                 mock_extract.json_parse_dirty.return_value = {
                     "tool_name": "test_tool",
-                    "tool_args": {}
+                    "tool_args": {},
                 }
 
                 # Act & Assert: Exception propagated
@@ -217,7 +232,9 @@ class TestToolCoordinator:
                 assert mock_agent.loop_data.current_tool is None
 
     @pytest.mark.asyncio
-    async def test_process_tools_cleanup_current_tool_after_execution(self, tool_coordinator, mock_agent, valid_tool_request):
+    async def test_process_tools_cleanup_current_tool_after_execution(
+        self, tool_coordinator, mock_agent, valid_tool_request
+    ):
         """Arrange: Tool execution with current_tool tracking"""
         mock_tool = MockTool(
             agent=mock_agent,
@@ -225,14 +242,14 @@ class TestToolCoordinator:
             method=None,
             args={},
             message=valid_tool_request,
-            loop_data=mock_agent.loop_data
+            loop_data=mock_agent.loop_data,
         )
 
-        with patch.object(tool_coordinator, 'get_tool', return_value=mock_tool):
-            with patch('python.coordinators.tool_coordinator.extract_tools') as mock_extract:
+        with patch.object(tool_coordinator, "get_tool", return_value=mock_tool):
+            with patch("python.coordinators.tool_coordinator.extract_tools") as mock_extract:
                 mock_extract.json_parse_dirty.return_value = {
                     "tool_name": "test_tool",
-                    "tool_args": {}
+                    "tool_args": {},
                 }
 
                 # Act: Process tool
@@ -251,14 +268,14 @@ class TestToolCoordinator:
             method=None,
             args={},
             message=empty_args_request,
-            loop_data=mock_agent.loop_data
+            loop_data=mock_agent.loop_data,
         )
 
-        with patch.object(tool_coordinator, 'get_tool', return_value=mock_tool):
-            with patch('python.coordinators.tool_coordinator.extract_tools') as mock_extract:
+        with patch.object(tool_coordinator, "get_tool", return_value=mock_tool):
+            with patch("python.coordinators.tool_coordinator.extract_tools") as mock_extract:
                 mock_extract.json_parse_dirty.return_value = {
                     "tool_name": "test_tool",
-                    "tool_args": {}
+                    "tool_args": {},
                 }
 
                 # Act: Process tool with empty args
@@ -276,7 +293,7 @@ class TestToolCoordinator:
         mock_instance = Mock()
         mock_tool_class.return_value = mock_instance
 
-        with patch('python.coordinators.tool_coordinator.extract_tools') as mock_extract:
+        with patch("python.coordinators.tool_coordinator.extract_tools") as mock_extract:
             mock_extract.load_classes_from_file.return_value = [mock_tool_class]
 
             # Act: Get tool from profile directory
@@ -285,7 +302,7 @@ class TestToolCoordinator:
                 method=None,
                 args={},
                 message="",
-                loop_data=mock_agent.loop_data
+                loop_data=mock_agent.loop_data,
             )
 
             # Assert: Tool loaded from profile directory
@@ -300,7 +317,8 @@ class TestToolCoordinator:
         mock_instance = Mock()
         mock_tool_class.return_value = mock_instance
 
-        with patch('python.coordinators.tool_coordinator.extract_tools') as mock_extract:
+        with patch("python.coordinators.tool_coordinator.extract_tools") as mock_extract:
+
             def side_effect(path, base):
                 if "profile" in path:
                     return []
@@ -315,7 +333,7 @@ class TestToolCoordinator:
                 method=None,
                 args={},
                 message="",
-                loop_data=mock_agent.loop_data
+                loop_data=mock_agent.loop_data,
             )
 
             # Assert: Tool loaded from default directory
@@ -324,7 +342,7 @@ class TestToolCoordinator:
 
     def test_get_tool_returns_unknown_when_not_found(self, tool_coordinator, mock_agent):
         """Arrange: Tool not found in any directory"""
-        with patch('python.coordinators.tool_coordinator.extract_tools') as mock_extract:
+        with patch("python.coordinators.tool_coordinator.extract_tools") as mock_extract:
             mock_extract.load_classes_from_file.return_value = []
 
             # Act: Get non-existent tool
@@ -333,7 +351,7 @@ class TestToolCoordinator:
                 method=None,
                 args={},
                 message="",
-                loop_data=mock_agent.loop_data
+                loop_data=mock_agent.loop_data,
             )
 
             # Assert: Returns Unknown tool
@@ -346,7 +364,7 @@ class TestToolCoordinator:
         mock_instance = Mock()
         mock_tool_class.return_value = mock_instance
 
-        with patch('python.coordinators.tool_coordinator.extract_tools') as mock_extract:
+        with patch("python.coordinators.tool_coordinator.extract_tools") as mock_extract:
             mock_extract.load_classes_from_file.return_value = [mock_tool_class]
 
             # Act: Get tool with all parameters
@@ -356,7 +374,7 @@ class TestToolCoordinator:
                 args={"param1": "value1"},
                 message="test message",
                 loop_data=mock_agent.loop_data,
-                extra_param="extra_value"
+                extra_param="extra_value",
             )
 
             # Assert: Tool instantiated with correct parameters
@@ -367,11 +385,13 @@ class TestToolCoordinator:
                 args={"param1": "value1"},
                 message="test message",
                 loop_data=mock_agent.loop_data,
-                extra_param="extra_value"
+                extra_param="extra_value",
             )
 
     @pytest.mark.asyncio
-    async def test_process_tools_calls_extensions_in_correct_order(self, tool_coordinator, mock_agent, valid_tool_request):
+    async def test_process_tools_calls_extensions_in_correct_order(
+        self, tool_coordinator, mock_agent, valid_tool_request
+    ):
         """Arrange: Tool request with extensions"""
         mock_tool = MockTool(
             agent=mock_agent,
@@ -379,14 +399,14 @@ class TestToolCoordinator:
             method=None,
             args={"param1": "value1"},
             message=valid_tool_request,
-            loop_data=mock_agent.loop_data
+            loop_data=mock_agent.loop_data,
         )
 
-        with patch.object(tool_coordinator, 'get_tool', return_value=mock_tool):
-            with patch('python.coordinators.tool_coordinator.extract_tools') as mock_extract:
+        with patch.object(tool_coordinator, "get_tool", return_value=mock_tool):
+            with patch("python.coordinators.tool_coordinator.extract_tools") as mock_extract:
                 mock_extract.json_parse_dirty.return_value = {
                     "tool_name": "test_tool",
-                    "tool_args": {"param1": "value1"}
+                    "tool_args": {"param1": "value1"},
                 }
 
                 # Act: Process tool
@@ -409,8 +429,8 @@ class TestIToolExecutorInterface:
         """Arrange: IToolExecutor interface defined"""
         # Act: ToolCoordinator should implement IToolExecutor
         # Assert: Interface methods exist
-        assert hasattr(ToolCoordinator, 'process_tools')
-        assert hasattr(ToolCoordinator, 'get_tool')
+        assert hasattr(ToolCoordinator, "process_tools")
+        assert hasattr(ToolCoordinator, "get_tool")
 
     @pytest.mark.asyncio
     async def test_process_tools_is_abstract_method(self):

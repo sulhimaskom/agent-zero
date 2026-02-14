@@ -1,12 +1,14 @@
-from abc import abstractmethod
 import asyncio
-from collections.abc import Mapping
 import json
 import math
-from typing import TypedDict, cast, Union, Dict, List
-from python.helpers import messages, tokens, settings
+from abc import abstractmethod
+from collections.abc import Mapping
+from typing import TypedDict, Union, cast
+
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage
+
+from python.helpers import messages, settings, tokens
 from python.helpers.constants import Limits
-from langchain_core.messages import BaseMessage, HumanMessage, AIMessage
 
 BULK_MERGE_COUNT = Limits.HISTORY_BULK_MERGE_COUNT
 TOPICS_KEEP_COUNT = Limits.HISTORY_TOPICS_KEEP_COUNT
@@ -26,11 +28,11 @@ class RawMessage(TypedDict):
 
 
 MessageContent = Union[
-    List["MessageContent"],
-    Dict[str, "MessageContent"],
-    List[Dict[str, "MessageContent"]],
+    list["MessageContent"],
+    dict[str, "MessageContent"],
+    list[dict[str, "MessageContent"]],
     str,
-    List[str],
+    list[str],
     RawMessage,
 ]
 
@@ -101,9 +103,7 @@ class Message(Record):
         return False
 
     def output(self):
-        return [
-            OutputMessage(ai=self.ai, content=self.summary or self.content)
-        ]
+        return [OutputMessage(ai=self.ai, content=self.summary or self.content)]
 
     def output_langchain(self):
         return output_langchain(self.output())
@@ -144,9 +144,7 @@ class Topic(Record):
                 self._tokens = sum(msg.get_tokens() for msg in self.messages)
         return self._tokens
 
-    def add_message(
-        self, ai: bool, content: MessageContent, tokens: int = 0
-    ) -> Message:
+    def add_message(self, ai: bool, content: MessageContent, tokens: int = 0) -> Message:
         msg = Message(ai=ai, content=content, tokens=tokens)
         self.messages.append(msg)
         self._tokens = None
@@ -192,9 +190,7 @@ class Topic(Record):
             trim_to_chars = leng * (msg_max_size / tok)
             # raw messages will be replaced as a whole, they would become invalid when truncated
             if _is_raw_message(out[0]["content"]):
-                msg.set_summary(
-                    "Message content replaced to save space in context window"
-                )
+                msg.set_summary("Message content replaced to save space in context window")
 
             # regular messages will be truncated
             else:
@@ -219,16 +215,12 @@ class Topic(Record):
     async def compress_attention(self) -> bool:
 
         if len(self.messages) > 2:
-            cnt_to_sum = math.ceil(
-                (len(self.messages) - 2) * TOPIC_COMPRESS_RATIO
-            )
-            msg_to_sum = self.messages[1: cnt_to_sum + 1]
+            cnt_to_sum = math.ceil((len(self.messages) - 2) * TOPIC_COMPRESS_RATIO)
+            msg_to_sum = self.messages[1 : cnt_to_sum + 1]
             summary = await self.summarize_messages(msg_to_sum)
-            sum_msg_content = self.history.agent.parse_prompt(
-                "fw.msg_summary.md", summary=summary
-            )
+            sum_msg_content = self.history.agent.parse_prompt("fw.msg_summary.md", summary=summary)
             sum_msg = Message(False, sum_msg_content)
-            self.messages[1: cnt_to_sum + 1] = [sum_msg]
+            self.messages[1 : cnt_to_sum + 1] = [sum_msg]
             self._tokens = None
             return True
         return False
@@ -240,12 +232,9 @@ class Topic(Record):
             msg_text = m.output_text()
             # Replace base64 image data URLs with placeholder
             import re
+
             # Pattern to match data:image/...;base64,... URLs
-            msg_text = re.sub(
-                r'data:image/[^;]+;base64,[A-Za-z0-9+/=]+',
-                '[Image]',
-                msg_text
-            )
+            msg_text = re.sub(r"data:image/[^;]+;base64,[A-Za-z0-9+/=]+", "[Image]", msg_text)
             processed_messages.append(msg_text)
 
         summary = await self.history.agent.call_utility_model(
@@ -267,10 +256,7 @@ class Topic(Record):
     def from_dict(data: dict, history: "History"):
         topic = Topic(history=history)
         topic.summary = data.get("summary", "")
-        topic.messages = [
-            Message.from_dict(m, history=history)
-            for m in data.get("messages", [])
-        ]
+        topic.messages = [Message.from_dict(m, history=history) for m in data.get("messages", [])]
         topic._tokens = None
         return topic
 
@@ -290,9 +276,7 @@ class Bulk(Record):
                 self._tokens = sum([r.get_tokens() for r in self.records])
         return self._tokens
 
-    def output(
-        self, human_label: str = "user", ai_label: str = "ai"
-    ) -> list[OutputMessage]:
+    def output(self, human_label: str = "user", ai_label: str = "ai") -> list[OutputMessage]:
         if self.summary:
             return [OutputMessage(ai=False, content=self.summary)]
         else:
@@ -328,9 +312,7 @@ class Bulk(Record):
     def from_dict(data: dict, history: "History"):
         bulk = Bulk(history=history)
         bulk.summary = data["summary"]
-        bulk.records = [
-            Record.from_dict(r, history=history) for r in data["records"]
-        ]
+        bulk.records = [Record.from_dict(r, history=history) for r in data["records"]]
         bulk._tokens = None
         return bulk
 
@@ -349,9 +331,7 @@ class History(Record):
     def get_tokens(self) -> int:
         if self._tokens is None:
             self._tokens = (
-                self.get_bulks_tokens()
-                + self.get_topics_tokens()
-                + self.get_current_topic_tokens()
+                self.get_bulks_tokens() + self.get_topics_tokens() + self.get_current_topic_tokens()
             )
         return self._tokens
 
@@ -369,9 +349,7 @@ class History(Record):
     def get_current_topic_tokens(self) -> int:
         return self.current.get_tokens()
 
-    def add_message(
-        self, ai: bool, content: MessageContent, tokens: int = 0
-    ) -> Message:
+    def add_message(self, ai: bool, content: MessageContent, tokens: int = 0) -> Message:
         self.counter += 1
         self._tokens = None
         return self.current.add_message(ai, content=content, tokens=tokens)
@@ -392,12 +370,8 @@ class History(Record):
     @staticmethod
     def from_dict(data: dict, history: "History"):
         history.counter = data.get("counter", 0)
-        history.bulks = [
-            Bulk.from_dict(b, history=history) for b in data["bulks"]
-        ]
-        history.topics = [
-            Topic.from_dict(t, history=history) for t in data["topics"]
-        ]
+        history.bulks = [Bulk.from_dict(b, history=history) for b in data["bulks"]]
+        history.topics = [Topic.from_dict(t, history=history) for t in data["topics"]]
         history.current = Topic.from_dict(data["current"], history=history)
         history._tokens = None
         return history
@@ -429,9 +403,7 @@ class History(Record):
                 (hist, HISTORY_TOPIC_RATIO, "history_topic"),
                 (bulk, HISTORY_BULK_RATIO, "history_bulk"),
             ]
-            ratios = sorted(
-                ratios, key=lambda x: (x[0] / total) / x[1], reverse=True
-            )
+            ratios = sorted(ratios, key=lambda x: (x[0] / total) / x[1], reverse=True)
             compressed_part = False
             for ratio in ratios:
                 if ratio[0] > ratio[1] * total:
@@ -489,10 +461,7 @@ class History(Record):
             return False
         # merge bulks in groups of count, even if there are fewer than count
         bulks = await asyncio.gather(
-            *[
-                self.merge_bulks(self.bulks[i: i + count])
-                for i in range(0, len(self.bulks), count)
-            ]
+            *[self.merge_bulks(self.bulks[i : i + count]) for i in range(0, len(self.bulks), count)]
         )
         self.bulks = bulks
         self._tokens = None
@@ -518,9 +487,7 @@ def _get_ctx_size_for_history() -> int:
     return int(set["chat_model_ctx_length"] * set["chat_model_ctx_history"])
 
 
-def _stringify_output(
-    output: OutputMessage, ai_label="ai", human_label="human"
-):
+def _stringify_output(output: OutputMessage, ai_label="ai", human_label="human"):
     return f'{ai_label if output["ai"] else human_label}: {_stringify_content(output["content"])}'
 
 
@@ -592,12 +559,8 @@ def output_langchain(messages: list[OutputMessage]):
     return result
 
 
-def output_text(
-    messages: list[OutputMessage], ai_label="ai", human_label="human"
-):
-    return "\n".join(
-        _stringify_output(o, ai_label, human_label) for o in messages
-    )
+def output_text(messages: list[OutputMessage], ai_label="ai", human_label="human"):
+    return "\n".join(_stringify_output(o, ai_label, human_label) for o in messages)
 
 
 def _merge_outputs(a: MessageContent, b: MessageContent) -> MessageContent:
@@ -620,8 +583,8 @@ def _merge_outputs(a: MessageContent, b: MessageContent) -> MessageContent:
 
 
 def _merge_properties(
-    a: Dict[str, MessageContent], b: Dict[str, MessageContent]
-) -> Dict[str, MessageContent]:
+    a: dict[str, MessageContent], b: dict[str, MessageContent]
+) -> dict[str, MessageContent]:
     result = a.copy()
     for k, v in b.items():
         if k in result:

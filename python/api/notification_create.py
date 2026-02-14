@@ -1,11 +1,12 @@
-from python.helpers.api import ApiHandler
 from flask import Request, Response
+
+from python.helpers.api import ApiHandler
+from python.helpers.constants import Limits
 from python.helpers.notification import (
     NotificationManager,
     NotificationPriority,
     NotificationType,
 )
-from python.helpers.constants import Limits
 
 
 class NotificationCreate(ApiHandler):
@@ -23,9 +24,7 @@ class NotificationCreate(ApiHandler):
         display_time = input.get(
             "display_time", Limits.NOTIFICATION_DISPLAY_TIME
         )  # Default from constants
-        group = input.get(
-            "group", ""
-        )  # Group parameter for notification grouping
+        group = input.get("group", "")  # Group parameter for notification grouping
 
         # Validate required fields
         if not message:
@@ -35,9 +34,7 @@ class NotificationCreate(ApiHandler):
         try:
             display_time = int(display_time)
             if display_time <= 0:
-                display_time = (
-                    Limits.NOTIFICATION_DISPLAY_TIME
-                )  # Reset to default if invalid
+                display_time = Limits.NOTIFICATION_DISPLAY_TIME  # Reset to default if invalid
         except (ValueError, TypeError):
             display_time = 3  # Reset to default if not convertible to int
 
@@ -72,5 +69,5 @@ class NotificationCreate(ApiHandler):
         except Exception as e:
             return {
                 "success": False,
-                "error": f"Failed to create notification: {str(e)}",
+                "error": f"Failed to create notification: {e!s}",
             }

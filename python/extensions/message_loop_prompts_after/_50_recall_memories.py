@@ -1,8 +1,9 @@
 import asyncio
+
+from agent import LoopData
+from python.helpers import dirty_json, errors, log, settings
 from python.helpers.extension import Extension
 from python.helpers.memory import Memory
-from agent import LoopData
-from python.helpers import dirty_json, errors, settings, log
 
 DATA_NAME_TASK = "_recall_memories_task"
 DATA_NAME_ITER = "_recall_memories_iter"
@@ -36,9 +37,7 @@ class RecallMemories(Extension):
             )
 
             task = asyncio.create_task(
-                self.search_memories(
-                    loop_data=loop_data, log_item=log_item, **kwargs
-                )
+                self.search_memories(loop_data=loop_data, log_item=log_item, **kwargs)
             )
         else:
             task = None
@@ -47,9 +46,7 @@ class RecallMemories(Extension):
         self.agent.set_data(DATA_NAME_TASK, task)
         self.agent.set_data(DATA_NAME_ITER, loop_data.iteration)
 
-    async def search_memories(
-        self, log_item: log.LogItem, loop_data: LoopData, **kwargs
-    ):
+    async def search_memories(self, log_item: log.LogItem, loop_data: LoopData, **kwargs):
 
         # cleanup
         extras = loop_data.extras_persistent
@@ -70,13 +67,9 @@ class RecallMemories(Extension):
 
         # call util llm to summarize conversation
         user_instruction = (
-            loop_data.user_message.output_text()
-            if loop_data.user_message
-            else "None"
+            loop_data.user_message.output_text() if loop_data.user_message else "None"
         )
-        history = self.agent.history.output_text()[
-            -set["memory_recall_history_len"]:
-        ]
+        history = self.agent.history.output_text()[-set["memory_recall_history_len"] :]
         message = self.agent.read_prompt(
             "memory.memories_query.msg.md",
             history=history,
@@ -148,17 +141,12 @@ class RecallMemories(Extension):
         # if post filtering is enabled
         if set["memory_recall_post_filter"]:
             # assemble an enumerated dict of memories and solutions for AI validation
-            mems_list = {
-                i: memory.page_content
-                for i, memory in enumerate(memories + solutions)
-            }
+            mems_list = {i: memory.page_content for i, memory in enumerate(memories + solutions)}
 
             # call AI to validate the memories
             try:
                 filter = await self.agent.call_utility_model(
-                    system=self.agent.read_prompt(
-                        "memory.memories_filter.sys.md"
-                    ),
+                    system=self.agent.read_prompt("memory.memories_filter.sys.md"),
                     message=self.agent.read_prompt(
                         "memory.memories_filter.msg.md",
                         memories=mems_list,
@@ -185,9 +173,7 @@ class RecallMemories(Extension):
                                 # this is a solution, adjust index
                                 sol_idx = idx - mem_len
                                 if sol_idx < len(solutions):
-                                    filtered_solutions.append(
-                                        solutions[sol_idx]
-                                    )
+                                    filtered_solutions.append(solutions[sol_idx])
 
                 # replace original lists with filtered ones
                 memories = filtered_memories
@@ -211,16 +197,8 @@ class RecallMemories(Extension):
             heading=f"{len(memories)} memories and {len(solutions)} relevant solutions found",
         )
 
-        memories_txt = (
-            "\n\n".join([mem.page_content for mem in memories])
-            if memories
-            else ""
-        )
-        solutions_txt = (
-            "\n\n".join([sol.page_content for sol in solutions])
-            if solutions
-            else ""
-        )
+        memories_txt = "\n\n".join([mem.page_content for mem in memories]) if memories else ""
+        solutions_txt = "\n\n".join([sol.page_content for sol in solutions]) if solutions else ""
 
         # log the full results
         if memories_txt:

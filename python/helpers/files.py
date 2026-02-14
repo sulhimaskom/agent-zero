@@ -4,20 +4,21 @@ Provides file operations including read/write, compression,
 path resolution, and a plugin system for variable substitution.
 """
 
-from abc import ABC, abstractmethod
-from fnmatch import fnmatch
+import base64
+import glob
 import json
+import mimetypes
 import os
 import re
-import base64
 import shutil
 import tempfile
-from typing import Any
 import zipfile
-import glob
-import mimetypes
-from python.helpers.strings import sanitize_string
+from abc import ABC, abstractmethod
+from fnmatch import fnmatch
+from typing import Any
+
 from python.helpers.constants import Limits
+from python.helpers.strings import sanitize_string
 
 
 class VariablesPlugin(ABC):
@@ -93,7 +94,7 @@ def parse_file(
     absolute_path = find_file_in_dirs(_filename, _directories)
 
     # Read the file content
-    with open(absolute_path, "r", encoding=_encoding) as f:
+    with open(absolute_path, encoding=_encoding) as f:
         # content = remove_code_fences(f.read())
         content = f.read()
 
@@ -137,7 +138,7 @@ def read_prompt_file(
     absolute_path = find_file_in_dirs(_file, _directories)
 
     # Read the file content
-    with open(absolute_path, "r", encoding=_encoding) as f:
+    with open(absolute_path, encoding=_encoding) as f:
         # content = remove_code_fences(f.read())
         content = f.read()
 
@@ -163,7 +164,7 @@ def read_file(relative_path: str, encoding="utf-8"):
     absolute_path = get_abs_path(relative_path)
 
     # Read the file content
-    with open(absolute_path, "r", encoding=encoding) as f:
+    with open(absolute_path, encoding=encoding) as f:
         return f.read()
 
 
@@ -219,9 +220,7 @@ def replace_placeholders_dict(_content: dict, **kwargs):
                                 json.dumps(replacement),
                             )
                         else:
-                            value = value.replace(
-                                f"{{{{{placeholder}}}}}", str(replacement)
-                            )
+                            value = value.replace(f"{{{{{placeholder}}}}}", str(replacement))
             return value
         elif isinstance(value, dict):
             return {k: replace_value(v) for k, v in value.items()}
@@ -244,9 +243,7 @@ def process_includes(_content: str, _directories: list[str], **kwargs):
             return match.group(0)
         # Search for the include file in the directories
         try:
-            included_content = read_prompt_file(
-                include_path, _directories, **kwargs
-            )
+            included_content = read_prompt_file(include_path, _directories, **kwargs)
             return included_content
         except FileNotFoundError:
             return match.group(0)  # Return original if file not found
@@ -268,9 +265,7 @@ def find_file_in_dirs(_filename: str, _directories: list[str]):
             return full_path
 
     # If the file is not found, raise FileNotFoundError
-    raise FileNotFoundError(
-        f"File '{_filename}' not found in any of the provided directories."
-    )
+    raise FileNotFoundError(f"File '{_filename}' not found in any of the provided directories.")
 
 
 def get_unique_filenames_in_dirs(dir_paths: list[str], pattern: str = "*"):
@@ -377,9 +372,7 @@ def move_dir(old_path: str, new_path: str):
         # log warning for debugging purposes
         import warnings
 
-        warnings.warn(
-            f"Failed to move directory from {abs_old} to {abs_new}: {e}"
-        )
+        warnings.warn(f"Failed to move directory from {abs_old} to {abs_new}: {e}")
 
 
 # move dir safely, remove with number if needed
@@ -422,17 +415,17 @@ def make_dirs(relative_path: str):
 
 
 def get_abs_path(*relative_paths):
-    "Convert relative paths to absolute paths based on the base directory."
+    """Convert relative paths to absolute paths based on the base directory."""
     return os.path.join(get_base_dir(), *relative_paths)
 
 
 def deabsolute_path(path: str):
-    "Convert absolute paths to relative paths based on the base directory."
+    """Convert absolute paths to relative paths based on the base directory."""
     return os.path.relpath(path, get_base_dir())
 
 
 def fix_dev_path(path: str):
-    "On dev environment, convert /a0/... paths to local absolute paths"
+    """On dev environment, convert /a0/... paths to local absolute paths"""
     from python.helpers.runtime import is_development
 
     if is_development():
@@ -442,7 +435,7 @@ def fix_dev_path(path: str):
 
 
 def normalize_a0_path(path: str):
-    "Convert absolute paths into /a0/... paths"
+    """Convert absolute paths into /a0/... paths"""
     if is_in_base_dir(path):
         deabs = deabsolute_path(path)
         return "/a0/" + deabs
@@ -456,9 +449,7 @@ def exists(*relative_paths):
 
 def get_base_dir():
     # Get the base directory from the current file path
-    base_dir = os.path.dirname(
-        os.path.abspath(os.path.join(__file__, "../../"))
-    )
+    base_dir = os.path.dirname(os.path.abspath(os.path.join(__file__, "../../")))
     return base_dir
 
 
@@ -498,21 +489,15 @@ def get_subdirectories(
         for subdir in os.listdir(abs_path)
         if os.path.isdir(os.path.join(abs_path, subdir))
         and any(fnmatch(subdir, inc) for inc in include)
-        and (
-            exclude is None or not any(fnmatch(subdir, exc) for exc in exclude)
-        )
+        and (exclude is None or not any(fnmatch(subdir, exc) for exc in exclude))
     ]
 
 
 def zip_dir(dir_path: str):
     full_path = get_abs_path(dir_path)
-    zip_file_path = tempfile.NamedTemporaryFile(
-        suffix=".zip", delete=False
-    ).name
+    zip_file_path = tempfile.NamedTemporaryFile(suffix=".zip", delete=False).name
     base_name = os.path.basename(full_path)
-    with zipfile.ZipFile(
-        zip_file_path, "w", compression=zipfile.ZIP_DEFLATED
-    ) as zip:
+    with zipfile.ZipFile(zip_file_path, "w", compression=zipfile.ZIP_DEFLATED) as zip:
         for root, _, files in os.walk(full_path):
             for file in files:
                 file_path = os.path.join(root, file)

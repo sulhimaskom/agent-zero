@@ -4,9 +4,9 @@ BroCula - Browser Console & Lighthouse Optimization Specialist
 Local execution script for manual runs
 """
 
+import json
 import subprocess
 import sys
-import json
 from datetime import datetime
 from pathlib import Path
 
@@ -86,13 +86,14 @@ STRICT RULES:
 Remember: You are BroCula. You love working in the browser console. You fix errors immediately. You optimize relentlessly. You never leave a mess behind.
 """
 
+
 def check_dependencies():
     """Check if required tools are available"""
     print("🔍 Checking dependencies...")
 
     # Check Node.js
     try:
-        result = subprocess.run(['node', '--version'], capture_output=True, text=True)
+        result = subprocess.run(["node", "--version"], capture_output=True, text=True)
         print(f"  ✅ Node.js: {result.stdout.strip()}")
     except FileNotFoundError:
         print("  ❌ Node.js not found")
@@ -100,7 +101,7 @@ def check_dependencies():
 
     # Check npm
     try:
-        result = subprocess.run(['npm', '--version'], capture_output=True, text=True)
+        result = subprocess.run(["npm", "--version"], capture_output=True, text=True)
         print(f"  ✅ npm: {result.stdout.strip()}")
     except FileNotFoundError:
         print("  ❌ npm not found")
@@ -108,7 +109,7 @@ def check_dependencies():
 
     # Check Python
     try:
-        result = subprocess.run(['python3', '--version'], capture_output=True, text=True)
+        result = subprocess.run(["python3", "--version"], capture_output=True, text=True)
         print(f"  ✅ Python: {result.stdout.strip()}")
     except FileNotFoundError:
         print("  ❌ Python not found")
@@ -116,7 +117,7 @@ def check_dependencies():
 
     # Check opencode CLI
     try:
-        result = subprocess.run(['opencode', '--version'], capture_output=True, text=True)
+        result = subprocess.run(["opencode", "--version"], capture_output=True, text=True)
         print(f"  ✅ OpenCode CLI: {result.stdout.strip()}")
     except FileNotFoundError:
         print("  ⚠️  OpenCode CLI not found. Install from: https://opencode.ai")
@@ -124,37 +125,39 @@ def check_dependencies():
 
     return True
 
+
 def get_project_info():
     """Get information about the project"""
     project_root = Path.cwd()
 
     info = {
-        'has_package_json': (project_root / 'package.json').exists(),
-        'has_requirements_txt': (project_root / 'requirements.txt').exists(),
-        'has_run_ui': (project_root / 'run_ui.py').exists(),
-        'has_npm_scripts': False,
-        'build_command': None,
-        'lint_command': None,
+        "has_package_json": (project_root / "package.json").exists(),
+        "has_requirements_txt": (project_root / "requirements.txt").exists(),
+        "has_run_ui": (project_root / "run_ui.py").exists(),
+        "has_npm_scripts": False,
+        "build_command": None,
+        "lint_command": None,
     }
 
-    if info['has_package_json']:
-        with open(project_root / 'package.json') as f:
+    if info["has_package_json"]:
+        with open(project_root / "package.json") as f:
             package = json.load(f)
-            if 'scripts' in package:
-                info['has_npm_scripts'] = True
-                scripts = package['scripts']
+            if "scripts" in package:
+                info["has_npm_scripts"] = True
+                scripts = package["scripts"]
                 # Detect build command
-                for cmd in ['build', 'build:prod', 'build:production']:
+                for cmd in ["build", "build:prod", "build:production"]:
                     if cmd in scripts:
-                        info['build_command'] = f"npm run {cmd}"
+                        info["build_command"] = f"npm run {cmd}"
                         break
                 # Detect lint command
-                for cmd in ['lint', 'eslint', 'lint:check']:
+                for cmd in ["lint", "eslint", "lint:check"]:
                     if cmd in scripts:
-                        info['lint_command'] = f"npm run {cmd}"
+                        info["lint_command"] = f"npm run {cmd}"
                         break
 
     return info
+
 
 def run_brocula():
     """Run BroCula agent with OpenCode"""
@@ -162,8 +165,8 @@ def run_brocula():
     print("=" * 60)
 
     # Save prompt to temp file
-    timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-    prompt_file = Path(f'/tmp/brocula_prompt_{timestamp}.txt')
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    prompt_file = Path(f"/tmp/brocula_prompt_{timestamp}.txt")
     prompt_file.write_text(BROCULA_PROMPT)
 
     print(f"\n📄 Prompt saved to: {prompt_file}")
@@ -173,10 +176,10 @@ def run_brocula():
     # Run opencode with the prompt
     try:
         result = subprocess.run(
-            ['opencode', 'run', BROCULA_PROMPT, '--model', 'opencode/kimi-k2.5-free'],
+            ["opencode", "run", BROCULA_PROMPT, "--model", "opencode/kimi-k2.5-free"],
             capture_output=False,
             text=True,
-            timeout=7200  # 2 hour timeout
+            timeout=7200,  # 2 hour timeout
         )
         return result.returncode == 0
     except subprocess.TimeoutExpired:
@@ -185,6 +188,7 @@ def run_brocula():
     except Exception as e:
         print(f"\n❌ Error running BroCula: {e}")
         return False
+
 
 def main():
     """Main entry point"""
@@ -225,7 +229,7 @@ def main():
     print("\n" + "=" * 60)
     response = input("\n🚀 Start BroCula workflow? (yes/no): ").lower().strip()
 
-    if response not in ['yes', 'y']:
+    if response not in ["yes", "y"]:
         print("\n👋 BroCula workflow cancelled.")
         sys.exit(0)
 
@@ -239,5 +243,6 @@ def main():
         print("\n❌ BroCula workflow encountered issues.")
         sys.exit(1)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()

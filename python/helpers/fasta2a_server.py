@@ -1,27 +1,27 @@
-# noqa: D401 (docstrings) – internal helper
 import asyncio
-import uuid
 import atexit
-from typing import Any, List
 import contextlib
 import threading
+import uuid
+from typing import Any
 
+from starlette.requests import Request
+
+from agent import AgentContext, AgentContextType, UserMessage
+from initialize import initialize_agent
 from python.helpers import settings
 from python.helpers.constants import ExternalUrls
-from starlette.requests import Request
+from python.helpers.persist_chat import remove_chat
 
 # Local imports
 from python.helpers.print_style import PrintStyle
-from agent import AgentContext, UserMessage, AgentContextType
-from initialize import initialize_agent
-from python.helpers.persist_chat import remove_chat
 
 # Import FastA2A
 try:
-    from fasta2a import Worker, FastA2A  # type: ignore
+    from fasta2a import FastA2A, Worker  # type: ignore
     from fasta2a.broker import InMemoryBroker  # type: ignore
+    from fasta2a.schema import AgentProvider, Artifact, Message, Skill  # type: ignore
     from fasta2a.storage import InMemoryStorage  # type: ignore
-    from fasta2a.schema import Message, Artifact, AgentProvider, Skill  # type: ignore
 
     FASTA2A_AVAILABLE = True
 except ImportError:  # pragma: no cover – library not installed
@@ -77,9 +77,7 @@ class AgentZeroWorker(Worker):  # type: ignore[misc]
             task_id = params["id"]
             message = params["message"]
 
-            _PRINTER.print(
-                f"[A2A] Processing task {task_id} with new temporary context"
-            )
+            _PRINTER.print(f"[A2A] Processing task {task_id} with new temporary context")
 
             # Convert A2A message to Agent Zero format
             agent_message = self._convert_message(message)
@@ -120,17 +118,11 @@ class AgentZeroWorker(Worker):  # type: ignore[misc]
             AgentContext.remove(context.id)
             remove_chat(context.id)
 
-            _PRINTER.print(
-                f"[A2A] Completed task {task_id} and cleaned up context"
-            )
+            _PRINTER.print(f"[A2A] Completed task {task_id} and cleaned up context")
 
         except Exception as e:
-            _PRINTER.print(
-                f"[A2A] Error processing task {params.get('id', 'unknown')}: {e}"
-            )
-            await self.storage.update_task(
-                task_id=params.get("id", "unknown"), state="failed"
-            )
+            _PRINTER.print(f"[A2A] Error processing task {params.get('id', 'unknown')}: {e}")
+            await self.storage.update_task(task_id=params.get("id", "unknown"), state="failed")
 
             # Clean up context even on failure to prevent resource leaks
             if context:
@@ -147,11 +139,11 @@ class AgentZeroWorker(Worker):  # type: ignore[misc]
 
         # Note: No context cleanup needed since contexts are always temporary and cleaned up in run_task
 
-    def build_message_history(self, history: List[Any]) -> List[Message]:  # type: ignore
+    def build_message_history(self, history: list[Any]) -> list[Message]:  # type: ignore
         # Not used in this simplified implementation
         return []
 
-    def build_artifacts(self, result: Any) -> List[Artifact]:  # type: ignore
+    def build_artifacts(self, result: Any) -> list[Artifact]:  # type: ignore
         # No artifacts for now
         return []
 
@@ -184,14 +176,10 @@ class DynamicA2AProxy:
     def __init__(self):
         self.app = None
         self.token = ""
-        self._lock = (
-            threading.Lock()
-        )  # Use threading.Lock instead of asyncio.Lock
+        self._lock = threading.Lock()  # Use threading.Lock instead of asyncio.Lock
         self._startup_done: bool = False
         self._worker_bg_task: asyncio.Task | None = None
-        self._reconfigure_needed: bool = (
-            False  # Flag for deferred reconfiguration
-        )
+        self._reconfigure_needed: bool = False  # Flag for deferred reconfiguration
 
         if FASTA2A_AVAILABLE:
             # Initialize with default token
@@ -200,9 +188,7 @@ class DynamicA2AProxy:
             self._configure()
             self._register_shutdown()
         else:
-            _PRINTER.print(
-                "[A2A] FastA2A not available, server will return 503"
-            )
+            _PRINTER.print("[A2A] FastA2A not available, server will return 503")
 
     @staticmethod
     def get_instance():
@@ -218,9 +204,7 @@ class DynamicA2AProxy:
                 # Mark that reconfiguration is needed - will be done on next request
                 self._reconfigure_needed = True
                 self._startup_done = False  # Force restart on next request
-                _PRINTER.print(
-                    "[A2A] Reconfiguration scheduled for next request"
-                )
+                _PRINTER.print("[A2A] Reconfiguration scheduled for next request")
 
     def _configure(self):
         """Configure the FastA2A application with Agent Zero integration."""
@@ -229,7 +213,7 @@ class DynamicA2AProxy:
             broker = InMemoryBroker()  # type: ignore[arg-type]
 
             # Define Agent Zero's skills
-            skills: List[Skill] = [
+            skills: list[Skill] = [
                 {  # type: ignore
                     "id": "general_assistance",
                     "name": "General AI Assistant",
@@ -476,9 +460,7 @@ class DynamicA2AProxy:
             if "/" in path[3:]:
                 path_parts = path[3:].split("/", 1)  # Remove '/t-' prefix
                 request_token = path_parts[0]
-                remaining_path = (
-                    "/" + path_parts[1] if len(path_parts) > 1 else "/"
-                )
+                remaining_path = "/" + path_parts[1] if len(path_parts) > 1 else "/"
             else:
                 request_token = path[3:]
                 remaining_path = "/"
@@ -516,13 +498,10 @@ class DynamicA2AProxy:
 
             if expected:
                 auth_header = request.headers.get("Authorization", "")
-                api_key = request.headers.get(
-                    "X-API-KEY"
-                ) or request.query_params.get("api_key")
+                api_key = request.headers.get("X-API-KEY") or request.query_params.get("api_key")
 
                 is_authorized = (
-                    auth_header.startswith("Bearer ")
-                    and auth_header.split(" ", 1)[1] == expected
+                    auth_header.startswith("Bearer ") and auth_header.split(" ", 1)[1] == expected
                 ) or (api_key == expected)
 
                 if not is_authorized:

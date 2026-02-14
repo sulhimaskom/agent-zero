@@ -1,8 +1,8 @@
 import asyncio
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
-from python.helpers.print_style import PrintStyle
 from python.helpers.constants import Timeouts
+from python.helpers.print_style import PrintStyle
 
 
 def format_remaining_time(total_seconds: float) -> str:
@@ -40,14 +40,12 @@ def format_remaining_time(total_seconds: float) -> str:
     return " ".join(parts) + " remaining"
 
 
-async def managed_wait(
-    agent, target_time, is_duration_wait, log, get_heading_callback
-):
+async def managed_wait(agent, target_time, is_duration_wait, log, get_heading_callback):
 
-    while datetime.now(timezone.utc) < target_time:
-        before_intervention = datetime.now(timezone.utc)
+    while datetime.now(UTC) < target_time:
+        before_intervention = datetime.now(UTC)
         await agent.handle_intervention()
-        after_intervention = datetime.now(timezone.utc)
+        after_intervention = datetime.now(UTC)
 
         if is_duration_wait:
             pause_duration = after_intervention - before_intervention
@@ -59,17 +57,13 @@ async def managed_wait(
                     f"Wait extended by {pause_duration.total_seconds():.1f}s to {target_time.isoformat()}...",
                 )
 
-        current_time = datetime.now(timezone.utc)
+        current_time = datetime.now(UTC)
         if current_time >= target_time:
             break
 
         remaining_seconds = (target_time - current_time).total_seconds()
         if log:
-            log.update(
-                heading=get_heading_callback(
-                    format_remaining_time(remaining_seconds)
-                )
-            )
+            log.update(heading=get_heading_callback(format_remaining_time(remaining_seconds)))
         sleep_duration = min(Timeouts.WAIT_SLEEP_INTERVAL, remaining_seconds)
 
         await asyncio.sleep(sleep_duration)

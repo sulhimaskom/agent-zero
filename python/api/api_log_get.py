@@ -71,7 +71,7 @@ class ApiLogGet(ApiHandler):
 
         except (AttributeError, RuntimeError) as e:
             return Response(
-                f'{{"error": "{str(e)}"}}',
+                f'{{"error": "{e!s}"}}',
                 status=HttpStatus.ERROR,
                 mimetype="application/json",
             )

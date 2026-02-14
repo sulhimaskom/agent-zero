@@ -14,9 +14,7 @@ class MaskHistoryContent(Extension):
             secrets_mgr = get_secrets_manager(self.agent.context)
 
             # Mask the content before adding to history
-            content_data["content"] = self._mask_content(
-                content_data["content"], secrets_mgr
-            )
+            content_data["content"] = self._mask_content(content_data["content"], secrets_mgr)
         except Exception:
             # If masking fails, proceed without masking
             pass
@@ -28,10 +26,7 @@ class MaskHistoryContent(Extension):
         elif isinstance(content, list):
             return [self._mask_content(item, secrets_mgr) for item in content]
         elif isinstance(content, dict):
-            return {
-                k: self._mask_content(v, secrets_mgr)
-                for k, v in content.items()
-            }
+            return {k: self._mask_content(v, secrets_mgr) for k, v in content.items()}
         else:
             # For other types, return as-is
             return content

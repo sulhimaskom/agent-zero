@@ -10,9 +10,7 @@ class LoadProfileSettings(Extension):
         if not self.agent or not self.agent.config.profile:
             return
 
-        settings_path = files.get_abs_path(
-            "agents", self.agent.config.profile, "settings.json"
-        )
+        settings_path = files.get_abs_path("agents", self.agent.config.profile, "settings.json")
         if files.exists(settings_path):
             try:
                 override_settings_str = files.read_file(settings_path)
@@ -22,9 +20,7 @@ class LoadProfileSettings(Extension):
                     # Preserve the original memory_subdir unless it's explicitly overridden
                     current_memory_subdir = self.agent.config.memory_subdir
 
-                    new_config = initialize_agent(
-                        override_settings=override_settings
-                    )
+                    new_config = initialize_agent(override_settings=override_settings)
 
                     if (
                         "agent_memory_subdir" not in override_settings
@@ -43,8 +39,7 @@ class LoadProfileSettings(Extension):
                     )
                 else:
                     raise Exception(
-                        f"Subordinate settings in {settings_path} "
-                        "must be a JSON object."
+                        f"Subordinate settings in {settings_path} " "must be a JSON object."
                     )
 
             except Exception as e:

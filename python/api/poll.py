@@ -1,10 +1,8 @@
-from python.helpers.api import ApiHandler, Request, Response
-
 from agent import AgentContext, AgentContextType
-
-from python.helpers.task_scheduler import TaskScheduler
-from python.helpers.localization import Localization
+from python.helpers.api import ApiHandler, Request, Response
 from python.helpers.dotenv import get_dotenv_value
+from python.helpers.localization import Localization
+from python.helpers.task_scheduler import TaskScheduler
 
 
 class Poll(ApiHandler):
@@ -15,9 +13,7 @@ class Poll(ApiHandler):
         notifications_from = input.get("notifications_from", 0)
 
         # Get timezone from input (default to dotenv default or UTC if not provided)
-        timezone = input.get(
-            "timezone", get_dotenv_value("DEFAULT_USER_TIMEZONE", "UTC")
-        )
+        timezone = input.get("timezone", get_dotenv_value("DEFAULT_USER_TIMEZONE", "UTC"))
         Localization.get().set_timezone(timezone)
 
         # context instance - get or create only if ctxid is provided
@@ -67,9 +63,7 @@ class Poll(ApiHandler):
 
             context_task = scheduler.get_task_by_uuid(ctx.id)
             # Determine if this is a task-dedicated context by checking if a task with this UUID exists
-            is_task_context = (
-                context_task is not None and context_task.context_id == ctx.id
-            )
+            is_task_context = context_task is not None and context_task.context_id == ctx.id
 
             if not is_task_context:
                 ctxs.append(context_data)
@@ -123,9 +117,7 @@ class Poll(ApiHandler):
             "log_guid": context.log.guid if context else "",
             "log_version": len(context.log.updates) if context else 0,
             "log_progress": context.log.progress if context else 0,
-            "log_progress_active": (
-                context.log.progress_active if context else False
-            ),
+            "log_progress_active": (context.log.progress_active if context else False),
             "paused": context.paused if context else False,
             "notifications": notifications,
             "notifications_guid": notification_manager.guid,

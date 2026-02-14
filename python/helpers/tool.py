@@ -2,14 +2,14 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from agent import Agent, LoopData
 
+from python.helpers.constants import Colors
 from python.helpers.print_style import PrintStyle
 from python.helpers.strings import sanitize_string
-from python.helpers.constants import Colors
 
 
 @dataclass
@@ -23,12 +23,12 @@ class Tool:
 
     def __init__(
         self,
-        agent: "Agent",
+        agent: Agent,
         name: str,
         method: str | None,
         args: dict[str, str],
         message: str,
-        loop_data: "LoopData | None",
+        loop_data: LoopData | None,
         **kwargs,
     ) -> None:
         self.agent = agent
@@ -61,9 +61,9 @@ class Tool:
         self.log = self.get_log_object()
         if self.args and isinstance(self.args, dict):
             for key, value in self.args.items():
-                PrintStyle(
-                    font_color=Colors.PRIMARY_LIGHT_BLUE, bold=True
-                ).stream(self.nice_key(key) + ": ")
+                PrintStyle(font_color=Colors.PRIMARY_LIGHT_BLUE, bold=True).stream(
+                    self.nice_key(key) + ": "
+                )
                 PrintStyle(
                     font_color=Colors.PRIMARY_LIGHT_BLUE,
                     padding=isinstance(value, str) and "\n" in value,
@@ -72,9 +72,7 @@ class Tool:
 
     async def after_execution(self, response: Response, **kwargs):
         text = sanitize_string(response.message.strip())
-        self.agent.hist_add_tool_result(
-            self.name, text, **(response.additional or {})
-        )
+        self.agent.hist_add_tool_result(self.name, text, **(response.additional or {}))
         PrintStyle(
             font_color=Colors.PRIMARY_BLUE,
             background_color=Colors.BG_WHITE,
@@ -89,9 +87,7 @@ class Tool:
             heading = f"icon://construction {self.agent.agent_name}: Using tool '{self.name}:{self.method}'"
         else:
             heading = f"icon://construction {self.agent.agent_name}: Using tool '{self.name}'"
-        return self.agent.context.log.log(
-            type="tool", heading=heading, content="", kvps=self.args
-        )
+        return self.agent.context.log.log(type="tool", heading=heading, content="", kvps=self.args)
 
     def nice_key(self, key: str):
         words = key.split("_")

@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from email.header import decode_header
 from email.message import Message as EmailMessage
 from fnmatch import fnmatch
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 import html2text
 from bs4 import BeautifulSoup
@@ -26,7 +26,7 @@ class Message:
     sender: str
     subject: str
     body: str
-    attachments: List[str]
+    attachments: list[str]
 
 
 class EmailClient:
@@ -42,7 +42,7 @@ class EmailClient:
         port: int = Limits.IMAP_DEFAULT_PORT,
         username: str = "",
         password: str = "",
-        options: Optional[Dict[str, Any]] = None,
+        options: dict[str, Any] | None = None,
     ):
         """
         Initialize email client with connection parameters.
@@ -66,11 +66,9 @@ class EmailClient:
 
         # Default options
         self.ssl = self.options.get("ssl", True)
-        self.timeout = self.options.get(
-            "timeout", Timeouts.EMAIL_CONNECTION_TIMEOUT
-        )
+        self.timeout = self.options.get("timeout", Timeouts.EMAIL_CONNECTION_TIMEOUT)
 
-        self.client: Optional[IMAPClient] = None
+        self.client: IMAPClient | None = None
         self.exchange_account = None
 
     async def connect(self) -> None:
@@ -95,9 +93,7 @@ class EmailClient:
         loop = asyncio.get_event_loop()
 
         def _sync_connect():
-            client = IMAPClient(
-                self.server, port=self.port, ssl=self.ssl, timeout=self.timeout
-            )
+            client = IMAPClient(self.server, port=self.port, ssl=self.ssl, timeout=self.timeout)
             # Increase line length limit to handle large emails (default is 10000)
             # This fixes "line too long" errors for emails with large headers or embedded content
             client._imap._maxline = Limits.IMAP_MAX_LINE_LENGTH
@@ -111,18 +107,16 @@ class EmailClient:
         """Establish Exchange connection."""
         try:
             from exchangelib import (
+                DELEGATE,
                 Account,
                 Configuration,
                 Credentials,
-                DELEGATE,
             )
 
             loop = asyncio.get_event_loop()
 
             def _sync_connect():
-                creds = Credentials(
-                    username=self.username, password=self.password
-                )
+                creds = Credentials(username=self.username, password=self.password)
                 config = Configuration(server=self.server, credentials=creds)
                 return Account(
                     primary_smtp_address=self.username,
@@ -131,9 +125,7 @@ class EmailClient:
                     access_type=DELEGATE,
                 )
 
-            self.exchange_account = await loop.run_in_executor(
-                None, _sync_connect
-            )
+            self.exchange_account = await loop.run_in_executor(None, _sync_connect)
             PrintStyle.standard(f"Connected to Exchange server: {self.server}")
         except ImportError as e:
             raise RepairableException(
@@ -157,8 +149,8 @@ class EmailClient:
     async def read_messages(
         self,
         download_folder: str,
-        filter: Optional[Dict[str, Any]] = None,
-    ) -> List[Message]:
+        filter: dict[str, Any] | None = None,
+    ) -> list[Message]:
         """
         Read messages based on filter criteria.
 
@@ -180,23 +172,19 @@ class EmailClient:
         elif self.account_type == "exchange":
             return await self._fetch_exchange_messages(download_folder, filter)
         else:
-            raise RepairableException(
-                f"Unsupported account type: {self.account_type}"
-            )
+            raise RepairableException(f"Unsupported account type: {self.account_type}")
 
     async def _fetch_imap_messages(
         self,
         download_folder: str,
-        filter: Dict[str, Any],
-    ) -> List[Message]:
+        filter: dict[str, Any],
+    ) -> list[Message]:
         """Fetch messages from IMAP server."""
         if not self.client:
-            raise RepairableException(
-                "IMAP client not connected. Call connect() first."
-            )
+            raise RepairableException("IMAP client not connected. Call connect() first.")
 
         loop = asyncio.get_event_loop()
-        messages: List[Message] = []
+        messages: list[Message] = []
 
         def _sync_fetch():
             # Select inbox
@@ -229,15 +217,11 @@ class EmailClient:
         # Fetch and process messages
         for msg_id in message_ids:
             try:
-                msg = await self._fetch_and_parse_imap_message(
-                    msg_id, download_folder, filter
-                )
+                msg = await self._fetch_and_parse_imap_message(msg_id, download_folder, filter)
                 if msg:
                     messages.append(msg)
             except Exception as e:
-                PrintStyle.error(
-                    f"Error processing message {msg_id}: {format_error(e)}"
-                )
+                PrintStyle.error(f"Error processing message {msg_id}: {format_error(e)}")
                 continue
 
         return messages
@@ -246,8 +230,8 @@ class EmailClient:
         self,
         msg_id: int,
         download_folder: str,
-        filter: Dict[str, Any],
-    ) -> Optional[Message]:
+        filter: dict[str, Any],
+    ) -> Message | None:
         """Fetch and parse a single IMAP message with retry logic for large messages."""
         loop = asyncio.get_event_loop()
 
@@ -264,9 +248,7 @@ class EmailClient:
                     )
                     # Fetch headers and body separately to avoid line length issues
                     try:
-                        envelope = self.client.fetch(
-                            [msg_id], ["BODY.PEEK[]"]
-                        )[msg_id]
+                        envelope = self.client.fetch([msg_id], ["BODY.PEEK[]"])[msg_id]
                         return envelope
                     except Exception as e2:
                         PrintStyle.error(
@@ -284,9 +266,7 @@ class EmailClient:
             elif b"BODY[]" in raw_msg:
                 email_data = raw_msg[b"BODY[]"]
             else:
-                PrintStyle.error(
-                    f"Unexpected response format for message {msg_id}"
-                )
+                PrintStyle.error(f"Unexpected response format for message {msg_id}")
                 return None
 
             email_msg = email.message_from_bytes(email_data)
@@ -298,35 +278,29 @@ class EmailClient:
 
             # Apply subject filter
             subject = self._decode_header(email_msg.get("Subject", ""))
-            if filter.get("subject") and not fnmatch(
-                subject, filter["subject"]
-            ):
+            if filter.get("subject") and not fnmatch(subject, filter["subject"]):
                 return None
 
             # Parse message
             return await self._parse_message(email_msg, download_folder)
 
         except Exception as e:
-            PrintStyle.error(
-                f"Failed to fetch/parse message {msg_id}: {format_error(e)}"
-            )
+            PrintStyle.error(f"Failed to fetch/parse message {msg_id}: {format_error(e)}")
             return None
 
     async def _fetch_exchange_messages(
         self,
         download_folder: str,
-        filter: Dict[str, Any],
-    ) -> List[Message]:
+        filter: dict[str, Any],
+    ) -> list[Message]:
         """Fetch messages from Exchange server."""
         if not self.exchange_account:
-            raise RepairableException(
-                "Exchange account not connected. Call connect() first."
-            )
+            raise RepairableException("Exchange account not connected. Call connect() first.")
 
         from exchangelib import Q
 
         loop = asyncio.get_event_loop()
-        messages: List[Message] = []
+        messages: list[Message] = []
 
         def _sync_fetch():
             # Build query
@@ -351,22 +325,16 @@ class EmailClient:
 
         exchange_messages = await loop.run_in_executor(None, _sync_fetch)
 
-        PrintStyle.standard(
-            f"Found {len(exchange_messages)} Exchange messages"
-        )
+        PrintStyle.standard(f"Found {len(exchange_messages)} Exchange messages")
 
         # Process messages
         for ex_msg in exchange_messages:
             try:
-                msg = await self._parse_exchange_message(
-                    ex_msg, download_folder
-                )
+                msg = await self._parse_exchange_message(ex_msg, download_folder)
                 if msg:
                     messages.append(msg)
             except Exception as e:
-                PrintStyle.error(
-                    f"Error processing Exchange message: {format_error(e)}"
-                )
+                PrintStyle.error(f"Error processing Exchange message: {format_error(e)}")
                 continue
 
         return messages
@@ -421,9 +389,9 @@ class EmailClient:
 
         # Extract body and attachments
         body = ""
-        attachment_paths: List[str] = []
-        cid_map: Dict[str, str] = {}  # Map Content-ID to file paths
-        body_parts: List[str] = []  # Track parts in order
+        attachment_paths: list[str] = []
+        cid_map: dict[str, str] = {}  # Map Content-ID to file paths
+        body_parts: list[str] = []  # Track parts in order
 
         if email_msg.is_multipart():
             # Process parts in order to maintain attachment positions
@@ -436,9 +404,7 @@ class EmailClient:
                     continue
 
                 # Handle attachments
-                if "attachment" in content_disposition or part.get(
-                    "Content-ID"
-                ):
+                if "attachment" in content_disposition or part.get("Content-ID"):
                     filename = part.get_filename()
                     if filename:
                         filename = self._decode_header(filename)
@@ -464,15 +430,11 @@ class EmailClient:
                 elif content_type == "text/plain":
                     if not body:  # Use first text/plain as primary body
                         charset = part.get_content_charset() or "utf-8"
-                        body = part.get_payload(decode=True).decode(
-                            charset, errors="ignore"
-                        )
+                        body = part.get_payload(decode=True).decode(charset, errors="ignore")
                         body_parts.append(body)
 
                 elif content_type == "text/html":
-                    if (
-                        not body
-                    ):  # Use first text/html as primary body if no text/plain
+                    if not body:  # Use first text/html as primary body if no text/plain
                         charset = part.get_content_charset() or "utf-8"
                         html_content = part.get_payload(decode=True).decode(
                             charset, errors="ignore"
@@ -490,9 +452,7 @@ class EmailClient:
             content = email_msg.get_payload(decode=True)
             if content:
                 if content_type == "text/html":
-                    body = self._html_to_text(
-                        content.decode(charset, errors="ignore"), cid_map
-                    )
+                    body = self._html_to_text(content.decode(charset, errors="ignore"), cid_map)
                 else:
                     body = content.decode(charset, errors="ignore")
 
@@ -503,9 +463,7 @@ class EmailClient:
             attachments=attachment_paths,
         )
 
-    def _html_to_text(
-        self, html_content: str, cid_map: Optional[Dict[str, str]] = None
-    ) -> str:
+    def _html_to_text(self, html_content: str, cid_map: dict[str, str] | None = None) -> str:
         """
         Convert HTML to plain text with inline attachment references.
 
@@ -577,9 +535,7 @@ class EmailClient:
         decoded_parts = []
         for part, encoding in decode_header(header):
             if isinstance(part, bytes):
-                decoded_parts.append(
-                    part.decode(encoding or "utf-8", errors="ignore")
-                )
+                decoded_parts.append(part.decode(encoding or "utf-8", errors="ignore"))
             else:
                 decoded_parts.append(str(part))
 
@@ -593,9 +549,9 @@ async def read_messages(
     username: str = "",
     password: str = "",
     download_folder: str = "tmp/email",
-    options: Optional[Dict[str, Any]] = None,
-    filter: Optional[Dict[str, Any]] = None,
-) -> List[Message]:
+    options: dict[str, Any] | None = None,
+    filter: dict[str, Any] | None = None,
+) -> list[Message]:
     """
     Convenience wrapper for reading email messages.
 

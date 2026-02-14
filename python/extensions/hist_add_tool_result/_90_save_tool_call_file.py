@@ -1,8 +1,9 @@
+import os
 from typing import Any
-from python.helpers.extension import Extension
+
 from python.helpers import files, persist_chat
 from python.helpers.constants import Extensions
-import os
+from python.helpers.extension import Extension
 
 
 class SaveToolCallFile(Extension):
@@ -20,9 +21,7 @@ class SaveToolCallFile(Extension):
             return
 
         # message files directory
-        msgs_folder = persist_chat.get_chat_msg_files_folder(
-            self.agent.context.id
-        )
+        msgs_folder = persist_chat.get_chat_msg_files_folder(self.agent.context.id)
         os.makedirs(msgs_folder, exist_ok=True)
 
         # count the files in the directory

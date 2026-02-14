@@ -1,5 +1,5 @@
-from python.helpers.api import ApiHandler, Input, Output, Request
 from python.helpers import projects
+from python.helpers.api import ApiHandler, Input, Output, Request
 
 
 class Projects(ApiHandler):
@@ -26,9 +26,7 @@ class Projects(ApiHandler):
             elif action == "deactivate":
                 data = self.deactivate_project(ctxid)
             elif action == "file_structure":
-                data = self.get_file_structure(
-                    input.get("name", None), input.get("settings")
-                )
+                data = self.get_file_structure(input.get("name", None), input.get("settings"))
             else:
                 raise Exception("Invalid action")
 

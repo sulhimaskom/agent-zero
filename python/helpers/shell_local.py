@@ -1,7 +1,6 @@
-from typing import Optional, Tuple
-from python.helpers import tty_session, runtime
-from python.helpers.shell_ssh import clean_string
+from python.helpers import runtime, tty_session
 from python.helpers.constants import Timeouts
+from python.helpers.shell_ssh import clean_string
 
 
 class LocalInteractiveSession:
@@ -11,9 +10,7 @@ class LocalInteractiveSession:
         self.cwd = cwd
 
     async def connect(self):
-        self.session = tty_session.TTYSession(
-            runtime.get_terminal_executable(), cwd=self.cwd
-        )
+        self.session = tty_session.TTYSession(runtime.get_terminal_executable(), cwd=self.cwd)
         await self.session.start()
         await self.session.read_full_until_idle(
             idle_timeout=Timeouts.IDLE_TIMEOUT, total_timeout=Timeouts.IDLE_TIMEOUT
@@ -32,7 +29,7 @@ class LocalInteractiveSession:
 
     async def read_output(
         self, timeout: float = 0, reset_full_output: bool = False
-    ) -> Tuple[str, Optional[str]]:
+    ) -> tuple[str, str | None]:
         if not self.session:
             raise Exception("Shell not connected")
 

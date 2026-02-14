@@ -1,16 +1,18 @@
-import base64
-import warnings
-import whisper
-import tempfile
 import asyncio
+import base64
+import tempfile
+import warnings
+
+import whisper
+
 from python.helpers import files
-from python.helpers.print_style import PrintStyle
+from python.helpers.constants import Paths, Timeouts
 from python.helpers.notification import (
     NotificationManager,
-    NotificationType,
     NotificationPriority,
+    NotificationType,
 )
-from python.helpers.constants import Paths, Timeouts
+from python.helpers.print_style import PrintStyle
 
 # Suppress FutureWarning from torch.load
 warnings.filterwarnings("ignore", category=FutureWarning)
@@ -97,9 +99,7 @@ async def _transcribe(model_name: str, audio_bytes_b64: str):
     # Create temp audio file
     import os
 
-    with tempfile.NamedTemporaryFile(
-        suffix=".wav", delete=False
-    ) as audio_file:
+    with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as audio_file:
         audio_file.write(audio_bytes)
         temp_path = audio_file.name
     try:

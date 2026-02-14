@@ -1,6 +1,8 @@
-from PIL import Image
 import io
 import math
+
+from PIL import Image
+
 from python.helpers.constants import Limits
 
 
@@ -8,7 +10,7 @@ def compress_image(
     image_data: bytes,
     *,
     max_pixels: int = Limits.IMAGE_MAX_PIXELS,
-    quality: int = Limits.IMAGE_QUALITY
+    quality: int = Limits.IMAGE_QUALITY,
 ) -> bytes:
     """Compress an image by scaling it down and converting to JPEG with quality settings.
 

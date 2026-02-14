@@ -1,14 +1,12 @@
 from python.helpers.api import ApiHandler, Input, Output, Request
-from python.helpers.task_scheduler import TaskScheduler, TaskState
-from python.helpers.print_style import PrintStyle
 from python.helpers.localization import Localization
+from python.helpers.print_style import PrintStyle
+from python.helpers.task_scheduler import TaskScheduler, TaskState
 
 
 class SchedulerTaskRun(ApiHandler):
 
-    _printer: PrintStyle = PrintStyle(
-        italic=True, font_color="green", padding=False
-    )
+    _printer: PrintStyle = PrintStyle(italic=True, font_color="green", padding=False)
 
     async def process(self, input: Input, request: Request) -> Output:
         """
@@ -24,9 +22,7 @@ class SchedulerTaskRun(ApiHandler):
         if not task_id:
             return {"error": "Missing required field: task_id"}
 
-        self._printer.print(
-            f"SchedulerTaskRun: On-Demand running task {task_id}"
-        )
+        self._printer.print(f"SchedulerTaskRun: On-Demand running task {task_id}")
 
         scheduler = TaskScheduler.get()
         await scheduler.reload()
@@ -34,9 +30,7 @@ class SchedulerTaskRun(ApiHandler):
         # Check if the task exists first
         task = scheduler.get_task_by_uuid(task_id)
         if not task:
-            self._printer.error(
-                f"SchedulerTaskRun: Task with ID '{task_id}' not found"
-            )
+            self._printer.error(f"SchedulerTaskRun: Task with ID '{task_id}' not found")
             return {"error": f"Task with ID '{task_id}' not found"}
 
         # Check if task is already running
@@ -54,9 +48,7 @@ class SchedulerTaskRun(ApiHandler):
         # Run the task, which now includes atomic state checks and updates
         try:
             await scheduler.run_task_by_uuid(task_id)
-            self._printer.print(
-                f"SchedulerTaskRun: Task '{task_id}' started successfully"
-            )
+            self._printer.print(f"SchedulerTaskRun: Task '{task_id}' started successfully")
             # Get updated task after run starts
             serialized_task = scheduler.serialize_task(task_id)
             if serialized_task:
@@ -71,12 +63,8 @@ class SchedulerTaskRun(ApiHandler):
                     "message": f"Task '{task_id}' started successfully",
                 }
         except ValueError as e:
-            self._printer.error(
-                f"SchedulerTaskRun: Task '{task_id}' failed to start: {str(e)}"
-            )
+            self._printer.error(f"SchedulerTaskRun: Task '{task_id}' failed to start: {e!s}")
             return {"error": str(e)}
         except Exception as e:
-            self._printer.error(
-                f"SchedulerTaskRun: Task '{task_id}' failed to start: {str(e)}"
-            )
-            return {"error": f"Failed to run task '{task_id}': {str(e)}"}
+            self._printer.error(f"SchedulerTaskRun: Task '{task_id}' failed to start: {e!s}")
+            return {"error": f"Failed to run task '{task_id}': {e!s}"}

@@ -1,6 +1,7 @@
 import os
-from pathlib import Path
 import subprocess
+from pathlib import Path
+
 from python.helpers import files
 
 # this helper ensures that playwright is installed in /lib/playwright
@@ -29,9 +30,7 @@ def ensure_playwright_binary():
         cache = get_playwright_cache_dir()
         env = os.environ.copy()
         env["PLAYWRIGHT_BROWSERS_PATH"] = cache
-        subprocess.check_call(
-            ["playwright", "install", "chromium", "--only-shell"], env=env
-        )
+        subprocess.check_call(["playwright", "install", "chromium", "--only-shell"], env=env)
     bin = get_playwright_binary()
     if not bin:
         raise Exception("Playwright binary not found after installation")

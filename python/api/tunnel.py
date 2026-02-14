@@ -1,7 +1,7 @@
-from python.helpers.api import ApiHandler, Request, Response
 from python.helpers import runtime
-from python.helpers.tunnel_manager import TunnelManager
+from python.helpers.api import ApiHandler, Request, Response
 from python.helpers.constants import Timeouts
+from python.helpers.tunnel_manager import TunnelManager
 
 
 class Tunnel(ApiHandler):

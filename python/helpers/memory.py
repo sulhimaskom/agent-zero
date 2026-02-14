@@ -5,42 +5,43 @@ across multiple areas (main, fragments, solutions, instruments).
 Supports AI filtering and memory consolidation.
 """
 
+import json
+import logging
+import os
+from collections.abc import Sequence
 from datetime import datetime
-from typing import Any, List, Sequence
-from langchain_core.stores import InMemoryByteStore
-from langchain_classic.storage import LocalFileStore
+from enum import Enum
+from typing import Any
+
+import faiss
+import numpy as np
 from langchain_classic.embeddings import CacheBackedEmbeddings
-from python.helpers import guids
+from langchain_classic.storage import LocalFileStore
+from langchain_community.docstore.in_memory import InMemoryDocstore
 
 # from langchain_chroma import Chroma
 from langchain_community.vectorstores import FAISS
-
-# faiss needs to be patched for python 3.12 on arm #TODO remove once not needed
-from python.helpers import faiss_monkey_patch  # noqa: F401
-import faiss
-
-
-from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain_community.vectorstores.utils import (
     DistanceStrategy,
 )
-
-import os
-import json
-
-import numpy as np
-
-from python.helpers.print_style import PrintStyle
-from . import files
 from langchain_core.documents import Document
-from python.helpers import knowledge_import
-from python.helpers.log import LogItem
-from python.helpers.constants import Limits, Paths, FilePatterns
-from enum import Enum
-from agent import Agent, AgentContext
-import models
-import logging
+from langchain_core.stores import InMemoryByteStore
 from simpleeval import simple_eval
+
+import models
+from agent import Agent, AgentContext
+
+# faiss needs to be patched for python 3.12 on arm #TODO remove once not needed
+from python.helpers import (
+    faiss_monkey_patch,  # noqa: F401
+    guids,
+    knowledge_import,
+)
+from python.helpers.constants import FilePatterns, Limits, Paths
+from python.helpers.log import LogItem
+from python.helpers.print_style import PrintStyle
+
+from . import files
 
 # Raise the log level so WARNING messages aren't shown
 logging.getLogger("langchain_core.vectorstores.base").setLevel(logging.ERROR)
@@ -48,11 +49,11 @@ logging.getLogger("langchain_core.vectorstores.base").setLevel(logging.ERROR)
 
 class MyFaiss(FAISS):
     # override aget_by_ids
-    def get_by_ids(self, ids: Sequence[str], /) -> List[Document]:
+    def get_by_ids(self, ids: Sequence[str], /) -> list[Document]:
         # return all self.docstore._dict[id] in ids
         return [self.docstore._dict[id] for id in (ids if isinstance(ids, list) else [ids]) if id in self.docstore._dict]  # type: ignore
 
-    async def aget_by_ids(self, ids: Sequence[str], /) -> List[Document]:
+    async def aget_by_ids(self, ids: Sequence[str], /) -> list[Document]:
         return self.get_by_ids(ids)
 
     def get_all_docs(self):
@@ -89,9 +90,7 @@ class Memory:
                 memory_subdir, agent.config.knowledge_subdirs or []
             )
             if knowledge_subdirs:
-                await wrap.preload_knowledge(
-                    log_item, knowledge_subdirs, memory_subdir
-                )
+                await wrap.preload_knowledge(log_item, knowledge_subdirs, memory_subdir)
             return wrap
         else:
             return Memory(
@@ -122,13 +121,9 @@ class Memory:
                     memory_subdir, agent_config.knowledge_subdirs or []
                 )
                 if knowledge_subdirs:
-                    await wrap.preload_knowledge(
-                        log_item, knowledge_subdirs, memory_subdir
-                    )
+                    await wrap.preload_knowledge(log_item, knowledge_subdirs, memory_subdir)
             Memory.index[memory_subdir] = db
-        return Memory(
-            db=Memory.index[memory_subdir], memory_subdir=memory_subdir
-        )
+        return Memory(db=Memory.index[memory_subdir], memory_subdir=memory_subdir)
 
     @staticmethod
     async def reload(agent: Agent):
@@ -169,9 +164,7 @@ class Memory:
             model_config.name,
             **model_config.build_kwargs(),
         )
-        embeddings_model_id = files.safe_file_name(
-            model_config.provider + "_" + model_config.name
-        )
+        embeddings_model_id = files.safe_file_name(model_config.provider + "_" + model_config.name)
 
         # here we setup the embeddings model with the chosen cache storage
         embedder = CacheBackedEmbeddings.from_bytes_store(
@@ -231,9 +224,7 @@ class Memory:
                 PrintStyle.standard("Indexing memories...")
                 if log_item:
                     log_item.stream(progress="\nIndexing memories")
-                db.add_documents(
-                    documents=list(docs.values()), ids=list(docs.keys())
-                )
+                db.add_documents(documents=list(docs.values()), ids=list(docs.keys()))
 
             # save DB
             Memory._save_db_file(db, memory_subdir)
@@ -279,21 +270,17 @@ class Memory:
 
         index: dict[str, knowledge_import.KnowledgeImport] = {}
         if os.path.exists(index_path):
-            with open(index_path, "r") as f:
+            with open(index_path) as f:
                 index = json.load(f)
 
         # preload knowledge folders
         index = self._preload_knowledge_folders(log_item, kn_dirs, index)
 
         for file in index:
-            if index[file]["state"] in ["changed", "removed"] and index[
-                file
-            ].get(
+            if index[file]["state"] in ["changed", "removed"] and index[file].get(
                 "ids", []
             ):  # for knowledge files that have been changed or removed and have IDs
-                await self.delete_documents_by_ids(
-                    index[file]["ids"]
-                )  # remove original version
+                await self.delete_documents_by_ids(index[file]["ids"])  # remove original version
             if index[file]["state"] == "changed":
                 index[file]["ids"] = await self.insert_documents(
                     index[file]["documents"]
@@ -367,9 +354,7 @@ class Memory:
             filter=comparator,
         )
 
-    async def delete_documents_by_query(
-        self, query: str, threshold: float, filter: str = ""
-    ):
+    async def delete_documents_by_query(self, query: str, threshold: float, filter: str = ""):
         k = Limits.MEMORY_SEARCH_K
         tot = 0
         removed = []
@@ -403,9 +388,7 @@ class Memory:
 
     async def delete_documents_by_ids(self, ids: list[str]):
         # aget_by_ids is not yet implemented in faiss, need to do a workaround
-        rem_docs = await self.db.aget_by_ids(
-            ids
-        )  # existing docs to remove (prevents error)
+        rem_docs = await self.db.aget_by_ids(ids)  # existing docs to remove (prevents error)
         if rem_docs:
             rem_ids = [doc.metadata["id"] for doc in rem_docs]  # ids to remove
             await self.db.adelete(ids=rem_ids)
@@ -437,9 +420,7 @@ class Memory:
     async def update_documents(self, docs: list[Document]):
         ids = [doc.metadata["id"] for doc in docs]
         await self.db.adelete(ids=ids)  # delete originals
-        ins = await self.db.aadd_documents(
-            documents=docs, ids=ids
-        )  # add updated
+        ins = await self.db.aadd_documents(documents=docs, ids=ids)  # add updated
         self._save_db()  # persist
         return ins
 
@@ -477,9 +458,7 @@ class Memory:
     @staticmethod
     def _cosine_normalizer(val: float) -> float:
         res = (1 + val) / 2
-        res = max(
-            0, min(1, res)
-        )  # float precision can cause values like 1.0000000596046448
+        res = max(0, min(1, res))  # float precision can cause values like 1.0000000596046448
         return res
 
     @staticmethod
@@ -515,9 +494,7 @@ def abs_db_dir(memory_subdir: str) -> str:
     if memory_subdir.startswith("projects/"):
         from python.helpers.projects import get_project_meta_folder
 
-        return files.get_abs_path(
-            get_project_meta_folder(memory_subdir[9:]), "memory"
-        )
+        return files.get_abs_path(get_project_meta_folder(memory_subdir[9:]), "memory")
     # standard subdirs
     return files.get_abs_path("memory", memory_subdir)
 
@@ -570,9 +547,7 @@ def get_existing_memory_subdirs() -> list[str]:
         # Get subdirectories from memory folder
         subdirs = files.get_subdirectories("memory", exclude="embeddings")
 
-        project_subdirs = files.get_subdirectories(
-            get_projects_parent_folder()
-        )
+        project_subdirs = files.get_subdirectories(get_projects_parent_folder())
         for project_subdir in project_subdirs:
             if files.exists(
                 get_project_meta_folder(project_subdir),
@@ -587,13 +562,11 @@ def get_existing_memory_subdirs() -> list[str]:
 
         return subdirs
     except Exception as e:
-        PrintStyle.error(f"Failed to get memory subdirectories: {str(e)}")
+        PrintStyle.error(f"Failed to get memory subdirectories: {e!s}")
         return ["default"]
 
 
-def get_knowledge_subdirs_by_memory_subdir(
-    memory_subdir: str, default: list[str]
-) -> list[str]:
+def get_knowledge_subdirs_by_memory_subdir(memory_subdir: str, default: list[str]) -> list[str]:
     if memory_subdir.startswith("projects/"):
         from python.helpers.projects import get_project_meta_folder
 

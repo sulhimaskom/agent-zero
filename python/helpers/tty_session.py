@@ -20,9 +20,7 @@ sys.stdout.reconfigure(errors="replace")  # type: ignore
 
 
 class TTYSession:
-    def __init__(
-        self, cmd, *, cwd=None, env=None, encoding="utf-8", echo=False
-    ):
+    def __init__(self, cmd, *, cwd=None, env=None, encoding="utf-8", echo=False):
         self.cmd = cmd if isinstance(cmd, str) else " ".join(cmd)
         self.cwd = cwd
         self.env = env or os.environ.copy()
@@ -45,9 +43,7 @@ class TTYSession:
     # ── user-facing coroutines ────────────────────────────────────────
     async def start(self):
         if _IS_WIN:
-            self._proc = await _spawn_winpty(
-                self.cmd, self.cwd, self.env, self.echo
-            )  # ← pass echo
+            self._proc = await _spawn_winpty(self.cmd, self.cwd, self.env, self.echo)  # ← pass echo
         else:
             self._proc = await _spawn_posix_pty(
                 self.cmd, self.cwd, self.env, self.echo
@@ -110,7 +106,7 @@ class TTYSession:
         # Return any decoded text the child produced, or None on timeout
         try:
             return await asyncio.wait_for(self._buf.get(), timeout)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             return None
 
     # backward-compat alias:
@@ -119,12 +115,7 @@ class TTYSession:
     async def read_full_until_idle(self, idle_timeout, total_timeout):
         # Collect child output using iter_until_idle to avoid duplicate logic
         return "".join(
-            [
-                chunk
-                async for chunk in self.read_chunks_until_idle(
-                    idle_timeout, total_timeout
-                )
-            ]
+            [chunk async for chunk in self.read_chunks_until_idle(idle_timeout, total_timeout)]
         )
 
     async def read_chunks_until_idle(self, idle_timeout, total_timeout):
@@ -146,9 +137,7 @@ class TTYSession:
             raise RuntimeError("TTYSpawn is not started")
         reader = self._proc.stdout
         while True:
-            chunk = await reader.read(
-                4096
-            )  # grab whatever is ready # type: ignore
+            chunk = await reader.read(4096)  # grab whatever is ready # type: ignore
             if not chunk:
                 break
             self._buf.put_nowait(chunk.decode(self.encoding, "replace"))
@@ -237,9 +226,7 @@ async def _spawn_winpty(cmd, cwd, env, echo):
                 # Run blocking read in executor to not block event loop
                 data = await loop.run_in_executor(None, child.read, 1 << 16)
                 if data:
-                    reader.feed_data(
-                        data.encode("utf-8") if isinstance(data, str) else data
-                    )
+                    reader.feed_data(data.encode("utf-8") if isinstance(data, str) else data)
             except EOFError:
                 break
             except Exception:
@@ -290,9 +277,7 @@ async def _spawn_winpty(cmd, cwd, env, echo):
 if __name__ == "__main__":
 
     async def interactive_shell():
-        shell_cmd, prompt_hint = (
-            ("powershell.exe", ">") if _IS_WIN else ("/bin/bash", "$")
-        )
+        shell_cmd, prompt_hint = ("powershell.exe", ">") if _IS_WIN else ("/bin/bash", "$")
 
         # echo=False → suppress the shell’s own echo of commands
         term = TTYSession(shell_cmd)
@@ -333,15 +318,11 @@ if __name__ == "__main__":
             total_timeout = 10 * idle_timeout
             if user == "":
                 # Just read output, do not send empty line
-                async for chunk in term.read_chunks_until_idle(
-                    idle_timeout, total_timeout
-                ):
+                async for chunk in term.read_chunks_until_idle(idle_timeout, total_timeout):
                     print(chunk, end="", flush=True)
             else:
                 await term.sendline(user)
-                async for chunk in term.read_chunks_until_idle(
-                    idle_timeout, total_timeout
-                ):
+                async for chunk in term.read_chunks_until_idle(idle_timeout, total_timeout):
                     print(chunk, end="", flush=True)
 
         await term.sendline("exit")

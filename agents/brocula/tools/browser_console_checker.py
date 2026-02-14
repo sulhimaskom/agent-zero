@@ -1,8 +1,11 @@
 import asyncio
-from python.helpers.tool import Tool, Response
-from python.helpers.playwright import ensure_playwright_binary
+
 from playwright.async_api import async_playwright
+
 from python.helpers.constants import Network
+from python.helpers.playwright import ensure_playwright_binary
+from python.helpers.tool import Response, Tool
+
 
 class State:
     @staticmethod
@@ -15,6 +18,7 @@ class State:
         self.console_logs = []
         self.errors_found = []
         self.warnings_found = []
+
 
 class browser_console_checker(Tool):
     """
@@ -53,7 +57,7 @@ class browser_console_checker(Tool):
                     log_entry = {
                         "type": msg.type,
                         "text": msg.text,
-                        "location": msg.location if hasattr(msg, 'location') else None
+                        "location": msg.location if hasattr(msg, "location") else None,
                     }
                     state.console_logs.append(log_entry)
 
@@ -82,7 +86,7 @@ class browser_console_checker(Tool):
                 f"Total console messages: {len(state.console_logs)}",
                 f"Errors: {len(state.errors_found)}",
                 f"Warnings: {len(state.warnings_found)}",
-                ""
+                "",
             ]
 
             if state.errors_found:
@@ -96,7 +100,9 @@ class browser_console_checker(Tool):
             if state.warnings_found:
                 report_lines.append("⚠️ WARNINGS FOUND:")
                 for i, warning in enumerate(state.warnings_found[:20], 1):  # Limit to 20
-                    report_lines.append(f"  {i}. [{warning['type'].upper()}] {warning['text'][:200]}")
+                    report_lines.append(
+                        f"  {i}. [{warning['type'].upper()}] {warning['text'][:200]}"
+                    )
                 if len(state.warnings_found) > 20:
                     report_lines.append(f"  ... and {len(state.warnings_found) - 20} more warnings")
                 report_lines.append("")
@@ -115,18 +121,14 @@ class browser_console_checker(Tool):
                 "errors": state.errors_found,
                 "warnings": state.warnings_found,
                 "has_errors": len(state.errors_found) > 0,
-                "has_warnings": len(state.warnings_found) > 0
+                "has_warnings": len(state.warnings_found) > 0,
             }
 
-            return Response(
-                message=message,
-                break_loop=False,
-                additional=additional
-            )
+            return Response(message=message, break_loop=False, additional=additional)
 
         except Exception as e:
             return Response(
-                message=f"❌ Failed to check browser console: {str(e)}",
+                message=f"❌ Failed to check browser console: {e!s}",
                 break_loop=False,
-                additional={"error": str(e), "has_errors": True}
+                additional={"error": str(e), "has_errors": True},
             )

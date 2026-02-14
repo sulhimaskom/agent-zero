@@ -1,7 +1,7 @@
-from python.helpers.tool import Tool, Response
 from agent import AgentContext
-from python.helpers.notification import NotificationPriority, NotificationType
 from python.helpers.constants import Timeouts
+from python.helpers.notification import NotificationPriority, NotificationType
+from python.helpers.tool import Response, Tool
 
 
 class NotifyUserTool(Tool):
@@ -47,8 +47,6 @@ class NotifyUserTool(Tool):
             display_time=timeout,
         )
         return Response(
-            message=self.agent.read_prompt(
-                "fw.notify_user.notification_sent.md"
-            ),
+            message=self.agent.read_prompt("fw.notify_user.notification_sent.md"),
             break_loop=False,
         )

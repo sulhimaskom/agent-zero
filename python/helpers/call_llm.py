@@ -1,14 +1,14 @@
-from typing import Callable, TypedDict
+from collections.abc import Callable
+from typing import TypedDict
+
 from langchain.prompts import (
     ChatPromptTemplate,
     FewShotChatMessagePromptTemplate,
 )
-
 from langchain.schema import AIMessage
-from langchain_core.messages import HumanMessage, SystemMessage
-
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.language_models.llms import BaseLLM
+from langchain_core.messages import HumanMessage, SystemMessage
 
 
 class Example(TypedDict):

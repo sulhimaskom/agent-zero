@@ -1,18 +1,17 @@
 import uuid
-from typing import Any, Dict, List, Optional
-from python.helpers.print_style import PrintStyle
+from typing import Any
+
 from python.helpers.constants import Timeouts
+from python.helpers.print_style import PrintStyle
 
 try:
-    from fasta2a.client import A2AClient  # type: ignore
     import httpx  # type: ignore
+    from fasta2a.client import A2AClient  # type: ignore
 
     FASTA2A_CLIENT_AVAILABLE = True
 except ImportError:
     FASTA2A_CLIENT_AVAILABLE = False
-    PrintStyle.warning(
-        "FastA2A client not available. Agent-to-agent communication disabled."
-    )
+    PrintStyle.warning("FastA2A client not available. Agent-to-agent communication disabled.")
 
 _PRINTER = PrintStyle(italic=True, font_color="cyan", padding=False)
 
@@ -24,7 +23,7 @@ class AgentConnection:
         self,
         agent_url: str,
         timeout: int = int(Timeouts.HTTP_CLIENT_DEFAULT_TIMEOUT),
-        token: Optional[str] = None,
+        token: str | None = None,
     ):
         """Initialize connection to an agent.
 
@@ -52,17 +51,15 @@ class AgentConnection:
             headers["X-API-KEY"] = token
         self._http_client = httpx.AsyncClient(timeout=timeout, headers=headers)  # type: ignore
         self._a2a_client = A2AClient(base_url=self.agent_url, http_client=self._http_client)  # type: ignore
-        self._agent_card: Optional[Dict[str, Any]] = None
+        self._agent_card: dict[str, Any] | None = None
         # Track conversation context automatically
-        self._context_id: Optional[str] = None
+        self._context_id: str | None = None
 
-    async def get_agent_card(self) -> Dict[str, Any]:
+    async def get_agent_card(self) -> dict[str, Any]:
         """Retrieve the agent card from the remote agent."""
         if self._agent_card is None:
             try:
-                response = await self._http_client.get(
-                    f"{self.agent_url}/.well-known/agent.json"
-                )
+                response = await self._http_client.get(f"{self.agent_url}/.well-known/agent.json")
                 response.raise_for_status()
                 self._agent_card = response.json()
                 _PRINTER.print(f"Retrieved agent card from {self.agent_url}")
@@ -73,9 +70,7 @@ class AgentConnection:
                 if "/a2a" in self.agent_url:
                     root_url = self.agent_url.split("/a2a", 1)[0]
                     try:
-                        response = await self._http_client.get(
-                            f"{root_url}/.well-known/agent.json"
-                        )
+                        response = await self._http_client.get(f"{root_url}/.well-known/agent.json")
                         response.raise_for_status()
                         self._agent_card = response.json()
                         _PRINTER.print(f"Retrieved agent card from {root_url}")
@@ -91,10 +86,10 @@ class AgentConnection:
     async def send_message(
         self,
         message: str,
-        attachments: Optional[List[str]] = None,
-        context_id: Optional[str] = None,
-        metadata: Optional[Dict[str, Any]] = None,
-    ) -> Dict[str, Any]:
+        attachments: list[str] | None = None,
+        context_id: str | None = None,
+        metadata: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
         """Send a message to the remote agent and return task response."""
         if not self._agent_card:
             await self.get_agent_card()
@@ -142,7 +137,7 @@ class AgentConnection:
             _PRINTER.print(f"[A2A] Error sending message: {e}")
             raise
 
-    async def get_task(self, task_id: str) -> Dict[str, Any]:
+    async def get_task(self, task_id: str) -> dict[str, Any]:
         """Get the status and results of a task.
 
         Args:
@@ -163,7 +158,7 @@ class AgentConnection:
         task_id: str,
         poll_interval: int = Timeouts.DOCUMENT_POLL_INTERVAL,
         max_wait: int = Timeouts.DOCUMENT_MAX_WAIT,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Wait for a task to complete and return the final result.
 
         Args:
@@ -186,9 +181,7 @@ class AgentConnection:
                 state = status.get("state", "unknown")
 
                 if state in ["completed", "failed", "canceled"]:
-                    _PRINTER.print(
-                        f"Task {task_id} finished with state: {state}"
-                    )
+                    _PRINTER.print(f"Task {task_id} finished with state: {state}")
                     return task_info
                 else:
                     _PRINTER.print(f"Task {task_id} status: {state}")
@@ -196,9 +189,7 @@ class AgentConnection:
             await asyncio.sleep(poll_interval)
             waited += poll_interval
 
-        raise TimeoutError(
-            f"Task {task_id} did not complete within {max_wait} seconds"
-        )
+        raise TimeoutError(f"Task {task_id} did not complete within {max_wait} seconds")
 
     async def close(self):
         """Close the HTTP client connection."""

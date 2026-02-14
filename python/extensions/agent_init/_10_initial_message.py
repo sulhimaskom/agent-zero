@@ -1,4 +1,5 @@
 import json
+
 from agent import LoopData
 from python.helpers.extension import Extension
 
@@ -10,7 +11,6 @@ class InitialMessage(Extension):
         Add an initial greeting message when first user message is processed.
         Called only once per session via _process_chain method.
         """
-
         # Only add initial message for main agent (A0), not subordinate agents
         if self.agent.number != 0:
             return

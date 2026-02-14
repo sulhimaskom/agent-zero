@@ -195,9 +195,7 @@ class Limits:
 
     # File browser limits
     FILE_BROWSER_MAX_FILE_SIZE: Final[int] = 100 * 1024 * 1024  # 100MB
-    FILE_BROWSER_MAX_ITEMS: Final[int] = (
-        10000  # Maximum number of files/folders to list
-    )
+    FILE_BROWSER_MAX_ITEMS: Final[int] = 10000  # Maximum number of files/folders to list
     FILE_READ_MAX_SIZE: Final[int] = 1024 * 1024  # 1MB
 
     # Project file structure limits
@@ -253,9 +251,7 @@ class Limits:
 
     # IMAP settings
     IMAP_DEFAULT_PORT: Final[int] = 993
-    IMAP_MAX_LINE_LENGTH: Final[int] = (
-        100000  # Increased from default 10000 to handle large emails
-    )
+    IMAP_MAX_LINE_LENGTH: Final[int] = 100000  # Increased from default 10000 to handle large emails
 
     # TTY settings
     TTY_BUFFER_SIZE: Final[int] = 4096
@@ -663,20 +659,12 @@ class Config:
     """Runtime configuration with environment variable support"""
 
     # Timeouts
-    CODE_EXEC_TIMEOUT = get_env_int(
-        "A0_CODE_EXEC_TIMEOUT", Timeouts.CODE_EXEC_MAX
-    )
-    BROWSER_TIMEOUT = get_env_int(
-        "A0_BROWSER_TIMEOUT", Timeouts.BROWSER_OPERATION_TIMEOUT
-    )
+    CODE_EXEC_TIMEOUT = get_env_int("A0_CODE_EXEC_TIMEOUT", Timeouts.CODE_EXEC_MAX)
+    BROWSER_TIMEOUT = get_env_int("A0_BROWSER_TIMEOUT", Timeouts.BROWSER_OPERATION_TIMEOUT)
 
     # Limits
-    MAX_MEMORY_RESULTS = get_env_int(
-        "A0_MAX_MEMORY_RESULTS", Limits.MEMORY_DEFAULT_LIMIT
-    )
-    MEMORY_THRESHOLD = get_env_float(
-        "A0_MEMORY_THRESHOLD", Limits.MEMORY_DEFAULT_THRESHOLD
-    )
+    MAX_MEMORY_RESULTS = get_env_int("A0_MAX_MEMORY_RESULTS", Limits.MEMORY_DEFAULT_LIMIT)
+    MEMORY_THRESHOLD = get_env_float("A0_MEMORY_THRESHOLD", Limits.MEMORY_DEFAULT_THRESHOLD)
 
     # Network
     DEFAULT_PORT = get_env_int("A0_DEFAULT_PORT", Network.WEB_UI_PORT_DEFAULT)
@@ -705,50 +693,32 @@ class Config:
     )
 
     # Tunnel settings
-    TUNNEL_CHECK_DELAY = get_env_int(
-        "A0_TUNNEL_CHECK_DELAY", Timeouts.TUNNEL_CHECK_DELAY
-    )
+    TUNNEL_CHECK_DELAY = get_env_int("A0_TUNNEL_CHECK_DELAY", Timeouts.TUNNEL_CHECK_DELAY)
 
     # External URLs - Fully configurable via environment variables
-    UPDATE_CHECK_URL = get_env_str(
-        "A0_UPDATE_CHECK_URL", ExternalUrls.UPDATE_CHECK_URL
-    )
+    UPDATE_CHECK_URL = get_env_str("A0_UPDATE_CHECK_URL", ExternalUrls.UPDATE_CHECK_URL)
     PERPLEXITY_API_BASE_URL = get_env_str(
         "A0_PERPLEXITY_API_BASE_URL", ExternalUrls.PERPLEXITY_API_BASE_URL
     )
     PERPLEXITY_DEFAULT_MODEL = get_env_str(
         "A0_PERPLEXITY_DEFAULT_MODEL", ExternalUrls.PERPLEXITY_DEFAULT_MODEL
     )
-    AGENT_ZERO_REPO_URL = get_env_str(
-        "A0_AGENT_ZERO_REPO_URL", ExternalUrls.AGENT_ZERO_REPO
-    )
+    AGENT_ZERO_REPO_URL = get_env_str("A0_AGENT_ZERO_REPO_URL", ExternalUrls.AGENT_ZERO_REPO)
 
     # Venice.ai configuration
-    VENICE_API_BASE = get_env_str(
-        "A0_VENICE_API_BASE", ExternalUrls.VENICE_API_BASE
-    )
-    A0_VENICE_API_BASE = get_env_str(
-        "A0_A0_VENICE_API_BASE", ExternalUrls.A0_VENICE_API_BASE
-    )
+    VENICE_API_BASE = get_env_str("A0_VENICE_API_BASE", ExternalUrls.VENICE_API_BASE)
+    A0_VENICE_API_BASE = get_env_str("A0_A0_VENICE_API_BASE", ExternalUrls.A0_VENICE_API_BASE)
 
     # OpenRouter configuration
-    OPENROUTER_API_BASE = get_env_str(
-        "A0_OPENROUTER_API_BASE", ExternalUrls.OPENROUTER_API_BASE
-    )
+    OPENROUTER_API_BASE = get_env_str("A0_OPENROUTER_API_BASE", ExternalUrls.OPENROUTER_API_BASE)
     OPENROUTER_HTTP_REFERER = get_env_str(
         "A0_OPENROUTER_HTTP_REFERER", ExternalUrls.OPENROUTER_HTTP_REFERER
     )
-    OPENROUTER_X_TITLE = get_env_str(
-        "A0_OPENROUTER_X_TITLE", ExternalUrls.OPENROUTER_X_TITLE
-    )
+    OPENROUTER_X_TITLE = get_env_str("A0_OPENROUTER_X_TITLE", ExternalUrls.OPENROUTER_X_TITLE)
 
     # Hostname defaults
-    DEFAULT_HOSTNAME = get_env_str(
-        "A0_DEFAULT_HOSTNAME", Network.DEFAULT_HOSTNAME
-    )
-    DEFAULT_LOCALHOST = get_env_str(
-        "A0_DEFAULT_LOCALHOST", Network.DEFAULT_LOCALHOST
-    )
+    DEFAULT_HOSTNAME = get_env_str("A0_DEFAULT_HOSTNAME", Network.DEFAULT_HOSTNAME)
+    DEFAULT_LOCALHOST = get_env_str("A0_DEFAULT_LOCALHOST", Network.DEFAULT_LOCALHOST)
 
     # Browser configuration - Allowed domains (comma-separated in env var)
     BROWSER_ALLOWED_DOMAINS = get_env_str(
@@ -756,10 +726,9 @@ class Config:
     ).split(",")
 
     # CORS Origins (comma-separated in env var)
-    DEV_CORS_ORIGINS = get_env_str(
-        "A0_DEV_CORS_ORIGINS",
-        ",".join(Network.DEV_CORS_ORIGINS)
-    ).split(",")
+    DEV_CORS_ORIGINS = get_env_str("A0_DEV_CORS_ORIGINS", ",".join(Network.DEV_CORS_ORIGINS)).split(
+        ","
+    )
 
     # Model defaults - All configurable via environment variables
     DEFAULT_CHAT_MODEL_PROVIDER = get_env_str("A0_CHAT_MODEL_PROVIDER", "openrouter")

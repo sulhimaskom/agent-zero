@@ -1,6 +1,6 @@
-from python.helpers.extension import Extension
 from agent import LoopData
 from python.helpers import projects
+from python.helpers.extension import Extension
 
 
 class IncludeProjectExtras(Extension):
@@ -17,9 +17,7 @@ class IncludeProjectExtras(Extension):
         # load file structure if enabled
         if project["file_structure"]["enabled"]:
             file_structure = projects.get_file_structure(project_name)
-            gitignore = cleanup_gitignore(
-                project["file_structure"]["gitignore"]
-            )
+            gitignore = cleanup_gitignore(project["file_structure"]["gitignore"])
 
             # read prompt
             file_structure_prompt = self.agent.read_prompt(
@@ -30,9 +28,7 @@ class IncludeProjectExtras(Extension):
                 file_structure=file_structure,
             )
             # add file structure to the prompt
-            loop_data.extras_temporary["project_file_structure"] = (
-                file_structure_prompt
-            )
+            loop_data.extras_temporary["project_file_structure"] = file_structure_prompt
 
 
 def cleanup_gitignore(gitignore_raw: str) -> str:

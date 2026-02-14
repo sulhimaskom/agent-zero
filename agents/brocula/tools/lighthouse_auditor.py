@@ -1,8 +1,10 @@
 import json
-import subprocess
 import os
-from python.helpers.tool import Tool, Response
+import subprocess
+
 from python.helpers.constants import Network
+from python.helpers.tool import Response, Tool
+
 
 class State:
     @staticmethod
@@ -15,16 +17,20 @@ class State:
         self.audit_results = {}
         self.opportunities = []
 
+
 class lighthouse_auditor(Tool):
     """
     Run Lighthouse audit on a URL to find optimization opportunities.
     Checks performance, accessibility, best practices, and SEO.
     """
 
-    async def execute(self, url: str = None,
-                      categories: str = "performance,accessibility,best-practices,seo",
-                      device: str = "desktop",
-                      **kwargs) -> Response:
+    async def execute(
+        self,
+        url: str = None,
+        categories: str = "performance,accessibility,best-practices,seo",
+        device: str = "desktop",
+        **kwargs,
+    ) -> Response:
         """
         Run Lighthouse audit and report optimization opportunities.
 
@@ -44,10 +50,7 @@ class lighthouse_auditor(Tool):
             # Check if lighthouse is installed
             try:
                 result = subprocess.run(
-                    ["lighthouse", "--version"],
-                    capture_output=True,
-                    text=True,
-                    timeout=10
+                    ["lighthouse", "--version"], capture_output=True, text=True, timeout=10
                 )
                 if result.returncode != 0:
                     raise Exception("Lighthouse not available")
@@ -55,7 +58,7 @@ class lighthouse_auditor(Tool):
                 return Response(
                     message="❌ Lighthouse is not installed. Install with: npm install -g lighthouse",
                     break_loop=False,
-                    additional={"error": "lighthouse_not_installed", "has_issues": True}
+                    additional={"error": "lighthouse_not_installed", "has_issues": True},
                 )
 
             # Prepare output file
@@ -74,24 +77,19 @@ class lighthouse_auditor(Tool):
                 f"--output-path={output_file}",
                 "--chrome-flags=--headless --no-sandbox --disable-gpu",
                 f"--preset={device}",
-                "--quiet"
+                "--quiet",
             ] + category_flags
 
             self.set_progress(f"Running Lighthouse audit on {url} ({device})...")
 
             # Run lighthouse
-            result = subprocess.run(
-                cmd,
-                capture_output=True,
-                text=True,
-                timeout=120
-            )
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
 
             if result.returncode != 0 and not os.path.exists(output_file):
                 return Response(
                     message=f"❌ Lighthouse audit failed: {result.stderr}",
                     break_loop=False,
-                    additional={"error": result.stderr, "has_issues": True}
+                    additional={"error": result.stderr, "has_issues": True},
                 )
 
             # Parse results
@@ -99,10 +97,10 @@ class lighthouse_auditor(Tool):
                 return Response(
                     message="❌ Lighthouse report file not created",
                     break_loop=False,
-                    additional={"error": "no_report", "has_issues": True}
+                    additional={"error": "no_report", "has_issues": True},
                 )
 
-            with open(output_file, 'r') as f:
+            with open(output_file) as f:
                 report = json.load(f)
 
             # Extract scores
@@ -120,26 +118,24 @@ class lighthouse_auditor(Tool):
                 if audit.get("details", {}).get("type") == "opportunity":
                     score = audit.get("score", 1)
                     if score is not None and score < 1:
-                        opportunities.append({
-                            "id": audit_id,
-                            "title": audit.get("title", audit_id),
-                            "description": audit.get("description", ""),
-                            "score": score,
-                            "display_value": audit.get("displayValue", ""),
-                            "numeric_value": audit.get("numericValue", 0),
-                            "details": audit.get("details", {})
-                        })
+                        opportunities.append(
+                            {
+                                "id": audit_id,
+                                "title": audit.get("title", audit_id),
+                                "description": audit.get("description", ""),
+                                "score": score,
+                                "display_value": audit.get("displayValue", ""),
+                                "numeric_value": audit.get("numericValue", 0),
+                                "details": audit.get("details", {}),
+                            }
+                        )
 
             # Sort by impact (lower score = higher priority)
             opportunities.sort(key=lambda x: x["score"])
             state.opportunities = opportunities
 
             # Generate report
-            report_lines = [
-                f"Lighthouse Audit Results for {url}",
-                "=" * 60,
-                ""
-            ]
+            report_lines = [f"Lighthouse Audit Results for {url}", "=" * 60, ""]
 
             # Report scores
             report_lines.append("📊 Scores:")
@@ -152,7 +148,11 @@ class lighthouse_auditor(Tool):
             if opportunities:
                 report_lines.append(f"🔧 Optimization Opportunities ({len(opportunities)} found):")
                 for i, opp in enumerate(opportunities[:15], 1):  # Limit to 15
-                    priority = "🔴 HIGH" if opp["score"] < 0.5 else "🟡 MEDIUM" if opp["score"] < 0.9 else "🟢 LOW"
+                    priority = (
+                        "🔴 HIGH"
+                        if opp["score"] < 0.5
+                        else "🟡 MEDIUM" if opp["score"] < 0.9 else "🟢 LOW"
+                    )
                     report_lines.append(f"\n  {i}. [{priority}] {opp['title']}")
                     report_lines.append(f"     Impact: {opp.get('display_value', 'N/A')}")
                     if opp["description"]:
@@ -183,24 +183,20 @@ class lighthouse_auditor(Tool):
                 "opportunities": opportunities[:20],
                 "low_score_categories": low_scores,
                 "has_issues": len(opportunities) > 0 or len(low_scores) > 0,
-                "report_file": output_file
+                "report_file": output_file,
             }
 
-            return Response(
-                message=message,
-                break_loop=False,
-                additional=additional
-            )
+            return Response(message=message, break_loop=False, additional=additional)
 
         except subprocess.TimeoutExpired:
             return Response(
                 message="❌ Lighthouse audit timed out (120s)",
                 break_loop=False,
-                additional={"error": "timeout", "has_issues": True}
+                additional={"error": "timeout", "has_issues": True},
             )
         except Exception as e:
             return Response(
-                message=f"❌ Lighthouse audit failed: {str(e)}",
+                message=f"❌ Lighthouse audit failed: {e!s}",
                 break_loop=False,
-                additional={"error": str(e), "has_issues": True}
+                additional={"error": str(e), "has_issues": True},
             )
