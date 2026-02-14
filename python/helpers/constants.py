@@ -644,10 +644,18 @@ class Config:
     # Network
     DEFAULT_PORT = get_env_int("A0_DEFAULT_PORT", Network.WEB_UI_PORT_DEFAULT)
     SEARXNG_PORT = get_env_int("A0_SEARXNG_PORT", Network.SEARXNG_PORT_DEFAULT)
+    TUNNEL_API_PORT = get_env_int("A0_TUNNEL_API_PORT", Network.TUNNEL_API_PORT_DEFAULT)
+    BROCULA_PORT = get_env_int("A0_BROCULA_PORT", Network.BROCULA_PORT_DEFAULT)
+
+    # RFC Ports
+    RFC_PORT_HTTP = get_env_int("A0_RFC_PORT_HTTP", Limits.RFC_PORT_HTTP)
+    RFC_PORT_SSH = get_env_int("A0_RFC_PORT_SSH", Limits.RFC_PORT_SSH)
 
     # Paths (can be overridden via env vars)
     PROJECTS_DIR = get_env_str("A0_PROJECTS_DIR", Paths.PROJECTS_PARENT_DIR)
     MEMORY_PATH = get_env_str("A0_MEMORY_PATH", Paths.MEMORY_DIR)
+    UPLOAD_FOLDER = get_env_str("A0_UPLOAD_FOLDER", Paths.UPLOAD_FOLDER)
+    WHISPER_MODEL_ROOT = get_env_str("A0_WHISPER_MODEL_ROOT", Paths.WHISPER_MODEL_ROOT)
 
     # Notification settings
     NOTIFICATION_LIFETIME_HOURS = get_env_int(
