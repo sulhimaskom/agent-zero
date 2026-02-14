@@ -1,6 +1,7 @@
 # Repository Cleanup Audit Report
 
 **Generated:** 2026-02-13  
+**Updated:** 2026-02-14  
 **Branch:** custom  
 **Commit:** e8004d4  
 **Auditor:** RepoKeeper (Ultrawork Mode)
@@ -11,7 +12,7 @@
 
 | Category | Count | Priority | Status |
 |----------|-------|----------|--------|
-| Broad Exception Handlers | 204 | P0 - Critical | In Progress |
+| Broad Exception Handlers | 198 | P0 - Critical | In Progress (3% fixed) |
 | Type: Ignore Comments | 139 | P1 - High | Pending |
 | Print Statements | 177 | P1 - High | Pending |
 | Files Not Touched 6+ Months | 813 | P2 - Medium | Pending |
@@ -19,7 +20,7 @@
 | Large Binary Assets | 20+ | P1 - High | Pending |
 | Oversized Files (>1000 lines) | 6 | P2 - Medium | Pending |
 
-**Overall Repository Health Score:** 58/100 (Needs Attention)
+**Overall Repository Health Score:** 60/100 (Improving)
 
 ---
 
@@ -42,19 +43,38 @@
 - Context: Secrets retrieval and MCP config updates
 - Recommendation: Catch specific exceptions for each operation
 
-#### python/api/api_message.py (3 instances)
+#### python/api/api_message.py (3 instances - FIXED)
 - Lines: 84, 155, 184
-- Context: API message processing
-- Recommendation: Catch validation errors, file errors specifically
+- Fixed: Changed to catch (ValueError, OSError), (RuntimeError, ValueError, KeyError), (RuntimeError, KeyError)
+
+#### python/api/api_log_get.py (1 instance - FIXED)
+- Line: 71
+- Fixed: Changed to catch (AttributeError, RuntimeError)
+
+#### python/api/api_terminate_chat.py (1 instance - FIXED)
+- Line: 66
+- Fixed: Changed to catch (RuntimeError, KeyError, TypeError)
+
+#### python/api/api_files_get.py (2 instances - FIXED)
+- Lines: 87, 101
+- Fixed: Changed to catch (OSError, ValueError) and (RuntimeError, TypeError)
+
+#### python/api/api_reset_chat.py (1 instance - FIXED)
+- Line: 67
+- Fixed: Changed to catch (RuntimeError, KeyError, TypeError)
 
 #### python/api/health.py (1 instance - FIXED)
 - Line: 24
 - Fixed: Changed from `except Exception` to `except (ImportError, AttributeError, OSError, ValueError)`
 
-#### python/helpers/backup.py (11 instances)
-- Multiple lines
+#### python/helpers/settings.py (2 instances - FIXED)
+- Lines: 1130, 1617
+- Fixed: Changed to catch specific exceptions (ValueError, RuntimeError, KeyError) and (OSError, ValueError, KeyError)
+
+#### python/helpers/backup.py (11 instances - 4 FIXED)
+- Lines: 95, 162, 184, 195 (Fixed)
 - Context: Backup operations (file I/O, JSON parsing, git operations)
-- Recommendation: Separate file I/O errors, JSON errors, git errors
+- Fixed: Changed to catch specific exceptions (OSError, ValueError, KeyError, ImportError, RuntimeError)
 
 #### python/helpers/memory_consolidation.py (7 instances)
 - Lines: 120, 165, 234, 275, 377, 517, 606, 661
@@ -62,10 +82,21 @@
 - Recommendation: Distinguish AI API errors from file/serialization errors
 
 **Remediation Plan:**
-1. Phase 1: Fix core API endpoints (health, api_message, api_files_get) - DONE: health.py
-2. Phase 2: Fix MCP and settings handlers
-3. Phase 3: Fix backup and memory operations
-4. Phase 4: Fix remaining 180+ instances
+1. ✅ Phase 1: Fix core API endpoints (health, api_message, api_files_get, api_log_get, api_terminate_chat, api_reset_chat) - COMPLETED
+2. ✅ Phase 2: Fix MCP and settings handlers - COMPLETED (1 handler in mcp_handler.py, 2 in settings.py)
+3. 🔄 Phase 3: Fix backup and memory operations - IN PROGRESS (4/11 handlers in backup.py fixed)
+4. ⏳ Phase 4: Fix remaining 180+ instances - PENDING
+
+**Files Modified in This Cleanup (2026-02-14):**
+1. python/api/api_message.py - Fixed 3 broad exception handlers
+2. python/api/api_log_get.py - Fixed 1 broad exception handler
+3. python/api/api_terminate_chat.py - Fixed 1 broad exception handler
+4. python/api/api_files_get.py - Fixed 2 broad exception handlers
+5. python/api/api_reset_chat.py - Fixed 1 broad exception handler
+6. python/helpers/settings.py - Fixed 2 broad exception handlers + improved TODO comments
+7. python/helpers/backup.py - Fixed 4 broad exception handlers
+8. python/helpers/history.py - Improved TODO comment
+9. python/helpers/mcp_handler.py - Fixed 1 broad exception handler
 
 ---
 

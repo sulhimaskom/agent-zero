@@ -68,7 +68,7 @@ class ApiLogGet(ApiHandler):
                 },
             }
 
-        except Exception as e:
+        except (AttributeError, RuntimeError) as e:
             return Response(
                 f'{{"error": "{str(e)}"}}',
                 status=500,

@@ -179,7 +179,8 @@ class Topic(Record):
         )
         large_msgs = []
         for m in (m for m in self.messages if not m.summary):
-            # TODO refactor this
+            # Technical Debt: This loop processes message output multiple times.
+            # Consider extracting message analysis into a separate method for clarity.
             out = m.output()
             text = output_text(out)
             tok = m.get_tokens()

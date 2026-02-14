@@ -1127,7 +1127,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
     secrets_manager = get_default_secrets_manager()
     try:
         secrets = secrets_manager.get_masked_secrets()
-    except Exception:
+    except (RuntimeError, ValueError, KeyError):
         secrets = ""
 
     secrets_fields.append(
@@ -1614,7 +1614,7 @@ def _apply_settings(previous: Settings | None):
                 mcp_config = MCPConfig.get_instance()
                 try:
                     MCPConfig.update(mcp_servers)
-                except Exception as e:
+                except (ValueError, RuntimeError, KeyError) as e:
                     AgentContext.log_to_all(
                         type="error",
                         content=f"Failed to update MCP settings: {e}",
@@ -1656,9 +1656,10 @@ def _apply_settings(previous: Settings | None):
             _ = defer.run_in_background(update_mcp_settings(config.mcp_servers))
 
         # update token in mcp server
-        current_token = (
-            create_auth_token()
-        )  # TODO - ugly, token in settings is generated from dotenv and does not always correspond
+        # Technical Debt: Token is generated from dotenv which may not match the settings store.
+        # This can cause token mismatch when dotenv is updated externally.
+        # Future: Implement unified token source of truth to prevent desynchronization.
+        current_token = create_auth_token()
         if not previous or current_token != previous["mcp_server_token"]:
 
             async def update_mcp_token(token: str):

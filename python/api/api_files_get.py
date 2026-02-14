@@ -84,7 +84,7 @@ class ApiFilesGet(ApiHandler):
                         f"Retrieved file: {filename} ({len(file_content)} bytes)"
                     )
 
-                except Exception as e:
+                except (OSError, ValueError) as e:
                     PrintStyle.error(f"Failed to read file {path}: {str(e)}")
                     continue
 
@@ -98,7 +98,7 @@ class ApiFilesGet(ApiHandler):
 
             return result
 
-        except Exception as e:
+        except (RuntimeError, TypeError) as e:
             PrintStyle.error(f"API files get error: {str(e)}")
             return Response(
                 json.dumps({"error": f"Internal server error: {str(e)}"}),
