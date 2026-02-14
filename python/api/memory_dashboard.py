@@ -11,7 +11,6 @@ from python.helpers.memory import (
 
 
 class MemoryDashboard(ApiHandler):
-
     async def process(self, input: dict, request: Request) -> dict | Response:
         try:
             action = input.get("action", "search")

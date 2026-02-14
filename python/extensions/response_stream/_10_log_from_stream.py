@@ -9,7 +9,6 @@ from python.helpers.extension import Extension
 
 
 class LogFromStream(Extension):
-
     async def execute(
         self,
         loop_data: LoopData = LoopData(),

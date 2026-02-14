@@ -4,7 +4,6 @@ from python.helpers.extension import Extension
 
 
 class BehaviourPrompt(Extension):
-
     async def execute(
         self, system_prompt: list[str] | None = None, loop_data: LoopData = LoopData(), **kwargs
     ):

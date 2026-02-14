@@ -424,9 +424,7 @@ class MCPConfig(BaseModel):
                             f"Error: Parsed MCP config (from json.loads) top-level structure is not a list. Config string was: '{config_str}'"
                         )
                         # servers_data remains empty
-                except (
-                    Exception
-                ) as e_json:  # Catch json.JSONDecodeError specifically if possible, or general Exception
+                except Exception as e_json:  # Catch json.JSONDecodeError specifically if possible, or general Exception
                     PrintStyle.error(
                         f"Error parsing MCP config string: {e_json}. Config string was: '{config_str}'"
                     )
@@ -717,8 +715,7 @@ class MCPConfig(BaseModel):
 
                 for tool in tools:
                     prompt += (
-                        f"\n### {server_name}.{tool['name']}:\n"
-                        f"{tool['description']}\n\n"
+                        f"\n### {server_name}.{tool['name']}:\n{tool['description']}\n\n"
                         # f"#### Categories:\n"
                         # f"* kind: MCP Server Tool\n"
                         # f'* server: "{server_name}" ({server.description})\n\n'
@@ -737,7 +734,7 @@ class MCPConfig(BaseModel):
                         # f'    "observations": ["..."],\n' # TODO: this should be a prompt file with placeholders
                         f'    "thoughts": ["..."],\n'
                         # f'    "reflection": ["..."],\n' # TODO: this should be a prompt file with placeholders
-                        f"    \"tool_name\": \"{server_name}.{tool['name']}\",\n"
+                        f'    "tool_name": "{server_name}.{tool["name"]}",\n'
                         f'    "tool_args": !follow schema above\n'
                         f"}}\n"
                     )
@@ -798,7 +795,9 @@ class MCPClientBase(ABC):
 
     # Protected method
     @abstractmethod
-    async def _create_stdio_transport(self, current_exit_stack: AsyncExitStack) -> tuple[
+    async def _create_stdio_transport(
+        self, current_exit_stack: AsyncExitStack
+    ) -> tuple[
         MemoryObjectReceiveStream[SessionMessage | Exception],
         MemoryObjectSendStream[SessionMessage],
     ]:
@@ -821,7 +820,6 @@ class MCPClientBase(ABC):
         try:
             async with AsyncExitStack() as temp_stack:
                 try:
-
                     stdio, write = await self._create_stdio_transport(temp_stack)
                     # PrintStyle(font_color="cyan").print(f"MCPClientBase ({self.server.name} - {operation_name}): Transport created. Initializing session...")
                     session = await temp_stack.enter_async_context(
@@ -903,7 +901,7 @@ class MCPClientBase(ABC):
             )
             with self.__lock:
                 self.tools = []  # Ensure tools are cleared on failure
-                self.error = f"Failed to initialize. {error_text[:Limits.COMMAND_TRUNCATION_PRIMARY]}{'...' if len(error_text) > Limits.COMMAND_TRUNCATION_PRIMARY else ''}"  # store error from tools fetch
+                self.error = f"Failed to initialize. {error_text[: Limits.COMMAND_TRUNCATION_PRIMARY]}{'...' if len(error_text) > Limits.COMMAND_TRUNCATION_PRIMARY else ''}"  # store error from tools fetch
         return self
 
     def has_tool(self, tool_name: str) -> bool:
@@ -983,7 +981,9 @@ class MCPClientLocal(MCPClientBase):
                 self.log_file.close()
             self.log_file = None
 
-    async def _create_stdio_transport(self, current_exit_stack: AsyncExitStack) -> tuple[
+    async def _create_stdio_transport(
+        self, current_exit_stack: AsyncExitStack
+    ) -> tuple[
         MemoryObjectReceiveStream[SessionMessage | Exception],
         MemoryObjectSendStream[SessionMessage],
     ]:
@@ -1050,13 +1050,14 @@ class CustomHTTPClientFactory(ABC):
 
 
 class MCPClientRemote(MCPClientBase):
-
     def __init__(self, server: MCPServerLocal | MCPServerRemote):
         super().__init__(server)
         self.session_id: str | None = None  # Track session ID for streaming HTTP clients
         self.session_id_callback: Callable[[], str | None] | None = None
 
-    async def _create_stdio_transport(self, current_exit_stack: AsyncExitStack) -> tuple[
+    async def _create_stdio_transport(
+        self, current_exit_stack: AsyncExitStack
+    ) -> tuple[
         MemoryObjectReceiveStream[SessionMessage | Exception],
         MemoryObjectSendStream[SessionMessage],
     ]:

@@ -48,7 +48,9 @@ async def _preload(model_name: str):
                 group="whisper-preload",
             )
             PrintStyle.standard(f"Loading Whisper model: {model_name}")
-            _model = whisper.load_model(name=model_name, download_root=files.get_abs_path(Paths.WHISPER_MODEL_ROOT))  # type: ignore
+            _model = whisper.load_model(
+                name=model_name, download_root=files.get_abs_path(Paths.WHISPER_MODEL_ROOT)
+            )  # type: ignore
             _model_name = model_name
             NotificationManager.send_notification(
                 NotificationType.INFO,

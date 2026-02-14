@@ -8,7 +8,6 @@ from python.helpers.settings import get_settings
 
 
 class SystemPrompt(Extension):
-
     async def execute(
         self,
         system_prompt: list[str] | None = None,

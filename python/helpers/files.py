@@ -23,7 +23,9 @@ from python.helpers.strings import sanitize_string
 
 class VariablesPlugin(ABC):
     @abstractmethod
-    def get_variables(self, file: str, backup_dirs: list[str] | None = None, **kwargs) -> dict[str, Any]:  # type: ignore
+    def get_variables(
+        self, file: str, backup_dirs: list[str] | None = None, **kwargs
+    ) -> dict[str, Any]:  # type: ignore
         pass
 
 
@@ -45,7 +47,6 @@ def load_plugin_variables(
         plugin_file = None
 
     if plugin_file and exists(plugin_file):
-
         from python.helpers import extract_tools
 
         classes = extract_tools.load_classes_from_file(

@@ -20,7 +20,6 @@ notification_cooldown_seconds = (
 
 
 class UpdateCheck(Extension):
-
     async def execute(self, loop_data: LoopData = LoopData(), text: str = "", **kwargs):
         try:
             global last_check, last_notification_id, last_notification_time

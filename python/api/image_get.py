@@ -11,7 +11,6 @@ from python.helpers.constants import Timeouts
 
 
 class ImageGet(ApiHandler):
-
     @classmethod
     def get_methods(cls) -> list[str]:
         return ["GET"]
@@ -51,7 +50,6 @@ class ImageGet(ApiHandler):
         #     return _get_file_metadata(path, filename, file_ext, image_extensions)
 
         if file_ext in image_extensions:
-
             # in development environment, try to serve the image from local file system if exists, otherwise from docker
             if runtime.is_development():
                 if files.exists(path):

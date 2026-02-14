@@ -44,7 +44,6 @@ class State:
 
 
 class CodeExecution(Tool):
-
     # Common shell prompt regex patterns (add more as needed)
     prompt_patterns = [
         re.compile(r"\\(venv\\).+[$#] ?$"),  # (venv) ...$ or (venv) ...#
@@ -199,7 +198,6 @@ class CodeExecution(Tool):
         # try again on lost connection
         for i in range(2):
             try:
-
                 self.state.shells[session].running = True
                 await self.state.shells[session].session.send_command(command)
 

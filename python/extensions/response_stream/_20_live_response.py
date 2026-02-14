@@ -3,7 +3,6 @@ from python.helpers.extension import Extension
 
 
 class LiveResponse(Extension):
-
     async def execute(
         self,
         loop_data: LoopData = LoopData(),

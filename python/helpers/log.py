@@ -180,7 +180,6 @@ class LogItem:
 
 
 class Log:
-
     def __init__(self):
         self.context: AgentContext | None = None  # set from outside
         self.guid: str = str(uuid.uuid4())
