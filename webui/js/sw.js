@@ -1,33 +1,36 @@
 /**
  * Agent Zero Service Worker
  * Provides offline support and caching for PWA functionality
- * @version 1.0.0
+ * @version 1.0.1
  */
 
-const CACHE_NAME = 'agent-zero-v1';
+const CACHE_NAME = 'agent-zero-v2';
 const STATIC_ASSETS = [
   '/',
   '/index.html',
-  '/index.css',
-  '/css/messages.css',
-  '/css/buttons.css',
-  '/css/toast.css',
-  '/css/settings.css',
-  '/css/modals.css',
-  '/css/speech.css',
-  '/css/scheduler-datepicker.css',
-  '/css/notification.css',
-  '/js/api.js',
-  '/js/messages.js',
-  '/js/settings.js',
-  '/js/scheduler.js',
-  '/js/modals.js',
-  '/js/components.js',
-  '/js/constants.js',
-  '/js/device.js',
-  '/js/keyboard-shortcuts.js',
-  '/js/speech_browser.js',
-  '/js/time-utils.js',
+  '/index.min.css',
+  '/css/messages.min.css',
+  '/css/buttons.min.css',
+  '/css/toast.min.css',
+  '/css/settings.min.css',
+  '/css/modals.min.css',
+  '/css/speech.min.css',
+  '/css/scheduler-datepicker.min.css',
+  '/css/notification.min.css',
+  '/js/api.min.js',
+  '/js/messages.min.js',
+  '/js/settings.min.js',
+  '/js/scheduler.min.js',
+  '/js/modals.min.js',
+  '/js/components.min.js',
+  '/js/constants.min.js',
+  '/js/device.min.js',
+  '/js/keyboard-shortcuts.min.js',
+  '/js/speech_browser.min.js',
+  '/js/time-utils.min.js',
+  '/js/initFw.min.js',
+  '/js/AlpineStore.min.js',
+  '/index.min.js',
   '/vendor/alpine/alpine.min.js',
   '/vendor/flatpickr/flatpickr.min.js',
   '/vendor/flatpickr/flatpickr.min.css',
@@ -40,33 +43,23 @@ const STATIC_ASSETS = [
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => {
-        return cache.addAll(STATIC_ASSETS);
-      })
-      .catch(() => {
-        // Failed to cache static assets - silent fail
-      })
+      .then((cache) => cache.addAll(STATIC_ASSETS))
+      .catch(() => {})
   );
-
-  // Skip waiting to activate immediately
   self.skipWaiting();
 });
 
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
+    caches.keys().then((cacheNames) =>
+      Promise.all(
         cacheNames
           .filter((name) => name !== CACHE_NAME)
-          .map((name) => {
-            return caches.delete(name);
-          })
-      );
-    })
+          .map((name) => caches.delete(name))
+      )
+    )
   );
-
-  // Take control of all clients immediately
   self.clients.claim();
 });
 
@@ -95,26 +88,18 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Stale-while-revalidate strategy for static assets
   event.respondWith(
     caches.match(request).then((cachedResponse) => {
       const fetchPromise = fetch(request)
         .then((networkResponse) => {
-          // Update cache with fresh response
           if (networkResponse.ok && networkResponse.status !== 206) {
-            const responseToCache = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => {
-              cache.put(request, responseToCache);
+              cache.put(request, networkResponse.clone());
             });
           }
           return networkResponse;
         })
-        .catch(() => {
-          // Return cached response if available
-          return cachedResponse;
-        });
-
-      // Return cached response immediately, or wait for network
+        .catch(() => cachedResponse);
       return cachedResponse || fetchPromise;
     })
   );

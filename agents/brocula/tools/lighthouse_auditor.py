@@ -54,7 +54,7 @@ class lighthouse_auditor(Tool):
                 )
                 if result.returncode != 0:
                     raise Exception("Lighthouse not available")
-            except Exception:
+            except Exception as e:
                 return Response(
                     message="❌ Lighthouse is not installed. Install with: npm install -g lighthouse",
                     break_loop=False,
@@ -152,9 +152,7 @@ class lighthouse_auditor(Tool):
                     priority = (
                         "🔴 HIGH"
                         if opp["score"] < 0.5
-                        else "🟡 MEDIUM"
-                        if opp["score"] < 0.9
-                        else "🟢 LOW"
+                        else "🟡 MEDIUM" if opp["score"] < 0.9 else "🟢 LOW"
                     )
                     report_lines.append(f"\n  {i}. [{priority}] {opp['title']}")
                     report_lines.append(f"     Impact: {opp.get('display_value', 'N/A')}")

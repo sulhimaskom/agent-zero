@@ -44,7 +44,7 @@ class TunnelManager:
                     self.tunnel.start()
                     self.tunnel_url = self.tunnel.tunnel_url
                     self.is_running = True
-                except Exception:
+                except Exception as e:
                     pass
 
             tunnel_thread = threading.Thread(target=run_tunnel)
@@ -60,7 +60,7 @@ class TunnelManager:
                 time.sleep(Timeouts.TUNNEL_STARTUP_DELAY)
 
             return self.tunnel_url
-        except Exception:
+        except Exception as e:
             return None
 
     def stop_tunnel(self):
@@ -72,7 +72,7 @@ class TunnelManager:
                 self.tunnel_url = None
                 self.provider = None
                 return True
-            except Exception:
+            except Exception as e:
                 return False
         return False
 
