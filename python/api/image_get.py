@@ -7,7 +7,7 @@ from flask import Request, Response, send_file
 
 from python.helpers import files, runtime
 from python.helpers.api import ApiHandler
-from python.helpers.constants import Timeouts
+from python.helpers.constants import MimeTypes, Timeouts
 
 
 class ImageGet(ApiHandler):
@@ -62,7 +62,7 @@ class ImageGet(ApiHandler):
                     file_content = base64.b64decode(b64_content)
                     mime_type, _ = guess_type(filename)
                     if not mime_type:
-                        mime_type = "application/octet-stream"
+                        mime_type = MimeTypes.DEFAULT_BINARY
                     response = send_file(
                         io.BytesIO(file_content),
                         mimetype=mime_type,

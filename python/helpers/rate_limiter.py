@@ -63,4 +63,4 @@ class RateLimiter:
             if not should_wait:
                 break
 
-            await asyncio.sleep(1)
+            await asyncio.sleep(Timeouts.RETRY_DELAY_SHORT)

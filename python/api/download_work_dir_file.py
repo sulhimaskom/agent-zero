@@ -8,6 +8,7 @@ from flask import Response
 from python.api import file_info
 from python.helpers import files, runtime
 from python.helpers.api import ApiHandler, Input, Output, Request
+from python.helpers.constants import MimeTypes
 
 
 def stream_file_download(file_source, download_name, chunk_size=8192):
@@ -56,7 +57,7 @@ def stream_file_download(file_source, download_name, chunk_size=8192):
     # Detect content type based on file extension
     content_type, _ = mimetypes.guess_type(download_name)
     if not content_type:
-        content_type = "application/octet-stream"
+        content_type = MimeTypes.DEFAULT_BINARY
 
     # Create streaming response with proper headers for immediate streaming
     response = Response(

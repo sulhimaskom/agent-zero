@@ -110,6 +110,10 @@ class Timeouts:
     # Rate limiter timeframe
     RATE_LIMITER_DEFAULT_TIMEFRAME: Final[int] = 60
 
+    # Async sleep delays
+    RETRY_DELAY_SHORT: Final[int] = 1  # Short delay between retries (seconds)
+    POLLING_INTERVAL: Final[int] = 1  # Polling interval for wait operations (seconds)
+
 
 # =============================================================================
 # SIZE LIMITS AND THRESHOLDS
@@ -392,6 +396,18 @@ class FileExtensions:
     JSON: Final[str] = ".json"
     YAML: Final[str] = ".yaml"
     YML: Final[str] = ".yml"
+
+
+class MimeTypes:
+    """MIME type constants for file handling."""
+
+    DEFAULT_BINARY: Final[str] = "application/octet-stream"
+    JSON: Final[str] = "application/json"
+    PDF: Final[str] = "application/pdf"
+    ZIP: Final[str] = "application/zip"
+    TEXT_PLAIN: Final[str] = "text/plain"
+    TEXT_HTML: Final[str] = "text/html"
+    IMAGE_SVG: Final[str] = "image/svg+xml"
 
 
 # =============================================================================

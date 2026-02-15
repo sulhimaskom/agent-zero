@@ -446,7 +446,7 @@ class DocumentQueryHelper:
                                 raise Exception(response.status)
                             break
                     except Exception as e:
-                        await asyncio.sleep(1)
+                        await asyncio.sleep(Timeouts.RETRY_DELAY_SHORT)
                         last_error = str(e)
                     retries += 1
                     await self.agent.handle_intervention()
