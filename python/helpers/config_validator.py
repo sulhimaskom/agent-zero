@@ -246,7 +246,7 @@ class ConfigValidator:
 
     def _generate_config_summary(self) -> dict[str, Any]:
         """Generate a safe summary of configuration."""
-        summary = {
+        summary: dict[str, Any] = {
             "environment": {},
             "api_configured": False,
         }
