@@ -638,7 +638,7 @@ class BrowserCompatibleChatWrapper(ChatOpenRouter):
             except (AttributeError, TypeError):
                 pass
 
-        except Exception:
+        except Exception as e:
             raise
 
         # another hack for browser-use post process invalid jsons

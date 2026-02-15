@@ -138,7 +138,7 @@ def get_comparator(condition: str):
         try:
             result = simple_eval(condition, {}, data)
             return result
-        except Exception:
+        except Exception as e:
             # PrintStyle.error(f"Error evaluating condition: {e}")
             return False
 

@@ -36,7 +36,7 @@ def get_test_urls():
 
         return {"token": token, "urls": urls}
 
-    except Exception:
+    except Exception as e:
         return None
 
 
@@ -74,7 +74,7 @@ def validate_token_format():
 
         return True
 
-    except Exception:
+    except Exception as e:
         return False
 
 
@@ -91,7 +91,7 @@ async def test_server_connectivity():
                 return True
             except httpx.ConnectError:
                 return False
-            except Exception:
+            except Exception as e:
                 return False
 
     except ImportError:
@@ -114,7 +114,7 @@ def main():
             print_troubleshooting()
             return 1
 
-    except Exception:
+    except Exception as e:
         pass
 
     # Print test commands

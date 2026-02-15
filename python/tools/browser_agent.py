@@ -217,7 +217,7 @@ class State:
                     if self.use_agent.browser_session
                     else None
                 )
-            except Exception:
+            except Exception as e:
                 # Browser session might be closed or invalid
                 return None
         return None
@@ -405,7 +405,7 @@ class BrowserAgent(Tool):
                 if self.state and self.state.task and not self.state.task.is_ready():
                     await self.state.task.execute_inside(_get_update)
 
-            except Exception:
+            except Exception as e:
                 pass
 
         return result
@@ -431,7 +431,7 @@ class BrowserAgent(Tool):
     def _mask(self, text: str) -> str:
         try:
             return get_secrets_manager(self.agent.context).mask_values(text or "")
-        except Exception:
+        except Exception as e:
             return text or ""
 
     # def __del__(self):
