@@ -10,6 +10,8 @@ from typing import Any
 
 from python.helpers.constants import (
     Config as ConstConfig,
+    Limits,
+    Network,
 )
 
 
@@ -43,10 +45,11 @@ def get_frontend_config() -> dict[str, Any]:
         },
         # Limits (for frontend validation)
         "LIMITS": {
-            "max_attachment_size": 10 * 1024 * 1024,  # 10MB
-            "max_file_size": 100 * 1024 * 1024,  # 100MB
+            "max_attachment_size": Limits.FILE_BROWSER_MAX_FILE_SIZE,
+            "max_file_size": Limits.FILE_READ_MAX_SIZE,
             "max_message_length": 10000,
         },
+        "STATIC_PORTS": ['8080', '5002', '3000', '5000', '8000', '5500', '3001', '50001'],
     }
 
 

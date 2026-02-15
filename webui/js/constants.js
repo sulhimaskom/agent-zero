@@ -31,9 +31,11 @@ export const API = {
   HOSTNAME: getEnvConfig('HOSTNAME', "localhost"),
 
   // Endpoints
-  CSRF_TOKEN_ENDPOINT: "/csrf_token",
+  CSRF_TOKEN_ENDPOINT: getEnvConfig('CSRF_TOKEN_ENDPOINT', "/csrf_token"),
   POLL_ENDPOINT: "/poll",
   LOGIN_ENDPOINT: "/login",
+
+  STATIC_PORTS: getEnvConfig('STATIC_PORTS', ['8080', '5002', '3000', '5000', '8000', '5500', '3001', '50001']),
 
   // Status codes
   STATUS_OK: 200,
