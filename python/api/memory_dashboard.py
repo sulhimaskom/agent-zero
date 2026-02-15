@@ -141,7 +141,7 @@ class MemoryDashboard(ApiHandler):
                 "memory_subdir": memory_subdir or "default",
             }
 
-        except Exception as e:
+        except Exception:
             return {
                 "success": True,  # Still success, just fallback to default
                 "memory_subdir": "default",

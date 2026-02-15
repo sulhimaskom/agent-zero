@@ -18,7 +18,7 @@ def gemini_clean_and_conform(text: str):
     try:
         # dirty_json parser is robust enough to handle markdown fences
         obj = dirty_json.parse(text)
-    except Exception as e:
+    except Exception:
         return None  # return None if parsing fails
 
     if not isinstance(obj, dict):
