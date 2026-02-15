@@ -10,8 +10,8 @@ import {
   justToast,
   getConnectionStatus,
 } from "/index.js";
-import { store as notificationStore } from "/components/notifications/notification-store.js";
-import { store as tasksStore } from "/components/sidebar/tasks/tasks-store.js";
+import { store as notificationStore } from "/components/notifications/notification-store.min.js";
+import { store as tasksStore } from "/components/sidebar/tasks/tasks-store.min.js";
 import { RETRY, TIMING } from '/js/constants.js';
 
 const model = {

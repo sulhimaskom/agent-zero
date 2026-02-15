@@ -1,6 +1,6 @@
 from python.helpers import errors, git
 from python.helpers.api import ApiHandler, Request, Response
-from python.helpers.health_check import get_health_checker, Diagnostics
+from python.helpers.health_check import Diagnostics, get_health_checker
 
 
 class HealthCheck(ApiHandler):

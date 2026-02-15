@@ -2,7 +2,7 @@ import { createStore } from "/js/AlpineStore.js";
 import { getContext } from "/index.js";
 import * as API from "/js/api.js";
 import { openModal, closeModal } from "/js/modals.js";
-import { store as notificationStore } from "/components/notifications/notification-store.js";
+import { store as notificationStore } from "/components/notifications/notification-store.min.js";
 import { LIMITS, STORAGE_KEYS, DEFAULTS, TIMING } from "/js/constants.js";
 
 // Helper function for toasts

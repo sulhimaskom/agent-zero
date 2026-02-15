@@ -1,6 +1,6 @@
-import { store as chatInputStore } from "/components/chat/input/input-store.js";
-import { store as historyStore } from "/components/modals/history/history-store.js";
-import { store as contextStore } from "/components/modals/context/context-store.js";
+import { store as chatInputStore } from "/components/chat/input/input-store.min.js";
+import { store as historyStore } from "/components/modals/history/history-store.min.js";
+import { store as contextStore } from "/components/modals/context/context-store.min.js";
 
 const shortcuts = {
   "ctrl+space": {

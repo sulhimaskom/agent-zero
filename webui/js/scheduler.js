@@ -4,11 +4,11 @@
  */
 
 import { formatDateTime, getUserTimezone } from './time-utils.js';
-import { store as chatsStore } from "/components/sidebar/chats/chats-store.js"
-import { store as  notificationsStore } from "/components/notifications/notification-store.js"
-import { store as projectsStore } from "/components/projects/projects-store.js"
+import { store as chatsStore } from "/components/sidebar/chats/chats-store.min.js"
+import { store as  notificationsStore } from "/components/notifications/notification-store.min.js"
+import { store as projectsStore } from "/components/projects/projects-store.min.js"
 import { TIMING } from './constants.js';
-import Logger from './logger.js';
+import Logger from './logger.min.js';
 
 const showToast = function(message, type = 'info') {
     // Use new frontend notification system
