@@ -10,7 +10,6 @@ import sys
 import time
 from pathlib import Path
 
-sys.path.insert(0, "/home/runner/work/agent-zero/agent-zero")
 from python.helpers.constants import Network
 
 

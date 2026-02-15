@@ -126,7 +126,7 @@ class ChatGenerationResult:
             close_pos = response.find(self.thinking_tag)
             if close_pos != -1:
                 reasoning += response[:close_pos]
-                response = response[close_pos + len(self.thinking_tag) :]
+                response = response[close_pos + len(self.thinking_tag):]
                 self.thinking = False
                 self.thinking_tag = ""
             else:
@@ -139,14 +139,14 @@ class ChatGenerationResult:
         else:
             for opening_tag, closing_tag in self.thinking_pairs:
                 if response.startswith(opening_tag):
-                    response = response[len(opening_tag) :]
+                    response = response[len(opening_tag):]
                     self.thinking = True
                     self.thinking_tag = closing_tag
 
                     close_pos = response.find(closing_tag)
                     if close_pos != -1:
                         reasoning += response[:close_pos]
-                        response = response[close_pos + len(closing_tag) :]
+                        response = response[close_pos + len(closing_tag):]
                         self.thinking = False
                         self.thinking_tag = ""
                     else:
@@ -707,7 +707,7 @@ class LocalSentenceTransformerWrapper(Embeddings):
 
         # Remove the "sentence-transformers/" prefix if present
         if model.startswith("sentence-transformers/"):
-            model = model[len("sentence-transformers/") :]
+            model = model[len("sentence-transformers/"):]
 
         # Filter kwargs for SentenceTransformer only (no LiteLLM params like 'stream_timeout')
         st_allowed_keys = {
