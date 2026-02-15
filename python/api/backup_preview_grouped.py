@@ -2,6 +2,7 @@ from typing import Any
 
 from python.helpers.api import ApiHandler, Request, Response
 from python.helpers.backup import BackupService
+from python.helpers.constants import Limits
 
 
 class BackupPreviewGrouped(ApiHandler):
@@ -57,7 +58,7 @@ class BackupPreviewGrouped(ApiHandler):
             }
 
             backup_service = BackupService()
-            all_files = await backup_service.test_patterns(metadata, max_files=10000)
+            all_files = await backup_service.test_patterns(metadata, max_files=Limits.BACKUP_MAX_FILES_PARTIAL)
 
             # Apply search filter if provided
             if search_filter.strip():

@@ -22,7 +22,7 @@ from langchain_core.prompts import (  # noqa: E402
 )
 
 import models  # noqa: E402
-import python.helpers.log as Log  # noqa: E402
+import python.helpers.log as Log  # noqa: E402, N812
 from python.coordinators import HistoryCoordinator, StreamCoordinator, ToolCoordinator  # noqa: E402
 from python.helpers import context as context_helper  # noqa: E402
 from python.helpers import (  # noqa: E402

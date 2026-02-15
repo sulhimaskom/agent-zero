@@ -1,5 +1,6 @@
 from python.helpers.api import ApiHandler, Request, Response
 from python.helpers.backup import BackupService
+from python.helpers.constants import Limits
 
 
 class BackupTest(ApiHandler):
@@ -17,7 +18,7 @@ class BackupTest(ApiHandler):
             include_patterns = input.get("include_patterns", [])
             exclude_patterns = input.get("exclude_patterns", [])
             include_hidden = input.get("include_hidden", False)
-            max_files = input.get("max_files", 1000)
+            max_files = input.get("max_files", Limits.BACKUP_MAX_FILES_TEST)
 
             # Support legacy string patterns format for backward compatibility
             patterns_string = input.get("patterns", "")

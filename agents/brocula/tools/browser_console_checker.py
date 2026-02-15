@@ -20,7 +20,7 @@ class State:
         self.warnings_found = []
 
 
-class browser_console_checker(Tool):
+class BrowserConsoleChecker(Tool):
     """
     Check browser console for errors and warnings using Playwright.
     Navigates to a URL, captures console output, and reports any errors or warnings.

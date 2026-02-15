@@ -36,7 +36,7 @@ class NotificationCreate(ApiHandler):
             if display_time <= 0:
                 display_time = Limits.NOTIFICATION_DISPLAY_TIME  # Reset to default if invalid
         except (ValueError, TypeError):
-            display_time = 3  # Reset to default if not convertible to int
+            display_time = Limits.NOTIFICATION_DISPLAY_TIME  # Reset to default if not convertible to int
 
         # Validate notification type
         try:

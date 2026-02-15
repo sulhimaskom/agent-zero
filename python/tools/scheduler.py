@@ -317,8 +317,8 @@ class SchedulerTool(Tool):
                 return Response(message=f"Task not found: {task_uuid}", break_loop=False)
 
             if task.state == TaskState.RUNNING:
-                await asyncio.sleep(1)
-                elapsed += 1
+                await asyncio.sleep(Timeouts.POLLING_INTERVAL)
+                elapsed += Timeouts.POLLING_INTERVAL
                 if elapsed > Timeouts.SCHEDULER_DEFAULT_WAIT:
                     return Response(
                         message=f"Task wait timeout ({Timeouts.SCHEDULER_DEFAULT_WAIT} seconds): {task_uuid}",
