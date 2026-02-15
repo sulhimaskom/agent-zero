@@ -9,7 +9,8 @@ class Synthesize(ApiHandler):
         text = input.get("text", "")
 
         # if not await kokoro_tts.is_downloaded():
-        #     context.log.log(type="info", content="Kokoro TTS model is currently being initialized, please wait...")
+        #     context.log.log(type="info", content=
+        #         "Kokoro TTS model is currently being initialized, please wait...")
 
         try:
             # # Clean and chunk text for long responses

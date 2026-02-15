@@ -10,7 +10,8 @@ class OrganizeHistory(Extension):
     async def execute(self, loop_data: LoopData | None = None, **kwargs):
         if loop_data is None:
             loop_data = LoopData()
-        # is there a running task? if yes, skip this round, the wait extension will double check the context size
+        # is there a running task? if yes, skip this round,
+        # the wait extension will double check the context size
         task = self.agent.get_data(DATA_NAME_TASK)
         if task and not task.done():
             return
