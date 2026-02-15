@@ -9,6 +9,8 @@ from typing import Any, TypeVar
 
 import regex
 
+from python.helpers.constants import FileExtensions
+
 from .dirty_json import DirtyJson
 from .files import get_abs_path
 
@@ -79,7 +81,7 @@ T = TypeVar("T")  # Define a generic type variable
 def import_module(file_path: str) -> ModuleType:
     # Handle file paths with periods in the name using importlib.util
     abs_path = get_abs_path(file_path)
-    module_name = os.path.basename(abs_path).replace(".py", "")
+    module_name = os.path.basename(abs_path).replace(FileExtensions.PYTHON, "")
 
     # Create the module spec and load the module
     spec = importlib.util.spec_from_file_location(module_name, abs_path)
@@ -105,7 +107,7 @@ def load_classes_from_folder[T](
         [
             file_name
             for file_name in os.listdir(abs_folder)
-            if fnmatch(file_name, name_pattern) and file_name.endswith(".py")
+            if fnmatch(file_name, name_pattern) and file_name.endswith(FileExtensions.PYTHON)
         ]
     )
 

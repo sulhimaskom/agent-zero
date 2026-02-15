@@ -1,7 +1,7 @@
 import uuid
 from typing import Any
 
-from python.helpers.constants import Timeouts
+from python.helpers.constants import MimeTypes, Timeouts
 from python.helpers.print_style import PrintStyle
 
 try:
@@ -125,7 +125,7 @@ class AgentConnection:
                 message=a2a_message,  # type: ignore
                 metadata=metadata,
                 configuration={
-                    "accepted_output_modes": ["application/json", "text/plain"],
+                    "accepted_output_modes": [MimeTypes.APPLICATION_JSON, MimeTypes.TEXT_PLAIN],
                     "blocking": True,
                 },  # type: ignore
             )

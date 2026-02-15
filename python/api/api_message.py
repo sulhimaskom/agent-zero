@@ -15,7 +15,7 @@ from agent import AgentContext, AgentContextType, UserMessage
 from initialize import initialize_agent
 from python.helpers import files
 from python.helpers.api import ApiHandler, Request, Response
-from python.helpers.constants import Colors, HttpStatus, Paths, Timeouts
+from python.helpers.constants import Colors, HttpStatus, MimeTypes, Paths, Timeouts
 from python.helpers.print_style import PrintStyle
 
 
@@ -49,7 +49,7 @@ class ApiMessage(ApiHandler):
             return Response(
                 '{"error": "Message is required"}',
                 status=HttpStatus.BAD_REQUEST,
-                mimetype="application/json",
+                mimetype=MimeTypes.APPLICATION_JSON,
             )
 
         # Handle attachments (base64 encoded)
@@ -94,7 +94,7 @@ class ApiMessage(ApiHandler):
                 return Response(
                     '{"error": "Context not found"}',
                     status=HttpStatus.NOT_FOUND,
-                    mimetype="application/json",
+                    mimetype=MimeTypes.APPLICATION_JSON,
                 )
         else:
             config = initialize_agent()
@@ -147,7 +147,7 @@ class ApiMessage(ApiHandler):
             return Response(
                 f'{{"error": "{e!s}"}}',
                 status=HttpStatus.ERROR,
-                mimetype="application/json",
+                mimetype=MimeTypes.APPLICATION_JSON,
             )
 
     @classmethod

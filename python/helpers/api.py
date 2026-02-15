@@ -7,6 +7,7 @@ from flask import Flask, Request, Response
 
 from agent import AgentContext
 from initialize import initialize_agent
+from python.helpers.constants import MimeTypes
 from python.helpers.errors import format_error
 from python.helpers.print_style import PrintStyle
 
@@ -71,14 +72,14 @@ class ApiHandler:
                 return Response(
                     response=response_json,
                     status=200,
-                    mimetype="application/json",
+                    mimetype=MimeTypes.APPLICATION_JSON,
                 )
 
             # return exceptions with 500
         except Exception as e:
             error = format_error(e)
             PrintStyle.error(f"API error: {error}")
-            return Response(response=error, status=500, mimetype="text/plain")
+            return Response(response=error, status=500, mimetype=MimeTypes.TEXT_PLAIN)
 
     # get context to run agent zero in
     def use_context(self, ctxid: str, create_if_not_exists: bool = True):
