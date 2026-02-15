@@ -60,7 +60,7 @@
                  x-transition:leave-start="opacity-100 translate-y-0"
                  x-transition:leave-end="opacity-0 translate-y-1"
                  class="tooltip expand-tooltip">
-                Expand for easier editing
+                 Expand for easier editing <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd>
             </div>
         </div>
 
@@ -246,8 +246,17 @@
     #expand-button svg { width: 1.3rem; height: 1.3rem; }
 
     /* Expand button tooltip */
-    .expand-tooltip { position: absolute; top: -40px; right: 0; transform: none; left: auto; margin-bottom: 0; }
+    .expand-tooltip { position: absolute; top: -40px; right: 0; transform: none; left: auto; margin-bottom: 0; white-space: nowrap; }
     .expand-tooltip::after { top: 100%; left: auto; right: 10px; transform: none; border-top-color: var(--color-secondary); border-left-color: transparent; }
+    .expand-tooltip kbd {
+        background-color: var(--color-panel);
+        border: 1px solid var(--color-border);
+        border-radius: 4px;
+        padding: 2px 6px;
+        font-family: var(--font-family-code);
+        font-size: 10px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
 
     /* Send button tooltip */
     .send-tooltip { position: absolute; top: -40px; right: 0; transform: none; left: auto; margin-bottom: 0; }
@@ -416,4 +425,3 @@
     </style>
 </body>
 </html>
-

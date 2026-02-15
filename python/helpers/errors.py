@@ -31,7 +31,7 @@ def format_error(e: Exception, start_entries=6, end_entries=4):
             trimmed_lines = [
                 *lines[: file_indices[start_index]],
                 f"\n>>>  {len(file_indices) - start_entries - end_entries} stack lines skipped <<<\n",
-                *lines[file_indices[start_index + end_entries] :],
+                *lines[file_indices[start_index + end_entries]:],
             ]
         else:
             # If no "File" lines found, or not enough to trim, just return the original traceback

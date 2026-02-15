@@ -252,7 +252,7 @@ class BackupService:
             # Check if the pattern starts with the backed up agent zero root
             if pattern.startswith(backed_up_agent_root + "/") or pattern == backed_up_agent_root:
                 # Replace the backed up root with the current root
-                relative_pattern = pattern[len(backed_up_agent_root) :].lstrip("/")
+                relative_pattern = pattern[len(backed_up_agent_root):].lstrip("/")
                 if relative_pattern:
                     translated_pattern = current_agent_root + "/" + relative_pattern
                 else:
@@ -871,7 +871,7 @@ class BackupService:
             or absolute_archive_path == backed_up_agent_root
         ):
             # Replace the backed up root with the current root
-            relative_path = absolute_archive_path[len(backed_up_agent_root) :].lstrip("/")
+            relative_path = absolute_archive_path[len(backed_up_agent_root):].lstrip("/")
             if relative_path:
                 translated_path = current_agent_root + "/" + relative_path
             else:

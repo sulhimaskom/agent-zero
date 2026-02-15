@@ -23,9 +23,6 @@ from python.helpers.constants import Limits, Timeouts
 from python.helpers.print_style import PrintStyle
 from python.helpers.vector_db import VectorDB
 
-os.environ["USER_AGENT"] = "@mixedbread-ai/unstructured"
-from langchain_unstructured import UnstructuredLoader
-
 DEFAULT_SEARCH_THRESHOLD = Limits.DOCUMENT_DEFAULT_THRESHOLD
 
 
@@ -625,6 +622,12 @@ class DocumentQueryHelper:
             os.unlink(temp_file_path)
 
     def handle_unstructured_document(self, document: str, scheme: str) -> str:
+        # Set user agent before importing UnstructuredLoader
+        import os
+
+        os.environ["USER_AGENT"] = "@mixedbread-ai/unstructured"
+        from langchain_unstructured import UnstructuredLoader
+
         elements: list[Document] = []
         if scheme in ["http", "https"]:
             # loader = UnstructuredURLLoader(urls=[document], mode="single")
@@ -640,7 +643,6 @@ class DocumentQueryHelper:
             # Use RFC file operations to read the file as binary
             file_content_bytes = files.read_file_bin(document)
             # Create a temporary file for UnstructuredLoader since it needs a file path
-            import os
             import tempfile
 
             # Get file extension to preserve it for proper processing
