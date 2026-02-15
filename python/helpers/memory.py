@@ -32,8 +32,8 @@ import models
 from agent import Agent, AgentContext
 
 # faiss needs to be patched for python 3.12 on arm #TODO remove once not needed
-from python.helpers import (
-    faiss_monkey_patch,  # noqa: F401
+from python.helpers import (  # noqa: F401
+    faiss_monkey_patch,
     guids,
     knowledge_import,
 )
