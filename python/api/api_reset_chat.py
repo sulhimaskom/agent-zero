@@ -8,23 +8,30 @@ from python.helpers.print_style import PrintStyle
 
 
 class ApiResetChat(ApiHandler):
+    """Handler for resetting chat context via API."""
+
     @classmethod
     def requires_auth(cls) -> bool:
+        """Return False as web auth is not required."""
         return False
 
     @classmethod
     def requires_csrf(cls) -> bool:
+        """Return False as CSRF is not required."""
         return False
 
     @classmethod
     def requires_api_key(cls) -> bool:
+        """Return True as API key is required."""
         return True
 
     @classmethod
     def get_methods(cls) -> list[str]:
+        """Return the list of allowed HTTP methods."""
         return ["POST"]
 
     async def process(self, input: dict, request: Request) -> dict | Response:
+        """Process the chat reset request."""
         try:
             # Get context_id from input
             context_id = input.get("context_id")

@@ -840,19 +840,21 @@ class MCPClientBase(ABC):
                     original_exception = excs[0] if excs else e
                     # Create a dummy exception to break out of the async block
                     raise RuntimeError("Dummy exception to break out of async block")
-        except Exception:
+        except Exception as e:
             # Check if this is our dummy exception
             if original_exception is not None:
-                e = original_exception
+                error_to_raise = original_exception
+            else:
+                error_to_raise = e
             # We have the original exception stored
             PrintStyle(
                 background_color=Colors.MCP_ERROR_RED,
                 font_color=Colors.BG_WHITE,
                 padding=False,
             ).print(
-                f"MCPClientBase ({self.server.name} - {operation_name}): Error during operation: {type(e).__name__}: {e}"
+                f"MCPClientBase ({self.server.name} - {operation_name}): Error during operation: {type(error_to_raise).__name__}: {error_to_raise}"
             )
-            raise e  # Re-raise the original exception
+            raise error_to_raise  # Re-raise the original exception
         # finally:
         #     PrintStyle(font_color="cyan").print(
         #         f"MCPClientBase ({self.server.name} - {operation_name}): Session and transport will be closed by AsyncExitStack."

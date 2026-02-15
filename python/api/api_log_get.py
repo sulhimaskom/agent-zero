@@ -4,23 +4,30 @@ from python.helpers.constants import HttpStatus
 
 
 class ApiLogGet(ApiHandler):
+    """Handler for retrieving chat logs via API."""
+
     @classmethod
     def get_methods(cls) -> list[str]:
+        """Return the list of allowed HTTP methods."""
         return ["GET", "POST"]
 
     @classmethod
     def requires_auth(cls) -> bool:
+        """Return False as web auth is not required."""
         return False  # No web auth required
 
     @classmethod
     def requires_csrf(cls) -> bool:
+        """Return False as CSRF is not required."""
         return False  # No CSRF required
 
     @classmethod
     def requires_api_key(cls) -> bool:
+        """Return True as API key is required."""
         return True  # Require API key
 
     async def process(self, input: dict, request: Request) -> dict | Response:
+        """Process the log retrieval request."""
         # Extract parameters (support both query params for GET and body for POST)
         if request.method == "GET":
             context_id = request.args.get("context_id", "")

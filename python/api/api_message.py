@@ -8,6 +8,7 @@ import base64
 import os
 import threading
 from datetime import datetime, timedelta
+from typing import ClassVar
 
 from werkzeug.utils import secure_filename
 
@@ -20,23 +21,29 @@ from python.helpers.print_style import PrintStyle
 
 
 class ApiMessage(ApiHandler):
+    """Handler for external API messaging."""
+
     # Track chat lifetimes for cleanup
-    _chat_lifetimes = {}
+    _chat_lifetimes: ClassVar[dict[str, datetime]] = {}
     _cleanup_lock = threading.Lock()
 
     @classmethod
     def requires_auth(cls) -> bool:
+        """Return False as web auth is not required."""
         return False  # No web auth required
 
     @classmethod
     def requires_csrf(cls) -> bool:
+        """Return False as CSRF is not required."""
         return False  # No CSRF required
 
     @classmethod
     def requires_api_key(cls) -> bool:
+        """Return True as API key is required."""
         return True  # Require API key
 
     async def process(self, input: dict, request: Request) -> dict | Response:
+        """Process the message request."""
         # Extract parameters
         context_id = input.get("context_id", "")
         message = input.get("message", "")
