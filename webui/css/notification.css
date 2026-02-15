@@ -20,6 +20,23 @@
     margin: 0;
     box-sizing: border-box;
     text-align: center;
+    /* Button reset styles for accessibility */
+    appearance: none;
+    -webkit-appearance: none;
+    font-family: inherit;
+    outline: none;
+}
+
+/* Focus styles for keyboard accessibility */
+.notification-toggle:focus-visible {
+    outline: 2px solid var(--color-highlight, #2196F3);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(33, 150, 243, 0.2);
+}
+
+/* Active state for button press feedback */
+.notification-toggle:active {
+    transform: scale(0.95);
 }
 
 .notification-toggle:hover {
