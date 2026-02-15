@@ -2,6 +2,7 @@ import asyncio
 
 from agent import LoopData
 from python.helpers import persist_chat, tokens
+from python.helpers.constants import Limits
 from python.helpers.extension import Extension
 
 
@@ -13,7 +14,7 @@ class RenameChat(Extension):
         try:
             # prepare history
             history_text = self.agent.history.output_text()
-            ctx_length = min(int(self.agent.config.utility_model.ctx_length * 0.7), 5000)
+            ctx_length = min(int(self.agent.config.utility_model.ctx_length * 0.7), Limits.CONTEXT_MAX_LEN_DEFAULT)
             history_text = tokens.trim_to_tokens(history_text, ctx_length, "start")
             # prepare system and user prompt
             system = self.agent.read_prompt("fw.rename_chat.sys.md")

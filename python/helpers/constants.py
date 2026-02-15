@@ -127,6 +127,9 @@ class Limits:
     DEFAULT_CHAT_MODEL_CTX_LENGTH: Final[int] = 100000
     DEFAULT_UTIL_MODEL_CTX_LENGTH: Final[int] = 100000
 
+    # Context length cap for UI operations (e.g., chat rename)
+    CONTEXT_MAX_LEN_DEFAULT: Final[int] = 5000
+
     # Memory recall limits
     MEMORY_RECALL_HISTORY_LENGTH: Final[int] = 10000
     MEMORY_RECALL_MAX_SEARCH_MEMORIES: Final[int] = 12
@@ -316,6 +319,11 @@ class Network:
 
     # Agent-specific ports
     BROCULA_PORT_DEFAULT: Final[int] = 50001
+    A2A_PORT_DEFAULT: Final[int] = 50101
+
+    STATIC_PORTS: Final[list[str]] = [
+        '8080', '5002', '3000', '5000', '8000', '5500', '3001', '50001'
+    ]
 
     # CORS allowed origins (development)
     DEV_CORS_ORIGINS: Final[list[str]] = [

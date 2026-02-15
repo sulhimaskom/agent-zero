@@ -58,7 +58,9 @@ class BackupPreviewGrouped(ApiHandler):
             }
 
             backup_service = BackupService()
-            all_files = await backup_service.test_patterns(metadata, max_files=Limits.BACKUP_MAX_FILES_PARTIAL)
+            all_files = await backup_service.test_patterns(
+                metadata, max_files=Limits.BACKUP_MAX_FILES_PARTIAL
+            )
 
             # Apply search filter if provided
             if search_filter.strip():
