@@ -17,7 +17,7 @@ import initialize
 from python.helpers import dotenv, fasta2a_server, files, git, login, mcp_server, process, runtime
 from python.helpers.api import ApiHandler
 from python.helpers.config import inject_config_into_html
-from python.helpers.constants import Config
+from python.helpers.constants import Config, Timeouts
 from python.helpers.extract_tools import load_classes_from_folder
 from python.helpers.files import get_abs_path
 from python.helpers.print_style import PrintStyle
@@ -228,17 +228,17 @@ async def serve_static(filename):
         return Response("Invalid path", 403)
 
     # Determine cache duration based on file type
-    cache_max_age = 3600  # Default 1 hour
+    cache_max_age = Timeouts.HTTP_CACHE_DEFAULT  # Default 1 hour
 
     # Long cache for vendor files (they rarely change)
     if filename.startswith("vendor/"):
-        cache_max_age = 31536000  # 1 year
+        cache_max_age = Timeouts.HTTP_CACHE_VENDOR  # 1 year
     # Medium cache for CSS/JS files
     elif filename.endswith((".css", ".js")):
-        cache_max_age = 86400  # 24 hours
+        cache_max_age = Timeouts.HTTP_CACHE_ASSETS  # 24 hours
     # Short cache for images and other assets
     elif filename.endswith((".png", ".jpg", ".jpeg", ".gif", ".svg", ".ico")):
-        cache_max_age = 604800  # 7 days
+        cache_max_age = Timeouts.HTTP_CACHE_IMAGES  # 7 days
 
     try:
         file_path = os.path.join(get_abs_path("./webui"), filename)
