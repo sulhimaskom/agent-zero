@@ -10,7 +10,7 @@ from starlette.requests import Request
 from agent import AgentContext, AgentContextType, UserMessage
 from initialize import initialize_agent
 from python.helpers import settings
-from python.helpers.constants import ExternalUrls
+from python.helpers.constants import ExternalUrls, MimeTypes
 from python.helpers.persist_chat import remove_chat
 
 # Local imports
@@ -233,8 +233,8 @@ class DynamicA2AProxy:
                         "Solve complex problems step by step",
                         "Install software and manage systems",
                     ],
-                    "input_modes": ["text/plain", "application/octet-stream"],
-                    "output_modes": ["text/plain", "application/json"],
+                    "input_modes": [MimeTypes.TEXT_PLAIN, MimeTypes.APPLICATION_OCTET_STREAM],
+                    "output_modes": [MimeTypes.TEXT_PLAIN, MimeTypes.APPLICATION_JSON],
                 }
             ]
 
