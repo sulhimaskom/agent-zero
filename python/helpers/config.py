@@ -1,5 +1,6 @@
 """
-Configuration management for Agent Zero
+Configuration management for Agent Zero.
+
 Flexy says: All configuration centralized, no hardcoded values!
 """
 
@@ -15,6 +16,7 @@ from python.helpers.constants import (
 def get_frontend_config() -> dict[str, Any]:
     """
     Get configuration for frontend injection.
+
     Returns a dictionary of configuration values that should be exposed to the frontend.
     """
     return {
