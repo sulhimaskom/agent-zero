@@ -322,7 +322,14 @@ class Network:
     A2A_PORT_DEFAULT: Final[int] = 50101
 
     STATIC_PORTS: Final[list[str]] = [
-        '8080', '5002', '3000', '5000', '8000', '5500', '3001', '50001'
+        "8080",
+        "5002",
+        "3000",
+        "5000",
+        "8000",
+        "5500",
+        "3001",
+        "50001",
     ]
 
     # CORS allowed origins (development)
