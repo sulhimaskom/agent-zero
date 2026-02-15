@@ -698,6 +698,10 @@ class Config:
     MEMORY_PATH = get_env_str("A0_MEMORY_PATH", Paths.MEMORY_DIR)
     UPLOAD_FOLDER = get_env_str("A0_UPLOAD_FOLDER", Paths.UPLOAD_FOLDER)
     WHISPER_MODEL_ROOT = get_env_str("A0_WHISPER_MODEL_ROOT", Paths.WHISPER_MODEL_ROOT)
+    ROOT_DIR = get_env_str("A0_ROOT_DIR", Paths.ROOT_DIR)
+    WORK_DIR = get_env_str("A0_WORK_DIR", Paths.WORK_DIR)
+    NODE_EVAL_SCRIPT = get_env_str("A0_NODE_EVAL_SCRIPT", Paths.NODE_EVAL_SCRIPT)
+    EMAIL_INBOX_PATH = get_env_str("A0_EMAIL_INBOX_PATH", Paths.EMAIL_INBOX_PATH)
 
     # Notification settings
     NOTIFICATION_LIFETIME_HOURS = get_env_int(
@@ -711,6 +715,7 @@ class Config:
 
     # Tunnel settings
     TUNNEL_CHECK_DELAY = get_env_int("A0_TUNNEL_CHECK_DELAY", Timeouts.TUNNEL_CHECK_DELAY)
+    FILE_BROWSER_TIMEOUT = get_env_int("A0_FILE_BROWSER_TIMEOUT", Timeouts.FILE_BROWSER_TIMEOUT)
 
     # External URLs - Fully configurable via environment variables
     UPDATE_CHECK_URL = get_env_str("A0_UPDATE_CHECK_URL", ExternalUrls.UPDATE_CHECK_URL)

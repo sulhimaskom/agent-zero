@@ -1,4 +1,5 @@
 import Logger from './logger.js';
+import { API } from './constants.js';
 
 // Track if we're in static file mode (no backend)
 let isStaticMode = false;
@@ -15,8 +16,7 @@ function detectStaticMode() {
   // 2. Page is served from common static server ports
   const url = new URL(window.location.href);
   if (url.protocol === 'file:') return true;
-  // Common static server ports to detect
-  const staticPorts = ['8080', '5002', '3000', '5000', '8000', '5500', '3001', '50001'];
+  const staticPorts = window.ENV_CONFIG?.STATIC_PORTS || ['8080', '5002', '3000', '5000', '8000', '5500', '3001', '50001'];
   if (staticPorts.includes(url.port)) return true;
 
   // Check if we're on a static file server by looking at the response headers
@@ -135,7 +135,7 @@ async function getCsrfToken() {
   }
 
   try {
-    const response = await fetch("/csrf_token", {
+    const response = await fetch(API.CSRF_TOKEN_ENDPOINT, {
       credentials: "same-origin",
     });
 
