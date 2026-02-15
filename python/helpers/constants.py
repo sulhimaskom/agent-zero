@@ -1,5 +1,6 @@
 """
 Modular constants for Agent Zero framework.
+
 Flexy says: No hardcoded values allowed! Everything configurable.
 """
 
