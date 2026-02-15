@@ -26,7 +26,7 @@ async def preload(model_name: str):
     try:
         # return await runtime.call_development_function(_preload, model_name)
         return await _preload(model_name)
-    except Exception:
+    except Exception as e:
         # if not runtime.is_development():
         raise
 
@@ -76,7 +76,7 @@ async def is_downloaded():
     try:
         # return await runtime.call_development_function(_is_downloaded)
         return _is_downloaded()
-    except Exception:
+    except Exception as e:
         # if not runtime.is_development():
         raise
         # Fallback to direct execution if RFC fails in development
@@ -111,5 +111,5 @@ async def _transcribe(model_name: str, audio_bytes_b64: str):
     finally:
         try:
             os.remove(temp_path)
-        except Exception:
+        except Exception as e:
             pass  # ignore errors during cleanup

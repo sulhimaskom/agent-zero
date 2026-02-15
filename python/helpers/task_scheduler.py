@@ -926,7 +926,7 @@ class TaskScheduler:
                                     attachment_filenames.append(attachment)
                                 else:
                                     self._printer.print(f"Skipping attachment: [{attachment}]")
-                            except Exception:
+                            except Exception as e:
                                 self._printer.print(f"Skipping attachment: [{attachment}]")
 
                 self._printer.print("User message:")
