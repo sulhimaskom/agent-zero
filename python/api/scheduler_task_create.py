@@ -62,8 +62,9 @@ class SchedulerTaskCreate(ApiHandler):
         token: str = input.get("token", "")
 
         # Debug log the token value
+        token_len = len(token) if token else 0
         printer.print(
-            f"Token received from frontend: '{token}' (type: {type(token)}, length: {len(token) if token else 0})"
+            f"Token received from frontend: '{token}' (type: {type(token)}, length: {token_len})"
         )
 
         # Generate a random token if empty or not provided

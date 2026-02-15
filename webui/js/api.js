@@ -16,7 +16,7 @@ function detectStaticMode() {
   const url = new URL(window.location.href);
   if (url.protocol === 'file:') return true;
   // Common static server ports to detect
-  const staticPorts = ['8080', '5002', '3000', '5000', '8000', '5500', '3001'];
+  const staticPorts = ['8080', '5002', '3000', '5000', '8000', '5500', '3001', '50001'];
   if (staticPorts.includes(url.port)) return true;
 
   // Check if we're on a static file server by looking at the response headers

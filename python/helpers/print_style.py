@@ -121,7 +121,7 @@ class PrintStyle:
 
                 self.secrets_mgr = get_secrets_manager()
             text = self.secrets_mgr.mask_values(text)
-        except Exception as e:
+        except Exception:
             # If masking fails, proceed without masking to avoid breaking functionality
             pass
 
