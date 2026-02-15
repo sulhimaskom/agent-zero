@@ -517,7 +517,7 @@ def _output_content_langchain(content: MessageContent):
         return content["raw_content"]  # type: ignore
     try:
         return _json_dumps(content)
-    except Exception:
+    except Exception as e:
         raise
 
 
