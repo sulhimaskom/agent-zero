@@ -62,7 +62,7 @@ class SchedulerTool(Tool):
         try:
             metadata = load_basic_project_data(project_slug)
             color = metadata.get("color") or None
-        except Exception:
+        except Exception as e:
             color = None
         return project_slug, color
 

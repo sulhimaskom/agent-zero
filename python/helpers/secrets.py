@@ -162,7 +162,7 @@ class SecretsManager:
         for path in self._files:
             try:
                 content = files.read_file(path)
-            except Exception:
+            except Exception as e:
                 content = ""
 
             self._raw_snapshots[path] = content
