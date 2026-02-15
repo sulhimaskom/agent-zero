@@ -18,7 +18,7 @@ class State:
         self.opportunities = []
 
 
-class lighthouse_auditor(Tool):
+class LighthouseAuditor(Tool):
     """
     Run Lighthouse audit on a URL to find optimization opportunities.
     Checks performance, accessibility, best practices, and SEO.
@@ -152,7 +152,9 @@ class lighthouse_auditor(Tool):
                     priority = (
                         "🔴 HIGH"
                         if opp["score"] < 0.5
-                        else "🟡 MEDIUM" if opp["score"] < 0.9 else "🟢 LOW"
+                        else "🟡 MEDIUM"
+                        if opp["score"] < 0.9
+                        else "🟢 LOW"
                     )
                     report_lines.append(f"\n  {i}. [{priority}] {opp['title']}")
                     report_lines.append(f"     Impact: {opp.get('display_value', 'N/A')}")
