@@ -108,6 +108,7 @@ ignore = [
     "RUF003",# Comment contains ambiguous unicode character
     "RUF006",# Store reference to asyncio.create_task
     "RUF012",# Mutable default value for class attribute
+    "F841",  # Unused variable (intentionally unused in exception handlers)
 ]
 
 [tool.ruff.lint.pydocstyle]
