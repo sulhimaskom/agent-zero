@@ -135,6 +135,7 @@
     <script type="module" src="js/scheduler.min.js"></script>
     <script type="module" src="js/keyboard-shortcuts.min.js"></script>
     <script type="module" src="components/modals/keyboard-shortcuts/keyboard-shortcuts-store.min.js"></script>
+    <script type="module" src="components/chat/typing-indicator/typing-indicator-store.js"></script>
 
     <script type="module" src="index.min.js"></script>
 
@@ -199,6 +200,8 @@
             </div>
             <!-- Message History (actual messages) -->
             <div id="chat-history" x-data x-show="!$store.welcomeStore || !$store.welcomeStore.isVisible"></div>
+
+            <x-component path="chat/typing-indicator/typing-indicator.html"></x-component>
 
             <!-- NEW: Toast Stack Component -->
             <div class="toast-container">

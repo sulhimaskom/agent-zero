@@ -12,6 +12,7 @@ import Logger from "/js/logger.js";
 import { store as chatsStore } from "/components/sidebar/chats/chats-store.js";
 import { store as tasksStore } from "/components/sidebar/tasks/tasks-store.js";
 import { store as chatTopStore } from "/components/chat/top-section/chat-top-store.js";
+import { store as typingIndicatorStore } from "/components/chat/typing-indicator/typing-indicator-store.js";
 
 globalThis.fetchApi = api.fetchApi; // TODO - backward compatibility for non-modular scripts, remove once refactored to alpine
 
@@ -105,6 +106,7 @@ export async function sendMessage() {
         toast("No response returned.", "error");
       } else {
         setContext(jsonResponse.context);
+        typingIndicatorStore.show();
       }
     }
   } catch (e) {
@@ -335,6 +337,7 @@ export async function poll() {
         );
       }
       afterMessagesUpdate(response.logs);
+      typingIndicatorStore.hide();
     }
 
     lastLogVersion = response.log_version;
