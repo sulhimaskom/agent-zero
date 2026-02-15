@@ -18,5 +18,8 @@ function setDeviceClass(){
         });
         // Add the new device class
         body.classList.add(`device-${type}`);
+    }).catch((error) => {
+        // Silently handle device detection errors - fallback to pointer device
+        document.body.classList.add('device-pointer');
     });
 }
