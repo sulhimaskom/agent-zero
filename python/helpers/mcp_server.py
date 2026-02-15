@@ -235,7 +235,7 @@ async def _run_chat(context: AgentContext, message: str, attachments: list[str] 
                             attachment_filenames.append(attachment)
                         else:
                             _PRINTER.print(f"Skipping attachment: [{attachment}]")
-                    except Exception as e:
+                    except Exception:
                         _PRINTER.print(f"Skipping attachment: [{attachment}]")
 
         _PRINTER.print("User message:")

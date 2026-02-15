@@ -19,7 +19,7 @@ class Poll(ApiHandler):
         if ctxid:
             try:
                 context = self.use_context(ctxid, create_if_not_exists=False)
-            except Exception as e:
+            except Exception:
                 context = None
         else:
             context = None
@@ -61,7 +61,8 @@ class Poll(ApiHandler):
             context_data = ctx.output()
 
             context_task = scheduler.get_task_by_uuid(ctx.id)
-            # Determine if this is a task-dedicated context by checking if a task with this UUID exists
+            # Determine if this is a task-dedicated context by checking
+            # if a task with this UUID exists
             is_task_context = context_task is not None and context_task.context_id == ctx.id
 
             if not is_task_context:

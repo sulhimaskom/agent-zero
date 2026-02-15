@@ -121,7 +121,9 @@ class RecallMemories(Extension):
             query=query,
             limit=set["memory_recall_memories_max_search"],
             threshold=set["memory_recall_similarity_threshold"],
-            filter=f"area == '{Memory.Area.MAIN.value}' or area == '{Memory.Area.FRAGMENTS.value}'",  # exclude solutions
+            filter=(
+                f"area == '{Memory.Area.MAIN.value}' or area == '{Memory.Area.FRAGMENTS.value}'"
+            ),  # exclude solutions
         )
 
         # search for solutions

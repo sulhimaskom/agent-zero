@@ -105,7 +105,10 @@ class MemoryDashboard(ApiHandler):
             elif len(rem) > 0:
                 return {
                     "success": True,
-                    "message": f"Successfully deleted {len(rem)} memories. {len(memory_ids) - len(rem)} failed.",
+                    "message": (
+                        f"Successfully deleted {len(rem)} memories. "
+                        f"{len(memory_ids) - len(rem)} failed."
+                    ),
                 }
             else:
                 return {
@@ -138,7 +141,7 @@ class MemoryDashboard(ApiHandler):
                 "memory_subdir": memory_subdir or "default",
             }
 
-        except Exception as e:
+        except Exception:
             return {
                 "success": True,  # Still success, just fallback to default
                 "memory_subdir": "default",

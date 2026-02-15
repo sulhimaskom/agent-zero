@@ -107,7 +107,7 @@ class BackupPreviewGrouped(ApiHandler):
 
             # Convert groups to sorted list and add display info
             sorted_groups = []
-            for group_path, group_info in sorted(groups.items()):
+            for _group_path, group_info in sorted(groups.items()):
                 group_info["subdirectories"] = sorted(group_info["subdirectories"])
 
                 # Limit displayed files for UI performance

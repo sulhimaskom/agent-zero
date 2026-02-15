@@ -288,7 +288,7 @@ class DynamicA2AProxy:
                 loop = asyncio.new_event_loop()
                 loop.run_until_complete(self._async_shutdown())
                 loop.close()
-            except Exception as e:
+            except Exception:
                 pass  # ignore errors during interpreter shutdown
 
         atexit.register(_sync_shutdown)
@@ -302,7 +302,7 @@ class DynamicA2AProxy:
         try:
             if hasattr(self, "app") and self.app:
                 await self.app.task_manager.__aexit__(None, None, None)  # type: ignore[attr-defined]
-        except Exception as e:
+        except Exception:
             pass
 
     async def _async_reconfigure(self):

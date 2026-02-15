@@ -260,7 +260,7 @@ class FileBrowser:
                     if str(current_abs) != str(self.base_dir):
                         parent_path = str(Path(current_path).parent)
 
-                except Exception as e:
+                except Exception:
                     parent_path = ""
 
             return {
