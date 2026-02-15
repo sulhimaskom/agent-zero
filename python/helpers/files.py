@@ -538,7 +538,7 @@ def read_text_files_in_dir(
             # Check if file is binary by reading a small chunk
             content = read_file(file_path)
             result[os.path.basename(file_path)] = content
-        except Exception as e:
+        except Exception:
             continue
     return result
 

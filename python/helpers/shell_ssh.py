@@ -86,7 +86,7 @@ class SSHInteractiveSession:
                         return
                     time.sleep(Timeouts.SSH_SHELL_DELAY)
 
-            except Exception as e:
+            except Exception:
                 errors += 1
                 if errors < 3:
                     PrintStyle.standard(f"SSH Connection attempt {errors}...")
