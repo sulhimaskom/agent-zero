@@ -1,9 +1,9 @@
 # AGENT ZERO PROJECT KNOWLEDGE BASE
 
-**Generated:** 2026-02-14
+**Generated:** 2026-02-15
 **Branch:** custom
-**Commit:** 0d28fe6
-**Last RepoKeeper Run:** 2026-02-14
+**Commit:** 4d7e155
+**Last RepoKeeper Run:** 2026-02-15
 
 ## OVERVIEW
 Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpine.js). Prompt-driven behavior - everything controlled by `/prompts/` markdown files. Grows organically through memory, tools, extensions, and agent profiles.
@@ -14,10 +14,10 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 ├── agents/              # Agent profiles (_example, agent0, brocula, default, developer, hacker, researcher) with custom prompts/tools/extensions
 ├── prompts/             # 98 system prompts defining framework behavior (fw.* = framework, agent.system.* = agent behavior)
 ├── python/
-│   ├── api/            # 62 Flask API endpoints (auto-registered via ApiHandler base class)
-│   ├── helpers/        # 71 utility modules (memory, history, settings, mcp, scheduler)
-│   ├── tools/          # 18 default tools (code_execution, browser_agent, memory_*, call_subordinate)
-│   └── extensions/     # 23 lifecycle hook points (message_loop_*, response_stream*, system_prompt)
+│   ├── api/            # 63 Flask API endpoints (auto-registered via ApiHandler base class)
+│   ├── helpers/        # 73 utility modules (memory, history, settings, mcp, scheduler)
+│   ├── tools/          # 24 default tools (code_execution, browser_agent, memory_*, call_subordinate)
+│   └── extensions/     # 22 lifecycle hook points (message_loop_*, response_stream*, system_prompt)
 ├── webui/              # Frontend (Alpine.js stores, modular components, 96 code files)
 │   ├── components/     # chat/, settings/, sidebar/, modals/, projects/, notifications/
 │   ├── js/            # ES modules, stores (scheduler.js 1835 lines, messages.js 1009 lines)
@@ -96,7 +96,7 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 
 ### Code Smells (TODOs to address)
 - `/python/helpers/settings.py` - Multiple TODOs about replacing with background tasks (lines 1558, 1616, 1621, 1631, 1643) - CRITICAL complexity hotspot
-- `/python/helpers/task_scheduler.py` - 1271 lines, consider splitting task types from scheduler logic
+- `/python/helpers/task_scheduler.py` - 1271 lines, TODO about splitting task types from scheduler logic
 - `/python/helpers/mcp_handler.py` - 1109 lines, TODO about inline prompts (lines 742-744)
 - `/python/helpers/history.py:236` - FIXME: vision bytes sent to utility LLM (inefficiency)
 - `/python/helpers/vector_db.py`, `/python/helpers/memory.py` - FAISS patch for Python 3.12 ARM (remove when fixed upstream)
@@ -117,7 +117,7 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 - **AI-powered CI**: GitHub workflows use OpenCode AI agent (opencode.ai) instead of traditional pytest/linting
 - **Debian base**: `debian:13-slim` (minimal, secure base image)
 - **Dual Python**: 3.13 system-wide + 3.12.4 via pyenv at `/opt/venv-a0`
-- **No pyproject.toml**: Uses requirements.txt only (not installable as package)
+- **pyproject.toml**: Modern Python packaging with ruff, black, mypy configurations
 - **No frontend bundler**: Direct ES module loading, no webpack/vite
 
 ## UNIQUE STYLES
@@ -185,8 +185,8 @@ docker run -p 50001:80 agent0ai/agent-zero
 - **Large frontend files**: `webui/js/scheduler.js` (1835 lines), `webui/js/messages.js` (1009 lines), `webui/components/chat/speech/speech-store.js` (967 lines)
 - **FAISS patch required** for Python 3.12 ARM - temporary workaround
 - **57 bare `pass` statements** - mostly in base classes/abstract methods (acceptable)
-- **219 Python files** - backend codebase
-- **564 JavaScript files** - frontend codebase
+- **192 Python files** - backend codebase
+- **562 JavaScript files** - frontend codebase
 - **96 prompt files** - system prompts and agent behavior definitions
 - **No traditional testing** - CI uses AI code analysis instead of pytest runs
 - **Automatic SSH password generation** - `prepare.py` generates random root password (security concern for production)
