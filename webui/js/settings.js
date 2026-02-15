@@ -1,5 +1,5 @@
 import { TIMING, API_ENDPOINTS } from './constants.js';
-import Logger from './logger.js';
+import Logger from './logger.min.js';
 
 const settingsModalProxy = {
     isOpen: false,

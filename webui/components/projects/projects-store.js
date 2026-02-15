@@ -1,9 +1,9 @@
 import { createStore } from "/js/AlpineStore.js";
 import * as api from "/js/api.js";
 import * as modals from "/js/modals.js";
-import * as notifications from "/components/notifications/notification-store.js";
-import { store as chatsStore } from "/components/sidebar/chats/chats-store.js";
-import { store as browserStore } from "/components/modals/file-browser/file-browser-store.js";
+import * as notifications from "/components/notifications/notification-store.min.js";
+import { store as chatsStore } from "/components/sidebar/chats/chats-store.min.js";
+import { store as browserStore } from "/components/modals/file-browser/file-browser-store.min.js";
 import * as shortcuts from "/js/shortcuts.js";
 
 const listModal = "projects/project-list.html";

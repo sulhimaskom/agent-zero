@@ -1,6 +1,6 @@
 import { createStore } from "/js/AlpineStore.js";
 import * as css from "/js/css.js";
-import { store as speechStore } from "/components/chat/speech/speech-store.js";
+import { store as speechStore } from "/components/chat/speech/speech-store.min.js";
 
 // Preferences store centralizes user preference toggles and side-effects
 const model = {

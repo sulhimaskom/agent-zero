@@ -3,16 +3,16 @@ import * as api from "/js/api.js";
 import * as css from "/js/css.js";
 import { sleep } from "/js/sleep.js";
 import { STORAGE_KEYS, TIMING } from "/js/constants.js";
-import { store as attachmentsStore } from "/components/chat/attachments/attachmentsStore.js";
-import { store as speechStore } from "/components/chat/speech/speech-store.js";
-import { store as notificationStore } from "/components/notifications/notification-store.js";
-import { store as preferencesStore } from "/components/sidebar/bottom/preferences/preferences-store.js";
-import { store as inputStore } from "/components/chat/input/input-store.js";
-import Logger from "/js/logger.js";
-import { store as chatsStore } from "/components/sidebar/chats/chats-store.js";
-import { store as tasksStore } from "/components/sidebar/tasks/tasks-store.js";
-import { store as chatTopStore } from "/components/chat/top-section/chat-top-store.js";
-import { store as typingIndicatorStore } from "/components/chat/typing-indicator/typing-indicator-store.js";
+import { store as attachmentsStore } from "/components/chat/attachments/attachmentsStore.min.js";
+import { store as speechStore } from "/components/chat/speech/speech-store.min.js";
+import { store as notificationStore } from "/components/notifications/notification-store.min.js";
+import { store as preferencesStore } from "/components/sidebar/bottom/preferences/preferences-store.min.js";
+import { store as inputStore } from "/components/chat/input/input-store.min.js";
+import Logger from "/js/logger.min.js";
+import { store as chatsStore } from "/components/sidebar/chats/chats-store.min.js";
+import { store as tasksStore } from "/components/sidebar/tasks/tasks-store.min.js";
+import { store as chatTopStore } from "/components/chat/top-section/chat-top-store.min.js";
+import { store as typingIndicatorStore } from "/components/chat/typing-indicator/typing-indicator-store.min.js";
 
 globalThis.fetchApi = api.fetchApi; // TODO - backward compatibility for non-modular scripts, remove once refactored to alpine
 
@@ -157,44 +157,48 @@ export function updateChatInput(text) {
 }
 
 async function updateUserTime() {
-  let userTimeElement = document.getElementById("time-date");
+  try {
+    let userTimeElement = document.getElementById("time-date");
 
-  while (!userTimeElement) {
-    await sleep(100);
-    userTimeElement = document.getElementById("time-date");
-  }
-
-  const now = new Date();
-  const hours = now.getHours();
-  const minutes = now.getMinutes();
-  const seconds = now.getSeconds();
-  const ampm = hours >= 12 ? "pm" : "am";
-  const formattedHours = hours % 12 || 12;
-
-  // Format the time
-  const timeString = `${formattedHours}:${minutes
-    .toString()
-    .padStart(2, "0")}:${seconds.toString().padStart(2, "0")} ${ampm}`;
-
-  // Format the date
-  const options = { year: "numeric", month: "short", day: "numeric" };
-  const dateString = now.toLocaleDateString(undefined, options);
-
-  // Update the HTML using safe DOM manipulation instead of innerHTML
-  let dateSpan = userTimeElement.querySelector("#user-date");
-  if (!dateSpan) {
-    userTimeElement.textContent = timeString;
-    dateSpan = document.createElement("span");
-    dateSpan.id = "user-date";
-    userTimeElement.appendChild(document.createElement("br"));
-    userTimeElement.appendChild(dateSpan);
-  } else {
-    // Update text content of first child (time)
-    if (userTimeElement.firstChild) {
-      userTimeElement.firstChild.textContent = timeString;
+    while (!userTimeElement) {
+      await sleep(100);
+      userTimeElement = document.getElementById("time-date");
     }
+
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+    const ampm = hours >= 12 ? "pm" : "am";
+    const formattedHours = hours % 12 || 12;
+
+    // Format the time
+    const timeString = `${formattedHours}:${minutes
+      .toString()
+      .padStart(2, "0")}:${seconds.toString().padStart(2, "0")} ${ampm}`;
+
+    // Format the date
+    const options = { year: "numeric", month: "short", day: "numeric" };
+    const dateString = now.toLocaleDateString(undefined, options);
+
+    // Update the HTML using safe DOM manipulation instead of innerHTML
+    let dateSpan = userTimeElement.querySelector("#user-date");
+    if (!dateSpan) {
+      userTimeElement.textContent = timeString;
+      dateSpan = document.createElement("span");
+      dateSpan.id = "user-date";
+      userTimeElement.appendChild(document.createElement("br"));
+      userTimeElement.appendChild(dateSpan);
+    } else {
+      // Update text content of first child (time)
+      if (userTimeElement.firstChild) {
+        userTimeElement.firstChild.textContent = timeString;
+      }
+    }
+    dateSpan.textContent = dateString;
+  } catch (error) {
+    // Silently ignore time update errors to prevent console spam
   }
-  dateSpan.textContent = dateString;
 }
 
 updateUserTime();
