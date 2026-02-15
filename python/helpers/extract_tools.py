@@ -41,7 +41,7 @@ def extract_json_object_string(content):
         return content[start:]
     else:
         # If there's a closing '}', return the substring from start to end
-        return content[start:end + 1]
+        return content[start : end + 1]
 
 
 def extract_json_string(content):

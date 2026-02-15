@@ -10,8 +10,9 @@ from typing import Any
 
 from python.helpers.constants import (
     Config as ConstConfig,
+)
+from python.helpers.constants import (
     Limits,
-    Network,
 )
 
 
@@ -49,7 +50,7 @@ def get_frontend_config() -> dict[str, Any]:
             "max_file_size": Limits.FILE_READ_MAX_SIZE,
             "max_message_length": 10000,
         },
-        "STATIC_PORTS": ['8080', '5002', '3000', '5000', '8000', '5500', '3001', '50001'],
+        "STATIC_PORTS": ["8080", "5002", "3000", "5000", "8000", "5500", "3001", "50001"],
     }
 
 

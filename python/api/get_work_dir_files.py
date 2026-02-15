@@ -16,6 +16,7 @@ class GetWorkDirFiles(ApiHandler):
             # else:
             #     current_path = "root"
             from python.helpers.constants import Paths
+
             current_path = Paths.WORK_DIR
 
         # browser = FileBrowser()
