@@ -61,6 +61,12 @@ class Timeouts:
     # HTTP cache duration (1 day in seconds)
     HTTP_CACHE_MAX_AGE: Final[int] = 86400
 
+    # Static file cache durations (in seconds)
+    HTTP_CACHE_DEFAULT: Final[int] = 3600  # 1 hour - default cache
+    HTTP_CACHE_VENDOR: Final[int] = 31536000  # 1 year - vendor files (rarely change)
+    HTTP_CACHE_ASSETS: Final[int] = 86400  # 24 hours - CSS/JS files
+    HTTP_CACHE_IMAGES: Final[int] = 604800  # 7 days - images and other assets
+
     # Notification default lifetime (hours)
     NOTIFICATION_LIFETIME_HOURS: Final[int] = 24
 

@@ -37,7 +37,7 @@
                       :class="{ 'placeholder-typing': $store.chatInput.placeholderTyping }"
                       rows="1"
                       @keydown.enter="if (!$event.shiftKey && !$event.isComposing && $event.keyCode !== 229) { $event.preventDefault(); $store.chatInput.sendMessage(); }"
-                      @input="$store.chatInput.adjustTextareaHeight()"
+                      @input="$store.chatInput.adjustTextareaHeight(); $el.classList.add('typing'); clearTimeout($el._typingTimeout); $el._typingTimeout = setTimeout(() => $el.classList.remove('typing'), 500)"
                       @focus="$store.chatInput.stopPlaceholderRotation()"
                       @blur="$store.chatInput.startPlaceholderRotation()"></textarea>
             <button id="expand-button"
@@ -226,6 +226,21 @@
                   0 0 20px rgba(66, 72, 241, 0.1),
                   inset 0 1px 2px rgba(255, 255, 255, 0.05);
       transform: scale(1.005);
+      animation: input-breathe 3s ease-in-out infinite;
+    }
+
+    /* Breathing glow animation for focused input - adds delightful micro-interaction */
+    @keyframes input-breathe {
+      0%, 100% {
+        box-shadow: 0 0 0 3px rgba(66, 72, 241, 0.15),
+                    0 0 20px rgba(66, 72, 241, 0.1),
+                    inset 0 1px 2px rgba(255, 255, 255, 0.05);
+      }
+      50% {
+        box-shadow: 0 0 0 4px rgba(66, 72, 241, 0.25),
+                    0 0 30px rgba(66, 72, 241, 0.2),
+                    inset 0 1px 2px rgba(255, 255, 255, 0.05);
+      }
     }
     #chat-input::placeholder {
       color: var(--color-text-muted);
@@ -237,6 +252,24 @@
     }
     #chat-input.placeholder-typing::placeholder {
       opacity: 0.4;
+    }
+
+    /* Typing state - enhanced glow when user is actively typing */
+    #chat-input.typing {
+      animation: input-typing-glow 1.5s ease-in-out infinite;
+    }
+
+    @keyframes input-typing-glow {
+      0%, 100% {
+        box-shadow: 0 0 0 3px rgba(66, 72, 241, 0.2),
+                    0 0 25px rgba(66, 72, 241, 0.15),
+                    inset 0 1px 2px rgba(255, 255, 255, 0.05);
+      }
+      50% {
+        box-shadow: 0 0 0 5px rgba(66, 72, 241, 0.3),
+                    0 0 35px rgba(66, 72, 241, 0.25),
+                    inset 0 1px 2px rgba(255, 255, 255, 0.05);
+      }
     }
 
     #expand-button { position: absolute; top: 12px; right: 10px; background: transparent; border: none; cursor: pointer; font-size: 1.2rem; color: var(--color-text); opacity: 0.4; transition: opacity 0.2s; }
@@ -398,9 +431,11 @@
         transition: none;
         -webkit-transition: none;
       }
-      #chat-input:focus {
+      #chat-input:focus,
+      #chat-input.typing {
         transform: none;
         box-shadow: 0 0 0 2px var(--color-highlight);
+        animation: none;
       }
       #send-button::after {
         transition: none;
