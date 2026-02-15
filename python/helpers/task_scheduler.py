@@ -654,7 +654,8 @@ class SchedulerTaskList(BaseModel):
             return [
                 task
                 for task in self.tasks
-                if task.check_schedule() and task.state == TaskState.IDLE
+                if task.check_schedule()
+                and task.state == TaskState.IDLE
                 # Prevent running same task multiple times within the same minute
                 # This fixes the race condition when SLEEP_TIME is lowered below 1 minute
                 and (task.last_run is None or (now - task.last_run).total_seconds() >= 60)
