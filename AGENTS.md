@@ -1,9 +1,9 @@
 # AGENT ZERO PROJECT KNOWLEDGE BASE
 
-**Generated:** 2026-02-15
+**Generated:** 2026-02-16
 **Branch:** custom
-**Commit:** 40970bb
-**Last RepoKeeper Run:** 2026-02-15
+**Commit:** 8cfff10
+**Last RepoKeeper Run:** 2026-02-16
 
 ## OVERVIEW
 Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpine.js). Prompt-driven behavior - everything controlled by `/prompts/` markdown files. Grows organically through memory, tools, extensions, and agent profiles.
@@ -12,15 +12,15 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 ```
 ./
 ├── agents/              # Agent profiles (_example, agent0, brocula, default, developer, hacker, researcher) with custom prompts/tools/extensions
-├── prompts/             # 98 system prompts defining framework behavior (fw.* = framework, agent.system.* = agent behavior)
+├── prompts/             # 96 system prompts defining framework behavior (fw.* = framework, agent.system.* = agent behavior)
 ├── python/
 │   ├── api/            # 63 Flask API endpoints (auto-registered via ApiHandler base class)
 │   ├── helpers/        # 73 utility modules (memory, history, settings, mcp, scheduler)
-│   ├── tools/          # 24 default tools (code_execution, browser_agent, memory_*, call_subordinate)
+│   ├── tools/          # 19 default tools (code_execution, browser_agent, memory_*, call_subordinate)
 │   └── extensions/     # 22 lifecycle hook points (message_loop_*, response_stream*, system_prompt)
 ├── webui/              # Frontend (Alpine.js stores, modular components, 96 code files)
 │   ├── components/     # chat/, settings/, sidebar/, modals/, projects/, notifications/
-│   ├── js/            # ES modules, stores (scheduler.js 1835 lines, messages.js 1009 lines)
+│   ├── js/            # ES modules, stores (scheduler.js 1579 lines, messages.js 1016 lines)
 │   └── css/           # Styling
 ├── conf/               # model_providers.yaml (15+ LLM providers), projects.default.gitignore
 ├── docker/             # base/ (Debian 13 slim, Python 3.13+3.12) + run/ (runtime container)
@@ -42,7 +42,7 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 | API endpoints | `/python/api/` | Classes inheriting `ApiHandler` auto-register as Flask routes |
 | Memory management | `/python/helpers/memory.py` | FAISS vector DB, semantic search, AI filtering |
 | History & context | `/python/helpers/history.py` | Message summarization, context management |
-| Settings | `/python/helpers/settings.py` | 1795 lines - complexity hotspot, needs refactoring to background tasks |
+| Settings | `/python/helpers/settings.py` | 1749 lines - complexity hotspot, needs refactoring to background tasks |
 | MCP integration | `/python/helpers/mcp_handler.py` | Server + client for Model Context Protocol |
 | Scheduler | `/python/helpers/task_scheduler.py` | Crontab-based scheduled tasks |
 | Agent profiles | `/agents/{profile}/` | Each has prompts/, tools/, extensions/ subdirs |
@@ -95,15 +95,15 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 - **NEVER use eval/exec** - safe `simple_eval()` only in controlled contexts
 
 ### Code Smells (TODOs to address)
-- `/python/helpers/settings.py` - Multiple TODOs about replacing with background tasks (lines 1558, 1616, 1621, 1631, 1643) - CRITICAL complexity hotspot
+- `/python/helpers/settings.py` - Uses `defer.run_in_background()` at lines 1558, 1616, 1621, 1631, 1643 to refactor blocking operations - CRITICAL complexity hotspot
 - `/python/helpers/task_scheduler.py` - 1270 lines, TODO about splitting task types from scheduler logic
 - `/python/helpers/mcp_handler.py` - 1107 lines, TODO about inline prompts (lines 742-744)
 - `/python/helpers/history.py:236` - FIXME: vision bytes sent to utility LLM (inefficiency)
 - `/python/helpers/vector_db.py`, `/python/helpers/memory.py` - FAISS patch for Python 3.12 ARM (remove when fixed upstream)
 - `/python/helpers/job_loop.py:34` - TODO: lowering SLEEP_TIME below 1min causes job duplication
-- 174 `# type: ignore` comments across 47 files - type suppression issues
-- 150 `except Exception as e:` handlers - broad exception catching
-- 309 PrintStyle calls across 45 files - intentional framework logging (not bare prints)
+- 139 `# type: ignore` comments across 47 files - type suppression issues
+- 186 `except Exception as e:` handlers - broad exception catching
+- 279 PrintStyle calls across 45 files - intentional framework logging (not bare prints)
 
 ### Testing
 - pytest.ini exists and configured (asyncio mode, markers, test paths)
@@ -183,11 +183,11 @@ docker run -p 50001:80 agent0ai/agent-zero
 - **CI is AI-powered** - GitHub workflows use OpenCode agent, not traditional pytest/linting
 - **Settings module** (1749 lines) identified as complexity hotspot needing refactoring
 - **Large files**: `agent.py` (741 lines), `models.py` (919 lines), `settings.py` (1749 lines), `task_scheduler.py` (1271 lines), `mcp_handler.py` (1109 lines)
-- **Large frontend files**: `webui/js/scheduler.js` (1835 lines), `webui/js/messages.js` (1009 lines), `webui/components/chat/speech/speech-store.js` (967 lines)
+- **Large frontend files**: `webui/js/scheduler.js` (1579 lines), `webui/js/messages.js` (1016 lines), `webui/components/chat/speech/speech-store.js` (965 lines)
 - **FAISS patch required** for Python 3.12 ARM - temporary workaround
 - **57 bare `pass` statements** - mostly in base classes/abstract methods (acceptable)
-- **224 Python files** - backend codebase
-- **566 JavaScript files** - frontend codebase
+- **195 Python files** - backend codebase
+- **562 JavaScript files** - frontend codebase
 - **96 prompt files** - system prompts and agent behavior definitions
 - **No traditional testing** - CI uses AI code analysis instead of pytest runs
 - **Automatic SSH password generation** - `prepare.py` generates random root password (security concern for production)
@@ -211,19 +211,19 @@ docker run -p 50001:80 agent0ai/agent-zero
 
 | Criterion | Weight | Score | Notes |
 |-----------|--------|-------|-------|
-| Correctness | 15% | 12/15 | Valid syntax, 174 type ignores |
+| Correctness | 15% | 12/15 | Valid syntax, 139 type ignores |
 | Readability | 10% | 7/10 | Good structure, prints for logging |
 | Simplicity | 10% | 6/10 | Large modules (settings.py: 1749 lines) |
 | Modularity | 15% | 9/15 | Extensions good, some too large |
 | Consistency | 5% | 3/5 | Mixed patterns |
-| **Testability** | **15%** | **3/15** | **Only 10 test files for 224 files (~4%)** |
+| **Testability** | **15%** | **3/15** | **Only 10 test files for 195 files (~5%)** |
 | Maintainability | 10% | 5/10 | Complexity hotspot in helpers/ |
 | **Error Handling** | **10%** | **7/10** | **Fixed: 62 bare exception handlers → 0** |
 | Dependencies | 5% | 4/5 | Well-defined requirements |
 | Determinism | 5% | 5/5 | No randomness issues |
 
 **Critical Issues:**
-1. **Test Coverage Crisis**: Only 10 test files for 224 Python files (~4% coverage)
+1. **Test Coverage Crisis**: Only 10 test files for 195 Python files (~5% coverage)
 2. ~~**Error Handling**: 182 broad `except Exception` handlers mask bugs~~ ✅ **FIXED**: 62 bare `except Exception:` handlers converted to `except Exception as e:`
 3. **Type Safety**: 174 `# type: ignore` comments bypass type checking
 4. **Observability**: PrintStyle logging is intentional framework behavior (not bare print statements)
@@ -298,8 +298,8 @@ docker run -p 50001:80 agent0ai/agent-zero
 |--------|---------|--------|----------|
 | Test Coverage | ~4% | 30% | P0 |
 | Broad Exceptions | 0 ✅ | 0 | P1 |
-| Type Ignores | 174 | 70 | P2 |
-| PrintStyle Calls | 290 (intentional) | N/A | - |
+| Type Ignores | 139 | 70 | P2 |
+| PrintStyle Calls | 279 (intentional) | N/A | - |
 | Linter Configs | 4 ✅ | 3+ | P2 |
 
 ### POSITIVE FINDINGS
@@ -311,10 +311,10 @@ docker run -p 50001:80 agent0ai/agent-zero
 ✅ **Security**: No secrets committed to repo
 ✅ **Clean Repo**: No temp files, OS files, or cache
 
-### RECENT CLEANUP (2026-02-15)
+### RECENT CLEANUP (2026-02-16)
 
 ✅ **Fixed bare exception handlers**: 62 `except Exception:` → `except Exception as e:` (44 files)
 ✅ **Verified test suite**: All 29 tests passing
 ✅ **No syntax errors**: All modified files compile successfully
 ✅ **Pre-commit hooks**: Already configured (ruff, black, mypy, prettier)
-✅ **Updated AGENTS.md**: Refreshed statistics (224 Python files, 566 JS files, 174 type ignores, 150 exception handlers, 309 PrintStyle calls)
+✅ **Updated AGENTS.md**: Refreshed statistics (195 Python files, 562 JS files, 139 type ignores, 186 exception handlers, 279 PrintStyle calls)
