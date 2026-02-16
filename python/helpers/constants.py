@@ -457,18 +457,6 @@ class FileExtensions:
     YML: Final[str] = ".yml"
 
 
-class MimeTypes:
-    """MIME type constants for file handling."""
-
-    DEFAULT_BINARY: Final[str] = "application/octet-stream"
-    JSON: Final[str] = "application/json"
-    PDF: Final[str] = "application/pdf"
-    ZIP: Final[str] = "application/zip"
-    TEXT_PLAIN: Final[str] = "text/plain"
-    TEXT_HTML: Final[str] = "text/html"
-    IMAGE_SVG: Final[str] = "image/svg+xml"
-
-
 # =============================================================================
 # MIME TYPES
 # =============================================================================
@@ -493,6 +481,9 @@ class MimeTypes:
     APPLICATION_ZIP: Final[str] = "application/zip"
     MULTIPART_FORM_DATA: Final[str] = "multipart/form-data"
     APPLICATION_OCTET_STREAM: Final[str] = "application/octet-stream"
+
+    # Alias for backward compatibility
+    DEFAULT_BINARY: Final[str] = APPLICATION_OCTET_STREAM
 
 
 # =============================================================================
