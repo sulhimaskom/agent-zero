@@ -359,6 +359,24 @@ class Network:
 class Paths:
     """File system paths and directories."""
 
+    # Base directories
+    PYTHON_DIR: Final[str] = "python"
+    AGENTS_DIR: Final[str] = "agents"
+    PROMPTS_DIR: Final[str] = "prompts"
+
+    # Extension paths
+    EXTENSIONS_DIR: Final[str] = "python/extensions"
+    AGENT_EXTENSIONS_DIR: Final[str] = "agents/{profile}/extensions"
+
+    # Tool paths
+    TOOLS_DIR: Final[str] = "python/tools"
+    AGENT_TOOLS_DIR: Final[str] = "agents/{profile}/tools"
+    TOOL_FILE_EXTENSION: Final[str] = ".py"
+
+    # Prompt paths
+    DEFAULT_PROMPTS_DIR: Final[str] = "prompts/default"
+    AGENT_PROMPTS_DIR: Final[str] = "agents/{profile}/prompts"
+
     # Project structure
     PROJECTS_PARENT_DIR: Final[str] = "usr/projects"
     PROJECT_META_DIR: Final[str] = ".a0proj"
@@ -402,6 +420,26 @@ class Paths:
     # A2A paths
     A2A_BASE_PATH: Final[str] = "/a2a"
     A2A_TOKEN_PATH_PREFIX: Final[str] = "/t-"
+
+    @staticmethod
+    def get_agent_extensions_path(profile: str, extension_point: str) -> str:
+        """Get the path to agent-specific extensions."""
+        return f"{Paths.AGENTS_DIR}/{profile}/extensions/{extension_point}"
+
+    @staticmethod
+    def get_agent_tools_path(profile: str, tool_name: str) -> str:
+        """Get the path to agent-specific tool file."""
+        return f"{Paths.AGENTS_DIR}/{profile}/tools/{tool_name}{Paths.TOOL_FILE_EXTENSION}"
+
+    @staticmethod
+    def get_default_extensions_path(extension_point: str) -> str:
+        """Get the path to default extensions."""
+        return f"{Paths.EXTENSIONS_DIR}/{extension_point}"
+
+    @staticmethod
+    def get_default_tools_path(tool_name: str) -> str:
+        """Get the path to default tool file."""
+        return f"{Paths.TOOLS_DIR}/{tool_name}{Paths.TOOL_FILE_EXTENSION}"
 
 
 # =============================================================================
