@@ -2,7 +2,7 @@
 
 **Generated:** 2026-02-16
 **Branch:** custom
-**Commit:** 8cfff10
+**Commit:** 141b9d9
 **Last RepoKeeper Run:** 2026-02-16
 
 ## OVERVIEW
@@ -101,9 +101,9 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 - `/python/helpers/history.py:236` - FIXME: vision bytes sent to utility LLM (inefficiency)
 - `/python/helpers/vector_db.py`, `/python/helpers/memory.py` - FAISS patch for Python 3.12 ARM (remove when fixed upstream)
 - `/python/helpers/job_loop.py:34` - TODO: lowering SLEEP_TIME below 1min causes job duplication
-- 139 `# type: ignore` comments across 47 files - type suppression issues
-- 186 `except Exception as e:` handlers - broad exception catching
-- 279 PrintStyle calls across 45 files - intentional framework logging (not bare prints)
+- 174 `# type: ignore` comments across 47 files - type suppression issues
+- 143 `except Exception as e:` handlers - broad exception catching
+- 309 PrintStyle calls across 45 files - intentional framework logging (not bare prints)
 
 ### Testing
 - pytest.ini exists and configured (asyncio mode, markers, test paths)
@@ -186,7 +186,7 @@ docker run -p 50001:80 agent0ai/agent-zero
 - **Large frontend files**: `webui/js/scheduler.js` (1579 lines), `webui/js/messages.js` (1016 lines), `webui/components/chat/speech/speech-store.js` (965 lines)
 - **FAISS patch required** for Python 3.12 ARM - temporary workaround
 - **57 bare `pass` statements** - mostly in base classes/abstract methods (acceptable)
-- **195 Python files** - backend codebase
+- **224 Python files** - backend codebase
 - **562 JavaScript files** - frontend codebase
 - **96 prompt files** - system prompts and agent behavior definitions
 - **No traditional testing** - CI uses AI code analysis instead of pytest runs
