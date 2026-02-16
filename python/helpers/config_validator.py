@@ -188,7 +188,9 @@ class ConfigValidator:
                     field="API_KEY",
                     message="No LLM API key found in environment",
                     level=ValidationLevel.WARNING,
-                    suggestion="Set at least one API key (OPENROUTER_API_KEY, OPENAI_API_KEY, etc.)",
+                    suggestion=(
+                        "Set at least one API key (OPENROUTER_API_KEY, OPENAI_API_KEY, etc.)"
+                    ),
                 )
             )
 

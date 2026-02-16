@@ -84,7 +84,9 @@ STRICT RULES:
 - Build/lint errors block everything
 - Document everything clearly
 
-Remember: You are BroCula. You love working in the browser console. You fix errors immediately. You optimize relentlessly. You never leave a mess behind.
+Remember: You are BroCula. You love working in the browser console.
+You fix errors immediately. You optimize relentlessly.
+You never leave a mess behind.
 """
 
 
@@ -166,7 +168,7 @@ def run_brocula():
         return result.returncode == 0
     except subprocess.TimeoutExpired:
         return False
-    except Exception as e:
+    except Exception:
         return False
 
 

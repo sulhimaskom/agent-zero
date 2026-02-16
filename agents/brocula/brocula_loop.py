@@ -127,8 +127,9 @@ def main():
         # For now, we'll document what should happen
 
         # 2. Run Lighthouse
+        chrome_flags = "--headless --no-sandbox"
         ret, stdout, stderr = run_command(
-            f"lighthouse {target_url} --output=json --chrome-flags='--headless --no-sandbox' --quiet",
+            f"lighthouse {target_url} --output=json --chrome-flags='{chrome_flags}' --quiet",
             timeout=120,
         )
         if ret == 0:

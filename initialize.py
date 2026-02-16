@@ -94,7 +94,9 @@ def initialize_agent(override_settings: dict | None = None):
     # initialize MCP in deferred task to prevent blocking the main thread
     # async def initialize_mcp_async(mcp_servers_config: str):
     #     return initialize_mcp(mcp_servers_config)
-    # defer.DeferredTask(thread_name="mcp-initializer").start_task(initialize_mcp_async, config.mcp_servers)
+    # defer.DeferredTask(thread_name="mcp-initializer").start_task(
+    #     initialize_mcp_async, config.mcp_servers
+    # )
     # initialize_mcp(config.mcp_servers)
 
     # import python.helpers.mcp_handler as mcp_helper
@@ -107,11 +109,16 @@ def initialize_agent(override_settings: dict | None = None):
     #         first_context = agent_helper.AgentContext.first()
     #         if first_context:
     #             (
-    #                 first_context.log
-    #                 .log(type="warning", content=f"Failed to update MCP settings: {e}", temp=False)
+    #                 first_context.log.log(
+    #                     type="warning",
+    #                     content=f"Failed to update MCP settings: {e}",
+    #                     temp=False,
+    #                 )
     #             )
     #         (
-    #             print_style_helper.PrintStyle(background_color="black", font_color="red", padding=True)
+    #             print_style_helper.PrintStyle(
+    #                 background_color="black", font_color="red", padding=True
+    #             )
     #             .print(f"Failed to update MCP settings: {e}")
     #         )
 

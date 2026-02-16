@@ -34,7 +34,8 @@ from python.helpers.rate_limiter import RateLimiter
 from python.helpers.tokens import approximate_tokens
 
 
-# disable extra logging, must be done repeatedly, otherwise browser-use will turn it back on for some reason
+# disable extra logging, must be done repeatedly, otherwise browser-use
+# will turn it back on for some reason
 def turn_off_logging():
     os.environ["LITELLM_LOG"] = "ERROR"  # only errors
     litellm.suppress_debug_info = True
@@ -611,7 +612,8 @@ class BrowserCompatibleChatWrapper(ChatOpenRouter):
             model = kwargs.pop("model", None)
             kwrgs = {**self._wrapper.kwargs, **kwargs}
 
-            # hack from browser-use to fix json schema for gemini (additionalProperties, $defs, $ref)
+            # hack from browser-use to fix json schema for gemini
+            # (additionalProperties, $defs, $ref)
             if (
                 "response_format" in kwrgs
                 and "json_schema" in kwrgs["response_format"]
@@ -638,7 +640,7 @@ class BrowserCompatibleChatWrapper(ChatOpenRouter):
             except (AttributeError, TypeError):
                 pass
 
-        except Exception as e:
+        except Exception:
             raise
 
         # another hack for browser-use post process invalid jsons
@@ -648,9 +650,7 @@ class BrowserCompatibleChatWrapper(ChatOpenRouter):
             ) or "json_object" in kwrgs["response_format"]:
                 if resp.choices[0].message.content is not None and not resp.choices[
                     0
-                ].message.content.startswith(
-                    "{"
-                ):  # type: ignore
+                ].message.content.startswith("{"):  # type: ignore
                     js = dirty_json.parse(resp.choices[0].message.content)  # type: ignore
                     resp.choices[0].message.content = dirty_json.stringify(js)  # type: ignore
         except (KeyError, IndexError, AttributeError):

@@ -553,7 +553,8 @@ class BackupService:
 
                 # Process each file in archive
                 for archive_path in archive_files:
-                    # Archive path is already the correct relative path (e.g., "a0/tmp/settings.json")
+                    # Archive path is already the correct relative path
+                    # (e.g., "a0/tmp/settings.json")
                     original_path = archive_path
 
                     # Translate path from backed up system to current system
@@ -602,7 +603,8 @@ class BackupService:
                 # Handle clean before restore if requested
                 files_to_delete = []
                 if clean_before_restore:
-                    # Use user-edited metadata for clean operations so patterns from ACE editor are used
+                    # Use user-edited metadata for clean operations
+                    # so patterns from ACE editor are used
                     files_to_delete = await self._find_files_to_clean_with_user_metadata(
                         backup_metadata, original_backup_metadata
                     )
@@ -673,7 +675,8 @@ class BackupService:
 
                 # Perform clean before restore if requested
                 if clean_before_restore:
-                    # Use user-edited metadata for clean operations so patterns from ACE editor are used
+                    # Use user-edited metadata for clean operations
+                    # so patterns from ACE editor are used
                     files_to_delete = await self._find_files_to_clean_with_user_metadata(
                         backup_metadata, original_backup_metadata
                     )
@@ -737,7 +740,8 @@ class BackupService:
 
                 # Process each file in archive
                 for archive_path in archive_files:
-                    # Archive path is already the correct relative path (e.g., "a0/tmp/settings.json")
+                    # Archive path is already the correct relative path
+                    # (e.g., "a0/tmp/settings.json")
                     original_path = archive_path
 
                     # Translate path from backed up system to current system
@@ -884,7 +888,9 @@ class BackupService:
     async def _find_files_to_clean_with_user_metadata(
         self, user_metadata: dict[str, Any], original_metadata: dict[str, Any]
     ) -> list[dict[str, Any]]:
-        """Find existing files that match patterns from user-edited metadata for clean operations."""
+        """Find existing files that match patterns from user-edited
+        metadata for clean operations.
+        """
         # Use user-edited patterns for what to clean
         user_include_patterns = user_metadata.get("include_patterns", [])
         user_exclude_patterns = user_metadata.get("exclude_patterns", [])
