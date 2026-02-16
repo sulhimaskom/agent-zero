@@ -70,8 +70,14 @@ Tools are modular components that provide specific functionality to agents. They
 
 #### Tool Structure
 Each tool is implemented as a Python class that inherits from the base `Tool` class. Tools are located in:
-- Default tools: `/python/tools/`
-- Agent-specific tools: `/agents/{agent_profile}/tools/`
+- **Tool definitions**: System prompts in `/prompts/agent.system.tools.md` and `/prompts/agent.system.tool.*.md` define available tools
+- **Tool implementations**: Agent-specific tools are implemented in `/agents/{agent_profile}/tools/`
+- **Tool base class**: `/python/helpers/tool.py` provides the `Tool` base class for tool implementations
+
+> [!NOTE]
+> Tools are primarily defined through the prompt system in the `/prompts/` directory. The actual tool
+> implementations are in agent-specific directories under `/agents/`. There is no `/python/tools/` directory
+> in the repository structure.
 
 #### Tool Override Logic
 When a tool with the same name is requested, Agent Zero first checks for its existence in the agent-specific tools directory. If found, that version is used. If not found, it falls back to the default tools directory.

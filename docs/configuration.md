@@ -64,8 +64,13 @@ All external API endpoints are fully configurable:
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `A0_UPDATE_CHECK_URL` | `https://api.agent-zero.ai/a0-update-check` | URL for checking Agent Zero updates |
-| `A0_PERPLEXITY_API_BASE_URL` | `https://api.perplexity.ai` | Perplexity API base URL |
-| `A0_PERPLEXITY_DEFAULT_MODEL` | `llama-3.1-sonar-large-128k-online` | Default Perplexity model |
+| `A0_PERPLEXITY_API_BASE_URL` | `https://api.perplexity.ai` | Perplexity API base URL *(deprecated)* |
+| `A0_PERPLEXITY_DEFAULT_MODEL` | `llama-3.1-sonar-large-128k-online` | Default Perplexity model *(deprecated)* |
+
+> [!WARNING]
+> **Perplexity integration is deprecated.** SearXNG is now the primary search provider.
+> These variables are maintained for backward compatibility only and may be removed in a future release.
+> See [SearXNG Integration](architecture.md#searxng-integration) for the recommended search configuration.
 | `A0_AGENT_ZERO_REPO_URL` | `https://github.com/frdel/agent-zero` | Agent Zero repository URL |
 | `A0_VENICE_API_BASE` | `https://api.venice.ai/api/v1` | Venice.ai API base URL |
 | `A0_A0_VENICE_API_BASE` | `https://api.agent-zero.ai/venice/v1` | Agent Zero Venice proxy URL |

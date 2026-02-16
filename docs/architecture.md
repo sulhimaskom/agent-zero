@@ -60,7 +60,7 @@ This architecture ensures:
 | `/docs` | Documentation files and guides |
 | `/instruments` | Custom scripts and tools for runtime environment |
 | `/knowledge` | Knowledge base storage |
-| `/logs` | HTML CLI-style chat logs |
+| `/logs` | HTML CLI-style chat logs (runtime container path) |
 | `/memory` | Persistent agent memory storage |
 | `/prompts` | System and tool prompts |
 | `/python` | Core Python codebase: |
@@ -74,7 +74,11 @@ This architecture ensures:
 | &nbsp;&nbsp;&nbsp;&nbsp;`/css` | Stylesheets |
 | &nbsp;&nbsp;&nbsp;&nbsp;`/js` | JavaScript modules |
 | &nbsp;&nbsp;&nbsp;&nbsp;`/public` | Static assets |
-| `/work_dir` | Working directory |
+| `/work_dir` | Working directory (runtime container path) |
+
+> [!NOTE]
+> The `/logs` and `/work_dir` paths refer to runtime container paths used when Agent Zero runs inside Docker.
+> They are not part of the repository filesystem structure but are created at runtime within the container.
 
 ### Key Files
 | File | Description |
@@ -357,7 +361,8 @@ Knowledge refers to the user-provided information and data that agents can lever
 
 - **Knowledge Base**:
   - Can include PDFs, databases, books, documentation
-  - `/docs` folder automatically added
+  - Content is loaded from `/knowledge/` and `/knowledge/custom/` directories via `knowledge_import.py`
+  - The `/docs` folder contains project documentation and is **not** automatically added to the knowledge base
   - Used for answering questions and decision-making
   - Supports RAG-augmented tasks
 
