@@ -48,7 +48,11 @@ Agent Zero uses a centralized configuration system that allows all important val
 | Environment Variable | Default | Description |
 |---------------------|---------|-------------|
 | `A0_UPDATE_CHECK_URL` | https://api.agent-zero.ai/a0-update-check | Update check endpoint |
-| `A0_PERPLEXITY_API_BASE_URL` | https://api.perplexity.ai | Perplexity API base |
+| `A0_PERPLEXITY_API_BASE_URL` | https://api.perplexity.ai | Perplexity API base *(deprecated)* |
+
+> [!WARNING]
+> **Perplexity integration is deprecated.** SearXNG is now the primary search provider.
+> These variables are maintained for backward compatibility only and may be removed in a future release.
 | `A0_VENICE_API_BASE` | https://api.venice.ai/api/v1 | Venice.ai API base |
 | `A0_OPENROUTER_API_BASE` | https://openrouter.ai/api/v1 | OpenRouter API base |
 | `A0_OPENROUTER_HTTP_REFERER` | https://agent-zero.ai/ | OpenRouter referer header |

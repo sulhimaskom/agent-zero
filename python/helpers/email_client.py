@@ -87,7 +87,7 @@ class EmailClient:
 
     async def _connect_imap(self) -> None:
         """Establish IMAP connection."""
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
 
         def _sync_connect():
             client = IMAPClient(self.server, port=self.port, ssl=self.ssl, timeout=self.timeout)
@@ -110,7 +110,7 @@ class EmailClient:
                 Credentials,
             )
 
-            loop = asyncio.get_event_loop()
+            loop = asyncio.get_running_loop()
 
             def _sync_connect():
                 creds = Credentials(username=self.username, password=self.password)
@@ -133,7 +133,7 @@ class EmailClient:
         """Clean up connection."""
         try:
             if self.client:
-                loop = asyncio.get_event_loop()
+                loop = asyncio.get_running_loop()
                 await loop.run_in_executor(None, self.client.logout)
                 self.client = None
                 PrintStyle.standard("Disconnected from IMAP server")
@@ -180,7 +180,7 @@ class EmailClient:
         if not self.client:
             raise RepairableException("IMAP client not connected. Call connect() first.")
 
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         messages: list[Message] = []
 
         def _sync_fetch():
@@ -230,7 +230,7 @@ class EmailClient:
         filter: dict[str, Any],
     ) -> Message | None:
         """Fetch and parse a single IMAP message with retry logic for large messages."""
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
 
         def _sync_fetch():
             try:
@@ -296,7 +296,7 @@ class EmailClient:
 
         from exchangelib import Q
 
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
         messages: list[Message] = []
 
         def _sync_fetch():
@@ -342,7 +342,7 @@ class EmailClient:
         download_folder: str,
     ) -> Message:
         """Parse an Exchange message."""
-        loop = asyncio.get_event_loop()
+        loop = asyncio.get_running_loop()
 
         def _get_body():
             return str(ex_msg.text_body or ex_msg.body or "")
