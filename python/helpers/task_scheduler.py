@@ -3,6 +3,7 @@ import os
 import random
 import threading
 import uuid
+from abc import abstractmethod
 from collections.abc import Callable
 from datetime import UTC, datetime, timedelta
 from enum import StrEnum
@@ -215,8 +216,10 @@ class BaseTask(BaseModel):
             return None
         return int((next_run - datetime.now(UTC)).total_seconds() / 60)
 
+    @abstractmethod
     async def on_run(self):
-        pass
+        """Execute the task. Must be implemented by subclasses."""
+        raise NotImplementedError("on_run must be implemented by subclasses")
 
     async def on_finish(self):
         # Ensure that updated_at is refreshed to reflect completion time

@@ -21,7 +21,7 @@
 *.sublime-*
 
 # ignore test files in root dir
-/*.test.py
+**/*.test.py
 
 # Ignore all contents of the virtual environment directory
 .venv/
