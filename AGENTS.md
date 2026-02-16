@@ -2,7 +2,7 @@
 
 **Generated:** 2026-02-16
 **Branch:** custom
-**Commit:** 141b9d9
+**Commit:** 0ebcdfd
 **Last RepoKeeper Run:** 2026-02-16
 
 ## OVERVIEW
@@ -109,7 +109,7 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 - pytest.ini exists and configured (asyncio mode, markers, test paths)
 - conftest.py exists with fixtures and mocks
 - All 29 tests passing
-- 10 test files for 224 Python files (~4% coverage)
+- 10 test files for 195 Python files (~5% coverage)
 - Tests not run in CI (GitHub workflows use OpenCode AI agent only)
 - Mixed naming: `test_*.py` and `*_test.py` both used
 - Coverage tool not configured
@@ -186,8 +186,8 @@ docker run -p 50001:80 agent0ai/agent-zero
 - **Large frontend files**: `webui/js/scheduler.js` (1579 lines), `webui/js/messages.js` (1016 lines), `webui/components/chat/speech/speech-store.js` (965 lines)
 - **FAISS patch required** for Python 3.12 ARM - temporary workaround
 - **57 bare `pass` statements** - mostly in base classes/abstract methods (acceptable)
-- **224 Python files** - backend codebase
-- **562 JavaScript files** - frontend codebase
+- **195 Python files** - backend codebase
+- **578 JavaScript files** - frontend codebase
 - **96 prompt files** - system prompts and agent behavior definitions
 - **No traditional testing** - CI uses AI code analysis instead of pytest runs
 - **Automatic SSH password generation** - `prepare.py` generates random root password (security concern for production)
