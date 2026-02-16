@@ -54,7 +54,7 @@ class LighthouseAuditor(Tool):
                 )
                 if result.returncode != 0:
                     raise Exception("Lighthouse not available")
-            except Exception:
+            except Exception as e:
                 return Response(
                     message="❌ Lighthouse not installed. Install: npm install -g lighthouse",
                     break_loop=False,

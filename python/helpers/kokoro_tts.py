@@ -28,7 +28,7 @@ async def preload():
     try:
         # return await runtime.call_development_function(_preload)
         return await _preload()
-    except Exception:
+    except Exception as e:
         # if not runtime.is_development():
         raise
         # Fallback to direct execution if RFC fails in development
@@ -71,7 +71,7 @@ async def is_downloading():
     try:
         # return await runtime.call_development_function(_is_downloading)
         return _is_downloading()
-    except Exception:
+    except Exception as e:
         # if not runtime.is_development():
         raise
         # Fallback to direct execution if RFC fails in development
@@ -86,7 +86,7 @@ async def is_downloaded():
     try:
         # return await runtime.call_development_function(_is_downloaded)
         return _is_downloaded()
-    except Exception:
+    except Exception as e:
         # if not runtime.is_development():
         raise
         # Fallback to direct execution if RFC fails in development
@@ -102,7 +102,7 @@ async def synthesize_sentences(sentences: list[str]):
     try:
         # return await runtime.call_development_function(_synthesize_sentences, sentences)
         return await _synthesize_sentences(sentences)
-    except Exception:
+    except Exception as e:
         # if not runtime.is_development():
         raise
         # Fallback to direct execution if RFC fails in development
