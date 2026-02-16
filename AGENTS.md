@@ -2,7 +2,7 @@
 
 **Generated:** 2026-02-16
 **Branch:** custom
-**Commit:** 0ebcdfd
+**Commit:** 45f0f24
 **Last RepoKeeper Run:** 2026-02-16
 
 ## OVERVIEW
@@ -298,8 +298,8 @@ docker run -p 50001:80 agent0ai/agent-zero
 |--------|---------|--------|----------|
 | Test Coverage | ~4% | 30% | P0 |
 | Broad Exceptions | 0 ✅ | 0 | P1 |
-| Type Ignores | 139 | 70 | P2 |
-| PrintStyle Calls | 279 (intentional) | N/A | - |
+| Type Ignores | 174 | 70 | P2 |
+| PrintStyle Calls | 309 (intentional) | N/A | - |
 | Linter Configs | 4 ✅ | 3+ | P2 |
 
 ### POSITIVE FINDINGS
@@ -317,4 +317,4 @@ docker run -p 50001:80 agent0ai/agent-zero
 ✅ **Verified test suite**: All 29 tests passing
 ✅ **No syntax errors**: All modified files compile successfully
 ✅ **Pre-commit hooks**: Already configured (ruff, black, mypy, prettier)
-✅ **Updated AGENTS.md**: Refreshed statistics (224 Python files, 582 JS files, 139 type ignores, 186 exception handlers, 279 PrintStyle calls)
+✅ **Updated AGENTS.md**: Refreshed statistics (224 Python files, 582 JS files, 174 type ignores, 208 exception handlers, 309 PrintStyle calls)
