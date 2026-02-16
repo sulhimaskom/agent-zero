@@ -109,7 +109,7 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 - pytest.ini exists and configured (asyncio mode, markers, test paths)
 - conftest.py exists with fixtures and mocks
 - All 29 tests passing
-- 10 test files for 195 Python files (~5% coverage)
+- 10 test files for 224 Python files (~4% coverage)
 - Tests not run in CI (GitHub workflows use OpenCode AI agent only)
 - Mixed naming: `test_*.py` and `*_test.py` both used
 - Coverage tool not configured
@@ -182,12 +182,12 @@ docker run -p 50001:80 agent0ai/agent-zero
 - **No LSP servers installed** - relies on VS Code Python extension for type checking
 - **CI is AI-powered** - GitHub workflows use OpenCode agent, not traditional pytest/linting
 - **Settings module** (1749 lines) identified as complexity hotspot needing refactoring
-- **Large files**: `agent.py` (741 lines), `models.py` (919 lines), `settings.py` (1749 lines), `task_scheduler.py` (1271 lines), `mcp_handler.py` (1109 lines)
+- **Large files**: `agent.py` (741 lines), `models.py` (919 lines), `settings.py` (1749 lines), `task_scheduler.py` (1270 lines), `mcp_handler.py` (1107 lines)
 - **Large frontend files**: `webui/js/scheduler.js` (1579 lines), `webui/js/messages.js` (1016 lines), `webui/components/chat/speech/speech-store.js` (965 lines)
 - **FAISS patch required** for Python 3.12 ARM - temporary workaround
 - **57 bare `pass` statements** - mostly in base classes/abstract methods (acceptable)
-- **195 Python files** - backend codebase
-- **578 JavaScript files** - frontend codebase
+- **224 Python files** - backend codebase
+- **582 JavaScript files** - frontend codebase
 - **96 prompt files** - system prompts and agent behavior definitions
 - **No traditional testing** - CI uses AI code analysis instead of pytest runs
 - **Automatic SSH password generation** - `prepare.py` generates random root password (security concern for production)
@@ -223,7 +223,7 @@ docker run -p 50001:80 agent0ai/agent-zero
 | Determinism | 5% | 5/5 | No randomness issues |
 
 **Critical Issues:**
-1. **Test Coverage Crisis**: Only 10 test files for 195 Python files (~5% coverage)
+1. **Test Coverage Crisis**: Only 10 test files for 224 Python files (~4% coverage)
 2. ~~**Error Handling**: 182 broad `except Exception` handlers mask bugs~~ ✅ **FIXED**: 62 bare `except Exception:` handlers converted to `except Exception as e:`
 3. **Type Safety**: 174 `# type: ignore` comments bypass type checking
 4. **Observability**: PrintStyle logging is intentional framework behavior (not bare print statements)
@@ -317,4 +317,4 @@ docker run -p 50001:80 agent0ai/agent-zero
 ✅ **Verified test suite**: All 29 tests passing
 ✅ **No syntax errors**: All modified files compile successfully
 ✅ **Pre-commit hooks**: Already configured (ruff, black, mypy, prettier)
-✅ **Updated AGENTS.md**: Refreshed statistics (195 Python files, 562 JS files, 139 type ignores, 186 exception handlers, 279 PrintStyle calls)
+✅ **Updated AGENTS.md**: Refreshed statistics (224 Python files, 582 JS files, 139 type ignores, 186 exception handlers, 279 PrintStyle calls)

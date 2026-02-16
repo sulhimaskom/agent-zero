@@ -121,10 +121,6 @@ class Settings(TypedDict):
     update_check_enabled: bool
 
 
-class PartialSettings(Settings, total=False):
-    pass
-
-
 class FieldOption(TypedDict):
     value: str
     label: str
