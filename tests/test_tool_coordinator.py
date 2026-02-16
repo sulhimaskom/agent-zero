@@ -343,17 +343,18 @@ class TestToolCoordinator:
         mock_instance = Mock()
         mock_tool_class.return_value = mock_instance
 
-        with patch("python.coordinators.tool_coordinator.extract_tools") as mock_extract:
+        calls = []
 
-            def side_effect(path, base):
-                if "profile" in path:
-                    return []
-                else:
-                    return [mock_tool_class]
+        def side_effect(path, base):
+            calls.append(str(path))
+            if "agents/" in str(path) and "test_profile" in str(path):
+                return []
+            return [mock_tool_class]
 
-            mock_extract.load_classes_from_file.side_effect = side_effect
-
-            # Act: Get tool (falls back to default directory)
+        with patch(
+            "python.coordinators.tool_coordinator.extract_tools.load_classes_from_file",
+            side_effect=side_effect,
+        ):
             result = tool_coordinator.get_tool(
                 name="default_tool",
                 method=None,
@@ -362,9 +363,10 @@ class TestToolCoordinator:
                 loop_data=mock_agent.loop_data,
             )
 
-            # Assert: Tool loaded from default directory
             assert result == mock_instance
-            assert mock_extract.load_classes_from_file.call_count == 2
+            assert len(calls) == 2, f"Expected 2 calls but got {len(calls)}: {calls}"
+            assert any("test_profile" in c for c in calls)
+            assert any("python/tools" in c for c in calls)
 
     def test_get_tool_returns_unknown_when_not_found(self, tool_coordinator, mock_agent):
         """Arrange: Tool not found in any directory"""
