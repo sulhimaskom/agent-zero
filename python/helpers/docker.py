@@ -41,7 +41,9 @@ class DockerContainerManager:
                     if self.logger:
                         self.logger.log(
                             type="hint",
-                            content="Connection to Docker failed. Is docker or Docker Desktop running?",
+                            content=(
+                                "Connection to Docker failed. Is docker or Docker Desktop running?"
+                            ),
                         )
                     PrintStyle.error(err)
                     if self.logger:
@@ -108,7 +110,9 @@ class DockerContainerManager:
                 if self.logger:
                     self.logger.log(
                         type="info",
-                        content=f"Starting existing container: {self.name} for safe code execution...",
+                        content=(
+                            f"Starting existing container: {self.name} for safe code execution..."
+                        ),
                         temp=True,
                     )
 
@@ -118,7 +122,10 @@ class DockerContainerManager:
 
             else:
                 self.container = existing_container
-                # PrintStyle.standard(f"Container with name '{self.name}' is already running with ID: {existing_container.id}")
+                # PrintStyle.standard(
+                #     f"Container with name '{self.name}' is already running "
+                #     f"with ID: {existing_container.id}"
+                # )
         else:
             PrintStyle.standard(
                 f"Initializing docker container {self.name} for safe code execution..."

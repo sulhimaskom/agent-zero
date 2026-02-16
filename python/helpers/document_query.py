@@ -393,7 +393,10 @@ class DocumentQueryHelper:
 
         if not selected_chunks:
             self.progress_callback("No relevant content found in the documents")
-            content = f"!!! No content found for documents: {json.dumps(document_uris)} matching queries: {json.dumps(questions)}"
+            content = (
+                f"!!! No content found for documents: {json.dumps(document_uris)} "
+                f"matching queries: {json.dumps(questions)}"
+            )
             return False, content
 
         self.progress_callback(

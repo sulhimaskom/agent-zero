@@ -255,7 +255,8 @@ class AgentContext:
         self.task.start_task(func, *args, **kwargs)
         return self.task
 
-    # this wrapper ensures that superior agents are called back if the chat was loaded from file and original callstack is gone
+    # this wrapper ensures that superior agents are called back if the chat was
+    # loaded from file and original callstack is gone
     async def _process_chain(self, agent: "Agent", msg: "UserMessage|str", user=True):
         try:
             if user:
@@ -409,7 +410,8 @@ class Agent:
 
                         if (
                             self.loop_data.last_response == agent_response
-                        ):  # if assistant_response is the same as last message in history, let him know
+                        ):  # if assistant_response is the same as last
+                            # message in history, let him know
                             # Append the assistant's response to the history
                             self.hist_add_ai_response(agent_response)
                             # Append warning message to the history
@@ -428,7 +430,9 @@ class Agent:
 
                     # exceptions inside message loop:
                     except InterventionException:
-                        pass  # intervention message has been handled in handle_intervention(), proceed with conversation loop
+                        # intervention message has been handled in
+                        # handle_intervention(), proceed with conversation loop
+                        pass
                     except RepairableException as e:
                         # Forward repairable errors to the LLM, maybe it can fix them
                         msg = {"message": errors.format_error(e)}

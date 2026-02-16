@@ -13,7 +13,11 @@ class ResponseTool(Tool):
         )
 
     async def before_execution(self, **kwargs):
-        # self.log = self.agent.context.log.log(type="response", heading=f"{self.agent.agent_name}: Responding", content=self.args.get("text", ""))
+        # self.log = self.agent.context.log.log(
+        #     type="response",
+        #     heading=f"{self.agent.agent_name}: Responding",
+        #     content=self.args.get("text", ""),
+        # )
         # don't log here anymore, we have the live_response extension now
         pass
 

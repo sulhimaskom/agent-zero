@@ -6,7 +6,8 @@ from python.helpers.constants import Timeouts
 from python.helpers.extension import Extension
 
 # check for newer versions of A0 available and send notification
-# check after user message is sent from UI, not API, MCP etc. (user is active and can see the notification)
+# check after user message is sent from UI, not API, MCP etc.
+# (user is active and can see the notification)
 # do not check too often, use cooldown
 # do not notify too often unless there's a different notification
 

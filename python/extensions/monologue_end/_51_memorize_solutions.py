@@ -118,8 +118,10 @@ class MemorizeSolutions(Extension):
 
                     consolidator = create_memory_consolidator(
                         self.agent,
-                        similarity_threshold=DEFAULT_MEMORY_THRESHOLD,  # More permissive for discovery
-                        max_similar_memories=Limits.MEMORY_SOL_MAX_SIMILAR_MEMORIES,  # Fewer for solutions (more complex)
+                        # More permissive for discovery
+                        similarity_threshold=DEFAULT_MEMORY_THRESHOLD,
+                        # Fewer for solutions (more complex)
+                        max_similar_memories=Limits.MEMORY_SOL_MAX_SIMILAR_MEMORIES,
                         max_llm_context_memories=Limits.MEMORY_SOL_MAX_LLM_CONTEXT_MEMORIES,
                     )
 
@@ -167,9 +169,15 @@ class MemorizeSolutions(Extension):
 
                 # Update final results with structured logging
                 log_item.update(
-                    heading=f"Solution memorization completed: {total_processed} solutions processed, {total_consolidated} intelligently consolidated",
+                    heading=(
+                        f"Solution memorization completed: {total_processed} "
+                        f"solutions processed, {total_consolidated} intelligently consolidated"
+                    ),
                     solutions=solutions_txt,
-                    result=f"{total_processed} solutions processed, {total_consolidated} intelligently consolidated",
+                    result=(
+                        f"{total_processed} solutions processed, "
+                        f"{total_consolidated} intelligently consolidated"
+                    ),
                     solutions_processed=total_processed,
                     solutions_consolidated=total_consolidated,
                     update_progress="none",
