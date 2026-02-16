@@ -1,4 +1,5 @@
 import { createStore } from "/js/AlpineStore.js";
+import { TIMING } from "/js/constants.js";
 
 const model = {
   isTyping: false,
@@ -20,7 +21,7 @@ const model = {
       if (this.isTyping) {
         this.dotCount = (this.dotCount + 1) % 4;
       }
-    }, 500);
+    }, TIMING.TYPING_INDICATOR_INTERVAL);
   },
 
   stopDotAnimation() {

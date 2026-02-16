@@ -202,7 +202,7 @@ async function updateUserTime() {
 }
 
 updateUserTime();
-const userTimeInterval = setInterval(updateUserTime, 1000);
+const userTimeInterval = setInterval(updateUserTime, TIMING.USER_TIME_UPDATE_INTERVAL);
 
 // Cleanup interval on page unload to prevent memory leaks
 window.addEventListener("beforeunload", () => {
