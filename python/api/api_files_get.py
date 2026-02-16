@@ -4,7 +4,7 @@ import os
 
 from python.helpers import files
 from python.helpers.api import ApiHandler, Request, Response
-from python.helpers.constants import Colors, HttpStatus, InternalPaths
+from python.helpers.constants import Colors, HttpStatus, InternalPaths, MimeTypes
 from python.helpers.print_style import PrintStyle
 
 
@@ -41,14 +41,14 @@ class ApiFilesGet(ApiHandler):
                 return Response(
                     '{"error": "paths array is required"}',
                     status=HttpStatus.BAD_REQUEST,
-                    mimetype="application/json",
+                    mimetype=MimeTypes.APPLICATION_JSON,
                 )
 
             if not isinstance(paths, list):
                 return Response(
                     '{"error": "paths must be an array"}',
                     status=HttpStatus.BAD_REQUEST,
-                    mimetype="application/json",
+                    mimetype=MimeTypes.APPLICATION_JSON,
                 )
 
             result = {}
@@ -103,5 +103,5 @@ class ApiFilesGet(ApiHandler):
             return Response(
                 json.dumps({"error": f"Internal server error: {e!s}"}),
                 status=HttpStatus.ERROR,
-                mimetype="application/json",
+                mimetype=MimeTypes.APPLICATION_JSON,
             )

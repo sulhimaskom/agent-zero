@@ -2,7 +2,7 @@ import json
 
 from agent import AgentContext
 from python.helpers.api import ApiHandler, Request, Response
-from python.helpers.constants import Colors, HttpStatus
+from python.helpers.constants import Colors, HttpStatus, MimeTypes
 from python.helpers.persist_chat import remove_chat
 from python.helpers.print_style import PrintStyle
 
@@ -40,7 +40,7 @@ class ApiTerminateChat(ApiHandler):
                 return Response(
                     '{"error": "context_id is required"}',
                     status=HttpStatus.BAD_REQUEST,
-                    mimetype="application/json",
+                    mimetype=MimeTypes.APPLICATION_JSON,
                 )
 
             # Check if context exists
@@ -49,7 +49,7 @@ class ApiTerminateChat(ApiHandler):
                 return Response(
                     '{"error": "Chat context not found"}',
                     status=HttpStatus.NOT_FOUND,
-                    mimetype="application/json",
+                    mimetype=MimeTypes.APPLICATION_JSON,
                 )
 
             # Delete the chat context
@@ -76,5 +76,5 @@ class ApiTerminateChat(ApiHandler):
             return Response(
                 json.dumps({"error": f"Internal server error: {e!s}"}),
                 status=HttpStatus.ERROR,
-                mimetype="application/json",
+                mimetype=MimeTypes.APPLICATION_JSON,
             )
