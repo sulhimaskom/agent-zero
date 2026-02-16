@@ -27,7 +27,7 @@ const STATIC_ASSETS = [
   '/js/device.min.js',
   '/js/keyboard-shortcuts.min.js',
   '/js/speech_browser.min.js',
-  '/js/time-utils.min.js',
+  '/js/time-utils.js',
   '/js/initFw.min.js',
   '/js/AlpineStore.min.js',
   '/index.min.js',
