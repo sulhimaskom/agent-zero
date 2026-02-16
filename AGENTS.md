@@ -2,7 +2,7 @@
 
 **Generated:** 2026-02-16
 **Branch:** custom
-**Commit:** 45f0f24
+**Commit:** f300d88
 **Last RepoKeeper Run:** 2026-02-16
 
 ## OVERVIEW
@@ -186,8 +186,8 @@ docker run -p 50001:80 agent0ai/agent-zero
 - **Large frontend files**: `webui/js/scheduler.js` (1579 lines), `webui/js/messages.js` (1016 lines), `webui/components/chat/speech/speech-store.js` (965 lines)
 - **FAISS patch required** for Python 3.12 ARM - temporary workaround
 - **57 bare `pass` statements** - mostly in base classes/abstract methods (acceptable)
-- **224 Python files** - backend codebase
-- **582 JavaScript files** - frontend codebase
+- **195 Python files** (27,224 lines) - backend codebase
+- **578 JavaScript files** (19,150 lines) - frontend codebase
 - **96 prompt files** - system prompts and agent behavior definitions
 - **No traditional testing** - CI uses AI code analysis instead of pytest runs
 - **Automatic SSH password generation** - `prepare.py` generates random root password (security concern for production)
@@ -223,7 +223,7 @@ docker run -p 50001:80 agent0ai/agent-zero
 | Determinism | 5% | 5/5 | No randomness issues |
 
 **Critical Issues:**
-1. **Test Coverage Crisis**: Only 10 test files for 224 Python files (~4% coverage)
+1. **Test Coverage Crisis**: Only 10 test files for 195 Python files (~5% coverage)
 2. ~~**Error Handling**: 182 broad `except Exception` handlers mask bugs~~ ✅ **FIXED**: 62 bare `except Exception:` handlers converted to `except Exception as e:`
 3. **Type Safety**: 174 `# type: ignore` comments bypass type checking
 4. **Observability**: PrintStyle logging is intentional framework behavior (not bare print statements)
@@ -317,4 +317,4 @@ docker run -p 50001:80 agent0ai/agent-zero
 ✅ **Verified test suite**: All 29 tests passing
 ✅ **No syntax errors**: All modified files compile successfully
 ✅ **Pre-commit hooks**: Already configured (ruff, black, mypy, prettier)
-✅ **Updated AGENTS.md**: Refreshed statistics (224 Python files, 582 JS files, 174 type ignores, 208 exception handlers, 309 PrintStyle calls)
+✅ **Updated AGENTS.md**: Refreshed statistics (195 Python files, 578 JS files, 27,224 lines Python, 19,150 lines JS)
