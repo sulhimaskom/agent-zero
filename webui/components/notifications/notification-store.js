@@ -2,6 +2,7 @@ import { createStore } from "/js/AlpineStore.js";
 import * as API from "/js/api.js";
 import { openModal } from "/js/modals.js";
 import { LIMITS, DEFAULTS } from "/js/constants.js";
+import Logger from "/js/logger.min.js";
 
 export const NotificationType = {
   INFO: "info",
@@ -685,14 +686,14 @@ const model = {
             return notificationId;
           }
         } catch (error) {
-          console.log(
+          Logger.debug(
             `Backend unavailable for notification, showing as frontend-only: ${
               error.message || error
             }`
           );
         }
       } else {
-        console.log("Backend disconnected, showing as frontend-only toast");
+        Logger.debug("Backend disconnected, showing as frontend-only toast");
       }
     }
 
