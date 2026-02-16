@@ -1,6 +1,7 @@
 import { createStore } from "/js/AlpineStore.js";
 import * as shortcuts from "/js/shortcuts.js";
 import { store as fileBrowserStore } from "/components/modals/file-browser/file-browser-store.js";
+import { TIMING } from "/js/constants.js";
 
 const model = {
   paused: false,
@@ -84,13 +85,13 @@ const model = {
       }
 
       // Subtle fade transition
-      chatInput.style.transition = 'opacity 0.2s ease';
+      chatInput.style.transition = `opacity ${TIMING.ANIMATION_OPACITY_DURATION / 1000}s ease`;
       chatInput.style.opacity = '0.7';
 
       setTimeout(() => {
         chatInput.style.opacity = '1';
-        setTimeout(resolve, 200);
-      }, 200);
+        setTimeout(resolve, TIMING.ANIMATION_OPACITY_DURATION);
+      }, TIMING.ANIMATION_OPACITY_DURATION);
     });
   },
 

@@ -245,7 +245,7 @@ class CodeExecution(Tool):
         # replace any sequence of ', ", or ` with a single '
         # short_cmd = re.sub(r"['\"`]+", "'", short_cmd) # no need anymore
         # final length
-        short_cmd = truncate_text_string(short_cmd, 100)
+        short_cmd = truncate_text_string(short_cmd, Limits.COMMAND_TRUNCATION_SECONDARY)
         return f"{short_cmd}"
 
     async def get_terminal_output(

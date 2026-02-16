@@ -83,6 +83,11 @@ export const TIMING = {
   // Missing constants (fixes runtime errors)
   WELCOME_ANIMATION_DELAY: 350,
   SLEEP_MAX_TIMEOUT: 1000,
+
+  // UI-specific intervals
+  TYPING_INDICATOR_INTERVAL: 500,  // Dot animation interval in typing indicator
+  USER_TIME_UPDATE_INTERVAL: 1000,  // User local time update interval
+  ANIMATION_OPACITY_DURATION: 200,  // Opacity transition duration
 };
 
 // =============================================================================
