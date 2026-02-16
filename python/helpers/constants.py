@@ -457,16 +457,69 @@ class FileExtensions:
     YML: Final[str] = ".yml"
 
 
-class MimeTypes:
-    """MIME type constants for file handling."""
+# =============================================================================
+# MIME TYPES
+# =============================================================================
 
-    DEFAULT_BINARY: Final[str] = "application/octet-stream"
-    JSON: Final[str] = "application/json"
-    PDF: Final[str] = "application/pdf"
-    ZIP: Final[str] = "application/zip"
+
+class MimeTypes:
+    """MIME type constants used throughout the system."""
+
+    APPLICATION_JSON: Final[str] = "application/json"
     TEXT_PLAIN: Final[str] = "text/plain"
     TEXT_HTML: Final[str] = "text/html"
+    TEXT_CSS: Final[str] = "text/css"
+    TEXT_JAVASCRIPT: Final[str] = "text/javascript"
+    IMAGE_PNG: Final[str] = "image/png"
+    IMAGE_JPEG: Final[str] = "image/jpeg"
+    IMAGE_GIF: Final[str] = "image/gif"
     IMAGE_SVG: Final[str] = "image/svg+xml"
+    AUDIO_MPEG: Final[str] = "audio/mpeg"
+    AUDIO_WAV: Final[str] = "audio/wav"
+    VIDEO_MP4: Final[str] = "video/mp4"
+    APPLICATION_PDF: Final[str] = "application/pdf"
+    APPLICATION_ZIP: Final[str] = "application/zip"
+    MULTIPART_FORM_DATA: Final[str] = "multipart/form-data"
+    APPLICATION_OCTET_STREAM: Final[str] = "application/octet-stream"
+
+    # Alias for backward compatibility
+    DEFAULT_BINARY: Final[str] = APPLICATION_OCTET_STREAM
+
+
+# =============================================================================
+# ENCODING CONSTANTS
+# =============================================================================
+
+
+class Encodings:
+    """Encoding constants used throughout the system."""
+
+    UTF_8: Final[str] = "utf-8"
+    ASCII: Final[str] = "ascii"
+    LATIN_1: Final[str] = "latin-1"
+
+
+# =============================================================================
+# STREAM AND CHUNK SIZES
+# =============================================================================
+
+
+class StreamSizes:
+    """Stream and chunk size constants."""
+
+    DEFAULT_CHUNK_SIZE: Final[int] = 8192  # Default chunk size for streaming downloads
+    TTY_READ_BUFFER: Final[int] = 1024  # Buffer size for TTY read operations
+    MIN_STREAM_LENGTH: Final[int] = 25  # Minimum stream length to process
+    BACKUP_TIMESTAMP_PREFIX_LEN: Final[int] = 10  # Length of date prefix in backup names
+    ANONYMIZED_ID_LEN: Final[int] = 20  # Length of anonymized ID
+    MEMORY_DOC_ID_LEN: Final[int] = 10  # Length of memory document ID
+    BROWSER_DISPLAY_TRUNCATE_LEN: Final[int] = 50  # Browser display truncation length
+    HEX_BASE: Final[int] = 16  # Base for hex parsing
+    MINUTES_PER_HOUR: Final[int] = 60  # Minutes per hour for time conversion
+    SECONDS_PER_MINUTE: Final[int] = 60  # Seconds per minute for time conversion
+    NORMALIZED_MIN: Final[float] = 0.0  # Minimum normalized value
+    NORMALIZED_MAX: Final[float] = 1.0  # Maximum normalized value
+    TOTAL_TIMEOUT_MULTIPLIER: Final[int] = 10  # Multiplier for total timeout calculation
 
 
 # =============================================================================
