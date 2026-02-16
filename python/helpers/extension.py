@@ -2,6 +2,7 @@ from abc import abstractmethod
 from typing import TYPE_CHECKING, Any
 
 from python.helpers import extract_tools, files
+from python.helpers.constants import Paths
 
 if TYPE_CHECKING:
     from agent import Agent
@@ -20,13 +21,13 @@ class Extension:
 async def call_extensions(extension_point: str, agent: "Agent|None" = None, **kwargs) -> Any:
 
     # get default extensions
-    defaults = await _get_extensions("python/extensions/" + extension_point)
+    defaults = await _get_extensions(Paths.get_default_extensions_path(extension_point))
     classes = defaults
 
     # get agent extensions
     if agent and agent.config.profile:
         agentics = await _get_extensions(
-            "agents/" + agent.config.profile + "/extensions/" + extension_point
+            Paths.get_agent_extensions_path(agent.config.profile, extension_point)
         )
         if agentics:
             # merge them, agentics overwrite defaults
