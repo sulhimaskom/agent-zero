@@ -1,6 +1,7 @@
 import { createStore } from "/js/AlpineStore.js";
 import * as Sleep from "/js/sleep.js";
 import { QR_CODE, TIMING } from "/js/constants.js";
+import Logger from "/js/logger.min.js";
 
 // define the model object holding data and functions
 const model = {
@@ -44,7 +45,7 @@ const model = {
   async checkTunnelStatus() {
     // Skip if fetchApi is not available yet (index.js not loaded)
     if (typeof fetchApi === 'undefined') {
-      console.log('fetchApi not available yet, skipping tunnel status check');
+      Logger.debug('fetchApi not available yet, skipping tunnel status check');
       return;
     }
 
