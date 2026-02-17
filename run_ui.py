@@ -248,26 +248,26 @@ async def serve_static(filename):
         file_path = os.path.join(get_abs_path("./webui"), filename)
         if os.path.exists(file_path) and os.path.isfile(file_path):
             from flask import send_file
-            import mimetypes
 
             response = send_file(file_path)
-            
+
             # Enhanced cache control headers for better performance
             if filename.startswith("vendor/"):
                 # Vendor files with immutable flag (they never change)
                 response.headers["Cache-Control"] = f"public, max-age={cache_max_age}, immutable"
             else:
                 response.headers["Cache-Control"] = f"public, max-age={cache_max_age}"
-            
+
             # Add Vary header for compression
             response.headers["Vary"] = "Accept-Encoding"
-            
+
             # Add ETag for conditional requests
             import hashlib
+
             file_stat = os.stat(file_path)
             etag = hashlib.md5(f"{file_stat.st_mtime}-{file_stat.st_size}".encode()).hexdigest()
             response.headers["ETag"] = f'"{etag}"'
-            
+
             return response
         else:
             return Response("File not found", 404)
