@@ -182,10 +182,15 @@
       cursor: pointer;
       text-align: left;
       color: inherit;
+      transition: background-color 0.2s ease-in-out, transform 0.1s ease-out;
     }
 
     .task-container:hover {
       background-color: var(--color-background-hover);
+    }
+
+    .task-container:active {
+      transform: scale(0.98);
     }
 
     .task-container:focus-visible {
@@ -198,10 +203,23 @@
     /* Selected task accent */
     .task-selected {
       background-color: var(--color-background-hover);
+      animation: task-select-pulse 0.3s ease-out;
     }
 
     .task-selected .task-name {
       font-weight: bold;
+    }
+
+    @keyframes task-select-pulse {
+      0% {
+        box-shadow: inset 0 0 0 0 rgba(66, 72, 241, 0.3);
+      }
+      50% {
+        box-shadow: inset 4px 0 0 0 var(--color-highlight, #4248f1);
+      }
+      100% {
+        box-shadow: inset 0 0 0 0 rgba(66, 72, 241, 0);
+      }
     }
 
     /* Scheduler badges (subset used in sidebar) */
@@ -317,6 +335,15 @@
         animation: none;
       }
       .delete-confirm-tooltip {
+        animation: none;
+      }
+      .task-container {
+        transition: background-color 0.2s ease-in-out;
+      }
+      .task-container:active {
+        transform: none;
+      }
+      .task-selected {
         animation: none;
       }
     }
