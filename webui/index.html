@@ -8,6 +8,25 @@
     <meta name="keywords" content="AI agent, autonomous agent, AI framework, LLM, artificial intelligence, task automation">
     <meta name="author" content="Agent Zero Team">
     <meta name="theme-color" content="#333333">
+
+    <!-- Open Graph / Facebook Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://agent-zero.ai">
+    <meta property="og:title" content="Agent Zero - AI Agent Framework">
+    <meta property="og:description" content="A personal, organic agentic framework that grows and learns with you. Autonomous AI agent using the computer as a tool to accomplish tasks.">
+    <meta property="og:image" content="https://agent-zero.ai/public/og-image.png">
+    <meta property="og:site_name" content="Agent Zero">
+
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:url" content="https://agent-zero.ai">
+    <meta name="twitter:title" content="Agent Zero - AI Agent Framework">
+    <meta name="twitter:description" content="A personal, organic agentic framework that grows and learns with you. Autonomous AI agent using the computer as a tool to accomplish tasks.">
+    <meta name="twitter:image" content="https://agent-zero.ai/public/og-image.png">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://agent-zero.ai">
+
     <title>Agent Zero</title>
     <link rel="icon" type="image/svg+xml" href="public/favicon.svg">
 
@@ -1069,36 +1088,36 @@
                                                     <td @click.stop>
                                                         <div class="scheduler-task-actions">
                                                             <button class="scheduler-task-action"
-                                                                @click="runTask(task.uuid)" title="Run Task">
+                                                                @click="runTask(task.uuid)" title="Run Task" aria-label="Run Task">
                                                                 <svg xmlns="http://www.w3.org/2000/svg"
                                                                     viewBox="0 0 24 24" fill="currentColor" width="16"
-                                                                    height="16">
+                                                                    height="16" aria-hidden="true">
                                                                     <path d="M8 5v14l11-7z" />
                                                                 </svg>
                                                             </button>
                                                             <button class="scheduler-task-action"
-                                                                @click="resetTaskState(task.uuid)" title="Reset State">
+                                                                @click="resetTaskState(task.uuid)" title="Reset State" aria-label="Reset Task State">
                                                                 <svg xmlns="http://www.w3.org/2000/svg"
                                                                     viewBox="0 0 24 24" fill="currentColor" width="16"
-                                                                    height="16">
+                                                                    height="16" aria-hidden="true">
                                                                     <path
                                                                         d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z" />
                                                                 </svg>
                                                             </button>
                                                             <button class="scheduler-task-action"
-                                                                @click="startEditTask(task.uuid)" title="Edit Task">
+                                                                @click="startEditTask(task.uuid)" title="Edit Task" aria-label="Edit Task">
                                                                 <svg xmlns="http://www.w3.org/2000/svg"
                                                                     viewBox="0 0 24 24" fill="currentColor" width="16"
-                                                                    height="16">
+                                                                    height="16" aria-hidden="true">
                                                                     <path
                                                                         d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
                                                                 </svg>
                                                             </button>
                                                             <button class="scheduler-task-action"
-                                                                @click="deleteTask(task.uuid)" title="Delete Task">
+                                                                @click="deleteTask(task.uuid)" title="Delete Task" aria-label="Delete Task">
                                                                 <svg xmlns="http://www.w3.org/2000/svg"
                                                                     viewBox="0 0 24 24" fill="currentColor" width="16"
-                                                                    height="16">
+                                                                    height="16" aria-hidden="true">
                                                                     <path
                                                                         d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
                                                                 </svg>

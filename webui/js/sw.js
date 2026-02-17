@@ -84,7 +84,9 @@ self.addEventListener('fetch', (event) => {
       url.pathname.startsWith('/project') ||
       url.pathname.startsWith('/tunnel') ||
       url.pathname.startsWith('/backup') ||
-      url.pathname.startsWith('/history')) {
+      url.pathname.startsWith('/history') ||
+      url.pathname.startsWith('/socket.io/') ||
+      url.pathname.startsWith('/login')) {
     return;
   }
 
