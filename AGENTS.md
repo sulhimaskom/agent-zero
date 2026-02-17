@@ -2,8 +2,8 @@
 
 **Generated:** 2026-02-17
 **Branch:** custom
-**Commit:** 5638411
-**Last RepoKeeper Run:** 2026-02-17 (RepoKeeper maintenance - updated statistics, merged main branch, fixed documentation)
+**Commit:** 5a2d36d
+**Last RepoKeeper Run:** 2026-02-17 (RepoKeeper maintenance - merged main branch, cleaned cache, updated statistics)
 
 ## OVERVIEW
 Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpine.js). Prompt-driven behavior - everything controlled by `/prompts/` markdown files. Grows organically through memory, tools, extensions, and agent profiles.
@@ -18,7 +18,7 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 │   ├── helpers/        # 74 utility modules (memory, history, settings, mcp, scheduler)
 │   ├── tools/          # 19 default tools (code_execution, browser_agent, memory_*, call_subordinate)
 │   └── extensions/     # 35 extension files across 23 lifecycle hook points (message_loop_*, response_stream*, system_prompt)
-├── webui/              # Frontend (Alpine.js stores, modular components, 96 code files)
+├── webui/              # Frontend (Alpine.js stores, modular components, 98 JS files)
 │   ├── components/     # chat/, settings/, sidebar/, modals/, projects/, notifications/
 │   ├── js/            # ES modules, stores (scheduler.js 1579 lines, messages.js 1016 lines)
 │   └── css/           # Styling
@@ -210,21 +210,21 @@ docker run -p 50001:80 agent0ai/agent-zero
 
 | Criterion | Weight | Score | Notes |
 |-----------|--------|-------|-------|
-| Correctness | 15% | 12/15 | Valid syntax, 139 type ignores |
+| Correctness | 15% | 12/15 | Valid syntax, 176 type ignores |
 | Readability | 10% | 7/10 | Good structure, prints for logging |
 | Simplicity | 10% | 6/10 | Large modules (settings.py: 1749 lines) |
 | Modularity | 15% | 9/15 | Extensions good, some too large |
 | Consistency | 5% | 3/5 | Mixed patterns |
-| **Testability** | **15%** | **5/15** | **12 test files for 196 files (~6%) - 198 tests passing** |
+| **Testability** | **15%** | **5/15** | **11 test files for 227 files (~5%)** |
 | Maintainability | 10% | 5/10 | Complexity hotspot in helpers/ |
 | **Error Handling** | **10%** | **7/10** | **Fixed: 62 bare exception handlers → 0** |
 | Dependencies | 5% | 4/5 | Well-defined requirements |
 | Determinism | 5% | 5/5 | No randomness issues |
 
 **Critical Issues:**
-1. **Test Coverage Crisis**: Only 12 test files for 196 Python files (~6% coverage) - 198 tests passing (19 async tests need pytest-asyncio configuration fix)
+1. **Test Coverage Crisis**: Only 11 test files for 227 Python files (~5% coverage)
 2. ~~**Error Handling**: 182 broad `except Exception` handlers mask bugs~~ ✅ **FIXED**: All bare `except Exception:` handlers converted to `except Exception as e:`
-3. **Type Safety**: 140 `# type: ignore` comments bypass type checking (improved from 174)
+3. **Type Safety**: 176 `# type: ignore` comments bypass type checking
 4. **Observability**: PrintStyle logging is intentional framework behavior (not bare print statements)
 
 ### B. SYSTEM QUALITY BREAKDOWN (72/100)
@@ -297,8 +297,8 @@ docker run -p 50001:80 agent0ai/agent-zero
 |--------|---------|--------|----------|
 | Test Coverage | ~6% (198 tests) | 30% | P0 |
 | Broad Exceptions | 0 ✅ | 0 | P1 |
-| Type Ignores | 140 | 70 | P2 |
-| PrintStyle Calls | 278 (intentional) | N/A | - |
+| Type Ignores | 176 | 70 | P2 |
+| PrintStyle Calls | 308 (intentional) | N/A | - |
 | Linter Configs | 4 ✅ | 3+ | P2 |
 
 ### POSITIVE FINDINGS
@@ -312,7 +312,7 @@ docker run -p 50001:80 agent0ai/agent-zero
 
 ### RECENT CLEANUP (2026-02-17)
 
-✅ **Updated AGENTS.md statistics**: Aligned all metrics with actual codebase (196 Python files, 96 JS files, 140 type ignores, 278 PrintStyle calls)
+✅ **Updated AGENTS.md statistics**: Aligned all metrics with actual codebase (227 Python files, 98 JS files, 176 type ignores, 308 PrintStyle calls)
 ✅ **Merged main into custom**: Branch now up to date with origin/main
 ✅ **Verified test suite**: 198 tests passing (19 async tests need pytest-asyncio configuration fix)
 ✅ **Linting clean**: All ruff checks pass
