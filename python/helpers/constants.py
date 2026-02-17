@@ -841,7 +841,7 @@ class Config:
 
     # Venice.ai configuration
     VENICE_API_BASE = get_env_str("A0_VENICE_API_BASE", ExternalUrls.VENICE_API_BASE)
-    A0_VENICE_API_BASE = get_env_str("A0_A0_VENICE_API_BASE", ExternalUrls.A0_VENICE_API_BASE)
+    A0_VENICE_API_BASE = get_env_str("A0_VENICE_API_BASE", ExternalUrls.A0_VENICE_API_BASE)
 
     # OpenRouter configuration
     OPENROUTER_API_BASE = get_env_str("A0_OPENROUTER_API_BASE", ExternalUrls.OPENROUTER_API_BASE)

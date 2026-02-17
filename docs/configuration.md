@@ -73,7 +73,7 @@ All external API endpoints are fully configurable:
 > See [SearXNG Integration](architecture.md#searxng-integration) for the recommended search configuration.
 | `A0_AGENT_ZERO_REPO_URL` | `https://github.com/frdel/agent-zero` | Agent Zero repository URL |
 | `A0_VENICE_API_BASE` | `https://api.venice.ai/api/v1` | Venice.ai API base URL |
-| `A0_A0_VENICE_API_BASE` | `https://api.agent-zero.ai/venice/v1` | Agent Zero Venice proxy URL |
+| `A0_VENICE_API_BASE` | `https://api.agent-zero.ai/venice/v1` | Agent Zero Venice proxy URL |
 | `A0_OPENROUTER_API_BASE` | `https://openrouter.ai/api/v1` | OpenRouter API base URL |
 | `A0_OPENROUTER_HTTP_REFERER` | `https://agent-zero.ai/` | HTTP Referer header for OpenRouter |
 | `A0_OPENROUTER_X_TITLE` | `Agent Zero` | X-Title header for OpenRouter |
