@@ -2,7 +2,7 @@ import json
 import os
 import subprocess
 
-from python.helpers.constants import Network
+from python.helpers.constants import Network, Timeouts
 from python.helpers.tool import Response, Tool
 
 
@@ -50,7 +50,7 @@ class LighthouseAuditor(Tool):
             # Check if lighthouse is installed
             try:
                 result = subprocess.run(
-                    ["lighthouse", "--version"], capture_output=True, text=True, timeout=10
+                    ["lighthouse", "--version"], capture_output=True, text=True, timeout=Timeouts.LIGHTHOUSE_VERSION_TIMEOUT
                 )
                 if result.returncode != 0:
                     raise Exception("Lighthouse not available")
@@ -84,7 +84,7 @@ class LighthouseAuditor(Tool):
             self.set_progress(f"Running Lighthouse audit on {url} ({device})...")
 
             # Run lighthouse
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=120)
+            result = subprocess.run(cmd, capture_output=True, text=True, timeout=Timeouts.LIGHTHOUSE_AUDIT_TIMEOUT)
 
             if result.returncode != 0 and not os.path.exists(output_file):
                 return Response(
@@ -193,7 +193,7 @@ class LighthouseAuditor(Tool):
 
         except subprocess.TimeoutExpired:
             return Response(
-                message="❌ Lighthouse audit timed out (120s)",
+                message=f"❌ Lighthouse audit timed out ({Timeouts.LIGHTHOUSE_AUDIT_TIMEOUT}s)",
                 break_loop=False,
                 additional={"error": "timeout", "has_issues": True},
             )

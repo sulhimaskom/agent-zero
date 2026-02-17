@@ -161,7 +161,7 @@ class SSHInteractiveSession:
 
             partial_output += data
             self.full_output += data
-            await asyncio.sleep(0.1)  # Prevent busy waiting
+            await asyncio.sleep(Timeouts.SSH_SHELL_DELAY)
 
         # Decode once at the end
         decoded_partial_output = partial_output.decode("utf-8", errors="replace")

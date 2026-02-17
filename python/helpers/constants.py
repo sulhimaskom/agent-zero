@@ -120,6 +120,26 @@ class Timeouts:
     RETRY_DELAY_SHORT: Final[int] = 1  # Short delay between retries (seconds)
     POLLING_INTERVAL: Final[int] = 1  # Polling interval for wait operations (seconds)
 
+    # Agent pause check interval
+    AGENT_PAUSE_CHECK_DELAY: Final[float] = 0.1  # Delay between pause checks
+
+    # Lighthouse audit timeouts
+    LIGHTHOUSE_VERSION_TIMEOUT: Final[int] = 10  # Timeout for checking lighthouse version
+    LIGHTHOUSE_AUDIT_TIMEOUT: Final[int] = 120  # Timeout for running lighthouse audit
+
+    # Brocula-specific timeouts
+    BROCULA_COMMAND_TIMEOUT: Final[int] = 60  # Default timeout for Brocula commands
+    BROCULA_LIGHTHOUSE_TIMEOUT: Final[int] = 120  # Timeout for Brocula lighthouse runs
+    BROCULA_OPCODE_TIMEOUT: Final[int] = 7200  # 2 hour timeout for Brocula OpenCode execution
+
+    # TTY session delays
+    TTY_DRAIN_DELAY: Final[float] = 0  # Delay for TTY drain operation
+    TTY_WRITE_DELAY: Final[float] = 0.01  # Delay after TTY write
+    TTY_READ_CHUNK_DELAY: Final[float] = 0.2  # Delay between TTY read chunks
+
+    # Task scheduler delay
+    TASK_SCHEDULER_INIT_DELAY: Final[float] = 0.1  # Initial scheduler delay
+
 
 # =============================================================================
 # SIZE LIMITS AND THRESHOLDS

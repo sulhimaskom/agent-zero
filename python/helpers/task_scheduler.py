@@ -1013,7 +1013,7 @@ class TaskScheduler:
 
         # Ensure background execution doesn't exit immediately on async await, especially in script contexts
         # This helps prevent premature exits when running from non-event-loop contexts
-        asyncio.create_task(asyncio.sleep(0.1))
+        asyncio.create_task(asyncio.sleep(Timeouts.TASK_SCHEDULER_INIT_DELAY))
 
     def serialize_all_tasks(self) -> list[dict[str, Any]]:
         """Serialize all tasks in the scheduler to a list of dictionaries."""
