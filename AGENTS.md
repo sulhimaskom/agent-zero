@@ -3,7 +3,7 @@
 **Generated:** 2026-02-17
 **Branch:** custom
 **Commit:** 3898997
-**Last RepoKeeper Run:** 2026-02-17 (RepoKeeper maintenance - updated statistics)
+**Last RepoKeeper Run:** 2026-02-17 (RepoKeeper maintenance - updated statistics, fixed documentation)
 
 ## OVERVIEW
 Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpine.js). Prompt-driven behavior - everything controlled by `/prompts/` markdown files. Grows organically through memory, tools, extensions, and agent profiles.
@@ -101,15 +101,15 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 - `/python/helpers/history.py:236` - FIXME: vision bytes sent to utility LLM (inefficiency)
 - `/python/helpers/vector_db.py`, `/python/helpers/memory.py` - FAISS patch for Python 3.12 ARM (remove when fixed upstream)
 - `/python/helpers/job_loop.py:34` - TODO: lowering SLEEP_TIME below 1min causes job duplication
-- 174 `# type: ignore` comments across 47 files - type suppression issues
-- 204 `except Exception as e:` handlers - broad exception catching
+- 175 `# type: ignore` comments across 47 files - type suppression issues
+- 196 `except Exception as e:` handlers - broad exception catching
 - 309 PrintStyle calls across 45 files - intentional framework logging (not bare prints)
 
 ### Testing
 - pytest.ini exists and configured (asyncio mode, markers, test paths)
 - conftest.py exists with fixtures and mocks
 - All tests passing
-- 8 test files for 224 Python files (~4% coverage)
+- 11 test files for 227 Python files (~5% coverage)
 - Tests not run in CI (GitHub workflows use OpenCode AI agent only)
 - Mixed naming: `test_*.py` and `*_test.py` both used
 - Coverage tool not configured
@@ -182,11 +182,11 @@ docker run -p 50001:80 agent0ai/agent-zero
 - **No LSP servers installed** - relies on VS Code Python extension for type checking
 - **CI is AI-powered** - GitHub workflows use OpenCode agent, not traditional pytest/linting
 - **Settings module** (1745 lines) identified as complexity hotspot needing refactoring
-- **Large files**: `agent.py` (733 lines), `models.py` (902 lines), `settings.py` (1745 lines), `task_scheduler.py` (1274 lines), `mcp_handler.py` (1111 lines)
+- **Large files**: `agent.py` (771 lines), `models.py` (897 lines), `settings.py` (1745 lines), `task_scheduler.py` (1273 lines), `mcp_handler.py` (1107 lines)
 - **Large frontend files**: `webui/js/scheduler.js` (1579 lines), `webui/js/messages.js` (1016 lines), `webui/components/chat/speech/speech-store.js` (965 lines)
 - **FAISS patch required** for Python 3.12 ARM - temporary workaround
-- **224 Python files** (33,009 lines) - backend codebase
-- **582 JavaScript files** (19,626 lines) - frontend codebase
+- **227 Python files** (~33,300 lines) - backend codebase
+- **583 JavaScript files** (~19,700 lines) - frontend codebase
 - **96 prompt files** - system prompts and agent behavior definitions
 - **No traditional testing** - CI uses AI code analysis instead of pytest runs
 - **Automatic SSH password generation** - `prepare.py` generates random root password (security concern for production)
@@ -316,4 +316,4 @@ docker run -p 50001:80 agent0ai/agent-zero
 ✅ **Verified test suite**: All 29 tests passing
 ✅ **No syntax errors**: All modified files compile successfully
 ✅ **Pre-commit hooks**: Already configured (ruff, black, mypy, prettier)
-✅ **Updated AGENTS.md**: Refreshed statistics (225 Python files, 582 JS files, 33,838 lines Python, 19,626 lines JS)
+✅ **Updated AGENTS.md**: Refreshed statistics (227 Python files, 583 JS files, ~33,300 lines Python, ~19,700 lines JS)
