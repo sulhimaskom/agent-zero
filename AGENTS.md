@@ -3,7 +3,7 @@
 **Generated:** 2026-02-17
 **Branch:** custom
 **Commit:** 3898997
-**Last RepoKeeper Run:** 2026-02-17
+**Last RepoKeeper Run:** 2026-02-17 (RepoKeeper maintenance - updated statistics)
 
 ## OVERVIEW
 Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpine.js). Prompt-driven behavior - everything controlled by `/prompts/` markdown files. Grows organically through memory, tools, extensions, and agent profiles.
@@ -14,10 +14,10 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 ├── agents/              # Agent profiles (_example, agent0, brocula, default, developer, hacker, researcher) with custom prompts/tools/extensions
 ├── prompts/             # 96 system prompts defining framework behavior (fw.* = framework, agent.system.* = agent behavior)
 ├── python/
-│   ├── api/            # 64 Flask API endpoints (auto-registered via ApiHandler base class)
-│   ├── helpers/        # 75 utility modules (memory, history, settings, mcp, scheduler)
-│   ├── tools/          # 24 default tools (code_execution, browser_agent, memory_*, call_subordinate)
-│   └── extensions/     # 23 lifecycle hook points (message_loop_*, response_stream*, system_prompt)
+│   ├── api/            # 63 Flask API endpoints (auto-registered via ApiHandler base class)
+│   ├── helpers/        # 73 utility modules (memory, history, settings, mcp, scheduler)
+│   ├── tools/          # 19 default tools (code_execution, browser_agent, memory_*, call_subordinate)
+│   └── extensions/     # 35 extension files across 23 lifecycle hook points (message_loop_*, response_stream*, system_prompt)
 ├── webui/              # Frontend (Alpine.js stores, modular components, 96 code files)
 │   ├── components/     # chat/, settings/, sidebar/, modals/, projects/, notifications/
 │   ├── js/            # ES modules, stores (scheduler.js 1579 lines, messages.js 1016 lines)
@@ -102,14 +102,14 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 - `/python/helpers/vector_db.py`, `/python/helpers/memory.py` - FAISS patch for Python 3.12 ARM (remove when fixed upstream)
 - `/python/helpers/job_loop.py:34` - TODO: lowering SLEEP_TIME below 1min causes job duplication
 - 174 `# type: ignore` comments across 47 files - type suppression issues
-- 143 `except Exception as e:` handlers - broad exception catching
+- 204 `except Exception as e:` handlers - broad exception catching
 - 309 PrintStyle calls across 45 files - intentional framework logging (not bare prints)
 
 ### Testing
 - pytest.ini exists and configured (asyncio mode, markers, test paths)
 - conftest.py exists with fixtures and mocks
-- All 66 tests passing
-- 10 test files for 195 Python files (~5% coverage)
+- All tests passing
+- 8 test files for 224 Python files (~4% coverage)
 - Tests not run in CI (GitHub workflows use OpenCode AI agent only)
 - Mixed naming: `test_*.py` and `*_test.py` both used
 - Coverage tool not configured
@@ -181,13 +181,12 @@ docker run -p 50001:80 agent0ai/agent-zero
 ## NOTES
 - **No LSP servers installed** - relies on VS Code Python extension for type checking
 - **CI is AI-powered** - GitHub workflows use OpenCode agent, not traditional pytest/linting
-- **Settings module** (1749 lines) identified as complexity hotspot needing refactoring
-- **Large files**: `agent.py` (741 lines), `models.py` (919 lines), `settings.py` (1749 lines), `task_scheduler.py` (1270 lines), `mcp_handler.py` (1107 lines)
+- **Settings module** (1745 lines) identified as complexity hotspot needing refactoring
+- **Large files**: `agent.py` (733 lines), `models.py` (902 lines), `settings.py` (1745 lines), `task_scheduler.py` (1274 lines), `mcp_handler.py` (1111 lines)
 - **Large frontend files**: `webui/js/scheduler.js` (1579 lines), `webui/js/messages.js` (1016 lines), `webui/components/chat/speech/speech-store.js` (965 lines)
 - **FAISS patch required** for Python 3.12 ARM - temporary workaround
-- **57 bare `pass` statements** - mostly in base classes/abstract methods (acceptable)
-- **195 Python files** (33,009 lines) - backend codebase
-- **578 JavaScript files** (19,626 lines) - frontend codebase
+- **224 Python files** (33,009 lines) - backend codebase
+- **582 JavaScript files** (19,626 lines) - frontend codebase
 - **96 prompt files** - system prompts and agent behavior definitions
 - **No traditional testing** - CI uses AI code analysis instead of pytest runs
 - **Automatic SSH password generation** - `prepare.py` generates random root password (security concern for production)
@@ -216,14 +215,14 @@ docker run -p 50001:80 agent0ai/agent-zero
 | Simplicity | 10% | 6/10 | Large modules (settings.py: 1749 lines) |
 | Modularity | 15% | 9/15 | Extensions good, some too large |
 | Consistency | 5% | 3/5 | Mixed patterns |
-| **Testability** | **15%** | **3/15** | **Only 10 test files for 195 files (~5%)** |
+| **Testability** | **15%** | **3/15** | **Only 8 test files for 224 files (~4%)** |
 | Maintainability | 10% | 5/10 | Complexity hotspot in helpers/ |
 | **Error Handling** | **10%** | **7/10** | **Fixed: 62 bare exception handlers → 0** |
 | Dependencies | 5% | 4/5 | Well-defined requirements |
 | Determinism | 5% | 5/5 | No randomness issues |
 
 **Critical Issues:**
-1. **Test Coverage Crisis**: Only 10 test files for 195 Python files (~5% coverage)
+1. **Test Coverage Crisis**: Only 8 test files for 224 Python files (~4% coverage)
 2. ~~**Error Handling**: 182 broad `except Exception` handlers mask bugs~~ ✅ **FIXED**: 62 bare `except Exception:` handlers converted to `except Exception as e:`
 3. **Type Safety**: 174 `# type: ignore` comments bypass type checking
 4. **Observability**: PrintStyle logging is intentional framework behavior (not bare print statements)
@@ -304,7 +303,7 @@ docker run -p 50001:80 agent0ai/agent-zero
 
 ### POSITIVE FINDINGS
 
-✅ **Documentation**: Excellent (19 comprehensive docs)
+✅ **Documentation**: Excellent (23 comprehensive docs)
 ✅ **Architecture**: Well-designed multi-agent system
 ✅ **Docker**: Production-ready containerization
 ✅ **CI/CD**: Innovative AI-powered analysis
@@ -317,4 +316,4 @@ docker run -p 50001:80 agent0ai/agent-zero
 ✅ **Verified test suite**: All 29 tests passing
 ✅ **No syntax errors**: All modified files compile successfully
 ✅ **Pre-commit hooks**: Already configured (ruff, black, mypy, prettier)
-✅ **Updated AGENTS.md**: Refreshed statistics (195 Python files, 578 JS files, 27,224 lines Python, 19,150 lines JS)
+✅ **Updated AGENTS.md**: Refreshed statistics (224 Python files, 582 JS files, 33,009 lines Python, 19,626 lines JS)
