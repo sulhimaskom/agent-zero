@@ -25,7 +25,6 @@ from enum import Enum
 from typing import Any, TypeVar, overload
 
 from python.helpers.constants import (
-    AgentDefaults,
     Config,
     Limits,
     Timeouts,
