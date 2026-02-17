@@ -244,7 +244,8 @@ const model = {
       const isBackendUnavailable = error.message?.includes('CSRF token unavailable') ||
                                    error.message?.includes('CSRF token endpoint returned') ||
                                    error.message?.includes('backend not running') ||
-                                   error.message?.includes('Failed to fetch');
+                                   error.message?.includes('Failed to fetch') ||
+                                   error.message?.includes('Static file mode');
       if (!isBackendUnavailable) {
         console.error("Error loading projects list:", error);
       }
