@@ -1,9 +1,9 @@
 # AGENT ZERO PROJECT KNOWLEDGE BASE
 
-**Generated:** 2026-02-16
+**Generated:** 2026-02-17
 **Branch:** custom
-**Commit:** f300d88
-**Last RepoKeeper Run:** 2026-02-16
+**Commit:** 3898997
+**Last RepoKeeper Run:** 2026-02-17
 
 ## OVERVIEW
 Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpine.js). Prompt-driven behavior - everything controlled by `/prompts/` markdown files. Grows organically through memory, tools, extensions, and agent profiles.
@@ -14,10 +14,10 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 ├── agents/              # Agent profiles (_example, agent0, brocula, default, developer, hacker, researcher) with custom prompts/tools/extensions
 ├── prompts/             # 96 system prompts defining framework behavior (fw.* = framework, agent.system.* = agent behavior)
 ├── python/
-│   ├── api/            # 63 Flask API endpoints (auto-registered via ApiHandler base class)
-│   ├── helpers/        # 73 utility modules (memory, history, settings, mcp, scheduler)
-│   ├── tools/          # 19 default tools (code_execution, browser_agent, memory_*, call_subordinate)
-│   └── extensions/     # 22 lifecycle hook points (message_loop_*, response_stream*, system_prompt)
+│   ├── api/            # 64 Flask API endpoints (auto-registered via ApiHandler base class)
+│   ├── helpers/        # 75 utility modules (memory, history, settings, mcp, scheduler)
+│   ├── tools/          # 24 default tools (code_execution, browser_agent, memory_*, call_subordinate)
+│   └── extensions/     # 23 lifecycle hook points (message_loop_*, response_stream*, system_prompt)
 ├── webui/              # Frontend (Alpine.js stores, modular components, 96 code files)
 │   ├── components/     # chat/, settings/, sidebar/, modals/, projects/, notifications/
 │   ├── js/            # ES modules, stores (scheduler.js 1579 lines, messages.js 1016 lines)
@@ -108,8 +108,8 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 ### Testing
 - pytest.ini exists and configured (asyncio mode, markers, test paths)
 - conftest.py exists with fixtures and mocks
-- All 29 tests passing
-- 10 test files for 224 Python files (~4% coverage)
+- All 66 tests passing
+- 10 test files for 195 Python files (~5% coverage)
 - Tests not run in CI (GitHub workflows use OpenCode AI agent only)
 - Mixed naming: `test_*.py` and `*_test.py` both used
 - Coverage tool not configured
@@ -186,8 +186,8 @@ docker run -p 50001:80 agent0ai/agent-zero
 - **Large frontend files**: `webui/js/scheduler.js` (1579 lines), `webui/js/messages.js` (1016 lines), `webui/components/chat/speech/speech-store.js` (965 lines)
 - **FAISS patch required** for Python 3.12 ARM - temporary workaround
 - **57 bare `pass` statements** - mostly in base classes/abstract methods (acceptable)
-- **195 Python files** (27,224 lines) - backend codebase
-- **578 JavaScript files** (19,150 lines) - frontend codebase
+- **195 Python files** (33,009 lines) - backend codebase
+- **578 JavaScript files** (19,626 lines) - frontend codebase
 - **96 prompt files** - system prompts and agent behavior definitions
 - **No traditional testing** - CI uses AI code analysis instead of pytest runs
 - **Automatic SSH password generation** - `prepare.py` generates random root password (security concern for production)
