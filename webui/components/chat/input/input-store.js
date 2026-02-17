@@ -23,6 +23,7 @@ const model = {
     "Press Enter to send, Shift+Enter for new line",
     "How can I help you today?",
     "Try asking about code, analysis, or creative tasks...",
+    "Press ? for keyboard shortcuts ⌨️",
   ],
 
   init() {
