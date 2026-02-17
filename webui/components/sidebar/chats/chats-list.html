@@ -58,8 +58,8 @@
             </li>
           </template>
         </ul>
-        <div class="empty-list-message" x-show="!$store.chats.isLoading && $store.chats.contexts.length === 0">
-          <p><i>No chats to list.</i></p>
+        <div x-show="!$store.chats.isLoading && $store.chats.contexts.length === 0" x-data="{ type: 'chats' }">
+          <x-component path="_shared/empty-state.html"></x-component>
         </div>
       </div>
     </template>
