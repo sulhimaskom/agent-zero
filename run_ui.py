@@ -53,9 +53,13 @@ webapp.config.update(
         "application/x-javascript",
         "application/xml",
         "text/x-component",
+        "font/woff2",
+        "font/woff",
+        "font/ttf",
     ],
-    COMPRESS_LEVEL=6,
-    COMPRESS_MIN_SIZE=500,
+    COMPRESS_LEVEL=9,
+    COMPRESS_MIN_SIZE=256,
+    COMPRESS_ALGORITHM=["gzip", "br"],
 )
 
 # Enable gzip compression for static assets
@@ -246,7 +250,24 @@ async def serve_static(filename):
             from flask import send_file
 
             response = send_file(file_path)
-            response.headers["Cache-Control"] = f"public, max-age={cache_max_age}"
+
+            # Enhanced cache control headers for better performance
+            if filename.startswith("vendor/"):
+                # Vendor files with immutable flag (they never change)
+                response.headers["Cache-Control"] = f"public, max-age={cache_max_age}, immutable"
+            else:
+                response.headers["Cache-Control"] = f"public, max-age={cache_max_age}"
+
+            # Add Vary header for compression
+            response.headers["Vary"] = "Accept-Encoding"
+
+            # Add ETag for conditional requests
+            import hashlib
+
+            file_stat = os.stat(file_path)
+            etag = hashlib.md5(f"{file_stat.st_mtime}-{file_stat.st_size}".encode()).hexdigest()
+            response.headers["ETag"] = f'"{etag}"'
+
             return response
         else:
             return Response("File not found", 404)
