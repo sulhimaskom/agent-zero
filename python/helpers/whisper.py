@@ -23,12 +23,8 @@ is_updating_model = False  # Tracks whether the model is currently updating
 
 
 async def preload(model_name: str):
-    try:
-        # return await runtime.call_development_function(_preload, model_name)
-        return await _preload(model_name)
-    except Exception as e:
-        # if not runtime.is_development():
-        raise
+    # return await runtime.call_development_function(_preload, model_name)
+    return await _preload(model_name)
 
 
 async def _preload(model_name: str):
@@ -73,14 +69,8 @@ def _is_downloading():
 
 
 async def is_downloaded():
-    try:
-        # return await runtime.call_development_function(_is_downloaded)
-        return _is_downloaded()
-    except Exception as e:
-        # if not runtime.is_development():
-        raise
-        # Fallback to direct execution if RFC fails in development
-        # return _is_downloaded()
+    # return await runtime.call_development_function(_is_downloaded)
+    return _is_downloaded()
 
 
 def _is_downloaded():

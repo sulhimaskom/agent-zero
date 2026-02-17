@@ -32,7 +32,6 @@ class MemorizeMemories(Extension):
         return task
 
     async def memorize(self, loop_data: LoopData, log_item: LogItem, **kwargs):
-
         set = settings.get_settings()
 
         db = await Memory.get(self.agent)
@@ -78,7 +77,7 @@ class MemorizeMemories(Extension):
 
         # If memories is not a list, try to make it one
         if not isinstance(memories, list):
-            if isinstance(memories, (str, dict)):
+            if isinstance(memories, str | dict):
                 memories = [memories]
             else:
                 log_item.update(heading="Invalid memories format received.")

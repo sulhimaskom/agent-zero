@@ -1682,7 +1682,7 @@ def _dict_to_env(data_dict):
             # Quote strings and escape internal quotes
             escaped_value = value.replace('"', '\\"')
             lines.append(f'{key}="{escaped_value}"')
-        elif isinstance(value, (dict, list, bool)) or value is None:
+        elif isinstance(value, dict | list | bool) or value is None:
             # Serialize as unquoted JSON
             lines.append(f"{key}={json.dumps(value, separators=(',', ':'))}")
         else:
