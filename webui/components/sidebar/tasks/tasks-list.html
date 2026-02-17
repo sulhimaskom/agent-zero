@@ -89,8 +89,8 @@
                 </li>
               </template>
             </ul>
-            <div class="empty-list-message" x-show="!$store.tasks.isLoading && $store.tasks.tasks.length === 0">
-              <p><i>No tasks to list.</i></p>
+            <div x-show="!$store.tasks.isLoading && $store.tasks.tasks.length === 0" x-data="{ type: 'tasks' }">
+              <x-component path="_shared/empty-state.html"></x-component>
             </div>
           </div>
           </div>
