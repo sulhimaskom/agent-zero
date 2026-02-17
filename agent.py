@@ -580,8 +580,46 @@ class Agent:
     def hist_add_tool_result(self, tool_name: str, tool_result: str, **kwargs):
         return self.history_coordinator.add_tool_result(tool_name, tool_result, **kwargs)
 
-    def concat_messages(self, messages):  # TODO add param for message range, topic, history
-        return self.history.output_text(human_label="user", ai_label="assistant")
+    def concat_messages(
+        self,
+        messages: list[history.OutputMessage] | None = None,
+        *,
+        topic: history.Topic | None = None,
+        message_range: tuple[int, int] | None = None,
+        use_history: bool = True,
+        human_label: str = "user",
+        ai_label: str = "assistant",
+    ) -> str:
+        """Concatenate messages into formatted text.
+
+        Args:
+            messages: Optional list of OutputMessage objects to format.
+                     If None and use_history is True, uses full history.
+            topic: Optional Topic to extract messages from.
+            message_range: Optional tuple of (start, end) indices to slice messages.
+            use_history: Whether to use self.history when messages not provided.
+            human_label: Label prefix for human messages.
+            ai_label: Label prefix for AI messages.
+
+        Returns:
+            Formatted string with all messages concatenated.
+        """
+        # Determine source messages
+        if messages is not None:
+            source_messages = messages
+        elif topic is not None:
+            source_messages = topic.output()
+        elif use_history:
+            source_messages = self.history.output()
+        else:
+            return ""
+
+        # Apply message range filter if specified
+        if message_range is not None:
+            start, end = message_range
+            source_messages = source_messages[start:end]
+
+        return history.output_text(source_messages, ai_label=ai_label, human_label=human_label)
 
     def get_chat_model(self):
         return models.get_chat_model(
