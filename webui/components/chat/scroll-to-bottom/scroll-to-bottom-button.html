@@ -1,0 +1,231 @@
+<html>
+<head>
+    <title>Scroll to Bottom Button</title>
+    <script type="module">
+        import { store } from "/components/chat/scroll-to-bottom/scroll-to-bottom-store.min.js";
+    </script>
+</head>
+<body>
+    <div class="scroll-to-bottom-container">
+        <button
+            x-show="$store.scrollToBottom.isVisible"
+            x-transition:enter="scroll-btn-enter"
+            x-transition:enter-start="scroll-btn-enter-start"
+            x-transition:enter-end="scroll-btn-enter-end"
+            x-transition:leave="scroll-btn-leave"
+            x-transition:leave-start="scroll-btn-leave-start"
+            x-transition:leave-end="scroll-btn-leave-end"
+            @click="$store.scrollToBottom.scrollToBottom()"
+            class="scroll-to-bottom-btn"
+            :class="{ 'has-new-messages': $store.scrollToBottom.newMessageCount > 0 }"
+            aria-label="Scroll to bottom"
+            title="Scroll to bottom"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="scroll-icon">
+                <path d="M12 16l-6-6h12l-6 6z"/>
+                <path d="M12 10l-6-6h12l-6 6z" opacity="0.5"/>
+            </svg>
+            <span
+                x-show="$store.scrollToBottom.newMessageCount > 0"
+                x-text="$store.scrollToBottom.newMessageCount > 99 ? '99+' : $store.scrollToBottom.newMessageCount"
+                class="new-messages-badge"
+                aria-label="New messages"
+            ></span>
+        </button>
+    </div>
+
+    <style>
+        .scroll-to-bottom-container {
+            position: fixed;
+            bottom: 120px;
+            right: 24px;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        .scroll-to-bottom-btn {
+            pointer-events: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--color-panel, #2d2d2d);
+            border: 1px solid var(--color-border, #444);
+            color: var(--color-text, #fff);
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
+                        0 0 0 1px rgba(255, 255, 255, 0.05);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+        }
+
+        .scroll-to-bottom-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4),
+                        0 0 0 2px var(--color-highlight, #4248f1);
+            background: var(--color-background-hover, #3d3d3d);
+        }
+
+        .scroll-to-bottom-btn:active {
+            transform: translateY(0) scale(0.95);
+        }
+
+        .scroll-to-bottom-btn:focus-visible {
+            outline: 2px solid var(--color-highlight, #4248f1);
+            outline-offset: 3px;
+        }
+
+        /* Pulse animation when new messages arrive */
+        .scroll-to-bottom-btn.has-new-messages {
+            animation: new-message-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes new-message-pulse {
+            0%, 100% {
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
+                            0 0 0 1px rgba(255, 255, 255, 0.05),
+                            0 0 0 0 rgba(66, 72, 241, 0.4);
+            }
+            50% {
+                box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3),
+                            0 0 0 1px rgba(255, 255, 255, 0.05),
+                            0 0 0 8px rgba(66, 72, 241, 0);
+            }
+        }
+
+        /* Scroll Icon */
+        .scroll-icon {
+            width: 24px;
+            height: 24px;
+            opacity: 0.8;
+            transition: opacity 0.2s ease;
+        }
+
+        .scroll-to-bottom-btn:hover .scroll-icon {
+            opacity: 1;
+        }
+
+        /* New Messages Badge */
+        .new-messages-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            background: var(--color-accent, #cf6679);
+            color: white;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            animation: badge-pop 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes badge-pop {
+            0% {
+                transform: scale(0);
+            }
+            70% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Entrance Animation Classes */
+        .scroll-btn-enter {
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .scroll-btn-enter-start {
+            opacity: 0;
+            transform: translateY(20px) scale(0.8);
+        }
+
+        .scroll-btn-enter-end {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .scroll-btn-leave {
+            transition: all 0.2s ease;
+        }
+
+        .scroll-btn-leave-start {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .scroll-btn-leave-end {
+            opacity: 0;
+            transform: translateY(10px) scale(0.8);
+        }
+
+        /* Light Mode Adjustments */
+        .light-mode .scroll-to-bottom-btn {
+            background: #ffffff;
+            border-color: #e0e0e0;
+            color: #333;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15),
+                        0 0 0 1px rgba(0, 0, 0, 0.05);
+        }
+
+        .light-mode .scroll-to-bottom-btn:hover {
+            background: #f5f5f5;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2),
+                        0 0 0 2px var(--color-highlight, #4248f1);
+        }
+
+        /* Mobile Adjustments */
+        @media (max-width: 768px) {
+            .scroll-to-bottom-container {
+                bottom: 140px;
+                right: 16px;
+            }
+
+            .scroll-to-bottom-btn {
+                width: 44px;
+                height: 44px;
+            }
+
+            .scroll-icon {
+                width: 20px;
+                height: 20px;
+            }
+        }
+
+        /* Accessibility: Respect reduced motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+            .scroll-to-bottom-btn {
+                transition: none;
+            }
+
+            .scroll-to-bottom-btn:hover {
+                transform: none;
+            }
+
+            .scroll-to-bottom-btn.has-new-messages {
+                animation: none;
+            }
+
+            .new-messages-badge {
+                animation: none;
+            }
+
+            .scroll-btn-enter,
+            .scroll-btn-leave {
+                transition: none;
+            }
+        }
+    </style>
+</body>
+</html>
