@@ -438,6 +438,8 @@ async def mcp_middleware(request: Request, call_next):
     cfg = settings.get_settings()
     if not cfg["mcp_server_enabled"]:
         PrintStyle.error("[MCP] Access denied: MCP server is disabled in settings.")
-        raise StarletteHTTPException(status_code=HttpStatus.FORBIDDEN, detail="MCP server is disabled in settings.")
+        raise StarletteHTTPException(
+            status_code=HttpStatus.FORBIDDEN, detail="MCP server is disabled in settings."
+        )
 
     return await call_next(request)

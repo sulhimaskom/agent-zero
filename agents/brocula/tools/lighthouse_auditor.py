@@ -50,7 +50,10 @@ class LighthouseAuditor(Tool):
             # Check if lighthouse is installed
             try:
                 result = subprocess.run(
-                    ["lighthouse", "--version"], capture_output=True, text=True, timeout=Timeouts.LIGHTHOUSE_VERSION_TIMEOUT
+                    ["lighthouse", "--version"],
+                    capture_output=True,
+                    text=True,
+                    timeout=Timeouts.LIGHTHOUSE_VERSION_TIMEOUT,
                 )
                 if result.returncode != 0:
                     raise Exception("Lighthouse not available")
@@ -84,7 +87,9 @@ class LighthouseAuditor(Tool):
             self.set_progress(f"Running Lighthouse audit on {url} ({device})...")
 
             # Run lighthouse
-            result = subprocess.run(cmd, capture_output=True, text=True, timeout=Timeouts.LIGHTHOUSE_AUDIT_TIMEOUT)
+            result = subprocess.run(
+                cmd, capture_output=True, text=True, timeout=Timeouts.LIGHTHOUSE_AUDIT_TIMEOUT
+            )
 
             if result.returncode != 0 and not os.path.exists(output_file):
                 return Response(
