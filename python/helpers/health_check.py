@@ -13,6 +13,8 @@ from datetime import datetime
 from enum import Enum
 from typing import Any
 
+from python.helpers.constants import HttpStatus, Limits
+
 
 class HealthStatus(Enum):
     """Health check status levels."""
@@ -169,7 +171,7 @@ class HealthChecker:
         version = sys.version_info
         version_str = f"{version.major}.{version.minor}.{version.micro}"
 
-        if version.major < 3 or (version.major == 3 and version.minor < 10):
+        if version.major < 3 or (version.major == 3 and version.minor < 10):  # type: ignore[comparison-overlap]
             return HealthCheckResult(
                 name="python_version",
                 status=HealthStatus.UNHEALTHY,

@@ -28,6 +28,7 @@ from pydantic import ConfigDict
 from sentence_transformers import SentenceTransformer
 
 from python.helpers import browser_use_monkeypatch, dirty_json, dotenv, settings
+from python.helpers.constants import HttpStatus
 from python.helpers.dotenv import load_dotenv
 from python.helpers.providers import get_provider_config
 from python.helpers.rate_limiter import RateLimiter
@@ -223,10 +224,17 @@ def _is_transient_litellm_error(exc: Exception) -> bool:
     # Prefer explicit status codes if present
     status_code = getattr(exc, "status_code", None)
     if isinstance(status_code, int):
-        if status_code in (408, 429, 500, 502, 503, 504):
+        if status_code in (
+            HttpStatus.REQUEST_TIMEOUT,
+            HttpStatus.TOO_MANY_REQUESTS,
+            HttpStatus.ERROR,
+            HttpStatus.BAD_GATEWAY,
+            HttpStatus.SERVICE_UNAVAILABLE,
+            HttpStatus.GATEWAY_TIMEOUT,
+        ):
             return True
         # Treat other 5xx as retriable
-        return status_code >= 500
+        return status_code >= HttpStatus.ERROR
 
     # Fallback to exception classes mapped by LiteLLM/OpenAI
     transient_types = tuple(
