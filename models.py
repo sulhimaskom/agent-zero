@@ -643,7 +643,9 @@ class BrowserCompatibleChatWrapper(ChatOpenRouter):
             ) or "json_object" in kwrgs["response_format"]:
                 if resp.choices[0].message.content is not None and not resp.choices[
                     0
-                ].message.content.startswith("{"):  # type: ignore
+                ].message.content.startswith(
+                    "{"
+                ):  # type: ignore
                     js = dirty_json.parse(resp.choices[0].message.content)  # type: ignore
                     resp.choices[0].message.content = dirty_json.stringify(js)  # type: ignore
         except (KeyError, IndexError, AttributeError):
