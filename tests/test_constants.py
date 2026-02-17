@@ -16,7 +16,6 @@ from python.helpers.constants import (
     AgentDefaults,
     Browser,
     Colors,
-    Config,
     Encodings,
     Extensions,
     ExternalUrls,
@@ -393,8 +392,14 @@ class TestNetwork:
     def test_static_ports(self):
         """Test static ports list"""
         expected_ports = [
-            "8080", "5002", "3000", "5000",
-            "8000", "5500", "3001", "50001",
+            "8080",
+            "5002",
+            "3000",
+            "5000",
+            "8000",
+            "5500",
+            "3001",
+            "50001",
         ]
         assert expected_ports == Network.STATIC_PORTS
 
@@ -746,33 +751,68 @@ class TestConfigClass:
 
     def test_config_timeout_overrides(self):
         """Test Config timeout environment overrides"""
+        import importlib
+
         with patch.dict(os.environ, {"A0_CODE_EXEC_TIMEOUT": "200"}):
-            assert Config.CODE_EXEC_TIMEOUT == 200
+            from python.helpers import constants
+
+            importlib.reload(constants)
+            assert constants.Config.CODE_EXEC_TIMEOUT == 200
 
     def test_config_limit_overrides(self):
         """Test Config limit environment overrides"""
+        import importlib
+
         with patch.dict(os.environ, {"A0_MAX_MEMORY_RESULTS": "20"}):
-            assert Config.MAX_MEMORY_RESULTS == 20
+            from python.helpers import constants
+
+            importlib.reload(constants)
+            assert constants.Config.MAX_MEMORY_RESULTS == 20
 
     def test_config_network_overrides(self):
         """Test Config network environment overrides"""
+        import importlib
+
         with patch.dict(os.environ, {"A0_DEFAULT_PORT": "8080"}):
-            assert Config.DEFAULT_PORT == 8080
+            from python.helpers import constants
+
+            importlib.reload(constants)
+            assert constants.Config.DEFAULT_PORT == 8080
 
     def test_config_external_url_overrides(self):
         """Test Config external URL environment overrides"""
+        import importlib
+
         with patch.dict(os.environ, {"A0_UPDATE_CHECK_URL": "https://custom.example.com/check"}):
-            assert Config.UPDATE_CHECK_URL == "https://custom.example.com/check"
+            from python.helpers import constants
+
+            importlib.reload(constants)
+            assert constants.Config.UPDATE_CHECK_URL == "https://custom.example.com/check"
 
     def test_config_model_defaults(self):
         """Test Config model default environment overrides"""
+        import importlib
+
         with patch.dict(os.environ, {"A0_CHAT_MODEL_PROVIDER": "custom_provider"}):
-            assert Config.DEFAULT_CHAT_MODEL_PROVIDER == "custom_provider"
+            from python.helpers import constants
+
+            importlib.reload(constants)
+            assert constants.Config.DEFAULT_CHAT_MODEL_PROVIDER == "custom_provider"
 
     def test_config_cors_origins(self):
         """Test Config CORS origins parsing"""
-        with patch.dict(os.environ, {"A0_DEV_CORS_ORIGINS": "http://localhost:3000,http://localhost:8080"}):
-            assert Config.DEV_CORS_ORIGINS == ["http://localhost:3000", "http://localhost:8080"]
+        import importlib
+
+        with patch.dict(
+            os.environ, {"A0_DEV_CORS_ORIGINS": "http://localhost:3000,http://localhost:8080"}
+        ):
+            from python.helpers import constants
+
+            importlib.reload(constants)
+            assert constants.Config.DEV_CORS_ORIGINS == [
+                "http://localhost:3000",
+                "http://localhost:8080",
+            ]
 
 
 class TestFrontendConfig:

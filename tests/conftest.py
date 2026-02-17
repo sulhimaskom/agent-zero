@@ -226,21 +226,8 @@ print_style_mock = create_mock_module("python.helpers.print_style")
 print_style_class = MagicMock
 print_style_mock.PrintStyle = print_style_class
 
-constants_mock = create_mock_module("python.helpers.constants")
-constants_mock.Colors = MagicMock()
-
-paths_mock = MagicMock()
-paths_mock.get_agent_tools_path = MagicMock(
-    side_effect=lambda profile, name: f"agents/{profile}/tools/{name}.py"
-)
-paths_mock.get_default_tools_path = MagicMock(side_effect=lambda name: f"python/tools/{name}.py")
-paths_mock.get_agent_extensions_path = MagicMock(
-    side_effect=lambda profile, point: f"agents/{profile}/extensions/{point}"
-)
-paths_mock.get_default_extensions_path = MagicMock(
-    side_effect=lambda point: f"python/extensions/{point}"
-)
-constants_mock.Paths = paths_mock
+# python.helpers.constants is intentionally not mocked - it has no heavy
+# dependencies and is directly tested by test_constants.py
 
 sys.modules["python.helpers.strings"] = MagicMock()
 sys.modules["python.helpers.strings"].sanitize_string = MagicMock(return_value="")
