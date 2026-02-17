@@ -10,7 +10,7 @@ from starlette.requests import Request
 from agent import AgentContext, AgentContextType, UserMessage
 from initialize import initialize_agent
 from python.helpers import settings
-from python.helpers.constants import ExternalUrls, MimeTypes
+from python.helpers.constants import ExternalUrls, HttpStatus, MimeTypes
 from python.helpers.persist_chat import remove_chat
 
 # Local imports
@@ -352,7 +352,7 @@ class DynamicA2AProxy:
             await send(
                 {
                     "type": "http.response.start",
-                    "status": 503,
+                    "status": HttpStatus.SERVICE_UNAVAILABLE,
                     "headers": [[b"content-type", b"text/plain"]],
                 }
             )
@@ -372,7 +372,7 @@ class DynamicA2AProxy:
             await send(
                 {
                     "type": "http.response.start",
-                    "status": 403,
+                    "status": HttpStatus.FORBIDDEN,
                     "headers": [[b"content-type", b"text/plain"]],
                 }
             )
@@ -394,7 +394,7 @@ class DynamicA2AProxy:
                 await send(
                     {
                         "type": "http.response.start",
-                        "status": 503,
+                        "status": HttpStatus.SERVICE_UNAVAILABLE,
                         "headers": [[b"content-type", b"text/plain"]],
                     }
                 )
@@ -412,7 +412,7 @@ class DynamicA2AProxy:
             await send(
                 {
                     "type": "http.response.start",
-                    "status": 503,
+                    "status": HttpStatus.SERVICE_UNAVAILABLE,
                     "headers": [[b"content-type", b"text/plain"]],
                 }
             )
@@ -435,7 +435,7 @@ class DynamicA2AProxy:
                 await send(
                     {
                         "type": "http.response.start",
-                        "status": 503,
+                        "status": HttpStatus.SERVICE_UNAVAILABLE,
                         "headers": [[b"content-type", b"text/plain"]],
                     }
                 )
@@ -474,7 +474,7 @@ class DynamicA2AProxy:
                 await send(
                     {
                         "type": "http.response.start",
-                        "status": 401,
+                        "status": HttpStatus.UNAUTHORIZED,
                         "headers": [[b"content-type", b"text/plain"]],
                     }
                 )
@@ -509,7 +509,7 @@ class DynamicA2AProxy:
                     await send(
                         {
                             "type": "http.response.start",
-                            "status": 401,
+                            "status": HttpStatus.UNAUTHORIZED,
                             "headers": [[b"content-type", b"text/plain"]],
                         }
                     )
@@ -533,7 +533,7 @@ class DynamicA2AProxy:
             await send(
                 {
                     "type": "http.response.start",
-                    "status": 503,
+                    "status": HttpStatus.SERVICE_UNAVAILABLE,
                     "headers": [[b"content-type", b"text/plain"]],
                 }
             )

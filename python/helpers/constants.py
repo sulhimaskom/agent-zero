@@ -323,6 +323,9 @@ class Limits:
     IMAGE_PREVIEW_MAX_SIZE: Final[int] = 800
     IMAGE_PREVIEW_QUALITY: Final[int] = 70
 
+    # Message length limits (for frontend validation)
+    MAX_MESSAGE_LENGTH: Final[int] = 10000
+
 
 # =============================================================================
 # NETWORK AND PORTS

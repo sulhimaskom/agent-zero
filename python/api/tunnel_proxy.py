@@ -2,7 +2,7 @@ import requests
 
 from python.helpers import dotenv, runtime
 from python.helpers.api import ApiHandler, Request, Response
-from python.helpers.constants import Network, Protocols, Timeouts
+from python.helpers.constants import HttpStatus, Network, Protocols, Timeouts
 
 
 class TunnelProxy(ApiHandler):
@@ -26,7 +26,7 @@ async def process(input: dict) -> dict | Response:
             json={"action": "health"},
             timeout=Timeouts.HTTP_CLIENT_DEFAULT_TIMEOUT,
         )
-        if response.status_code == 200:
+        if response.status_code == HttpStatus.OK:
             service_ok = True
     except Exception as e:
         service_ok = False

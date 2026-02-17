@@ -49,7 +49,7 @@ def get_frontend_config() -> dict[str, Any]:
         "LIMITS": {
             "max_attachment_size": Limits.FILE_BROWSER_MAX_FILE_SIZE,
             "max_file_size": Limits.FILE_READ_MAX_SIZE,
-            "max_message_length": 10000,
+            "max_message_length": Limits.MAX_MESSAGE_LENGTH,
         },
         "STATIC_PORTS": Network.STATIC_PORTS,
     }

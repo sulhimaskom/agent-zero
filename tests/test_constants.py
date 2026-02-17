@@ -367,6 +367,10 @@ class TestLimits:
         assert Limits.IMAGE_PREVIEW_MAX_SIZE == 800
         assert Limits.IMAGE_PREVIEW_QUALITY == 70
 
+    def test_max_message_length(self):
+        """Test max message length for frontend validation"""
+        assert Limits.MAX_MESSAGE_LENGTH == 10000
+
 
 class TestNetwork:
     """Test Network constants class"""

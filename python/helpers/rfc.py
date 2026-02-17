@@ -6,6 +6,7 @@ from typing import Any, TypedDict
 import aiohttp
 
 from python.helpers import crypto
+from python.helpers.constants import HttpStatus
 
 # Remote Function Call library
 # Call function via http request
@@ -80,7 +81,7 @@ async def _send_json_data(url: str, data):
             json=data,
         ) as response,
     ):
-        if response.status == 200:
+        if response.status == HttpStatus.OK:
             result = await response.json()
             return result
         else:
