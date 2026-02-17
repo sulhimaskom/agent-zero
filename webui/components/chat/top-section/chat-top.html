@@ -12,7 +12,61 @@
 <body>
 
     <!-- This construct of x-data + x-if is used to ensure the component is only rendered when the store is available -->
-    <div x-data>
+    <div x-data="{
+        isAtBottom: true,
+        unreadCount: 0,
+        showScrollButton: false,
+        lastScrollTop: 0,
+
+        init() {
+            this.setupScrollListener();
+        },
+
+        setupScrollListener() {
+            const chatHistory = document.getElementById('chat-history');
+            if (!chatHistory) return;
+
+            chatHistory.addEventListener('scroll', () => {
+                this.updateScrollState(chatHistory);
+            });
+
+            // Initial state check
+            this.updateScrollState(chatHistory);
+        },
+
+        updateScrollState(chatHistory) {
+            const tolerancePx = 10;
+            const scrollTop = chatHistory.scrollTop;
+            const scrollHeight = chatHistory.scrollHeight;
+            const clientHeight = chatHistory.clientHeight;
+
+            const wasAtBottom = this.isAtBottom;
+            this.isAtBottom = scrollHeight - scrollTop <= clientHeight + tolerancePx;
+
+            // Show button when not at bottom
+            this.showScrollButton = !this.isAtBottom;
+
+            // Track unread messages when scrolling up
+            if (wasAtBottom && !this.isAtBottom) {
+                // User scrolled up, start tracking unread
+                this.unreadCount = 0;
+            }
+
+            this.lastScrollTop = scrollTop;
+        },
+
+        scrollToBottom() {
+            const chatHistory = document.getElementById('chat-history');
+            if (!chatHistory) return;
+
+            chatHistory.scrollTo({
+                top: chatHistory.scrollHeight,
+                behavior: 'smooth'
+            });
+
+            this.unreadCount = 0;
+        }
+    }" x-init="init()">
         <template x-if="$store.chatTop">
 
             <!-- Time and Date -->
@@ -36,8 +90,178 @@
             </div>
 
         </template>
+
+        <!-- Scroll to Bottom Button -->
+        <button
+            x-show="showScrollButton"
+            x-transition:enter="scroll-btn-enter"
+            x-transition:enter-start="scroll-btn-enter-start"
+            x-transition:enter-end="scroll-btn-enter-end"
+            x-transition:leave="scroll-btn-leave"
+            x-transition:leave-start="scroll-btn-leave-start"
+            x-transition:leave-end="scroll-btn-leave-end"
+            @click="scrollToBottom()"
+            class="scroll-to-bottom-btn"
+            aria-label="Scroll to bottom of chat"
+            title="Scroll to bottom">
+            <span class="scroll-btn-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <polyline points="6 9 12 15 18 9"></polyline>
+                </svg>
+            </span>
+            <span x-show="unreadCount > 0" class="unread-badge" x-text="unreadCount"></span>
+        </button>
     </div>
 
+    <style>
+        /* Scroll to Bottom Button Styles */
+        .scroll-to-bottom-btn {
+            position: fixed;
+            bottom: 120px;
+            right: 24px;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--color-panel);
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 100;
+            padding: 0;
+        }
+
+        .scroll-to-bottom-btn:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            background: var(--color-background-hover);
+            border-color: var(--color-highlight);
+        }
+
+        .scroll-to-bottom-btn:active {
+            transform: translateY(0) scale(0.95);
+        }
+
+        .scroll-to-bottom-btn:focus-visible {
+            outline: 2px solid var(--color-highlight);
+            outline-offset: 2px;
+        }
+
+        .scroll-btn-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+        }
+
+        .scroll-btn-icon svg {
+            width: 100%;
+            height: 100%;
+            transition: transform 0.2s ease;
+        }
+
+        .scroll-to-bottom-btn:hover .scroll-btn-icon svg {
+            transform: translateY(2px);
+        }
+
+        /* Unread Badge */
+        .unread-badge {
+            position: absolute;
+            top: -4px;
+            right: -4px;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            background: #F44336;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--color-panel);
+            animation: badge-pop 0.3s ease;
+        }
+
+        @keyframes badge-pop {
+            0% {
+                transform: scale(0);
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Alpine.js Transition Classes */
+        .scroll-btn-enter {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .scroll-btn-enter-start {
+            opacity: 0;
+            transform: translateY(20px) scale(0.8);
+        }
+
+        .scroll-btn-enter-end {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .scroll-btn-leave {
+            transition: all 0.2s ease;
+        }
+
+        .scroll-btn-leave-start {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .scroll-btn-leave-end {
+            opacity: 0;
+            transform: translateY(10px) scale(0.9);
+        }
+
+        /* Accessibility: Respect reduced motion preferences */
+        @media (prefers-reduced-motion: reduce) {
+            .scroll-to-bottom-btn,
+            .scroll-btn-icon svg {
+                transition: none;
+            }
+
+            .unread-badge {
+                animation: none;
+            }
+
+            .scroll-btn-enter,
+            .scroll-btn-leave {
+                transition: none;
+            }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .scroll-to-bottom-btn {
+                bottom: 140px;
+                right: 16px;
+                width: 44px;
+                height: 44px;
+            }
+
+            .scroll-btn-icon {
+                width: 22px;
+                height: 22px;
+            }
+        }
+    </style>
 </body>
 
 </html>
