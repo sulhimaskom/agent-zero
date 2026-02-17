@@ -213,7 +213,6 @@ class Topic(Record):
         return compress
 
     async def compress_attention(self) -> bool:
-
         if len(self.messages) > 2:
             cnt_to_sum = math.ceil((len(self.messages) - 2) * TOPIC_COMPRESS_RATIO)
             msg_to_sum = self.messages[1 : cnt_to_sum + 1]
@@ -515,10 +514,7 @@ def _output_content_langchain(content: MessageContent):
         return content
     if _is_raw_message(content):
         return content["raw_content"]  # type: ignore
-    try:
-        return _json_dumps(content)
-    except Exception as e:
-        raise
+    return _json_dumps(content)
 
 
 def group_outputs_abab(outputs: list[OutputMessage]) -> list[OutputMessage]:

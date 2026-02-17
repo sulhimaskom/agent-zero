@@ -13,7 +13,7 @@ class RateLimiter:
     ):
         self.timeframe = seconds
         self.limits = {
-            key: value if isinstance(value, (int, float)) else 0
+            key: value if isinstance(value, int | float) else 0
             for key, value in (limits or {}).items()
         }
         self.values = {key: [] for key in self.limits}

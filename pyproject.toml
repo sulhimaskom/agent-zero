@@ -138,7 +138,7 @@ ignore = [
     "TRY002",# Create your own exception
     "TRY003",# Avoid specifying long messages outside the exception class
     "TRY004",# Prefer TypeError exception for invalid type
-    "TRY203",# Remove exception handler; error is immediately re-raised
+
     "TRY300",# Consider moving this statement to an else block
     "TRY301",# Abstract raise to an inner function
     "B007",  # Loop control variable not used

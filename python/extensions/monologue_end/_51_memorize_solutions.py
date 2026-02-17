@@ -32,7 +32,6 @@ class MemorizeSolutions(Extension):
         return task
 
     async def memorize(self, loop_data: LoopData, log_item: LogItem, **kwargs):
-
         set = settings.get_settings()
 
         db = await Memory.get(self.agent)
@@ -78,7 +77,7 @@ class MemorizeSolutions(Extension):
 
         # If solutions is not a list, try to make it one
         if not isinstance(solutions, list):
-            if isinstance(solutions, (str, dict)):
+            if isinstance(solutions, str | dict):
                 solutions = [solutions]
             else:
                 log_item.update(heading="Invalid solutions format received.")
