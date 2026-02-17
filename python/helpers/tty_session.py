@@ -134,7 +134,9 @@ class TTYSession:
             raise RuntimeError("TTYSpawn is not started")
         reader = self._proc.stdout
         while True:
-            chunk = await reader.read(Limits.TTY_BUFFER_SIZE)  # grab whatever is ready # type: ignore
+            chunk = await reader.read(
+                Limits.TTY_BUFFER_SIZE
+            )  # grab whatever is ready # type: ignore
             if not chunk:
                 break
             self._buf.put_nowait(chunk.decode(self.encoding, "replace"))
