@@ -8,10 +8,10 @@ from flask import Response
 from python.api import file_info
 from python.helpers import files, runtime
 from python.helpers.api import ApiHandler, Input, Output, Request
-from python.helpers.constants import MimeTypes
+from python.helpers.constants import MimeTypes, StreamSizes
 
 
-def stream_file_download(file_source, download_name, chunk_size=8192):
+def stream_file_download(file_source, download_name, chunk_size=StreamSizes.DEFAULT_CHUNK_SIZE):
     """
     Create a streaming response for file downloads that shows progress in browser.
 

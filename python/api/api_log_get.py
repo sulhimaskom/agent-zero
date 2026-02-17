@@ -1,6 +1,6 @@
 from agent import AgentContext
 from python.helpers.api import ApiHandler, Request, Response
-from python.helpers.constants import HttpStatus, MimeTypes
+from python.helpers.constants import HttpStatus, Limits, MimeTypes
 
 
 class ApiLogGet(ApiHandler):
@@ -31,10 +31,10 @@ class ApiLogGet(ApiHandler):
         # Extract parameters (support both query params for GET and body for POST)
         if request.method == "GET":
             context_id = request.args.get("context_id", "")
-            length = int(request.args.get("length", 100))
+            length = int(request.args.get("length", Limits.MEMORY_CONTENT_PREVIEW_LIMIT))
         else:
             context_id = input.get("context_id", "")
-            length = input.get("length", 100)
+            length = input.get("length", Limits.MEMORY_CONTENT_PREVIEW_LIMIT)
 
         if not context_id:
             return Response(

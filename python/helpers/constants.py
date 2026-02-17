@@ -601,8 +601,12 @@ class HttpStatus:
     UNAUTHORIZED: Final[int] = 401
     FORBIDDEN: Final[int] = 403
     NOT_FOUND: Final[int] = 404
+    REQUEST_TIMEOUT: Final[int] = 408
+    TOO_MANY_REQUESTS: Final[int] = 429
     ERROR: Final[int] = 500
+    BAD_GATEWAY: Final[int] = 502
     SERVICE_UNAVAILABLE: Final[int] = 503
+    GATEWAY_TIMEOUT: Final[int] = 504
 
 
 # =============================================================================

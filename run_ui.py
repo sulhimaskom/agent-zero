@@ -17,7 +17,7 @@ import initialize
 from python.helpers import dotenv, fasta2a_server, files, git, login, mcp_server, process, runtime
 from python.helpers.api import ApiHandler
 from python.helpers.config import inject_config_into_html
-from python.helpers.constants import Config, Timeouts
+from python.helpers.constants import Config, HttpStatus, MimeTypes, Timeouts
 from python.helpers.extract_tools import load_classes_from_folder
 from python.helpers.files import get_abs_path
 from python.helpers.print_style import PrintStyle
@@ -43,12 +43,12 @@ webapp.config.update(
     SESSION_PERMANENT=True,
     PERMANENT_SESSION_LIFETIME=timedelta(days=1),
     COMPRESS_MIMETYPES=[
-        "text/html",
-        "text/css",
-        "text/javascript",
-        "text/plain",
+        MimeTypes.TEXT_HTML,
+        MimeTypes.TEXT_CSS,
+        MimeTypes.TEXT_JAVASCRIPT,
+        MimeTypes.TEXT_PLAIN,
         "text/xml",
-        "application/json",
+        MimeTypes.APPLICATION_JSON,
         "application/javascript",
         "application/x-javascript",
         "application/xml",
@@ -113,13 +113,13 @@ def requires_api_key(f):
 
         if api_key := request.headers.get("X-API-KEY"):
             if api_key != valid_api_key:
-                return Response("Invalid API key", 401)
+                return Response("Invalid API key", HttpStatus.UNAUTHORIZED)
         elif request.json and request.json.get("api_key"):
             api_key = request.json.get("api_key")
             if api_key != valid_api_key:
-                return Response("Invalid API key", 401)
+                return Response("Invalid API key", HttpStatus.UNAUTHORIZED)
         else:
-            return Response("API key required", 401)
+            return Response("API key required", HttpStatus.UNAUTHORIZED)
         return await f(*args, **kwargs)
 
     return decorated
@@ -132,7 +132,7 @@ def requires_loopback(f):
         if not is_loopback_address(request.remote_addr):
             return Response(
                 "Access denied.",
-                403,
+                HttpStatus.FORBIDDEN,
                 {},
             )
         return await f(*args, **kwargs)
@@ -165,7 +165,7 @@ def csrf_protect(f):
         cookie = request.cookies.get("csrf_token_" + runtime.get_runtime_id())
         sent = header or cookie
         if not token or not sent or token != sent:
-            return Response("CSRF token missing or invalid", 403)
+            return Response("CSRF token missing or invalid", HttpStatus.FORBIDDEN)
         return await f(*args, **kwargs)
 
     return decorated
@@ -229,7 +229,7 @@ async def serve_index():
 async def serve_static(filename):
     # Only serve files from webui folder
     if ".." in filename or filename.startswith("/"):
-        return Response("Invalid path", 403)
+        return Response("Invalid path", HttpStatus.FORBIDDEN)
 
     # Determine cache duration based on file type
     cache_max_age = Timeouts.HTTP_CACHE_DEFAULT  # Default 1 hour
@@ -270,9 +270,9 @@ async def serve_static(filename):
 
             return response
         else:
-            return Response("File not found", 404)
+            return Response("File not found", HttpStatus.NOT_FOUND)
     except OSError:
-        return Response("Error serving file", 500)
+        return Response("Error serving file", HttpStatus.ERROR)
 
 
 def run():
