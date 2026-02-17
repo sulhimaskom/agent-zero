@@ -19,7 +19,7 @@ from langchain_core.documents import Document
 
 from agent import Agent
 from python.helpers import errors, files
-from python.helpers.constants import Limits, Timeouts
+from python.helpers.constants import HttpStatus, Limits, Timeouts
 from python.helpers.print_style import PrintStyle
 from python.helpers.vector_db import VectorDB
 
@@ -574,7 +574,7 @@ class DocumentQueryHelper:
 
             with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as temp_file:
                 response = requests.get(document, timeout=Timeouts.DOCUMENT_DOWNLOAD_TIMEOUT)
-                if response.status_code != 200:
+                if response.status_code != HttpStatus.OK:
                     raise ValueError(
                         f"DocumentQueryHelper::handle_pdf_document: Failed to download PDF from {document}: {response.status_code}"
                     )

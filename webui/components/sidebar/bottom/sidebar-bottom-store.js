@@ -20,12 +20,20 @@ const model = {
 
   async copyVersion() {
     const textToCopy = this.versionLabel;
-    if (!textToCopy) return;
+    if (!textToCopy) return false;
 
     try {
       await navigator.clipboard.writeText(textToCopy);
+      if (window.toastFrontendInfo) {
+        window.toastFrontendInfo('Version info copied to clipboard', 'Copied');
+      }
+      return true;
     } catch (err) {
       console.warn("Failed to copy version:", err);
+      if (window.toastFrontendError) {
+        window.toastFrontendError('Failed to copy version info', 'Copy Error');
+      }
+      return false;
     }
   },
 };

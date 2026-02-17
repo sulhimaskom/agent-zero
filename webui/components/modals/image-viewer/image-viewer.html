@@ -37,9 +37,9 @@
 
                 <!-- Simple zoom controls -->
                 <div class="zoom-controls">
-                    <button @click="$store.imageViewer.zoomOut()" class="zoom-btn" title="Zoom Out">−</button>
-                    <button @click="$store.imageViewer.resetZoom()" class="zoom-btn" title="Reset">⌂</button>
-                    <button @click="$store.imageViewer.zoomIn()" class="zoom-btn" title="Zoom In">+</button>
+                    <button @click="$store.imageViewer.zoomOut()" class="zoom-btn" title="Zoom Out" aria-label="Zoom Out Image">−</button>
+                    <button @click="$store.imageViewer.resetZoom()" class="zoom-btn" title="Reset Zoom" aria-label="Reset Image Zoom">⌂</button>
+                    <button @click="$store.imageViewer.zoomIn()" class="zoom-btn" title="Zoom In" aria-label="Zoom In Image">+</button>
                 </div>
             </div>
         </template>
@@ -146,4 +146,3 @@
 </body>
 
 </html>
-

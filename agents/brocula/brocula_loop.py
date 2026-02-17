@@ -10,10 +10,10 @@ import sys
 import time
 from pathlib import Path
 
-from python.helpers.constants import Network
+from python.helpers.constants import Network, Timeouts
 
 
-def run_command(cmd, timeout=60):
+def run_command(cmd, timeout=Timeouts.BROCULA_COMMAND_TIMEOUT):
     """Run a shell command and return output."""
     try:
         result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=timeout)
@@ -103,7 +103,7 @@ def main():
 
     # Configuration
     target_url = f"http://{Network.DEFAULT_HOSTNAME}:{Network.BROCULA_PORT_DEFAULT}"
-    check_interval = 300  # 5 minutes between checks
+    check_interval = Timeouts.SCHEDULER_DEFAULT_WAIT
 
     # Determine verification commands
     lint_cmd = check_linter()
@@ -130,7 +130,7 @@ def main():
         chrome_flags = "--headless --no-sandbox"
         ret, stdout, stderr = run_command(
             f"lighthouse {target_url} --output=json --chrome-flags='{chrome_flags}' --quiet",
-            timeout=120,
+            timeout=Timeouts.BROCULA_LIGHTHOUSE_TIMEOUT,
         )
         if ret == 0:
             pass

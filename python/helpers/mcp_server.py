@@ -16,6 +16,7 @@ from starlette.types import ASGIApp, Receive, Scope, Send
 from agent import AgentContext, AgentContextType, UserMessage
 from initialize import initialize_agent
 from python.helpers import settings
+from python.helpers.constants import HttpStatus
 from python.helpers.persist_chat import remove_chat
 from python.helpers.print_style import PrintStyle
 
@@ -428,7 +429,7 @@ class DynamicMcpProxy:
             # Route to HTTP app
             await http_app(scope, receive, send)
         else:
-            raise StarletteHTTPException(status_code=403, detail="MCP forbidden")
+            raise StarletteHTTPException(status_code=HttpStatus.FORBIDDEN, detail="MCP forbidden")
 
 
 async def mcp_middleware(request: Request, call_next):
@@ -437,6 +438,6 @@ async def mcp_middleware(request: Request, call_next):
     cfg = settings.get_settings()
     if not cfg["mcp_server_enabled"]:
         PrintStyle.error("[MCP] Access denied: MCP server is disabled in settings.")
-        raise StarletteHTTPException(status_code=403, detail="MCP server is disabled in settings.")
+        raise StarletteHTTPException(status_code=HttpStatus.FORBIDDEN, detail="MCP server is disabled in settings.")
 
     return await call_next(request)

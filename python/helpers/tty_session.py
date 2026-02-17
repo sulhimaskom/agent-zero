@@ -191,7 +191,7 @@ async def _spawn_posix_pty(cmd, cwd, env, echo):
             os.write(master, d)
 
         async def drain(self):
-            await asyncio.sleep(0)
+            await asyncio.sleep(Timeouts.TTY_DRAIN_DELAY)
 
     proc.stdin = _Stdin()  # type: ignore
     proc.stdout = reader
@@ -226,7 +226,7 @@ async def _spawn_winpty(cmd, cwd, env, echo):
             except EOFError:
                 break
             except Exception as e:
-                await asyncio.sleep(0.01)
+                await asyncio.sleep(Timeouts.TTY_WRITE_DELAY)
         reader.feed_eof()
 
     # Start pumping output in background
@@ -243,7 +243,7 @@ async def _spawn_winpty(cmd, cwd, env, echo):
             child.write(d)
 
         async def drain(self):
-            await asyncio.sleep(0.01)  # Give write time to complete
+            await asyncio.sleep(Timeouts.TTY_WRITE_DELAY)
 
     class _Proc:
         def __init__(self):
@@ -254,7 +254,7 @@ async def _spawn_winpty(cmd, cwd, env, echo):
 
         async def wait(self):
             while child.isalive():
-                await asyncio.sleep(0.2)
+                await asyncio.sleep(Timeouts.TTY_READ_CHUNK_DELAY)
             self.returncode = 0
             return 0
 

@@ -1,8 +1,8 @@
-import * as msgs from "/js/messages.js";
-import * as api from "/js/api.js";
-import * as css from "/js/css.js";
-import { sleep } from "/js/sleep.js";
-import { STORAGE_KEYS, TIMING } from "/js/constants.js";
+import * as msgs from "/js/messages.min.js";
+import * as api from "/js/api.min.js";
+import * as css from "/js/css.min.js";
+import { sleep } from "/js/sleep.min.js";
+import { STORAGE_KEYS, TIMING } from "/js/constants.min.js";
 import { store as attachmentsStore } from "/components/chat/attachments/attachmentsStore.min.js";
 import { store as speechStore } from "/components/chat/speech/speech-store.min.js";
 import { store as notificationStore } from "/components/notifications/notification-store.min.js";

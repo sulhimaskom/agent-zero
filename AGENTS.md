@@ -12,7 +12,7 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 ```
 ./
 ├── agents/              # Agent profiles (_example, agent0, brocula, default, developer, hacker, researcher) with custom prompts/tools/extensions
-├── prompts/             # 96 system prompts defining framework behavior (fw.* = framework, agent.system.* = agent behavior)
+├── prompts/             # 104 system prompts defining framework behavior (fw.* = framework, agent.system.* = agent behavior)
 ├── python/
 │   ├── api/            # 63 Flask API endpoints (auto-registered via ApiHandler base class)
 │   ├── helpers/        # 73 utility modules (memory, history, settings, mcp, scheduler)
@@ -215,14 +215,14 @@ docker run -p 50001:80 agent0ai/agent-zero
 | Simplicity | 10% | 6/10 | Large modules (settings.py: 1749 lines) |
 | Modularity | 15% | 9/15 | Extensions good, some too large |
 | Consistency | 5% | 3/5 | Mixed patterns |
-| **Testability** | **15%** | **3/15** | **Only 8 test files for 224 files (~4%)** |
+| **Testability** | **15%** | **3/15** | **Only 8 test files for 225 files (~4%)** |
 | Maintainability | 10% | 5/10 | Complexity hotspot in helpers/ |
 | **Error Handling** | **10%** | **7/10** | **Fixed: 62 bare exception handlers → 0** |
 | Dependencies | 5% | 4/5 | Well-defined requirements |
 | Determinism | 5% | 5/5 | No randomness issues |
 
 **Critical Issues:**
-1. **Test Coverage Crisis**: Only 8 test files for 224 Python files (~4% coverage)
+1. **Test Coverage Crisis**: Only 8 test files for 225 Python files (~4% coverage)
 2. ~~**Error Handling**: 182 broad `except Exception` handlers mask bugs~~ ✅ **FIXED**: 62 bare `except Exception:` handlers converted to `except Exception as e:`
 3. **Type Safety**: 174 `# type: ignore` comments bypass type checking
 4. **Observability**: PrintStyle logging is intentional framework behavior (not bare print statements)
@@ -316,4 +316,4 @@ docker run -p 50001:80 agent0ai/agent-zero
 ✅ **Verified test suite**: All 29 tests passing
 ✅ **No syntax errors**: All modified files compile successfully
 ✅ **Pre-commit hooks**: Already configured (ruff, black, mypy, prettier)
-✅ **Updated AGENTS.md**: Refreshed statistics (224 Python files, 582 JS files, 33,009 lines Python, 19,626 lines JS)
+✅ **Updated AGENTS.md**: Refreshed statistics (225 Python files, 582 JS files, 33,838 lines Python, 19,626 lines JS)

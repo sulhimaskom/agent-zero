@@ -32,7 +32,7 @@ from python.helpers import (  # noqa: E402
     history,
     tokens,
 )
-from python.helpers.constants import Config  # noqa: E402
+from python.helpers.constants import Config, Timeouts  # noqa: E402
 from python.helpers.defer import DeferredTask  # noqa: E402
 from python.helpers.errors import RepairableException  # noqa: E402
 from python.helpers.extension import call_extensions  # noqa: E402
@@ -679,7 +679,7 @@ class Agent:
 
     async def handle_intervention(self, progress: str = ""):
         while self.context.paused:
-            await asyncio.sleep(0.1)  # wait if paused
+            await asyncio.sleep(Timeouts.AGENT_PAUSE_CHECK_DELAY)
         if self.intervention:  # if there is an intervention message, but not yet processed
             msg = self.intervention
             self.intervention = None  # reset the intervention message
@@ -698,7 +698,7 @@ class Agent:
 
     async def wait_if_paused(self):
         while self.context.paused:
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(Timeouts.AGENT_PAUSE_CHECK_DELAY)
 
     async def process_tools(self, msg: str) -> str | None:
         """Process tool usage requests in agent message."""

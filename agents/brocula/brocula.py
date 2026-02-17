@@ -11,6 +11,8 @@ import sys
 from datetime import datetime
 from pathlib import Path
 
+from python.helpers.constants import Timeouts
+
 BROCULA_PROMPT = """
 ultrawork
 
@@ -163,7 +165,7 @@ def run_brocula():
             ["opencode", "run", BROCULA_PROMPT, "--model", "opencode/kimi-k2.5-free"],
             capture_output=False,
             text=True,
-            timeout=7200,  # 2 hour timeout
+            timeout=Timeouts.BROCULA_OPCODE_TIMEOUT,
         )
         return result.returncode == 0
     except subprocess.TimeoutExpired:
