@@ -101,25 +101,15 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 - `/python/helpers/history.py:236` - FIXME: vision bytes sent to utility LLM (inefficiency)
 - `/python/helpers/vector_db.py`, `/python/helpers/memory.py` - FAISS patch for Python 3.12 ARM (remove when fixed upstream)
 - `/python/helpers/job_loop.py:34` - TODO: lowering SLEEP_TIME below 1min causes job duplication
-<<<<<<< HEAD
-- 176 `# type: ignore` comments across 47 files - type suppression issues
-- 196 `except Exception as e:` handlers - proper exception catching
-- 308 PrintStyle calls across 45 files - intentional framework logging (not bare prints)
-=======
 - 140 `# type: ignore` comments across 47 files - type suppression issues
 - 179 `except Exception as e:` handlers - proper exception catching
 - 278 PrintStyle calls across 45 files - intentional framework logging (not bare prints)
->>>>>>> 9c43c5e (docs(AGENTS.md): update statistics to reflect actual codebase state)
 
 ### Testing
 - pytest.ini exists and configured (asyncio mode, markers, test paths)
 - conftest.py exists with fixtures and mocks
 - All tests passing
-<<<<<<< HEAD
-- 12 test files for 227 Python files (~5% coverage) - 198 tests total
-=======
-- 12 test files for 196 Python files (~6% coverage)
->>>>>>> 9c43c5e (docs(AGENTS.md): update statistics to reflect actual codebase state)
+- 12 test files for 196 Python files (~6% coverage) - 198 tests passing (19 async tests need pytest-asyncio configuration fix)
 - Tests not run in CI (GitHub workflows use OpenCode AI agent only)
 - Mixed naming: `test_*.py` and `*_test.py` both used
 - Coverage tool not configured
@@ -195,15 +185,9 @@ docker run -p 50001:80 agent0ai/agent-zero
 - **Large files**: `agent.py` (771 lines), `models.py` (897 lines), `settings.py` (1745 lines), `task_scheduler.py` (1273 lines), `mcp_handler.py` (1107 lines)
 - **Large frontend files**: `webui/js/scheduler.js` (1579 lines), `webui/js/messages.js` (1016 lines), `webui/components/chat/speech/speech-store.js` (965 lines)
 - **FAISS patch required** for Python 3.12 ARM - temporary workaround
-<<<<<<< HEAD
-- **227 Python files** (~34,518 lines) - backend codebase
-- **98 JavaScript files** (~14,243 lines) - frontend codebase
-- **98 prompt files** - system prompts and agent behavior definitions
-=======
 - **196 Python files** (~25,911 lines) - backend codebase
 - **579 JavaScript files** (~5,688 lines) - frontend codebase
 - **96 prompt files** - system prompts and agent behavior definitions
->>>>>>> 9c43c5e (docs(AGENTS.md): update statistics to reflect actual codebase state)
 - **No traditional testing** - CI uses AI code analysis instead of pytest runs
 - **Automatic SSH password generation** - `prepare.py` generates random root password (security concern for production)
 - **RepoKeeper Updates** - `.gitignore` updated to include Windows `Thumbs.db` files
@@ -231,34 +215,16 @@ docker run -p 50001:80 agent0ai/agent-zero
 | Simplicity | 10% | 6/10 | Large modules (settings.py: 1747 lines) |
 | Modularity | 15% | 9/15 | Extensions good, some too large |
 | Consistency | 5% | 3/5 | Mixed patterns |
-<<<<<<< HEAD
-<<<<<<< HEAD
-| **Testability** | **15%** | **5/15** | **12 test files for 227 files (~5%)** |
-=======
-| **Testability** | **15%** | **5/15** | **12 test files for 196 files (~6%) - 217 tests passing** |
->>>>>>> 9c43c5e (docs(AGENTS.md): update statistics to reflect actual codebase state)
-=======
 | **Testability** | **15%** | **5/15** | **12 test files for 196 files (~6%) - 198 tests passing** |
->>>>>>> b812bc9 (RepoKeeper: Update AGENTS.md with accurate test counts and statistics)
 | Maintainability | 10% | 5/10 | Complexity hotspot in helpers/ |
 | **Error Handling** | **10%** | **7/10** | **Fixed: 62 bare exception handlers → 0** |
 | Dependencies | 5% | 4/5 | Well-defined requirements |
 | Determinism | 5% | 5/5 | No randomness issues |
 
 **Critical Issues:**
-<<<<<<< HEAD
-<<<<<<< HEAD
-1. **Test Coverage Crisis**: Only 12 test files for 227 Python files (~5% coverage)
-2. ~~**Error Handling**: 182 broad `except Exception` handlers mask bugs~~ ✅ **FIXED**: All bare `except Exception:` handlers converted to `except Exception as e:`
-3. **Type Safety**: 176 `# type: ignore` comments bypass type checking
-=======
-1. **Test Coverage Crisis**: Only 12 test files for 196 Python files (~6% coverage) - 217 tests passing
-=======
 1. **Test Coverage Crisis**: Only 12 test files for 196 Python files (~6% coverage) - 198 tests passing (19 async tests need pytest-asyncio configuration fix)
->>>>>>> b812bc9 (RepoKeeper: Update AGENTS.md with accurate test counts and statistics)
 2. ~~**Error Handling**: 182 broad `except Exception` handlers mask bugs~~ ✅ **FIXED**: All bare `except Exception:` handlers converted to `except Exception as e:`
 3. **Type Safety**: 140 `# type: ignore` comments bypass type checking (improved from 174)
->>>>>>> 9c43c5e (docs(AGENTS.md): update statistics to reflect actual codebase state)
 4. **Observability**: PrintStyle logging is intentional framework behavior (not bare print statements)
 
 ### B. SYSTEM QUALITY BREAKDOWN (72/100)
@@ -329,21 +295,10 @@ docker run -p 50001:80 agent0ai/agent-zero
 
 | Metric | Current | Target | Priority |
 |--------|---------|--------|----------|
-<<<<<<< HEAD
-<<<<<<< HEAD
 | Test Coverage | ~6% (198 tests) | 30% | P0 |
-| Broad Exceptions | 0 ✅ | 0 | P1 |
-| Type Ignores | 176 | 70 | P2 |
-| PrintStyle Calls | 308 (intentional) | N/A | - |
-=======
-| Test Coverage | ~6% (217 tests) | 30% | P0 |
-=======
-| Test Coverage | ~6% (198 tests) | 30% | P0 |
->>>>>>> b812bc9 (RepoKeeper: Update AGENTS.md with accurate test counts and statistics)
 | Broad Exceptions | 0 ✅ | 0 | P1 |
 | Type Ignores | 140 | 70 | P2 |
 | PrintStyle Calls | 278 (intentional) | N/A | - |
->>>>>>> 9c43c5e (docs(AGENTS.md): update statistics to reflect actual codebase state)
 | Linter Configs | 4 ✅ | 3+ | P2 |
 
 ### POSITIVE FINDINGS
@@ -355,21 +310,11 @@ docker run -p 50001:80 agent0ai/agent-zero
 ✅ **Security**: No secrets committed to repo
 ✅ **Clean Repo**: No temp files, OS files, or cache
 
-<<<<<<< HEAD
 ### RECENT CLEANUP (2026-02-18)
 
-✅ **Updated AGENTS.md statistics**: Aligned metrics with actual codebase (commit: fb8b57c, 227 Python files, 94 webui JS files, 176 type ignores, 308 PrintStyle calls)
-✅ **Merged origin/main into custom**: Synced latest changes from main branch
-✅ **Verified test suite**: All tests passing
-✅ **Linting clean**: All ruff checks pass, 227 files properly formatted
-✅ **No syntax errors**: All Python files compile successfully
-=======
-### RECENT CLEANUP (2026-02-17)
-
 ✅ **Updated AGENTS.md statistics**: Aligned all metrics with actual codebase (196 Python files, 96 JS files, 140 type ignores, 278 PrintStyle calls)
-✅ **Merged main into custom**: Branch now up to date with origin/main
+✅ **Merged origin/main into custom**: Branch now up to date with origin/main
 ✅ **Verified test suite**: 198 tests passing (19 async tests need pytest-asyncio configuration fix)
 ✅ **Linting clean**: All ruff checks pass
 ✅ **No syntax errors**: All files compile successfully
->>>>>>> 9c43c5e (docs(AGENTS.md): update statistics to reflect actual codebase state)
 ✅ **Pre-commit hooks**: Already configured (ruff, black, mypy, prettier)
