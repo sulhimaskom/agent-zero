@@ -2,8 +2,8 @@
 
 **Generated:** 2026-02-18
 **Branch:** custom
-**Commit:** 3028b71
-**Last RepoKeeper Run:** 2026-02-18 (Repository maintenance - synchronized with main, linting verified, statistics updated)
+**Commit:** 60a4d28
+**Last RepoKeeper Run:** 2026-02-18 (Repository maintenance - synchronized with main, linting verified, statistics updated, 4 files reformatted)
 
 ## OVERVIEW
 Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpine.js). Prompt-driven behavior - everything controlled by `/prompts/` markdown files. Grows organically through memory, tools, extensions, and agent profiles.
@@ -101,9 +101,9 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 - `/python/helpers/history.py:236` - FIXME: vision bytes sent to utility LLM (inefficiency)
 - `/python/helpers/vector_db.py`, `/python/helpers/memory.py` - FAISS patch for Python 3.12 ARM (remove when fixed upstream)
 - `/python/helpers/job_loop.py:34` - TODO: lowering SLEEP_TIME below 1min causes job duplication
-- 141 `# type: ignore` comments across 47 files - type suppression issues
+- 176 `# type: ignore` comments across 47 files - type suppression issues
 - 175 `except Exception as e:` handlers - proper exception catching
-- 278 PrintStyle calls across 45 files - intentional framework logging (not bare prints)
+- 308 PrintStyle calls across 45 files - intentional framework logging (not bare prints)
 
 ### Testing
 - pytest.ini exists and configured (asyncio mode, markers, test paths)
@@ -185,7 +185,7 @@ docker run -p 50001:80 agent0ai/agent-zero
 - **Large files**: `agent.py` (771 lines), `models.py` (905 lines), `settings.py` (1745 lines), `task_scheduler.py` (1284 lines), `mcp_handler.py` (1109 lines)
 - **Large frontend files**: `webui/js/scheduler.js` (1579 lines), `webui/js/messages.js` (1016 lines), `webui/components/chat/speech/speech-store.js` (965 lines)
 - **FAISS patch required** for Python 3.12 ARM - temporary workaround
-- **196 Python files** (~27,603 lines) - backend codebase
+- **228 Python files** (~27,603 lines) - backend codebase
 - **582 JavaScript files** (~19,590 lines) - frontend codebase
 - **96 prompt files** - system prompts and agent behavior definitions
 - **No traditional testing** - CI uses AI code analysis instead of pytest runs
