@@ -545,7 +545,7 @@ async def read_messages(
     port: int = Limits.IMAP_DEFAULT_PORT,
     username: str = "",
     password: str = "",
-    download_folder: str = Paths.EMAIL_DIR,
+    download_folder: str = Paths.EMAIL_INBOX_PATH,
     options: dict[str, Any] | None = None,
     filter: dict[str, Any] | None = None,
 ) -> list[Message]:
