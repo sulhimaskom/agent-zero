@@ -1875,3 +1875,162 @@ nav ul li a img {
   width: 100%;
   display: contents;
 }
+
+/* ============================================
+   UNIFIED COPY FEEDBACK MICRO-INTERACTION
+   Delightful visual feedback for copy-to-clipboard actions
+   ============================================ */
+
+/* Base copy button styles */
+.copy-btn {
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Copy success state - adds scale pulse and color shift */
+.copy-btn.copied,
+.copy-btn[data-copied="true"] {
+  color: #4CAF50;
+  transform: scale(1.05);
+  animation: copy-feedback-success 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Copy error state - shake animation */
+.copy-btn.copy-error,
+.copy-btn[data-copied="error"] {
+  color: #F44336;
+  animation: copy-feedback-error 0.4s ease;
+}
+
+/* Icon transition within copy buttons */
+.copy-btn .material-symbols-outlined {
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+/* Success icon pop effect */
+.copy-btn.copied .material-symbols-outlined,
+.copy-btn[data-copied="true"] .material-symbols-outlined {
+  transform: scale(1.2);
+}
+
+/* Keyframe animations for copy feedback */
+@keyframes copy-feedback-success {
+  0% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(1.15);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  70% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes copy-feedback-error {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  20%, 60% {
+    transform: translateX(-4px);
+  }
+  40%, 80% {
+    transform: translateX(4px);
+  }
+}
+
+/* Subtle glow effect on success (dark mode optimized) */
+.copy-btn.copied::after,
+.copy-btn[data-copied="true"]::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  background: radial-gradient(circle, rgba(76, 175, 80, 0.3) 0%, transparent 70%);
+  opacity: 0;
+  animation: copy-glow-fade 0.6s ease-out;
+  pointer-events: none;
+  z-index: -1;
+}
+
+@keyframes copy-glow-fade {
+  0% {
+    opacity: 1;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+/* Reduced motion support for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .copy-btn.copied,
+  .copy-btn[data-copied="true"],
+  .copy-btn.copy-error,
+  .copy-btn[data-copied="error"] {
+    animation: none;
+    transform: none;
+  }
+  
+  .copy-btn.copied .material-symbols-outlined,
+  .copy-btn[data-copied="true"] .material-symbols-outlined {
+    transform: none;
+  }
+  
+  .copy-btn.copied::after,
+  .copy-btn[data-copied="true"]::after {
+    animation: none;
+  }
+}
+
+/* Light mode adjustments */
+.light-mode .copy-btn.copied,
+.light-mode .copy-btn[data-copied="true"] {
+  color: #2E7D32;
+}
+
+.light-mode .copy-btn.copy-error,
+.light-mode .copy-btn[data-copied="error"] {
+  color: #C62828;
+}
+
+/* Copy tooltip enhancement - brief success message */
+.copy-tooltip {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 12px;
+  background: var(--color-secondary);
+  color: var(--color-text);
+  border-radius: 6px;
+  font-size: 12px;
+  white-space: nowrap;
+  z-index: 1002;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  margin-bottom: 8px;
+}
+
+.copy-tooltip.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-4px);
+}
+
+.copy-tooltip::after {
+  content: '';
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 6px solid transparent;
+  border-top-color: var(--color-secondary);
+}
