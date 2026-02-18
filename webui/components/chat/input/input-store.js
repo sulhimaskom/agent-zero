@@ -13,6 +13,11 @@ const model = {
   placeholderTyping: false,
   placeholderInterval: null,
 
+  // Character counter for accessibility and UX
+  characterCount: 0,
+  maxCharacterLimit: 10000,
+  characterWarningThreshold: 8000,
+
   // Rotating placeholder messages - mix of helpful hints and personality
   placeholderMessages: [
     "Type your message here...",
@@ -116,6 +121,29 @@ const model = {
       chatInput.style.height = "auto";
       chatInput.style.height = chatInput.scrollHeight + "px";
     }
+  },
+
+  /**
+   * Updates character count from textarea input
+   * Called on input events to track message length
+   */
+  updateCharacterCount() {
+    const chatInput = document.getElementById("chat-input");
+    if (chatInput) {
+      this.characterCount = chatInput.value.length;
+    }
+  },
+
+  /**
+   * Returns visual status for character counter UI
+   * - 'normal': below warning threshold
+   * - 'warning': approaching limit
+   * - 'critical': at or exceeding limit
+   */
+  getCharacterStatus() {
+    if (this.characterCount >= this.maxCharacterLimit) return 'critical';
+    if (this.characterCount >= this.characterWarningThreshold) return 'warning';
+    return 'normal';
   },
 
   async pauseAgent(paused) {

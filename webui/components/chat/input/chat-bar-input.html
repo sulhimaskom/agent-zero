@@ -37,9 +37,23 @@
                       :class="{ 'placeholder-typing': $store.chatInput.placeholderTyping }"
                       rows="1"
                       @keydown.enter="if (!$event.shiftKey && !$event.isComposing && $event.keyCode !== 229) { $event.preventDefault(); $store.chatInput.sendMessage(); }"
-                      @input="$store.chatInput.adjustTextareaHeight(); $el.classList.add('typing'); clearTimeout($el._typingTimeout); $el._typingTimeout = setTimeout(() => $el.classList.remove('typing'), 500)"
+                      @input="$store.chatInput.adjustTextareaHeight(); $store.chatInput.updateCharacterCount(); $el.classList.add('typing'); clearTimeout($el._typingTimeout); $el._typingTimeout = setTimeout(() => $el.classList.remove('typing'), 500)"
                       @focus="$store.chatInput.stopPlaceholderRotation()"
                       @blur="$store.chatInput.startPlaceholderRotation()"></textarea>
+            <!-- Character Counter -->
+            <div class="character-counter"
+                 :class="$store.chatInput.getCharacterStatus()"
+                 x-show="$store.chatInput.characterCount > 0"
+                 x-transition:enter="counter-enter"
+                 x-transition:enter-start="counter-enter-start"
+                 x-transition:enter-end="counter-enter-end"
+                 x-transition:leave="counter-leave"
+                 x-transition:leave-start="counter-leave-start"
+                 x-transition:leave-end="counter-leave-end">
+                <span class="counter-current" x-text="$store.chatInput.characterCount"></span>
+                <span class="counter-separator">/</span>
+                <span class="counter-max" x-text="$store.chatInput.maxCharacterLimit"></span>
+            </div>
             <button id="expand-button"
                     @click="$store.fullScreenInputModal.openModal()"
                     aria-label="Expand input for easier editing (Ctrl+Shift+F)"
@@ -275,8 +289,101 @@
     #expand-button { position: absolute; top: 12px; right: 10px; background: transparent; border: none; cursor: pointer; font-size: 1.2rem; color: var(--color-text); opacity: 0.4; transition: opacity 0.2s; }
     #expand-button:hover { opacity: 0.7; }
     #expand-button:active { opacity: 1; }
-    #expand-button:focus-visible { opacity: 1; outline: 2px solid var(--color-highlight); outline-offset: 2px; border-radius: 4px; }
+    #expand-button:focus-visible { opacity: 1; outline: 2px solid var(--color-highlight); outline-offset: 2px; }
     #expand-button svg { width: 1.3rem; height: 1.3rem; }
+
+    /* Character Counter Styles */
+    .character-counter {
+        position: absolute;
+        bottom: 8px;
+        right: 44px;
+        font-size: 0.7rem;
+        font-family: var(--font-family-code);
+        padding: 2px 8px;
+        border-radius: 12px;
+        background: rgba(128, 128, 128, 0.15);
+        color: var(--color-text);
+        opacity: 0.7;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        z-index: 10;
+    }
+
+    .character-counter:hover {
+        opacity: 1;
+        background: rgba(128, 128, 128, 0.25);
+    }
+
+    /* Normal state - below warning threshold */
+    .character-counter.normal {
+        color: var(--color-text);
+    }
+
+    /* Warning state - approaching limit */
+    .character-counter.warning {
+        background: rgba(255, 193, 7, 0.15);
+        color: #ffc107;
+        animation: counter-pulse-warning 2s ease-in-out infinite;
+    }
+
+    @keyframes counter-pulse-warning {
+        0%, 100% {
+            box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.3);
+        }
+        50% {
+            box-shadow: 0 0 0 4px rgba(255, 193, 7, 0);
+        }
+    }
+
+    /* Critical state - at or exceeding limit */
+    .character-counter.critical {
+        background: rgba(244, 67, 54, 0.15);
+        color: #f44336;
+        animation: counter-pulse-critical 1s ease-in-out infinite;
+    }
+
+    @keyframes counter-pulse-critical {
+        0%, 100% {
+            box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.4);
+        }
+        50% {
+            box-shadow: 0 0 0 4px rgba(244, 67, 54, 0);
+        }
+    }
+
+    .counter-current {
+        font-weight: 600;
+    }
+
+    .counter-separator {
+        opacity: 0.5;
+    }
+
+    .counter-max {
+        opacity: 0.6;
+        font-size: 0.65rem;
+    }
+
+    /* Character Counter Transitions */
+    .counter-enter { transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+    .counter-enter-start { opacity: 0; transform: translateY(5px) scale(0.9); }
+    .counter-enter-end { opacity: 0.7; transform: translateY(0) scale(1); }
+
+    .counter-leave { transition: all 0.15s ease; }
+    .counter-leave-start { opacity: 0.7; transform: translateY(0) scale(1); }
+    .counter-leave-end { opacity: 0; transform: translateY(5px) scale(0.9); }
+
+    /* Accessibility: Respect reduced motion preferences */
+    @media (prefers-reduced-motion: reduce) {
+        .character-counter,
+        .character-counter.warning,
+        .character-counter.critical {
+            animation: none;
+            transition: opacity 0.2s ease;
+        }
+    }
 
     /* Expand button tooltip */
     .expand-tooltip { position: absolute; top: -40px; right: 0; transform: none; left: auto; margin-bottom: 0; white-space: nowrap; }
