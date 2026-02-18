@@ -77,6 +77,7 @@ class Timeouts:
     # MCP timeouts
     MCP_CLIENT_INIT_TIMEOUT: Final[int] = 10
     MCP_CLIENT_TOOL_TIMEOUT: Final[int] = 120
+    MCP_CLIENT_SESSION_TIMEOUT: Final[int] = 60  # Default session read timeout
 
     # Document query timeouts
     DOCUMENT_DOWNLOAD_TIMEOUT: Final[float] = 10.0
@@ -131,6 +132,7 @@ class Timeouts:
     BROCULA_COMMAND_TIMEOUT: Final[int] = 60  # Default timeout for Brocula commands
     BROCULA_LIGHTHOUSE_TIMEOUT: Final[int] = 120  # Timeout for Brocula lighthouse runs
     BROCULA_OPCODE_TIMEOUT: Final[int] = 7200  # 2 hour timeout for Brocula OpenCode execution
+    BROCULA_PAGE_NAV_TIMEOUT: Final[int] = 30000  # Page navigation timeout for Playwright (30s in ms)
 
     # TTY session delays
     TTY_DRAIN_DELAY: Final[float] = 0  # Delay for TTY drain operation

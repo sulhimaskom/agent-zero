@@ -4,6 +4,8 @@ import hmac
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
 
+from python.helpers.constants import Limits
+
 
 def hash_data(data: str, password: str):
     return hmac.new(password.encode(), data.encode(), hashlib.sha256).hexdigest()
@@ -15,8 +17,8 @@ def verify_data(data: str, hash: str, password: str):
 
 def _generate_private_key():
     return rsa.generate_private_key(
-        public_exponent=65537,
-        key_size=2048,
+        public_exponent=Limits.RSA_PUBLIC_EXPONENT,
+        key_size=Limits.RSA_KEY_SIZE,
     )
 
 

@@ -420,9 +420,7 @@ class MCPConfig(BaseModel):
                             f"Error: Parsed MCP config (from json.loads) top-level structure is not a list. Config string was: '{config_str}'"
                         )
                         # servers_data remains empty
-                except (
-                    Exception
-                ) as e_json:  # Catch json.JSONDecodeError specifically if possible, or general Exception
+                except Exception as e_json:  # Catch json.JSONDecodeError specifically if possible, or general Exception
                     PrintStyle.error(
                         f"Error parsing MCP config string: {e_json}. Config string was: '{config_str}'"
                     )
@@ -795,7 +793,9 @@ class MCPClientBase(ABC):
 
     # Protected method
     @abstractmethod
-    async def _create_stdio_transport(self, current_exit_stack: AsyncExitStack) -> tuple[
+    async def _create_stdio_transport(
+        self, current_exit_stack: AsyncExitStack
+    ) -> tuple[
         MemoryObjectReceiveStream[SessionMessage | Exception],
         MemoryObjectSendStream[SessionMessage],
     ]:
@@ -805,7 +805,7 @@ class MCPClientBase(ABC):
     async def _execute_with_session(
         self,
         coro_func: Callable[[ClientSession], Awaitable[T]],
-        read_timeout_seconds=60,
+        read_timeout_seconds=Timeouts.MCP_CLIENT_SESSION_TIMEOUT,
     ) -> T:
         """
         Manages the lifecycle of an MCP session for a single operation.
@@ -981,7 +981,9 @@ class MCPClientLocal(MCPClientBase):
                 self.log_file.close()
             self.log_file = None
 
-    async def _create_stdio_transport(self, current_exit_stack: AsyncExitStack) -> tuple[
+    async def _create_stdio_transport(
+        self, current_exit_stack: AsyncExitStack
+    ) -> tuple[
         MemoryObjectReceiveStream[SessionMessage | Exception],
         MemoryObjectSendStream[SessionMessage],
     ]:
@@ -1053,7 +1055,9 @@ class MCPClientRemote(MCPClientBase):
         self.session_id: str | None = None  # Track session ID for streaming HTTP clients
         self.session_id_callback: Callable[[], str | None] | None = None
 
-    async def _create_stdio_transport(self, current_exit_stack: AsyncExitStack) -> tuple[
+    async def _create_stdio_transport(
+        self, current_exit_stack: AsyncExitStack
+    ) -> tuple[
         MemoryObjectReceiveStream[SessionMessage | Exception],
         MemoryObjectSendStream[SessionMessage],
     ]:

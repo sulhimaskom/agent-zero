@@ -31,7 +31,7 @@ class BrowserConsoleChecker(Tool):
         Check browser console for errors and warnings.
 
         Args:
-            url: The URL to navigate to (default: http://localhost:50001)
+            url: The URL to navigate to (default: uses Network.DEFAULT_HOSTNAME and Network.BROCULA_PORT_DEFAULT)
             wait_time: Time to wait after page load for console messages (default: 5 seconds)
         """
         if url is None:
