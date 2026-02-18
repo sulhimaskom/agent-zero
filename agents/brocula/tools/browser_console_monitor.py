@@ -1,4 +1,5 @@
 import asyncio
+
 from python.helpers.tool import Response, Tool
 
 
@@ -42,19 +43,23 @@ class BrowserConsoleMonitor(Tool):
             failed_requests = []
 
             def handle_console(msg):
-                logs.append({
-                    "type": msg.type,
-                    "text": msg.text,
-                    "location": str(msg.location) if hasattr(msg, "location") else None,
-                })
+                logs.append(
+                    {
+                        "type": msg.type,
+                        "text": msg.text,
+                        "location": str(msg.location) if hasattr(msg, "location") else None,
+                    }
+                )
 
             def handle_response(response):
                 if response.status >= 400:
-                    failed_requests.append({
-                        "url": response.url,
-                        "status": response.status,
-                        "status_text": response.status_text,
-                    })
+                    failed_requests.append(
+                        {
+                            "url": response.url,
+                            "status": response.status,
+                            "status_text": response.status_text,
+                        }
+                    )
 
             async with async_playwright() as p:
                 browser = await p.chromium.launch(headless=True)
@@ -76,9 +81,9 @@ class BrowserConsoleMonitor(Tool):
                 await browser.close()
 
             # Analyze results
-            errors = [l for l in logs if l["type"] == "error"]
-            warnings = [l for l in logs if l["type"] == "warning"]
-            info_logs = [l for l in logs if l["type"] not in ["error", "warning"]]
+            errors = [log for log in logs if log["type"] == "error"]
+            warnings = [log for log in logs if log["type"] == "warning"]
+            info_logs = [log for log in logs if log["type"] not in ["error", "warning"]]
 
             # Generate report
             report_lines = [f"Browser Console Report for {url}", "=" * 60, ""]
@@ -127,7 +132,11 @@ class BrowserConsoleMonitor(Tool):
             if capture_level == "all" and logs:
                 report_lines.append("📋 ALL LOGS:")
                 for log in logs[:20]:  # Limit output
-                    icon = "🔴" if log["type"] == "error" else "🟡" if log["type"] == "warning" else "ℹ️"
+                    icon = (
+                        "🔴"
+                        if log["type"] == "error"
+                        else "🟡" if log["type"] == "warning" else "ℹ️"
+                    )
                     text = log["text"][:100] + "..." if len(log["text"]) > 100 else log["text"]
                     report_lines.append(f"  {icon} [{log['type']}] {text}")
                 if len(logs) > 20:
@@ -137,10 +146,14 @@ class BrowserConsoleMonitor(Tool):
             report_lines.append("")
             report_lines.append("=" * 60)
             if errors:
-                report_lines.append(f"⚠️  Status: {len(errors)} console error(s) found - NEEDS ATTENTION")
+                report_lines.append(
+                    f"⚠️  Status: {len(errors)} console error(s) found - NEEDS ATTENTION"
+                )
                 has_issues = True
             elif warnings:
-                report_lines.append(f"⚠️  Status: {len(warnings)} warning(s) found - Review recommended")
+                report_lines.append(
+                    f"⚠️  Status: {len(warnings)} warning(s) found - Review recommended"
+                )
                 has_issues = True
             else:
                 report_lines.append("✅ Status: Console is clean!")
