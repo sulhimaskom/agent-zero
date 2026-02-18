@@ -18,7 +18,7 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 │   ├── helpers/        # 74 utility modules (memory, history, settings, mcp, scheduler)
 │   ├── tools/          # 19 default tools (code_execution, browser_agent, memory_*, call_subordinate)
 │   └── extensions/     # 35 extension files across 23 lifecycle hook points (message_loop_*, response_stream*, system_prompt)
-├── webui/              # Frontend (Alpine.js stores, modular components, 582 JS files)
+├── webui/              # Frontend (Alpine.js stores, modular components, 586 JS files)
 │   ├── components/     # chat/, settings/, sidebar/, modals/, projects/, notifications/
 │   ├── js/            # ES modules, stores (scheduler.js 1579 lines, messages.js 1016 lines)
 │   └── css/           # Styling
@@ -185,8 +185,8 @@ docker run -p 50001:80 agent0ai/agent-zero
 - **Large files**: `agent.py` (771 lines), `models.py` (905 lines), `settings.py` (1745 lines), `task_scheduler.py` (1284 lines), `mcp_handler.py` (1109 lines)
 - **Large frontend files**: `webui/js/scheduler.js` (1579 lines), `webui/js/messages.js` (1016 lines), `webui/components/chat/speech/speech-store.js` (965 lines)
 - **FAISS patch required** for Python 3.12 ARM - temporary workaround
-- **204 Python files** (~25,988 lines) - backend codebase
-- **582 JavaScript files** (~19,590 lines) - frontend codebase
+- **228 Python files** (~34,834 lines) - backend codebase
+- **586 JavaScript files** (~20,094 lines) - frontend codebase
 - **96 prompt files** - system prompts and agent behavior definitions
 - **No traditional testing** - CI uses AI code analysis instead of pytest runs
 - **Automatic SSH password generation** - `prepare.py` generates random root password (security concern for production)
@@ -314,7 +314,7 @@ docker run -p 50001:80 agent0ai/agent-zero
 
 ✅ **Branch status**: Custom branch is 30 commits ahead of main
 ✅ **Verified repository cleanliness**: No .pyc, __pycache__, .DS_Store, Thumbs.db, or temp files found
-✅ **Updated AGENTS.md statistics**: 204 Python files, 582 JS files, 177 Markdown files, 176 type ignores, 278 PrintStyle calls, 25,988 Python LOC, 19,590 JS LOC
+✅ **Updated AGENTS.md statistics**: 228 Python files, 586 JS files, 176 Markdown files, 176 type ignores, 278 PrintStyle calls, 34,834 Python LOC, 20,094 JS LOC
 ✅ **Linting verified**: All ruff checks passed
 ✅ **Code formatting**: Fixed formatting in python/helpers/constants.py
 ✅ **Branch synchronized**: Merged latest changes from origin/main
