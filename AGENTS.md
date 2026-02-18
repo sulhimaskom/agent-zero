@@ -2,7 +2,7 @@
 
 **Generated:** 2026-02-18
 **Branch:** custom
-**Commit:** 76bc550
+**Commit:** 3028b71
 **Last RepoKeeper Run:** 2026-02-18 (Repository maintenance - synchronized with main, linting verified, statistics updated)
 
 ## OVERVIEW
@@ -96,14 +96,14 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 
 ### Code Smells (TODOs to address)
 - `/python/helpers/settings.py` - Uses `defer.run_in_background()` at lines 1558, 1616, 1621, 1631, 1643 to refactor blocking operations - CRITICAL complexity hotspot
-- `/python/helpers/task_scheduler.py` - 1270 lines, TODO about splitting task types from scheduler logic
-- `/python/helpers/mcp_handler.py` - 1107 lines, TODO about inline prompts (lines 742-744)
+- `/python/helpers/task_scheduler.py` - 1284 lines, TODO about splitting task types from scheduler logic
+- `/python/helpers/mcp_handler.py` - 1109 lines, TODO about inline prompts (lines 742-744)
 - `/python/helpers/history.py:236` - FIXME: vision bytes sent to utility LLM (inefficiency)
 - `/python/helpers/vector_db.py`, `/python/helpers/memory.py` - FAISS patch for Python 3.12 ARM (remove when fixed upstream)
 - `/python/helpers/job_loop.py:34` - TODO: lowering SLEEP_TIME below 1min causes job duplication
-- 176 `# type: ignore` comments across 47 files - type suppression issues
-- 179 `except Exception as e:` handlers - proper exception catching
-- 308 PrintStyle calls across 45 files - intentional framework logging (not bare prints)
+- 141 `# type: ignore` comments across 47 files - type suppression issues
+- 175 `except Exception as e:` handlers - proper exception catching
+- 278 PrintStyle calls across 45 files - intentional framework logging (not bare prints)
 
 ### Testing
 - pytest.ini exists and configured (asyncio mode, markers, test paths)
@@ -182,11 +182,11 @@ docker run -p 50001:80 agent0ai/agent-zero
 - **No LSP servers installed** - relies on VS Code Python extension for type checking
 - **CI is AI-powered** - GitHub workflows use OpenCode agent, not traditional pytest/linting
 - **Settings module** (1745 lines) identified as complexity hotspot needing refactoring
-- **Large files**: `agent.py` (771 lines), `models.py` (897 lines), `settings.py` (1745 lines), `task_scheduler.py` (1273 lines), `mcp_handler.py` (1107 lines)
+- **Large files**: `agent.py` (771 lines), `models.py` (905 lines), `settings.py` (1745 lines), `task_scheduler.py` (1284 lines), `mcp_handler.py` (1109 lines)
 - **Large frontend files**: `webui/js/scheduler.js` (1579 lines), `webui/js/messages.js` (1016 lines), `webui/components/chat/speech/speech-store.js` (965 lines)
 - **FAISS patch required** for Python 3.12 ARM - temporary workaround
-- **228 Python files** (~34,709 lines) - backend codebase
-- **586 JavaScript files** (~20,066 lines) - frontend codebase
+- **196 Python files** (~27,603 lines) - backend codebase
+- **582 JavaScript files** (~19,590 lines) - frontend codebase
 - **96 prompt files** - system prompts and agent behavior definitions
 - **No traditional testing** - CI uses AI code analysis instead of pytest runs
 - **Automatic SSH password generation** - `prepare.py` generates random root password (security concern for production)
@@ -297,8 +297,8 @@ docker run -p 50001:80 agent0ai/agent-zero
 |--------|---------|--------|----------|
 | Test Coverage | ~5% (217 tests) | 30% | P0 |
 | Broad Exceptions | 0 ✅ | 0 | P1 |
-| Type Ignores | 176 | 70 | P2 |
-| PrintStyle Calls | 308 (intentional) | N/A | - |
+| Type Ignores | 141 | 70 | P2 |
+| PrintStyle Calls | 278 (intentional) | N/A | - |
 | Linter Configs | 4 ✅ | 3+ | P2 |
 
 ### POSITIVE FINDINGS
@@ -312,9 +312,9 @@ docker run -p 50001:80 agent0ai/agent-zero
 
 ### RECENT CLEANUP (2026-02-18)
 
-✅ **Synchronized with main**: Merged 7 commits from origin/main (GitHub issue templates, Phase 1 audit report)
+✅ **Synchronized with main**: Branch custom up to date with origin/custom
 ✅ **Verified repository cleanliness**: No .pyc, __pycache__, .DS_Store, Thumbs.db, or temp files found
-✅ **Updated AGENTS.md statistics**: 228 Python files (+32), 586 JS files (+4), 176 Markdown files, 176 type ignores (+34), 308 PrintStyle calls (+19), 34,709 Python LOC, 20,066 JS LOC
+✅ **Updated AGENTS.md statistics**: 196 Python files, 582 JS files, 177 Markdown files, 141 type ignores, 278 PrintStyle calls, 27,603 Python LOC, 19,590 JS LOC
 ✅ **Verified test suite**: All tests passing
 ✅ **Linting clean**: No syntax errors
 ✅ **No temporary files**: Repository clean of .pyc, .DS_Store, Thumbs.db, cache directories

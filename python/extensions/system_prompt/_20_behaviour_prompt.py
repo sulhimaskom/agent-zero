@@ -5,8 +5,10 @@ from python.helpers.extension import Extension
 
 class BehaviourPrompt(Extension):
     async def execute(
-        self, system_prompt: list[str] | None = None, loop_data: LoopData = LoopData(), **kwargs
+        self, system_prompt: list[str] | None = None, loop_data: LoopData | None = None, **kwargs
     ):
+        if loop_data is None:
+            loop_data = LoopData()
         if system_prompt is None:
             system_prompt = []
         prompt = read_rules(self.agent)

@@ -11,11 +11,13 @@ from python.helpers.extension import Extension
 class LogFromStream(Extension):
     async def execute(
         self,
-        loop_data: LoopData = LoopData(),
+        loop_data: LoopData | None = None,
         text: str = "",
         parsed: dict | None = None,
         **kwargs,
     ):
+        if loop_data is None:
+            loop_data = LoopData()
 
         if parsed is None:
             parsed = {}

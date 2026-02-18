@@ -6,7 +6,9 @@ from python.helpers.extension import Extension
 
 
 class OrganizeHistoryWait(Extension):
-    async def execute(self, loop_data: LoopData = LoopData(), **kwargs):
+    async def execute(self, loop_data: LoopData | None = None, **kwargs):
+        if loop_data is None:
+            loop_data = LoopData()
 
         # sync action only required if the history is too large, otherwise leave it in background
         while self.agent.history.is_over_limit():
