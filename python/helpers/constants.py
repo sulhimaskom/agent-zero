@@ -132,7 +132,9 @@ class Timeouts:
     BROCULA_COMMAND_TIMEOUT: Final[int] = 60  # Default timeout for Brocula commands
     BROCULA_LIGHTHOUSE_TIMEOUT: Final[int] = 120  # Timeout for Brocula lighthouse runs
     BROCULA_OPCODE_TIMEOUT: Final[int] = 7200  # 2 hour timeout for Brocula OpenCode execution
-    BROCULA_PAGE_NAV_TIMEOUT: Final[int] = 30000  # Page navigation timeout for Playwright (30s in ms)
+    BROCULA_PAGE_NAV_TIMEOUT: Final[int] = (
+        30000  # Page navigation timeout for Playwright (30s in ms)
+    )
 
     # TTY session delays
     TTY_DRAIN_DELAY: Final[float] = 0  # Delay for TTY drain operation
@@ -436,6 +438,12 @@ class Paths:
     # Code execution paths
     NODE_EVAL_SCRIPT: Final[str] = "/exe/node_eval.js"
     EMAIL_INBOX_PATH: Final[str] = "tmp/email/inbox"
+
+    # Additional tmp directories
+    CHATS_FOLDER: Final[str] = "tmp/chats"
+    PLAYWRIGHT_DIR: Final[str] = "tmp/playwright"
+    DOWNLOADS_DIR: Final[str] = "tmp/downloads"
+    UPLOAD_DIR: Final[str] = "tmp/uploads"
 
     # MCP paths
     MCP_SSE_PATH_PATTERN: Final[str] = "/t-{token}/sse"
