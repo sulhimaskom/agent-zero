@@ -446,18 +446,6 @@ class Paths:
     DOWNLOADS_DIR: Final[str] = "tmp/downloads"
     UPLOAD_DIR: Final[str] = "tmp/uploads"
 
-    # Additional tmp directories
-    CHATS_FOLDER: Final[str] = "tmp/chats"
-    PLAYWRIGHT_DIR: Final[str] = "tmp/playwright"
-    DOWNLOADS_DIR: Final[str] = "tmp/downloads"
-    UPLOAD_DIR: Final[str] = "tmp/uploads"
-
-    # Additional tmp directories
-    CHATS_FOLDER: Final[str] = "tmp/chats"
-    PLAYWRIGHT_DIR: Final[str] = "tmp/playwright"
-    DOWNLOADS_DIR: Final[str] = "tmp/downloads"
-    UPLOAD_DIR: Final[str] = "tmp/uploads"
-
     # MCP paths
     MCP_SSE_PATH_PATTERN: Final[str] = "/t-{token}/sse"
     MCP_HTTP_PATH_PATTERN: Final[str] = "/t-{token}/http"
