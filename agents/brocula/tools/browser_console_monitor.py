@@ -80,7 +80,9 @@ class BrowserConsoleMonitor(Tool):
                 page.on("response", handle_response)
 
                 try:
-                    await page.goto(url, wait_until="networkidle", timeout=Timeouts.BROCULA_PAGE_NAV_TIMEOUT)
+                    await page.goto(
+                        url, wait_until="networkidle", timeout=Timeouts.BROCULA_PAGE_NAV_TIMEOUT
+                    )
                     await asyncio.sleep(wait_time)
                 except Exception as e:
                     await browser.close()
