@@ -115,12 +115,10 @@ export async function importComponent(path, targetElement) {
               });
               const blobUrl = URL.createObjectURL(blob);
 
-              const modulePromise = import(blobUrl)
-                .catch((err) => {
-                  console.error("Failed to load inline module", err);
-                  throw err;
-                })
-                .finally(() => URL.revokeObjectURL(blobUrl));
+              const modulePromise = import(blobUrl).catch((err) => {
+                console.error("Failed to load inline module", err);
+                throw err;
+              });
 
               componentCache[virtualUrl] = modulePromise;
               loadPromises.push(modulePromise);
