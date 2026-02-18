@@ -438,6 +438,7 @@ class Paths:
     # Code execution paths
     NODE_EVAL_SCRIPT: Final[str] = "/exe/node_eval.js"
     EMAIL_INBOX_PATH: Final[str] = "tmp/email/inbox"
+    EMAIL_DIR: Final[str] = "tmp/email"
 
     # Additional tmp directories
     CHATS_FOLDER: Final[str] = "tmp/chats"
