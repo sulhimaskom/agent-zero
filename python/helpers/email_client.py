@@ -474,7 +474,7 @@ class EmailClient:
             soup = BeautifulSoup(html_content, "html.parser")
             for img in soup.find_all("img"):
                 src = img.get("src", "")
-                if src.startswith("cid:"):
+                if isinstance(src, str) and src.startswith("cid:"):
                     cid = src[4:]  # Remove "cid:" prefix
                     if cid in cid_map:
                         # Replace with file path marker
