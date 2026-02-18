@@ -936,10 +936,10 @@ class Messages:
     SCHEDULER_TASK_COMPLETED: Final[str] = "Scheduler Task '{task_name}' completed: {result}"
     SCHEDULER_TASK_FAILED: Final[str] = "Scheduler Task '{task_name}' failed: {error}"
     SCHEDULER_TASK_NOT_FOUND: Final[str] = "Scheduler Task with UUID '{task_uuid}' not found"
-    SCHEDULER_TASK_RUNNING: Final[str] = (
-        "Scheduler Task '{task_name}' already running, skipping"
+    SCHEDULER_TASK_RUNNING: Final[str] = "Scheduler Task '{task_name}' already running, skipping"
+    SCHEDULER_TASK_DISABLED: Final[str] = (
+        "Scheduler Task '{task_name}' state is '{state}', skipping"
     )
-    SCHEDULER_TASK_DISABLED: Final[str] = "Scheduler Task '{task_name}' state is '{state}', skipping"
     SCHEDULER_CONTEXT_MISMATCH: Final[str] = (
         "Context ID mismatch for task {task_name}: context {context_id} != task {task_id}"
     )

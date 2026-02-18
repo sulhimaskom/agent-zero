@@ -657,7 +657,8 @@ class SchedulerTaskList(BaseModel):
             return [
                 task
                 for task in self.tasks
-                if task.check_schedule() and task.state == TaskState.IDLE
+                if task.check_schedule()
+                and task.state == TaskState.IDLE
                 # Prevent running same task multiple times within the same minute
                 # This fixes the race condition when SLEEP_TIME is lowered below 1 minute
                 and (task.last_run is None or (now - task.last_run).total_seconds() >= 60)
@@ -884,14 +885,14 @@ class TaskScheduler:
                 state=TaskState.RUNNING,
             )
             if not current_task:
-                self._printer.print(
-                    Messages.SCHEDULER_TASK_NOT_FOUND.format(task_uuid=task_uuid)
-                )
+                self._printer.print(Messages.SCHEDULER_TASK_NOT_FOUND.format(task_uuid=task_uuid))
                 return
             if current_task.state != TaskState.RUNNING:
                 # This means the update failed due to state conflict
                 self._printer.print(
-                    Messages.SCHEDULER_TASK_DISABLED.format(task_name=current_task.name, state=current_task.state)
+                    Messages.SCHEDULER_TASK_DISABLED.format(
+                        task_name=current_task.name, state=current_task.state
+                    )
                 )
                 return
 
@@ -901,7 +902,9 @@ class TaskScheduler:
             agent = None
 
             try:
-                self._printer.print(Messages.SCHEDULER_TASK_STARTED.format(task_name=current_task.name))
+                self._printer.print(
+                    Messages.SCHEDULER_TASK_STARTED.format(task_name=current_task.name)
+                )
 
                 context = await self._get_chat_context(current_task)
                 AgentContext.use(context.id)
@@ -973,7 +976,11 @@ class TaskScheduler:
                 result = await agent.monologue()
 
                 # Success
-                self._printer.print(Messages.SCHEDULER_TASK_COMPLETED.format(task_name=current_task.name, result=result))
+                self._printer.print(
+                    Messages.SCHEDULER_TASK_COMPLETED.format(
+                        task_name=current_task.name, result=result
+                    )
+                )
                 await self._persist_chat(current_task, context)
                 await current_task.on_success(result)
 
@@ -988,7 +995,9 @@ class TaskScheduler:
 
             except Exception as e:
                 # Error
-                self._printer.print(Messages.SCHEDULER_TASK_FAILED.format(task_name=current_task.name, error=e))
+                self._printer.print(
+                    Messages.SCHEDULER_TASK_FAILED.format(task_name=current_task.name, error=e)
+                )
                 await current_task.on_error(str(e))
 
                 # Explicitly verify task was updated in storage after error
