@@ -147,7 +147,9 @@ class BrowserConsoleMonitor(Tool):
                     icon = (
                         "🔴"
                         if log["type"] == "error"
-                        else "🟡" if log["type"] == "warning" else "ℹ️"
+                        else "🟡"
+                        if log["type"] == "warning"
+                        else "ℹ️"
                     )
                     text = log["text"][:100] + "..." if len(log["text"]) > 100 else log["text"]
                     report_lines.append(f"  {icon} [{log['type']}] {text}")
