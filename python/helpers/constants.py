@@ -132,7 +132,9 @@ class Timeouts:
     BROCULA_COMMAND_TIMEOUT: Final[int] = 60  # Default timeout for Brocula commands
     BROCULA_LIGHTHOUSE_TIMEOUT: Final[int] = 120  # Timeout for Brocula lighthouse runs
     BROCULA_OPCODE_TIMEOUT: Final[int] = 7200  # 2 hour timeout for Brocula OpenCode execution
-    BROCULA_PAGE_NAV_TIMEOUT: Final[int] = 30000  # Page navigation timeout for Playwright (30s in ms)
+    BROCULA_PAGE_NAV_TIMEOUT: Final[int] = (
+        30000  # Page navigation timeout for Playwright (30s in ms)
+    )
 
     # TTY session delays
     TTY_DRAIN_DELAY: Final[float] = 0  # Delay for TTY drain operation

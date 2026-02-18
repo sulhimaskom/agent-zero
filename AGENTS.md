@@ -2,8 +2,8 @@
 
 **Generated:** 2026-02-18
 **Branch:** custom
-**Commit:** a340dd0
-**Last RepoKeeper Run:** 2026-02-18 (Repository maintenance - linting verified, statistics updated, branch is 24 commits ahead of main)
+**Commit:** 3a6cdc9
+**Last RepoKeeper Run:** 2026-02-18 (Repository maintenance - linting verified, statistics updated, branch is 30 commits ahead of main)
 
 ## OVERVIEW
 Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpine.js). Prompt-driven behavior - everything controlled by `/prompts/` markdown files. Grows organically through memory, tools, extensions, and agent profiles.
@@ -101,9 +101,9 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 - `/python/helpers/history.py:236` - FIXME: vision bytes sent to utility LLM (inefficiency)
 - `/python/helpers/vector_db.py`, `/python/helpers/memory.py` - FAISS patch for Python 3.12 ARM (remove when fixed upstream)
 - `/python/helpers/job_loop.py:34` - TODO: lowering SLEEP_TIME below 1min causes job duplication
-- 176 `# type: ignore` comments across 47 files - type suppression issues
-- 150 `except Exception as e:` handlers - proper exception catching
-- 308 PrintStyle calls across 45 files - intentional framework logging (not bare prints)
+- 176 `# type: ignore` comments across 46 files - type suppression issues
+- 53 bare `except Exception:` handlers remaining (reduced from 182)
+- 278 PrintStyle calls across 45 files - intentional framework logging (not bare prints)
 
 ### Testing
 - pytest.ini exists and configured (asyncio mode, markers, test paths)
@@ -185,7 +185,7 @@ docker run -p 50001:80 agent0ai/agent-zero
 - **Large files**: `agent.py` (771 lines), `models.py` (905 lines), `settings.py` (1745 lines), `task_scheduler.py` (1284 lines), `mcp_handler.py` (1109 lines)
 - **Large frontend files**: `webui/js/scheduler.js` (1579 lines), `webui/js/messages.js` (1016 lines), `webui/components/chat/speech/speech-store.js` (965 lines)
 - **FAISS patch required** for Python 3.12 ARM - temporary workaround
-- **228 Python files** (~25,988 lines) - backend codebase
+- **204 Python files** (~25,988 lines) - backend codebase
 - **582 JavaScript files** (~19,590 lines) - frontend codebase
 - **96 prompt files** - system prompts and agent behavior definitions
 - **No traditional testing** - CI uses AI code analysis instead of pytest runs
@@ -296,9 +296,9 @@ docker run -p 50001:80 agent0ai/agent-zero
 | Metric | Current | Target | Priority |
 |--------|---------|--------|----------|
 | Test Coverage | ~5% (tests passing) | 30% | P0 |
-| Broad Exceptions | 0 ✅ | 0 | P1 |
+| Broad Exceptions | 53 ⚠️ | 0 | P1 |
 | Type Ignores | 176 | 70 | P2 |
-| PrintStyle Calls | 308 (intentional) | N/A | - |
+| PrintStyle Calls | 278 (intentional) | N/A | - |
 | Linter Configs | 4 ✅ | 3+ | P2 |
 
 ### POSITIVE FINDINGS
@@ -312,8 +312,10 @@ docker run -p 50001:80 agent0ai/agent-zero
 
 ### RECENT CLEANUP (2026-02-18)
 
-✅ **Branch status**: Custom branch is 24 commits ahead of main
+✅ **Branch status**: Custom branch is 30 commits ahead of main
 ✅ **Verified repository cleanliness**: No .pyc, __pycache__, .DS_Store, Thumbs.db, or temp files found
-✅ **Updated AGENTS.md statistics**: 228 Python files, 582 JS files, 177 Markdown files, 176 type ignores, 308 PrintStyle calls, 25,988 Python LOC, 19,590 JS LOC
+✅ **Updated AGENTS.md statistics**: 204 Python files, 582 JS files, 177 Markdown files, 176 type ignores, 278 PrintStyle calls, 25,988 Python LOC, 19,590 JS LOC
 ✅ **Linting verified**: All ruff checks passed
+✅ **Code formatting**: Fixed formatting in python/helpers/constants.py
+✅ **Branch synchronized**: Merged latest changes from origin/main
 ✅ **No temporary files**: Repository clean of .pyc, .DS_Store, Thumbs.db, cache directories
