@@ -32,7 +32,11 @@ class BrowserConsoleMonitor(Tool):
                 from playwright.async_api import async_playwright
             except ImportError:
                 return Response(
-                    message="❌ Playwright not installed. Run: pip install playwright && python -m playwright install chromium",
+                    message=(
+                        "❌ Playwright not installed. Run: "
+                        "pip install playwright && "
+                        "python -m playwright install chromium"
+                    ),
                     break_loop=False,
                     additional={"error": "playwright_not_installed", "has_issues": True},
                 )
@@ -83,7 +87,7 @@ class BrowserConsoleMonitor(Tool):
             # Analyze results
             errors = [log for log in logs if log["type"] == "error"]
             warnings = [log for log in logs if log["type"] == "warning"]
-            info_logs = [log for log in logs if log["type"] not in ["error", "warning"]]
+            # Info logs: [log for log in logs if log["type"] not in ["error", "warning"]]
 
             # Generate report
             report_lines = [f"Browser Console Report for {url}", "=" * 60, ""]
@@ -135,7 +139,9 @@ class BrowserConsoleMonitor(Tool):
                     icon = (
                         "🔴"
                         if log["type"] == "error"
-                        else "🟡" if log["type"] == "warning" else "ℹ️"
+                        else "🟡"
+                        if log["type"] == "warning"
+                        else "ℹ️"
                     )
                     text = log["text"][:100] + "..." if len(log["text"]) > 100 else log["text"]
                     report_lines.append(f"  {icon} [{log['type']}] {text}")
