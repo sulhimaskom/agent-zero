@@ -227,7 +227,7 @@ async def _spawn_winpty(cmd, cwd, env, echo):
                     reader.feed_data(data.encode("utf-8") if isinstance(data, str) else data)
             except EOFError:
                 break
-            except Exception as e:
+            except Exception:
                 await asyncio.sleep(Timeouts.TTY_WRITE_DELAY)
         reader.feed_eof()
 

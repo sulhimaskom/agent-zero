@@ -11,9 +11,11 @@ class SystemPrompt(Extension):
     async def execute(
         self,
         system_prompt: list[str] | None = None,
-        loop_data: LoopData = LoopData(),
+        loop_data: LoopData | None = None,
         **kwargs: Any,
     ):
+        if loop_data is None:
+            loop_data = LoopData()
         # append main system prompt and tools
         if system_prompt is None:
             system_prompt = []
@@ -66,7 +68,7 @@ def get_secrets_prompt(agent: Agent):
         secrets = secrets_manager.get_secrets_for_prompt()
         vars = get_settings()["variables"]
         return agent.read_prompt("agent.system.secrets.md", secrets=secrets, vars=vars)
-    except Exception as e:
+    except Exception:
         # If secrets module is not available or has issues, return empty string
         return ""
 

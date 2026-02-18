@@ -5,11 +5,13 @@ from python.helpers.extension import Extension
 class LiveResponse(Extension):
     async def execute(
         self,
-        loop_data: LoopData = LoopData(),
+        loop_data: LoopData | None = None,
         text: str = "",
         parsed: dict | None = None,
         **kwargs,
     ):
+        if loop_data is None:
+            loop_data = LoopData()
         if parsed is None:
             parsed = {}
         try:
@@ -32,5 +34,5 @@ class LiveResponse(Extension):
             # update log message
             log_item = loop_data.params_temporary["log_item_response"]
             log_item.update(content=parsed["tool_args"]["text"])
-        except Exception as e:
+        except Exception:
             pass

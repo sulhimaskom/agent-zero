@@ -172,7 +172,7 @@ class DeferredTask:
                             self.event_loop_thread.loop.run_until_complete(
                                 asyncio.gather(task, return_exceptions=True)
                             )
-                    except Exception as e:
+                    except Exception:
                         pass  # Ignore cleanup errors
 
             self.event_loop_thread.loop.call_soon_threadsafe(cleanup)

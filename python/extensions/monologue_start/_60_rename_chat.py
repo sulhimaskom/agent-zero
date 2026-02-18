@@ -7,7 +7,9 @@ from python.helpers.extension import Extension
 
 
 class RenameChat(Extension):
-    async def execute(self, loop_data: LoopData = LoopData(), **kwargs):
+    async def execute(self, loop_data: LoopData | None = None, **kwargs):
+        if loop_data is None:
+            loop_data = LoopData()
         asyncio.create_task(self.change_name())
 
     async def change_name(self):
@@ -39,5 +41,5 @@ class RenameChat(Extension):
                 # apply to context and save
                 self.agent.context.name = new_name
                 persist_chat.save_tmp_chat(self.agent.context)
-        except Exception as e:
+        except Exception:
             pass  # non-critical
