@@ -15,13 +15,14 @@
         <div class="version-info" x-data="{ showTooltip: false, copied: false }">
           <button
             id="a0version"
-            class="version-label-button"
+            class="version-label-button copy-btn"
             @click="$store.sidebarBottom.copyVersion(); copied = true; setTimeout(() => copied = false, 2000)"
             @mouseover="showTooltip = true"
             @mouseleave="showTooltip = false"
             @focus="showTooltip = true"
             @blur="showTooltip = false"
             :class="{ 'copied': copied }"
+            :data-copied="copied ? 'true' : null"
             :aria-label="'Version ' + $store.sidebarBottom.versionNo + '. Click to copy to clipboard'">
             <span class="version-text" x-text="$store.sidebarBottom.versionLabel"></span>
             <span class="version-icon" x-show="!copied">

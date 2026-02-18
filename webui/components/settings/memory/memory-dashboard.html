@@ -229,8 +229,9 @@
                                         <!-- Actions -->
                                         <td class="actions-cell" @click.stop>
                                             <div class="actions-wrapper">
-                                                <button class="btn btn-action copy"
+                                                <button class="btn btn-action copy copy-btn"
                                                     :class="{ 'copied': $store.memoryDashboardStore.recentlyCopied[memory.id] }"
+                                                    :data-copied="$store.memoryDashboardStore.recentlyCopied[memory.id] ? 'true' : null"
                                                     @click="$store.memoryDashboardStore.copyToClipboard($store.memoryDashboardStore.formatMemoryForCopy(memory), true, memory.id)"
                                                     :title="$store.memoryDashboardStore.recentlyCopied[memory.id] ? 'Copied!' : 'Copy Memory'">
                                                     <span class="material-symbols-outlined" x-text="$store.memoryDashboardStore.recentlyCopied[memory.id] ? 'check' : 'content_copy'"></span>
