@@ -9,12 +9,15 @@
     <meta name="author" content="Agent Zero Team">
     <meta name="theme-color" content="#333333">
 
+    <!-- Content Security Policy - Protects against XSS and data injection attacks -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' ws: wss:; media-src 'self' blob:; worker-src 'self' blob:;">
+
     <!-- Open Graph / Facebook Meta Tags -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://agent-zero.ai">
     <meta property="og:title" content="Agent Zero - AI Agent Framework">
     <meta property="og:description" content="A personal, organic agentic framework that grows and learns with you. Autonomous AI agent using the computer as a tool to accomplish tasks.">
-    <meta property="og:image" content="https://agent-zero.ai/public/og-image.png">
+    <meta property="og:image" content="https://agent-zero.ai/public/splash.jpg">
     <meta property="og:site_name" content="Agent Zero">
 
     <!-- Twitter Card Meta Tags -->
@@ -22,7 +25,7 @@
     <meta name="twitter:url" content="https://agent-zero.ai">
     <meta name="twitter:title" content="Agent Zero - AI Agent Framework">
     <meta name="twitter:description" content="A personal, organic agentic framework that grows and learns with you. Autonomous AI agent using the computer as a tool to accomplish tasks.">
-    <meta name="twitter:image" content="https://agent-zero.ai/public/og-image.png">
+    <meta name="twitter:image" content="https://agent-zero.ai/public/splash.jpg">
 
     <!-- Canonical URL -->
     <link rel="canonical" href="https://agent-zero.ai">
@@ -244,25 +247,25 @@
                 <div class="modal-container">
                     <div class="modal-header">
                         <h2 x-text="settings.title"></h2>
-                        <button class="modal-close" @click="handleCancel()">&times;</button>
+                        <button class="modal-close" @click="handleCancel()" aria-label="Close settings modal">&times;</button>
                     </div>
 
                     <div class="modal-content">
                         <!-- Tab Navigation -->
                         <div class="settings-tabs-container">
-                            <div class="settings-tabs">
+                            <div class="settings-tabs" role="tablist" aria-label="Settings categories">
                                 <div class="settings-tab" :class="{'active': activeTab === 'agent'}"
-                                    @click="switchTab('agent')" title="Agent Settings">Agent Settings</div>
+                                    @click="switchTab('agent')" title="Agent Settings" role="tab" :aria-selected="activeTab === 'agent' ? 'true' : 'false'" tabindex="0">Agent Settings</div>
                                 <div class="settings-tab" :class="{'active': activeTab === 'external'}"
-                                    @click="switchTab('external')" title="External Services">External Services</div>
+                                    @click="switchTab('external')" title="External Services" role="tab" :aria-selected="activeTab === 'external' ? 'true' : 'false'" tabindex="0">External Services</div>
                                 <div class="settings-tab" :class="{'active': activeTab === 'mcp'}"
-                                    @click="switchTab('mcp')" title="MCP">MCP/A2A</div>
+                                    @click="switchTab('mcp')" title="MCP" role="tab" :aria-selected="activeTab === 'mcp' ? 'true' : 'false'" tabindex="0">MCP/A2A</div>
                                 <div class="settings-tab" :class="{'active': activeTab === 'developer'}"
-                                    @click="switchTab('developer')" title="Developer">Developer</div>
+                                    @click="switchTab('developer')" title="Developer" role="tab" :aria-selected="activeTab === 'developer' ? 'true' : 'false'" tabindex="0">Developer</div>
                                 <div class="settings-tab" :class="{'active': activeTab === 'scheduler'}"
-                                    @click="switchTab('scheduler')" title="Task Scheduler">Task Scheduler</div>
+                                    @click="switchTab('scheduler')" title="Task Scheduler" role="tab" :aria-selected="activeTab === 'scheduler' ? 'true' : 'false'" tabindex="0">Task Scheduler</div>
                                 <div class="settings-tab" :class="{'active': activeTab === 'backup'}"
-                                    @click="switchTab('backup')" title="Backup & Restore">Backup & Restore</div>
+                                    @click="switchTab('backup')" title="Backup & Restore" role="tab" :aria-selected="activeTab === 'backup' ? 'true' : 'false'" tabindex="0">Backup & Restore</div>
                             </div>
                         </div>
 
