@@ -32,7 +32,7 @@ class Message(ApiHandler):
             attachment_paths = []
 
             upload_folder_int = Paths.UPLOAD_FOLDER
-            upload_folder_ext = files.get_abs_path("tmp/uploads")  # for development environment
+            upload_folder_ext = files.get_abs_path(Paths.UPLOAD_DIR)  # for development environment
 
             if attachments:
                 os.makedirs(upload_folder_ext, exist_ok=True)

@@ -10,7 +10,7 @@ from python.helpers import files, history
 from python.helpers.constants import Paths
 from python.helpers.log import Log, LogItem
 
-CHATS_FOLDER = "tmp/chats"
+CHATS_FOLDER = Paths.CHATS_FOLDER
 LOG_SIZE = Paths.CHAT_LOG_SIZE
 CHAT_FILE_NAME = Paths.CHAT_FILE_NAME
 

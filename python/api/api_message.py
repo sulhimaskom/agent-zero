@@ -63,7 +63,7 @@ class ApiMessage(ApiHandler):
         attachment_paths = []
         if attachments:
             upload_folder_int = Paths.UPLOAD_FOLDER
-            upload_folder_ext = files.get_abs_path("tmp/uploads")
+            upload_folder_ext = files.get_abs_path(Paths.UPLOAD_DIR)
             os.makedirs(upload_folder_ext, exist_ok=True)
 
             for attachment in attachments:

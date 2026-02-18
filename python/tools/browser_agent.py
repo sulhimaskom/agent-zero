@@ -9,7 +9,7 @@ from agent import Agent, InterventionException
 from python.extensions.message_loop_start._10_iteration_no import get_iter_no
 from python.helpers import defer, files, persist_chat, strings
 from python.helpers.browser_use import browser_use  # type: ignore[attr-defined]
-from python.helpers.constants import Browser, Limits, Shell, Timeouts
+from python.helpers.constants import Browser, Limits, Paths, Shell, Timeouts
 from python.helpers.dirty_json import DirtyJson
 from python.helpers.playwright import ensure_playwright_binary
 from python.helpers.print_style import PrintStyle
@@ -53,7 +53,7 @@ class State:
                 disable_security=True,
                 chromium_sandbox=False,
                 accept_downloads=True,
-                downloads_path=files.get_abs_path("tmp/downloads"),
+                downloads_path=files.get_abs_path(Paths.DOWNLOADS_DIR),
                 allowed_domains=Browser.ALLOWED_DOMAINS,
                 executable_path=pw_binary,
                 keep_alive=True,

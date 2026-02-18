@@ -13,6 +13,7 @@ from python.helpers.constants import (
     Config,
     Limits,
     Network,
+    Paths,
     Timeouts,
 )
 from python.helpers.print_style import PrintStyle
@@ -165,7 +166,7 @@ class SettingsOutput(TypedDict):
 PASSWORD_PLACEHOLDER = "****PSWD****"
 API_KEY_PLACEHOLDER = "************"
 
-SETTINGS_FILE = files.get_abs_path("tmp/settings.json")
+SETTINGS_FILE = files.get_abs_path(Paths.SETTINGS_FILE)
 _settings: Settings | None = None
 
 

@@ -14,7 +14,7 @@ from bs4 import BeautifulSoup
 from imapclient import IMAPClient
 
 from python.helpers import files
-from python.helpers.constants import Limits, Timeouts
+from python.helpers.constants import Limits, Paths, Timeouts
 from python.helpers.errors import RepairableException, format_error
 from python.helpers.print_style import PrintStyle
 
@@ -545,7 +545,7 @@ async def read_messages(
     port: int = Limits.IMAP_DEFAULT_PORT,
     username: str = "",
     password: str = "",
-    download_folder: str = "tmp/email",
+    download_folder: str = Paths.EMAIL_DIR,
     options: dict[str, Any] | None = None,
     filter: dict[str, Any] | None = None,
 ) -> list[Message]:

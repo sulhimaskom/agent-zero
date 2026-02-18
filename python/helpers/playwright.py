@@ -3,6 +3,7 @@ import subprocess
 from pathlib import Path
 
 from python.helpers import files
+from python.helpers.constants import Paths
 
 # this helper ensures that playwright is installed in /lib/playwright
 # should work for both docker and local installation
@@ -21,7 +22,7 @@ def get_playwright_binary():
 
 
 def get_playwright_cache_dir():
-    return files.get_abs_path("tmp/playwright")
+    return files.get_abs_path(Paths.PLAYWRIGHT_DIR)
 
 
 def ensure_playwright_binary():
