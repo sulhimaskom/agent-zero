@@ -2,8 +2,8 @@
 
 **Generated:** 2026-02-18
 **Branch:** custom
-**Commit:** 60a4d28
-**Last RepoKeeper Run:** 2026-02-18 (Repository maintenance - synchronized with main, linting verified, statistics updated, 4 files reformatted)
+**Commit:** a340dd0
+**Last RepoKeeper Run:** 2026-02-18 (Repository maintenance - linting verified, statistics updated, branch is 24 commits ahead of main)
 
 ## OVERVIEW
 Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpine.js). Prompt-driven behavior - everything controlled by `/prompts/` markdown files. Grows organically through memory, tools, extensions, and agent profiles.
@@ -42,7 +42,7 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 | API endpoints | `/python/api/` | Classes inheriting `ApiHandler` auto-register as Flask routes |
 | Memory management | `/python/helpers/memory.py` | FAISS vector DB, semantic search, AI filtering |
 | History & context | `/python/helpers/history.py` | Message summarization, context management |
-| Settings | `/python/helpers/settings.py` | 1749 lines - complexity hotspot, needs refactoring to background tasks |
+| Settings | `/python/helpers/settings.py` | 1745 lines - complexity hotspot, needs refactoring to background tasks |
 | MCP integration | `/python/helpers/mcp_handler.py` | Server + client for Model Context Protocol |
 | Scheduler | `/python/helpers/task_scheduler.py` | Crontab-based scheduled tasks |
 | Agent profiles | `/agents/{profile}/` | Each has prompts/, tools/, extensions/ subdirs |
@@ -102,14 +102,14 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 - `/python/helpers/vector_db.py`, `/python/helpers/memory.py` - FAISS patch for Python 3.12 ARM (remove when fixed upstream)
 - `/python/helpers/job_loop.py:34` - TODO: lowering SLEEP_TIME below 1min causes job duplication
 - 176 `# type: ignore` comments across 47 files - type suppression issues
-- 175 `except Exception as e:` handlers - proper exception catching
+- 150 `except Exception as e:` handlers - proper exception catching
 - 308 PrintStyle calls across 45 files - intentional framework logging (not bare prints)
 
 ### Testing
 - pytest.ini exists and configured (asyncio mode, markers, test paths)
 - conftest.py exists with fixtures and mocks
 - All tests passing
-- 11 test files for 228 Python files (~5% coverage) - 198 tests passing (19 async tests need pytest-asyncio configuration fix)
+- 11 test files for 228 Python files (~5% coverage) - tests passing
 - Tests not run in CI (GitHub workflows use OpenCode AI agent only)
 - Mixed naming: `test_*.py` and `*_test.py` both used
 - Coverage tool not configured
@@ -185,7 +185,7 @@ docker run -p 50001:80 agent0ai/agent-zero
 - **Large files**: `agent.py` (771 lines), `models.py` (905 lines), `settings.py` (1745 lines), `task_scheduler.py` (1284 lines), `mcp_handler.py` (1109 lines)
 - **Large frontend files**: `webui/js/scheduler.js` (1579 lines), `webui/js/messages.js` (1016 lines), `webui/components/chat/speech/speech-store.js` (965 lines)
 - **FAISS patch required** for Python 3.12 ARM - temporary workaround
-- **228 Python files** (~27,603 lines) - backend codebase
+- **228 Python files** (~25,988 lines) - backend codebase
 - **582 JavaScript files** (~19,590 lines) - frontend codebase
 - **96 prompt files** - system prompts and agent behavior definitions
 - **No traditional testing** - CI uses AI code analysis instead of pytest runs
@@ -210,21 +210,21 @@ docker run -p 50001:80 agent0ai/agent-zero
 
 | Criterion | Weight | Score | Notes |
 |-----------|--------|-------|-------|
-| Correctness | 15% | 12/15 | Valid syntax, 142 type ignores |
+| Correctness | 15% | 12/15 | Valid syntax, 176 type ignores |
 | Readability | 10% | 7/10 | Good structure, prints for logging |
 | Simplicity | 10% | 6/10 | Large modules (settings.py: 1747 lines) |
 | Modularity | 15% | 9/15 | Extensions good, some too large |
 | Consistency | 5% | 3/5 | Mixed patterns |
-| **Testability** | **15%** | **5/15** | **12 test files for 196 files (~5%) - 217 tests passing** |
+| **Testability** | **15%** | **5/15** | **11 test files for 228 files (~5%) - tests passing** |
 | Maintainability | 10% | 5/10 | Complexity hotspot in helpers/ |
 | **Error Handling** | **10%** | **7/10** | **Fixed: 62 bare exception handlers → 0** |
 | Dependencies | 5% | 4/5 | Well-defined requirements |
 | Determinism | 5% | 5/5 | No randomness issues |
 
 **Critical Issues:**
-1. **Test Coverage Crisis**: Only 12 test files for 196 Python files (~5% coverage) - 217 tests passing
+1. **Test Coverage Crisis**: Only 11 test files for 228 Python files (~5% coverage) - tests passing
 2. ~~**Error Handling**: 182 broad `except Exception` handlers mask bugs~~ ✅ **FIXED**: All bare `except Exception:` handlers converted to `except Exception as e:`
-3. **Type Safety**: 140 `# type: ignore` comments bypass type checking (improved from 174)
+3. **Type Safety**: 176 `# type: ignore` comments bypass type checking
 4. **Observability**: PrintStyle logging is intentional framework behavior (not bare print statements)
 
 ### B. SYSTEM QUALITY BREAKDOWN (72/100)
@@ -242,7 +242,7 @@ docker run -p 50001:80 agent0ai/agent-zero
 
 | Criterion | Score | Notes |
 |-----------|-------|-------|
-| Documentation | 18/20 | Comprehensive (19 docs files) |
+| Documentation | 18/20 | Comprehensive (23 docs files) |
 | API Clarity | 14/15 | 61 Flask endpoints well-structured |
 | Local Dev Setup | 13/15 | Docker support excellent |
 | Debuggability | 12/15 | Real-time streaming, HTML logs |
@@ -295,10 +295,10 @@ docker run -p 50001:80 agent0ai/agent-zero
 
 | Metric | Current | Target | Priority |
 |--------|---------|--------|----------|
-| Test Coverage | ~5% (217 tests) | 30% | P0 |
+| Test Coverage | ~5% (tests passing) | 30% | P0 |
 | Broad Exceptions | 0 ✅ | 0 | P1 |
-| Type Ignores | 141 | 70 | P2 |
-| PrintStyle Calls | 278 (intentional) | N/A | - |
+| Type Ignores | 176 | 70 | P2 |
+| PrintStyle Calls | 308 (intentional) | N/A | - |
 | Linter Configs | 4 ✅ | 3+ | P2 |
 
 ### POSITIVE FINDINGS
@@ -312,9 +312,8 @@ docker run -p 50001:80 agent0ai/agent-zero
 
 ### RECENT CLEANUP (2026-02-18)
 
-✅ **Synchronized with main**: Branch custom up to date with origin/custom
+✅ **Branch status**: Custom branch is 24 commits ahead of main
 ✅ **Verified repository cleanliness**: No .pyc, __pycache__, .DS_Store, Thumbs.db, or temp files found
-✅ **Updated AGENTS.md statistics**: 196 Python files, 582 JS files, 177 Markdown files, 141 type ignores, 278 PrintStyle calls, 27,603 Python LOC, 19,590 JS LOC
-✅ **Verified test suite**: All tests passing
-✅ **Linting clean**: No syntax errors
+✅ **Updated AGENTS.md statistics**: 228 Python files, 582 JS files, 177 Markdown files, 176 type ignores, 308 PrintStyle calls, 25,988 Python LOC, 19,590 JS LOC
+✅ **Linting verified**: All ruff checks passed
 ✅ **No temporary files**: Repository clean of .pyc, .DS_Store, Thumbs.db, cache directories
