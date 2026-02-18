@@ -2,8 +2,8 @@
 
 **Generated:** 2026-02-18
 **Branch:** custom
-**Commit:** 965ee93
-**Last RepoKeeper Run:** 2026-02-18 (RepoKeeper maintenance - synchronized with main, __pycache__ cleaned, statistics updated)
+**Commit:** 674093e
+**Last RepoKeeper Run:** 2026-02-18 (Repository maintenance - synchronized with main, linting verified, statistics updated)
 
 ## OVERVIEW
 Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpine.js). Prompt-driven behavior - everything controlled by `/prompts/` markdown files. Grows organically through memory, tools, extensions, and agent profiles.
@@ -18,7 +18,7 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 │   ├── helpers/        # 74 utility modules (memory, history, settings, mcp, scheduler)
 │   ├── tools/          # 19 default tools (code_execution, browser_agent, memory_*, call_subordinate)
 │   └── extensions/     # 35 extension files across 23 lifecycle hook points (message_loop_*, response_stream*, system_prompt)
-├── webui/              # Frontend (Alpine.js stores, modular components, 586 JS files)
+├── webui/              # Frontend (Alpine.js stores, modular components, 582 JS files)
 │   ├── components/     # chat/, settings/, sidebar/, modals/, projects/, notifications/
 │   ├── js/            # ES modules, stores (scheduler.js 1579 lines, messages.js 1016 lines)
 │   └── css/           # Styling
@@ -210,19 +210,19 @@ docker run -p 50001:80 agent0ai/agent-zero
 
 | Criterion | Weight | Score | Notes |
 |-----------|--------|-------|-------|
-| Correctness | 15% | 12/15 | Valid syntax, 176 type ignores |
+| Correctness | 15% | 12/15 | Valid syntax, 142 type ignores |
 | Readability | 10% | 7/10 | Good structure, prints for logging |
 | Simplicity | 10% | 6/10 | Large modules (settings.py: 1747 lines) |
 | Modularity | 15% | 9/15 | Extensions good, some too large |
 | Consistency | 5% | 3/5 | Mixed patterns |
-| **Testability** | **15%** | **5/15** | **12 test files for 227 files (~5%) - 217 tests passing** |
+| **Testability** | **15%** | **5/15** | **12 test files for 196 files (~5%) - 217 tests passing** |
 | Maintainability | 10% | 5/10 | Complexity hotspot in helpers/ |
 | **Error Handling** | **10%** | **7/10** | **Fixed: 62 bare exception handlers → 0** |
 | Dependencies | 5% | 4/5 | Well-defined requirements |
 | Determinism | 5% | 5/5 | No randomness issues |
 
 **Critical Issues:**
-1. **Test Coverage Crisis**: Only 12 test files for 227 Python files (~5% coverage) - 217 tests passing
+1. **Test Coverage Crisis**: Only 12 test files for 196 Python files (~5% coverage) - 217 tests passing
 2. ~~**Error Handling**: 182 broad `except Exception` handlers mask bugs~~ ✅ **FIXED**: All bare `except Exception:` handlers converted to `except Exception as e:`
 3. **Type Safety**: 140 `# type: ignore` comments bypass type checking (improved from 174)
 4. **Observability**: PrintStyle logging is intentional framework behavior (not bare print statements)
@@ -257,7 +257,7 @@ docker run -p 50001:80 agent0ai/agent-zero
 | Release Safety | 20% | 13/20 | No rollback mechanism |
 | Config Parity | 15% | 11/15 | Docker configs consistent |
 | Migration Safety | 15% | 10/15 | Backup/restore exists |
-| Tech Debt | 15% | 9/15 | 176 type ignores, complex modules |
+| Tech Debt | 15% | 9/15 | 142 type ignores, complex modules |
 | Change Velocity | 15% | 8/15 | Large modules slow dev |
 
 ### RECOMMENDED PRIORITY ACTIONS
@@ -286,7 +286,7 @@ docker run -p 50001:80 agent0ai/agent-zero
     - JSON format for production
     - Log rotation
 
-6. **Type Safety**: Address 174 `# type: ignore` comments
+6. **Type Safety**: Address 142 `# type: ignore` comments
    - Add proper type annotations
    - Use stubs for external libs
    - Gradual mypy enforcement
@@ -297,8 +297,8 @@ docker run -p 50001:80 agent0ai/agent-zero
 |--------|---------|--------|----------|
 | Test Coverage | ~5% (217 tests) | 30% | P0 |
 | Broad Exceptions | 0 ✅ | 0 | P1 |
-| Type Ignores | 176 | 70 | P2 |
-| PrintStyle Calls | 308 (intentional) | N/A | - |
+| Type Ignores | 142 | 70 | P2 |
+| PrintStyle Calls | 289 (intentional) | N/A | - |
 | Linter Configs | 4 ✅ | 3+ | P2 |
 
 ### POSITIVE FINDINGS
@@ -314,7 +314,7 @@ docker run -p 50001:80 agent0ai/agent-zero
 
 ✅ **Synchronized with main**: Merged 2 commits from origin/main (browser console monitoring tool, audit report)
 ✅ **Cleaned __pycache__**: Removed 97 cached bytecode files
-✅ **Updated AGENTS.md statistics**: 228 Python files (+1), 586 JS files, 169 Markdown files (+1), 176 type ignores, 308 PrintStyle calls
+✅ **Updated AGENTS.md statistics**: 196 Python files (-32), 582 JS files (-4), 169 Markdown files, 142 type ignores (-34), 289 PrintStyle calls (-19), 27,536 Python LOC, 19,546 JS LOC
 ✅ **Verified test suite**: All tests passing
 ✅ **Linting clean**: No syntax errors
 ✅ **No temporary files**: Repository clean of .pyc, .DS_Store, Thumbs.db, cache directories
