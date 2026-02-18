@@ -23,7 +23,7 @@
             @blur="showTooltip = false"
             :class="{ 'copied': copied }"
             :data-copied="copied ? 'true' : null"
-            :aria-label="'Version ' + $store.sidebarBottom.versionNo + '. Click to copy to clipboard'">
+            aria-label="Copy version info to clipboard">
             <span class="version-text" x-text="$store.sidebarBottom.versionLabel"></span>
             <span class="version-icon" x-show="!copied">
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
