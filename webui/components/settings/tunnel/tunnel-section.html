@@ -49,9 +49,10 @@
                                 <input type="text" class="tunnel-link-input" :value="$store.tunnelStore.tunnelLink"
                                     readonly>
                                 <div class="buttons-row" x-data="{ copyState: 'idle', copyTimeout: null }" @copy-success.window="if ($event.detail?.component === 'tunnel') { copyState = 'success'; if (copyTimeout) clearTimeout(copyTimeout); copyTimeout = setTimeout(() => copyState = 'idle', 2000); }" @copy-error.window="if ($event.detail?.component === 'tunnel') { copyState = 'error'; if (copyTimeout) clearTimeout(copyTimeout); copyTimeout = setTimeout(() => copyState = 'idle', 2000); }">
-                                    <button class="copy-link-button"
+                                    <button class="copy-link-button copy-btn"
                                         @click="$store.tunnelStore.copyToClipboard()"
-                                        :class="{ 'copy-success': copyState === 'success', 'copy-error': copyState === 'error' }"
+                                        :class="{ 'copied': copyState === 'success', 'copy-error': copyState === 'error' }"
+                                        :data-copied="copyState === 'success' ? 'true' : copyState === 'error' ? 'error' : null"
                                         :aria-label="copyState === 'success' ? 'Copied to clipboard!' : copyState === 'error' ? 'Copy failed' : 'Copy tunnel URL to clipboard'"
                                         title="Copy to clipboard">
                                         <span class="icon material-symbols-outlined" x-show="copyState === 'idle'">content_copy</span>

@@ -22,15 +22,17 @@
                         <template x-if="!$store.memoryDashboardStore.editMode">
                             <div style="display: flex; gap: 0.5rem;">
 
-                                <button class="btn btn-action-header copy-all"
+                                <button class="btn btn-action-header copy-all copy-btn"
                                         :class="{ 'copied': $store.memoryDashboardStore.recentlyCopied[$store.memoryDashboardStore.detailMemory?.id + '_all'] }"
+                                        :data-copied="$store.memoryDashboardStore.recentlyCopied[$store.memoryDashboardStore.detailMemory?.id + '_all'] ? 'true' : null"
                                         @click="$store.memoryDashboardStore.copyToClipboard($store.memoryDashboardStore.formatMemoryForCopy($store.memoryDashboardStore.detailMemory), true, $store.memoryDashboardStore.detailMemory?.id + '_all')"
                                         :title="$store.memoryDashboardStore.recentlyCopied[$store.memoryDashboardStore.detailMemory?.id + '_all'] ? 'Copied!' : 'Copy Complete Memory with Metadata'">
                                     <span class="material-symbols-outlined" x-text="$store.memoryDashboardStore.recentlyCopied[$store.memoryDashboardStore.detailMemory?.id + '_all'] ? 'check' : 'copy_all'"></span>
                                     <span x-text="$store.memoryDashboardStore.recentlyCopied[$store.memoryDashboardStore.detailMemory?.id + '_all'] ? 'Copied!' : 'All'"></span>
                                 </button>
-                                <button class="btn btn-action-header copy-content"
+                                <button class="btn btn-action-header copy-content copy-btn"
                                         :class="{ 'copied': $store.memoryDashboardStore.recentlyCopied[$store.memoryDashboardStore.detailMemory?.id + '_content'] }"
+                                        :data-copied="$store.memoryDashboardStore.recentlyCopied[$store.memoryDashboardStore.detailMemory?.id + '_content'] ? 'true' : null"
                                         @click="$store.memoryDashboardStore.copyToClipboard($store.memoryDashboardStore.detailMemory?.content_full, true, $store.memoryDashboardStore.detailMemory?.id + '_content')"
                                         :title="$store.memoryDashboardStore.recentlyCopied[$store.memoryDashboardStore.detailMemory?.id + '_content'] ? 'Copied!' : 'Copy Content Only'">
                                     <span class="material-symbols-outlined" x-text="$store.memoryDashboardStore.recentlyCopied[$store.memoryDashboardStore.detailMemory?.id + '_content'] ? 'check' : 'content_copy'"></span>
