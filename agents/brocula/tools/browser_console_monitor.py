@@ -1,6 +1,12 @@
 import asyncio
 
+from python.helpers.constants import Network, Timeouts
 from python.helpers.tool import Response, Tool
+
+
+def _get_default_url() -> str:
+    """Get the default URL for browser console monitoring."""
+    return f"http://{Network.DEFAULT_HOSTNAME}:{Network.BROCULA_PORT_DEFAULT}"
 
 
 class BrowserConsoleMonitor(Tool):
@@ -11,7 +17,7 @@ class BrowserConsoleMonitor(Tool):
 
     async def execute(
         self,
-        url: str = "http://localhost:50001",
+        url: str | None = None,
         wait_time: int = 3,
         capture_level: str = "all",
         **kwargs,
@@ -20,10 +26,12 @@ class BrowserConsoleMonitor(Tool):
         Monitor browser console for errors and warnings.
 
         Args:
-            url: The URL to monitor (default: http://localhost:50001)
+            url: The URL to monitor (default: uses Network.DEFAULT_HOSTNAME and Network.BROCULA_PORT_DEFAULT)
             wait_time: Seconds to wait for scripts to execute (default: 3)
             capture_level: What to capture - 'errors', 'warnings', or 'all' (default: all)
         """
+        if url is None:
+            url = _get_default_url()
         await self.agent.handle_intervention()
 
         try:
@@ -72,7 +80,7 @@ class BrowserConsoleMonitor(Tool):
                 page.on("response", handle_response)
 
                 try:
-                    await page.goto(url, wait_until="networkidle", timeout=30000)
+                    await page.goto(url, wait_until="networkidle", timeout=Timeouts.BROCULA_PAGE_NAV_TIMEOUT)
                     await asyncio.sleep(wait_time)
                 except Exception as e:
                     await browser.close()

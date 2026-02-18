@@ -805,7 +805,7 @@ class MCPClientBase(ABC):
     async def _execute_with_session(
         self,
         coro_func: Callable[[ClientSession], Awaitable[T]],
-        read_timeout_seconds=60,
+        read_timeout_seconds=Timeouts.MCP_CLIENT_SESSION_TIMEOUT,
     ) -> T:
         """
         Manages the lifecycle of an MCP session for a single operation.

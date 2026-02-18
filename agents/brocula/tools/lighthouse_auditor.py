@@ -35,7 +35,7 @@ class LighthouseAuditor(Tool):
         Run Lighthouse audit and report optimization opportunities.
 
         Args:
-            url: The URL to audit (default: http://localhost:50001)
+            url: The URL to audit (default: uses Network.DEFAULT_HOSTNAME and Network.BROCULA_PORT_DEFAULT)
             categories: Comma-separated list of categories to audit (default: all)
             device: Device type - 'desktop' or 'mobile' (default: desktop)
         """
