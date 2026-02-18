@@ -7,6 +7,8 @@ const model = {
   attachments: [],
   hasAttachments: false,
   dragDropOverlayVisible: false,
+  dragFileCount: 0,
+  showDropSuccess: false,
 
   async init() {
     await this.initialize();
@@ -82,39 +84,80 @@ const model = {
       );
     });
 
-    // Handle drag enter
     document.addEventListener(
       "dragenter",
       (e) => {
         dragCounter++;
         if (dragCounter === 1) {
+          let fileCount = 0;
+          if (e.dataTransfer) {
+            if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+              fileCount = e.dataTransfer.items.length;
+            } else if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+              fileCount = e.dataTransfer.files.length;
+            }
+          }
+          this.dragFileCount = fileCount;
           this.showDragDropOverlay();
         }
       },
       false
     );
 
-    // Handle drag leave
+    document.addEventListener(
+      "dragover",
+      (e) => {
+        if (this.dragDropOverlayVisible && e.dataTransfer) {
+          let fileCount = 0;
+          if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+            for (let i = 0; i < e.dataTransfer.items.length; i++) {
+              if (e.dataTransfer.items[i].kind === 'file') {
+                fileCount++;
+              }
+            }
+          } else if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+            fileCount = e.dataTransfer.files.length;
+          }
+          if (fileCount !== this.dragFileCount) {
+            this.dragFileCount = fileCount;
+          }
+        }
+      },
+      false
+    );
+
     document.addEventListener(
       "dragleave",
       (e) => {
         dragCounter--;
         if (dragCounter === 0) {
           this.hideDragDropOverlay();
+          this.dragFileCount = 0;
         }
       },
       false
     );
 
-    // Handle drop
     document.addEventListener(
       "drop",
       (e) => {
         dragCounter = 0;
-        this.hideDragDropOverlay();
-
         const files = e.dataTransfer.files;
+        const fileCount = files.length;
+
         this.handleFiles(files);
+
+        if (fileCount > 0) {
+          this.showDropSuccess = true;
+          setTimeout(() => {
+            this.showDropSuccess = false;
+            this.hideDragDropOverlay();
+            this.dragFileCount = 0;
+          }, 1200);
+        } else {
+          this.hideDragDropOverlay();
+          this.dragFileCount = 0;
+        }
       },
       false
     );

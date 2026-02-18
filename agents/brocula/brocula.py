@@ -170,7 +170,7 @@ def run_brocula():
         return result.returncode == 0
     except subprocess.TimeoutExpired:
         return False
-    except Exception as e:
+    except Exception:
         return False
 
 
