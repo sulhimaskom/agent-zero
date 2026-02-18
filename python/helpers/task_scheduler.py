@@ -27,7 +27,7 @@ from pydantic import BaseModel, Field, PrivateAttr
 from agent import AgentContext, UserMessage
 from initialize import initialize_agent
 from python.helpers import projects
-from python.helpers.constants import Limits, Paths, Timeouts
+from python.helpers.constants import Limits, Messages, Paths, Timeouts
 from python.helpers.defer import DeferredTask
 from python.helpers.files import get_abs_path, make_dirs, read_file, write_file
 from python.helpers.localization import Localization
@@ -850,7 +850,9 @@ class TaskScheduler:
     ):
         if context.id != task.context_id:
             raise ValueError(
-                f"Context ID mismatch for task {task.name}: context {context.id} != task {task.context_id}"
+                Messages.SCHEDULER_CONTEXT_MISMATCH.format(
+                    task_name=task.name, context_id=context.id, task_id=task.context_id
+                )
             )
         save_tmp_chat(context)
 
@@ -867,11 +869,11 @@ class TaskScheduler:
                 task_uuid
             )
             if task_snapshot is None:
-                self._printer.print(f"Scheduler Task with UUID '{task_uuid}' not found")
+                self._printer.print(Messages.SCHEDULER_TASK_NOT_FOUND.format(task_uuid=task_uuid))
                 return
             if task_snapshot.state == TaskState.RUNNING:
                 self._printer.print(
-                    f"Scheduler Task '{task_snapshot.name}' already running, skipping"
+                    Messages.SCHEDULER_TASK_RUNNING.format(task_name=task_snapshot.name)
                 )
                 return
 
@@ -883,13 +885,13 @@ class TaskScheduler:
             )
             if not current_task:
                 self._printer.print(
-                    f"Scheduler Task with UUID '{task_uuid}' not found or updated by another process"
+                    Messages.SCHEDULER_TASK_NOT_FOUND.format(task_uuid=task_uuid)
                 )
                 return
             if current_task.state != TaskState.RUNNING:
                 # This means the update failed due to state conflict
                 self._printer.print(
-                    f"Scheduler Task '{current_task.name}' state is '{current_task.state}', skipping"
+                    Messages.SCHEDULER_TASK_DISABLED.format(task_name=current_task.name, state=current_task.state)
                 )
                 return
 
@@ -899,7 +901,7 @@ class TaskScheduler:
             agent = None
 
             try:
-                self._printer.print(f"Scheduler Task '{current_task.name}' started")
+                self._printer.print(Messages.SCHEDULER_TASK_STARTED.format(task_name=current_task.name))
 
                 context = await self._get_chat_context(current_task)
                 AgentContext.use(context.id)
@@ -971,7 +973,7 @@ class TaskScheduler:
                 result = await agent.monologue()
 
                 # Success
-                self._printer.print(f"Scheduler Task '{current_task.name}' completed: {result}")
+                self._printer.print(Messages.SCHEDULER_TASK_COMPLETED.format(task_name=current_task.name, result=result))
                 await self._persist_chat(current_task, context)
                 await current_task.on_success(result)
 
@@ -986,7 +988,7 @@ class TaskScheduler:
 
             except Exception as e:
                 # Error
-                self._printer.print(f"Scheduler Task '{current_task.name}' failed: {e}")
+                self._printer.print(Messages.SCHEDULER_TASK_FAILED.format(task_name=current_task.name, error=e))
                 await current_task.on_error(str(e))
 
                 # Explicitly verify task was updated in storage after error

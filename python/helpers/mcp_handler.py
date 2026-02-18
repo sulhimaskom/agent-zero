@@ -32,7 +32,7 @@ from mcp.types import CallToolResult, ListToolsResult
 from pydantic import BaseModel, Discriminator, Field, PrivateAttr, Tag
 
 from python.helpers import dirty_json, errors, settings
-from python.helpers.constants import Colors, Limits, Timeouts
+from python.helpers.constants import Colors, Limits, Messages, Timeouts
 from python.helpers.print_style import PrintStyle
 from python.helpers.tool import Response, Tool
 
@@ -94,12 +94,12 @@ def initialize_mcp(mcp_servers_config: str):
 
             AgentContext.log_to_all(
                 type="warning",
-                content=f"Failed to update MCP settings: {e}",
+                content=Messages.MCP_CONFIG_ERROR.format(error=e),
                 temp=False,
             )
 
             PrintStyle(background_color="black", font_color="red", padding=True).print(
-                f"Failed to update MCP settings: {e}"
+                Messages.MCP_CONFIG_ERROR.format(error=e)
             )
 
 
@@ -114,8 +114,8 @@ class MCPTool(Tool):
             if response.isError:
                 error = message
         except Exception as e:
-            error = f"MCP Tool Exception: {e!s}"
-            message = f"ERROR: {e!s}"
+            error = Messages.MCP_TOOL_EXCEPTION.format(error=e)
+            message = f"{Messages.ERROR_PREFIX} {e}"
 
         if error:
             PrintStyle(
@@ -123,7 +123,7 @@ class MCPTool(Tool):
                 font_color=Colors.BG_WHITE,
                 bold=True,
                 padding=True,
-            ).print(f"MCPTool::Failed to call mcp tool {self.name}:")
+            ).print(Messages.MCP_TOOL_FAILED.format(tool_name=self.name))
             PrintStyle(
                 background_color=Colors.MCP_ERROR_RED,
                 font_color=Colors.BG_WHITE,
@@ -144,7 +144,7 @@ class MCPTool(Tool):
                 padding=True,
                 background_color=Colors.BG_WHITE,
                 bold=True,
-            ).print(f"{self.agent.agent_name}: Using tool '{self.name}'")
+            ).print(Messages.TOOL_USING.format(tool_name=self.name))
         )
         self.log = self.get_log_object()
 
@@ -162,10 +162,10 @@ class MCPTool(Tool):
         raw_tool_response = response.message.strip() if response.message else ""
         if not raw_tool_response:
             PrintStyle(font_color="red").print(
-                f"Warning: Tool '{self.name}' returned an empty message."
+                Messages.TOOL_EMPTY_RESPONSE
             )
             # Even if empty, we might still want to provide context for the agent
-            raw_tool_response = "[Tool returned no textual content]"
+            raw_tool_response = Messages.TOOL_EMPTY_RESPONSE
 
         # Prepare user message context
         # user_message_text = (
@@ -208,12 +208,12 @@ class MCPTool(Tool):
                 padding=True,
                 bold=True,
             ).print(
-                f"{self.agent.agent_name}: Response from tool '{self.name}' (plus context added)"
+                Messages.TOOL_RESPONSE.format(tool_name=self.name)
             )
         )
         # Print only the raw response to console for brevity, agent gets the full context.
         PrintStyle(font_color=Colors.PRIMARY_LIGHT_BLUE).print(
-            raw_tool_response if raw_tool_response else "[No direct textual output from tool]"
+            raw_tool_response if raw_tool_response else Messages.TOOL_NO_OUTPUT
         )
         if self.log:
             self.log.update(content=final_text_for_agent)  # Log includes the full context
@@ -526,7 +526,7 @@ class MCPConfig(BaseModel):
         if not isinstance(servers_list, Iterable):
             (
                 PrintStyle(background_color="grey", font_color="red", padding=True).print(
-                    "MCPConfig::__init__::servers_list must be a list"
+                    Messages.MCP_SERVER_INIT_ERROR.format(error_msg="servers_list must be a list")
                 )
             )
             return
@@ -537,7 +537,7 @@ class MCPConfig(BaseModel):
                 error_msg = "server_item must be a mapping"
                 (
                     PrintStyle(background_color="grey", font_color="red", padding=True).print(
-                        f"MCPConfig::__init__::{error_msg}"
+                        Messages.MCP_SERVER_INIT_ERROR.format(error_msg=error_msg)
                     )
                 )
                 # add to failed servers with generic name
@@ -565,7 +565,7 @@ class MCPConfig(BaseModel):
                 self.disconnected_servers.append(
                     {
                         "config": server_item,
-                        "error": "Disabled in config",
+                        "error": Messages.STATUS_DISABLED,
                         "name": server_name,
                     }
                 )
@@ -574,10 +574,10 @@ class MCPConfig(BaseModel):
             server_name = server_item.get("name", "__not__found__")
             if server_name == "__not__found__":
                 # log the error
-                error_msg = "server_name is required"
+                error_msg = Messages.ERROR_VALUE_REQUIRED.format(name="server_name")
                 (
                     PrintStyle(background_color="grey", font_color="red", padding=True).print(
-                        f"MCPConfig::__init__::{error_msg}"
+                        Messages.MCP_SERVER_INIT_ERROR.format(error_msg=error_msg)
                     )
                 )
                 # add to failed servers
@@ -601,7 +601,7 @@ class MCPConfig(BaseModel):
                 error_msg = str(e)
                 (
                     PrintStyle(background_color="grey", font_color="red", padding=True).print(
-                        f"MCPConfig::__init__: Failed to create MCPServer '{server_name}': {error_msg}"
+                        Messages.MCP_SERVER_INIT_ERROR.format(error_msg=f"Failed to create MCPServer '{server_name}': {error_msg}")
                     )
                 )
                 # add to failed servers
