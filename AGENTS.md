@@ -2,7 +2,7 @@
 
 **Generated:** 2026-02-19
 **Branch:** custom
-**Commit:** 6baeab5
+**Commit:** 7d55c0a
 **Last RepoKeeper Run:** 2026-02-19 (Repository maintenance - synchronized with main, statistics updated, branch merged with latest main, documentation sync)
 
 ## OVERVIEW
@@ -101,9 +101,9 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 - `/python/helpers/history.py:236` - FIXME: vision bytes sent to utility LLM (inefficiency)
 - `/python/helpers/vector_db.py`, `/python/helpers/memory.py` - FAISS patch for Python 3.12 ARM (remove when fixed upstream)
 - `/python/helpers/job_loop.py:34` - TODO: lowering SLEEP_TIME below 1min causes job duplication
-- 142 `# type: ignore` comments across 46 files - type suppression issues
+- 176 `# type: ignore` comments across 46 files - type suppression issues
 - 53 bare `except Exception:` handlers remaining (reduced from 182)
-- 289 PrintStyle calls across 45 files - intentional framework logging (not bare prints)
+- 278 PrintStyle calls across 45 files - intentional framework logging (not bare prints)
 
 ### Testing
 - pytest.ini exists and configured (asyncio mode, markers, test paths)
@@ -185,8 +185,8 @@ docker run -p 50001:80 agent0ai/agent-zero
 - **Large files**: `agent.py` (771 lines), `models.py` (905 lines), `settings.py` (1745 lines), `task_scheduler.py` (1284 lines), `mcp_handler.py` (1109 lines)
 - **Large frontend files**: `webui/js/scheduler.js` (1579 lines), `webui/js/messages.js` (1016 lines), `webui/components/chat/speech/speech-store.js` (965 lines)
 - **FAISS patch required** for Python 3.12 ARM - temporary workaround
-- **196 Python files** (~27,653 lines) - backend codebase
-- **583 JavaScript files** (~19,599 lines) - frontend codebase
+- **228 Python files** (~34,832 lines) - backend codebase
+- **587 JavaScript files** (~20,075 lines) - frontend codebase
 - **96 prompt files** - system prompts and agent behavior definitions
 - **No traditional testing** - CI uses AI code analysis instead of pytest runs
 - **Automatic SSH password generation** - `prepare.py` generates random root password (security concern for production)
@@ -210,7 +210,7 @@ docker run -p 50001:80 agent0ai/agent-zero
 
 | Criterion | Weight | Score | Notes |
 |-----------|--------|-------|-------|
-| Correctness | 15% | 12/15 | Valid syntax, 142 type ignores |
+| Correctness | 15% | 12/15 | Valid syntax, 176 type ignores |
 | Readability | 10% | 7/10 | Good structure, prints for logging |
 | Simplicity | 10% | 6/10 | Large modules (settings.py: 1747 lines) |
 | Modularity | 15% | 9/15 | Extensions good, some too large |
@@ -222,9 +222,9 @@ docker run -p 50001:80 agent0ai/agent-zero
 | Determinism | 5% | 5/5 | No randomness issues |
 
 **Critical Issues:**
-1. **Test Coverage Crisis**: Only 11 test files for 196 Python files (~5% coverage) - tests passing
+1. **Test Coverage Crisis**: Only 11 test files for 228 Python files (~5% coverage) - tests passing
 2. ~~**Error Handling**: 182 broad `except Exception` handlers mask bugs~~ ✅ **FIXED**: All bare `except Exception:` handlers converted to `except Exception as e:`
-3. **Type Safety**: 141 `# type: ignore` comments bypass type checking
+3. **Type Safety**: 176 `# type: ignore` comments bypass type checking
 4. **Observability**: PrintStyle logging is intentional framework behavior (not bare print statements)
 
 ### B. SYSTEM QUALITY BREAKDOWN (72/100)
@@ -313,6 +313,6 @@ docker run -p 50001:80 agent0ai/agent-zero
 ### RECENT CLEANUP (2026-02-19)
 
 ✅ **Branch synchronized**: Merged main (9a7a1a0) into custom branch
-✅ **Updated AGENTS.md statistics**: 196 Python files, 583 JS files, 176 Markdown files, 141 type ignores, 278 PrintStyle calls, 27,653 Python LOC, 19,599 JS LOC
+✅ **Updated AGENTS.md statistics**: 228 Python files, 587 JS files, 174 Markdown files, 176 type ignores, 278 PrintStyle calls, 34,832 Python LOC, 20,075 JS LOC
 ✅ **Verified repository cleanliness**: No .pyc, __pycache__, .DS_Store, Thumbs.db, or temp files found
 ✅ **No temporary files**: Repository clean of .pyc, .DS_Store, Thumbs.db, cache directories
