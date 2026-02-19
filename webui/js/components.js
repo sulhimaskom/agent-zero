@@ -83,46 +83,29 @@ export async function importComponent(path, targetElement) {
               loadPromises.push(modulePromise);
             }
           } else {
-            const virtualUrl = `${componentUrl.replaceAll(
-              "/",
-              "_"
-            )}.${++blobCounter}.js`;
-
-            // For inline module scripts, use cache or create blob
-            if (!componentCache[virtualUrl]) {
-              // Transform relative import paths to absolute URLs
-              let content = node.textContent.replace(
-                /import\s+([^'"]+)\s+from\s+["']([^"']+)["']/g,
-                (match, bindings, importPath) => {
-                  // Convert relative OR root-based (e.g. /src/...) to absolute URLs
-                  if (!/^https?:\/\//.test(importPath)) {
-                    const absoluteUrl = new URL(
-                      importPath,
-                      globalThis.location.origin
-                    ).href;
-                    return `import ${bindings} from "${absoluteUrl}"`;
-                  }
-                  return match;
+            // For inline module scripts, append directly to DOM
+            // This lets the browser handle imports natively without blob URLs
+            const script = document.createElement("script");
+            script.type = "module";
+            
+            // Get script content and transform imports to absolute URLs
+            let content = node.textContent || "";
+            content = content.replace(
+              /import\s+([^'"]+)\s+from\s+["']([^"']+)["']/g,
+              (match, bindings, importPath) => {
+                if (!/^https?:\/\//.test(importPath)) {
+                  const absoluteUrl = new URL(
+                    importPath,
+                    globalThis.location.origin
+                  ).href;
+                  return `import ${bindings} from "${absoluteUrl}"`;
                 }
-              );
-
-              // Add sourceURL to the content
-              content += `\n//# sourceURL=${virtualUrl}`;
-
-              // Create a Blob from the rewritten content
-              const blob = new Blob([content], {
-                type: "text/javascript",
-              });
-              const blobUrl = URL.createObjectURL(blob);
-
-              const modulePromise = import(blobUrl).catch((err) => {
-                console.error("Failed to load inline module", err);
-                throw err;
-              });
-
-              componentCache[virtualUrl] = modulePromise;
-              loadPromises.push(modulePromise);
-            }
+                return match;
+              }
+            );
+            
+            script.textContent = content;
+            targetElement.appendChild(script);
           }
         } else {
           // Non-module script

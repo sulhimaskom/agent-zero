@@ -1,6 +1,6 @@
 // Import the component loader and page utilities
-import { importComponent } from "/js/components.js";
-import { UI } from './constants.js';
+import { importComponent } from "/js/components.min.js";
+import { UI } from './constants.min.js';
 
 // Modal functionality
 const modalStack = [];

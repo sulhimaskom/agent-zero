@@ -1,6 +1,6 @@
 
 
-import * as device from "./device.js";
+import * as device from "./device.min.js";
 
 export async function initialize(){
     // set device class to body tag

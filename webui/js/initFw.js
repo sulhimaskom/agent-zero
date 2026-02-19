@@ -1,6 +1,6 @@
-import * as initializer from "./initializer.js";
-import * as _modals from "./modals.js";
-import * as _components from "./components.js";
+import * as initializer from "./initializer.min.js";
+import * as _modals from "./modals.min.js";
+import * as _components from "./components.min.js";
 
 // initialize required elements
 await initializer.initialize();
