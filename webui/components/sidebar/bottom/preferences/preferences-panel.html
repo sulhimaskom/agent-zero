@@ -108,6 +108,157 @@
       margin-left: auto;
     }
     .pref-section li { display: flex; align-items: center; }
+
+    /* ============================================
+       ENHANCED TOGGLE SWITCH MICRO-INTERACTIONS
+       Satisfying snap animation with visual feedback
+       ============================================ */
+
+    /* Base switch enhancement */
+    .pref-section .slider {
+      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      position: relative;
+      overflow: visible;
+    }
+
+    /* The toggle knob */
+    .pref-section .slider:before {
+      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Checked state - enhanced visual feedback */
+    .pref-section input:checked + .slider {
+      background-color: var(--color-highlight);
+      box-shadow: 0 0 8px rgba(66, 72, 241, 0.4);
+    }
+
+    /* Light mode adjustment for checked state */
+    .light-mode .pref-section input:checked + .slider {
+      box-shadow: 0 0 8px rgba(66, 72, 241, 0.3);
+    }
+
+    /* Knob position when checked with enhanced animation */
+    .pref-section input:checked + .slider:before {
+      transform: translateX(16px) scale(1.05);
+      background-color: #ffffff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Hover state for enhanced interactivity */
+    .pref-section .switch:hover .slider {
+      box-shadow: 0 0 0 3px rgba(66, 72, 241, 0.15);
+    }
+
+    .pref-section .switch:hover input:checked + .slider {
+      box-shadow: 0 0 0 3px rgba(66, 72, 241, 0.25),
+                  0 0 8px rgba(66, 72, 241, 0.4);
+    }
+
+    /* Active/click state for tactile feedback */
+    .pref-section .switch:active .slider:before {
+      transform: scale(0.95);
+    }
+
+    .pref-section .switch:active input:checked + .slider:before {
+      transform: translateX(16px) scale(0.9);
+    }
+
+    /* Focus visible for accessibility */
+    .pref-section .switch input:focus-visible + .slider {
+      outline: 2px solid var(--color-highlight);
+      outline-offset: 2px;
+    }
+
+    /* Toggle "snap" animation keyframes */
+    @keyframes toggle-snap-on {
+      0% {
+        transform: translateX(0) scale(1);
+      }
+      40% {
+        transform: translateX(18px) scale(1.15);
+      }
+      70% {
+        transform: translateX(14px) scale(0.95);
+      }
+      100% {
+        transform: translateX(16px) scale(1.05);
+      }
+    }
+
+    @keyframes toggle-snap-off {
+      0% {
+        transform: translateX(16px) scale(1.05);
+      }
+      40% {
+        transform: translateX(-2px) scale(1.15);
+      }
+      70% {
+        transform: translateX(2px) scale(0.95);
+      }
+      100% {
+        transform: translateX(0) scale(1);
+      }
+    }
+
+    /* Apply snap animation on toggle */
+    .pref-section .switch input:checked + .slider:before {
+      animation: toggle-snap-on 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+    }
+
+    .pref-section .switch input:not(:checked) + .slider:before {
+      animation: toggle-snap-off 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+    }
+
+    /* Glow pulse effect when toggled */
+    @keyframes toggle-glow {
+      0%, 100% {
+        box-shadow: 0 0 8px rgba(66, 72, 241, 0.4);
+      }
+      50% {
+        box-shadow: 0 0 16px rgba(66, 72, 241, 0.6),
+                    0 0 24px rgba(66, 72, 241, 0.3);
+      }
+    }
+
+    .pref-section input:checked + .slider {
+      animation: toggle-glow 0.6s ease-out;
+    }
+
+    /* Label highlight on toggle */
+    .pref-section li:has(input:checked) span {
+      color: var(--color-highlight);
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    /* Light mode label adjustment */
+    .light-mode .pref-section li:has(input:checked) span {
+      color: var(--color-highlight);
+    }
+
+    /* Accessibility: Respect reduced motion preferences */
+    @media (prefers-reduced-motion: reduce) {
+      .pref-section .slider,
+      .pref-section .slider:before {
+        transition: none;
+        animation: none !important;
+      }
+
+      .pref-section input:checked + .slider:before {
+        transform: translateX(16px);
+        animation: none;
+      }
+
+      .pref-section input:not(:checked) + .slider:before {
+        transform: translateX(0);
+        animation: none;
+      }
+
+      .pref-section input:checked + .slider {
+        animation: none;
+      }
+    }
   </style>
 </body>
 </html>
