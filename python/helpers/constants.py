@@ -264,6 +264,9 @@ class Limits:
     RFC_PORT_HTTP: Final[int] = 55080
     RFC_PORT_SSH: Final[int] = 55022
 
+    # Standard SSH port (for local shell interface)
+    SSH_DEFAULT_PORT: Final[int] = 22
+
     # STT settings
     STT_SILENCE_DURATION: Final[int] = 1000
     STT_SILENCE_THRESHOLD: Final[float] = 0.3

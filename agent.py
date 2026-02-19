@@ -293,7 +293,7 @@ class AgentConfig:
         default_factory=lambda: os.getenv("CODE_EXEC_SSH_ADDR", Config.DEFAULT_HOSTNAME)
     )
     code_exec_ssh_port: int = field(
-        default_factory=lambda: int(os.getenv("CODE_EXEC_SSH_PORT", "55022"))
+        default_factory=lambda: int(os.getenv("CODE_EXEC_SSH_PORT", str(Config.RFC_PORT_SSH)))
     )
     code_exec_ssh_user: str = field(default_factory=lambda: os.getenv("CODE_EXEC_SSH_USER", "root"))
     code_exec_ssh_pass: str = field(default_factory=lambda: os.getenv("CODE_EXEC_SSH_PASS", ""))
