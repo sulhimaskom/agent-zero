@@ -3,7 +3,7 @@
 ## PROMPTS
 
 ### OVERVIEW
-95+ markdown files controlling entire framework behavior through LLM system prompts. Edit prompts to change agent behavior without code changes.
+96 markdown files controlling entire framework behavior through LLM system prompts. Edit prompts to change agent behavior without code changes.
 
 ### STRUCTURE
 ```
