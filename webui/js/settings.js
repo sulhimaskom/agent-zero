@@ -97,7 +97,7 @@ const settingsModalProxy = {
 
         //get settings from backend
         try {
-            const set = await sendJsonData("/settings_get", null);
+            const set = await sendJsonData(API_ENDPOINTS.SETTINGS_GET, null);
 
             // First load the settings data without setting the active tab
             const settings = {
