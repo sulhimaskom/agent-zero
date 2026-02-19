@@ -181,7 +181,12 @@
 
     <script>
         // Expose git info for sidebar component
-        globalThis.gitinfo = { version: "{{version_no}}", commit_time: "{{version_time}}" };
+        // Template variables {{version_no}} and {{version_time}} are replaced by backend
+        // When served statically, they remain as literal strings which is valid JS
+        globalThis.gitinfo = {
+            version: "{{version_no}}" || "dev",
+            commit_time: "{{version_time}}" || new Date().toISOString()
+        };
     </script>
 </head>
 

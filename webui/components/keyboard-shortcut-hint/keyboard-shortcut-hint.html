@@ -23,7 +23,20 @@
     </div>
 
     <script>
-        document.addEventListener('alpine:init', () => {
+        // Register keyboardShortcutHint component
+        // Support both immediate registration (if Alpine is loaded) and deferred (via alpine:init)
+        function registerKeyboardShortcutHint() {
+            if (typeof Alpine === 'undefined') {
+                // Alpine not loaded yet, wait for alpine:init
+                document.addEventListener('alpine:init', registerKeyboardShortcutHint);
+                return;
+            }
+            
+            // Don't register if already registered
+            if (Alpine.$data && Alpine.$data.keyboardShortcutHint) {
+                return;
+            }
+            
             Alpine.data('keyboardShortcutHint', () => ({
                 isVisible: false,
                 hideTimer: null,
@@ -100,7 +113,10 @@
                     this.hideHint();
                 }
             }));
-        });
+        }
+        
+        // Try to register immediately
+        registerKeyboardShortcutHint();
     </script>
 
     <style>
