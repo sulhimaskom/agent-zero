@@ -1,6 +1,6 @@
 import { createStore } from "/js/AlpineStore.js";
 import * as Sleep from "/js/sleep.js";
-import { QR_CODE, TIMING } from "/js/constants.js";
+import { QR_CODE, TIMING, API_ENDPOINTS } from "/js/constants.js";
 import Logger from "/js/logger.min.js";
 
 // define the model object holding data and functions
@@ -50,7 +50,7 @@ const model = {
     }
 
     try {
-      const response = await fetchApi("/tunnel_proxy", {
+      const response = await fetchApi(API_ENDPOINTS.TUNNEL_PROXY, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -84,7 +84,7 @@ const model = {
 
         if (storedTunnelUrl) {
           // Use the stored URL but verify it's still valid
-          const verifyResponse = await fetchApi("/tunnel_proxy", {
+          const verifyResponse = await fetchApi(API_ENDPOINTS.TUNNEL_PROXY, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -150,7 +150,7 @@ const model = {
 
       try {
         // First stop any existing tunnel
-        const stopResponse = await fetchApi("/tunnel_proxy", {
+        const stopResponse = await fetchApi(API_ENDPOINTS.TUNNEL_PROXY, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -184,7 +184,7 @@ const model = {
   async generateLink() {
     // First check if authentication is enabled
     try {
-      const authCheckResponse = await fetchApi("/settings_get");
+      const authCheckResponse = await fetchApi(API_ENDPOINTS.SETTINGS_GET);
       const authData = await authCheckResponse.json();
 
       // Find the auth_login and auth_password in the settings
@@ -247,7 +247,7 @@ const model = {
 
     try {
       // Call the backend API to create a tunnel
-      const response = await fetchApi("/tunnel_proxy", {
+      const response = await fetchApi(API_ENDPOINTS.TUNNEL_PROXY, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -289,7 +289,7 @@ const model = {
 
         // Check if tunnel is running now
         try {
-          const statusResponse = await fetchApi("/tunnel_proxy", {
+          const statusResponse = await fetchApi(API_ENDPOINTS.TUNNEL_PROXY, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -360,7 +360,7 @@ const model = {
 
       try {
         // Call the backend to stop the tunnel
-        const response = await fetchApi("/tunnel_proxy", {
+        const response = await fetchApi(API_ENDPOINTS.TUNNEL_PROXY, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

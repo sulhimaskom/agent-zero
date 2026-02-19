@@ -2,7 +2,7 @@ import * as msgs from "/js/messages.min.js";
 import * as api from "/js/api.min.js";
 import * as css from "/js/css.min.js";
 import { sleep } from "/js/sleep.min.js";
-import { STORAGE_KEYS, TIMING } from "/js/constants.min.js";
+import { STORAGE_KEYS, TIMING, Selectors } from "/js/constants.min.js";
 import { store as attachmentsStore } from "/components/chat/attachments/attachmentsStore.min.js";
 import { store as speechStore } from "/components/chat/speech/speech-store.min.js";
 import { store as notificationStore } from "/components/notifications/notification-store.min.js";
@@ -659,7 +659,7 @@ document.addEventListener("DOMContentLoaded", function () {
   // Assign DOM elements to variables now that the DOM is ready
   leftPanel = document.getElementById("left-panel");
   rightPanel = document.getElementById("right-panel");
-  container = document.querySelector(".container");
+  container = document.querySelector(Selectors.CONTAINER);
   chatInput = document.getElementById("chat-input");
   chatHistory = document.getElementById("chat-history");
   sendButton = document.getElementById("send-button");

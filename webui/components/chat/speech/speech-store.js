@@ -3,7 +3,7 @@ import { updateChatInput, sendMessage } from "/index.js";
 import { sleep } from "/js/sleep.js";
 import { store as microphoneSettingStore } from "/components/settings/speech/microphone-setting-store.js";
 import * as shortcuts from "/js/shortcuts.js";
-import { TIMING, SPEECH } from "/js/constants.js";
+import { TIMING, SPEECH, API_ENDPOINTS } from "/js/constants.js";
 import Logger from "/js/logger.js";
 
 const Status = {
@@ -108,7 +108,7 @@ const model = {
   // Load settings from server
   async loadSettings() {
     try {
-      const response = await fetchApi("/settings_get", { method: "POST" });
+      const response = await fetchApi(API_ENDPOINTS.SETTINGS_GET, { method: "POST" });
       const data = await response.json();
       const speechSection = data.settings.sections.find(
         (s) => s.title === "Speech"
