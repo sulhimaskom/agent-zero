@@ -1,9 +1,9 @@
 # AGENT ZERO PROJECT KNOWLEDGE BASE
 
-**Generated:** 2026-02-18
+**Generated:** 2026-02-19
 **Branch:** custom
-**Commit:** 3a6cdc9
-**Last RepoKeeper Run:** 2026-02-18 (Repository maintenance - linting verified, statistics updated, branch is 30 commits ahead of main)
+**Commit:** 93d74f0
+**Last RepoKeeper Run:** 2026-02-19 (Repository maintenance - synchronized with main, statistics updated)
 
 ## OVERVIEW
 Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpine.js). Prompt-driven behavior - everything controlled by `/prompts/` markdown files. Grows organically through memory, tools, extensions, and agent profiles.
@@ -103,7 +103,7 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 - `/python/helpers/job_loop.py:34` - TODO: lowering SLEEP_TIME below 1min causes job duplication
 - 176 `# type: ignore` comments across 46 files - type suppression issues
 - 53 bare `except Exception:` handlers remaining (reduced from 182)
-- 278 PrintStyle calls across 45 files - intentional framework logging (not bare prints)
+- 308 PrintStyle calls across 45 files - intentional framework logging (not bare prints)
 
 ### Testing
 - pytest.ini exists and configured (asyncio mode, markers, test paths)
@@ -185,8 +185,8 @@ docker run -p 50001:80 agent0ai/agent-zero
 - **Large files**: `agent.py` (771 lines), `models.py` (905 lines), `settings.py` (1745 lines), `task_scheduler.py` (1284 lines), `mcp_handler.py` (1109 lines)
 - **Large frontend files**: `webui/js/scheduler.js` (1579 lines), `webui/js/messages.js` (1016 lines), `webui/components/chat/speech/speech-store.js` (965 lines)
 - **FAISS patch required** for Python 3.12 ARM - temporary workaround
-- **228 Python files** (~34,834 lines) - backend codebase
-- **586 JavaScript files** (~20,094 lines) - frontend codebase
+- **228 Python files** (~34,827 lines) - backend codebase
+- **586 JavaScript files** (~20,092 lines) - frontend codebase
 - **96 prompt files** - system prompts and agent behavior definitions
 - **No traditional testing** - CI uses AI code analysis instead of pytest runs
 - **Automatic SSH password generation** - `prepare.py` generates random root password (security concern for production)
@@ -310,12 +310,9 @@ docker run -p 50001:80 agent0ai/agent-zero
 ✅ **Security**: No secrets committed to repo
 ✅ **Clean Repo**: No temp files, OS files, or cache
 
-### RECENT CLEANUP (2026-02-18)
+### RECENT CLEANUP (2026-02-19)
 
-✅ **Branch status**: Custom branch is 30 commits ahead of main
+✅ **Branch synchronized**: Merged main (9a7a1a0) into custom branch
+✅ **Updated AGENTS.md statistics**: 228 Python files, 586 JS files, 176 Markdown files, 176 type ignores, 308 PrintStyle calls, 34,827 Python LOC, 20,092 JS LOC
 ✅ **Verified repository cleanliness**: No .pyc, __pycache__, .DS_Store, Thumbs.db, or temp files found
-✅ **Updated AGENTS.md statistics**: 228 Python files, 586 JS files, 176 Markdown files, 176 type ignores, 278 PrintStyle calls, 34,834 Python LOC, 20,094 JS LOC
-✅ **Linting verified**: All ruff checks passed
-✅ **Code formatting**: Fixed formatting in python/helpers/constants.py
-✅ **Branch synchronized**: Merged latest changes from origin/main
 ✅ **No temporary files**: Repository clean of .pyc, .DS_Store, Thumbs.db, cache directories
