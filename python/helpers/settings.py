@@ -1712,7 +1712,9 @@ def get_runtime_config(set: Settings):
             "code_exec_ssh_addr": dotenv.get_dotenv_value(
                 "CODE_EXEC_SSH_ADDR", Config.DEFAULT_HOSTNAME
             ),
-            "code_exec_ssh_port": int(dotenv.get_dotenv_value("CODE_EXEC_SSH_PORT", str(Limits.SSH_DEFAULT_PORT))),
+            "code_exec_ssh_port": int(
+                dotenv.get_dotenv_value("CODE_EXEC_SSH_PORT", str(Limits.SSH_DEFAULT_PORT))
+            ),
             "code_exec_ssh_user": dotenv.get_dotenv_value("CODE_EXEC_SSH_USER", "root"),
         }
     else:
