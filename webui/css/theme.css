@@ -1,0 +1,338 @@
+/**
+ * Flexy Theme System - CSS Variables for Agent Zero
+ * 
+ * Flexy says: No hardcoded values in CSS either!
+ * All colors, sizes, and timing values are defined as CSS variables.
+ * 
+ * Usage: var(--variable-name)
+ * Override: Define custom values in a theme override file or inline
+ */
+
+/* =============================================================================
+   COLOR PALETTE - Primary
+   ========================================================================== */
+:root {
+  /* Primary brand colors */
+  --color-primary: #2196f3;
+  --color-primary-light: #64b5f6;
+  --color-primary-dark: #1976d2;
+  --color-primary-rgb: 33, 150, 243;
+
+  /* Secondary colors */
+  --color-secondary: #4248f1;
+  --color-secondary-light: #5c6bc0;
+  --color-secondary-dark: #353bc5;
+
+  /* Accent colors */
+  --color-accent: #e91e63;
+  --color-accent-light: #f06292;
+  --color-accent-dark: #c2185b;
+  --color-highlight: #7c4dff;
+}
+
+/* =============================================================================
+   COLOR PALETTE - Semantic (Dark Theme - Default)
+   ========================================================================== */
+:root {
+  /* Background colors */
+  --bg-color: #0f111a;
+  --bg-color-secondary: #1a1d29;
+  --bg-color-tertiary: #252a3a;
+  --bg-color-panel: #1e1e2a;
+  --bg-color-hover: rgba(255, 255, 255, 0.05);
+  --bg-color-active: rgba(255, 255, 255, 0.1);
+
+  /* Text colors */
+  --color-text: #eaeaea;
+  --color-text-secondary: #b0b0b0;
+  --color-text-muted: #8a8a8a;
+  --color-text-disabled: #666666;
+  --color-text-inverse: #1a1a1a;
+
+  /* Border colors */
+  --color-border: #2b2b2b;
+  --color-border-light: rgba(255, 255, 255, 0.1);
+  --color-border-hover: rgba(255, 255, 255, 0.2);
+
+  /* Status colors */
+  --color-success: #2ecc71;
+  --color-success-bg: rgba(46, 204, 113, 0.1);
+  --color-warning: #f39c12;
+  --color-warning-bg: rgba(243, 156, 18, 0.1);
+  --color-error: #f44336;
+  --color-error-bg: rgba(244, 67, 54, 0.1);
+  --color-info: #3498db;
+  --color-info-bg: rgba(52, 152, 219, 0.1);
+}
+
+/* =============================================================================
+   COLOR PALETTE - Light Theme
+   ========================================================================== */
+[data-theme="light"] {
+  --bg-color: #f9f9f9;
+  --bg-color-secondary: #ffffff;
+  --bg-color-tertiary: #f0f0f0;
+  --bg-color-panel: #ffffff;
+  --bg-color-hover: rgba(0, 0, 0, 0.05);
+  --bg-color-active: rgba(0, 0, 0, 0.1);
+
+  --color-text: #1a1a1a;
+  --color-text-secondary: #4a4a4a;
+  --color-text-muted: #888888;
+  --color-text-disabled: #aaaaaa;
+  --color-text-inverse: #ffffff;
+
+  --color-border: #c8c8c8;
+  --color-border-light: rgba(0, 0, 0, 0.1);
+  --color-border-hover: rgba(0, 0, 0, 0.2);
+}
+
+/* =============================================================================
+   MESSAGE TYPE COLORS
+   ========================================================================== */
+:root {
+  --color-message-user: #4a4a4a;
+  --color-message-default: #1a242f;
+  --color-message-agent: #34506b;
+  --color-message-agent-response: #1f3c1e;
+  --color-message-agent-delegation: #12685e;
+  --color-message-tool: #2a4170;
+  --color-message-code-exe: #4b3a69;
+  --color-message-browser: #4b3a69;
+}
+
+[data-theme="light"] {
+  --color-message-user: #e8e8e8;
+  --color-message-default: #f5f5f5;
+  --color-message-agent: #d4e6f1;
+  --color-message-agent-response: #d5f5e3;
+  --color-message-agent-delegation: #d1f2eb;
+  --color-message-tool: #d6eaf8;
+  --color-message-code-exe: #e8daef;
+  --color-message-browser: #e8daef;
+}
+
+/* =============================================================================
+   TYPOGRAPHY
+   ========================================================================== */
+:root {
+  /* Font families */
+  --font-family-main: "Rubik", Arial, Helvetica, sans-serif;
+  --font-family-code: "Roboto Mono", "Fira Code", monospace;
+  --font-family-alt: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Font sizes */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-normal: 1rem;
+  --font-size-md: 1.125rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.5rem;
+  --font-size-2xl: 2rem;
+
+  /* Font weights */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Line heights */
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+
+  /* Letter spacing */
+  --letter-spacing-tight: -0.025em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.025em;
+}
+
+/* =============================================================================
+   SPACING
+   ========================================================================== */
+:root {
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 24px;
+  --spacing-2xl: 32px;
+  --spacing-3xl: 48px;
+}
+
+/* =============================================================================
+   SIZING
+   ========================================================================== */
+:root {
+  /* Border radius */
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-full: 9999px;
+
+  /* Component sizes */
+  --size-btn-sm: 28px;
+  --size-btn-md: 36px;
+  --size-btn-lg: 44px;
+  --size-icon-sm: 16px;
+  --size-icon-md: 20px;
+  --size-icon-lg: 24px;
+
+  /* Modal sizes */
+  --modal-width: 1100px;
+  --modal-max-height: 90vh;
+  --modal-radius: 12px;
+
+  /* Notification sizes */
+  --notification-width: 400px;
+  --notification-max-height: 80vh;
+}
+
+/* =============================================================================
+   ANIMATION & TRANSITIONS
+   ========================================================================== */
+:root {
+  /* Durations */
+  --dur-instant: 0ms;
+  --dur-fast: 150ms;
+  --dur-normal: 200ms;
+  --dur-medium: 300ms;
+  --dur-slow: 500ms;
+  --dur-slower: 1000ms;
+
+  /* Easing functions */
+  --ease-linear: linear;
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Standard transitions */
+  --transition-fast: all var(--dur-fast) var(--ease-smooth);
+  --transition-normal: all var(--dur-normal) var(--ease-smooth);
+  --transition-slow: all var(--dur-slow) var(--ease-smooth);
+}
+
+/* =============================================================================
+   Z-INDEX SCALE
+   ========================================================================== */
+:root {
+  --z-index-base: 0;
+  --z-index-dropdown: 100;
+  --z-index-sticky: 200;
+  --z-index-fixed: 300;
+  --z-index-modal-backdrop: 400;
+  --z-index-modal: 500;
+  --z-index-popover: 600;
+  --z-index-tooltip: 700;
+  --z-index-notification: 3000;
+  --z-index-toast: 3100;
+  --z-index-modal-stack: 3200;
+}
+
+/* =============================================================================
+   SHADOWS
+   ========================================================================== */
+:root {
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.15);
+  --shadow-focus: 0 0 0 4px rgba(33, 150, 243, 0.2);
+  --shadow-glow: 0 0 20px rgba(33, 150, 243, 0.3);
+}
+
+[data-theme="light"] {
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.05);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* =============================================================================
+   NOTIFICATION SPECIFIC
+   ========================================================================== */
+:root {
+  /* Notification colors (already defined in semantic, but specific overrides) */
+  --notification-bg: var(--bg-color-panel);
+  --notification-border: var(--color-border);
+  --notification-text: var(--color-text);
+  --notification-badge-bg: var(--color-error);
+  --notification-badge-text: white;
+  --notification-pulse-color: var(--color-primary);
+  
+  /* Notification timing */
+  --notification-display-time: 3000ms;
+  --notification-toast-error-time: 5000ms;
+  --notification-toast-success-time: 3000ms;
+  --notification-toast-warning-time: 4000ms;
+  --notification-pulse-duration: 2s;
+}
+
+/* =============================================================================
+   BUTTON SPECIFIC
+   ========================================================================== */
+:root {
+  --btn-primary-bg: var(--color-primary);
+  --btn-primary-text: white;
+  --btn-primary-hover-bg: var(--color-primary-dark);
+  
+  --btn-secondary-bg: var(--color-secondary);
+  --btn-secondary-text: white;
+  --btn-secondary-hover-bg: var(--color-secondary-dark);
+  
+  --btn-ok-bg: var(--color-secondary);
+  --btn-ok-hover-bg: var(--color-secondary-dark);
+  
+  --btn-disabled-bg: #cccccc;
+  --btn-disabled-text: #666666;
+}
+
+/* =============================================================================
+   FOCUS STATES
+   ========================================================================== */
+:root {
+  --focus-outline-width: 2px;
+  --focus-outline-style: solid;
+  --focus-outline-color: var(--color-primary);
+  --focus-outline-offset: 2px;
+  --focus-shadow: var(--shadow-focus);
+}
+
+/* =============================================================================
+   UTILITY CLASSES
+   ========================================================================== */
+
+/* Theme transition helper */
+.theme-transition {
+  transition: background-color var(--dur-normal) var(--ease-smooth),
+              color var(--dur-normal) var(--ease-smooth),
+              border-color var(--dur-normal) var(--ease-smooth);
+}
+
+/* Focus visible utility */
+.focus-ring:focus-visible {
+  outline: var(--focus-outline-width) var(--focus-outline-style) var(--focus-outline-color);
+  outline-offset: var(--focus-outline-offset);
+  box-shadow: var(--focus-shadow);
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  :root {
+    --color-border: #000000;
+    --focus-outline-width: 3px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 0ms;
+    --dur-normal: 0ms;
+    --dur-medium: 0ms;
+    --dur-slow: 0ms;
+  }
+}
