@@ -4,6 +4,7 @@ from agent import Agent, LoopData
 from python.helpers import projects
 from python.helpers.extension import Extension
 from python.helpers.mcp_handler import MCPConfig
+from python.helpers.print_style import PrintStyle
 from python.helpers.settings import get_settings
 
 
@@ -70,7 +71,7 @@ def get_secrets_prompt(agent: Agent):
         return agent.read_prompt("agent.system.secrets.md", secrets=secrets, vars=vars)
     except Exception as e:
         # If secrets module is not available or has issues, return empty string
-        print(f"Failed to get secrets prompt: {e}")
+        PrintStyle.error(f"Failed to get secrets prompt: {e}")
         return ""
 
 

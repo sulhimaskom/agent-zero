@@ -36,4 +36,4 @@ class MaskReasoningStreamChunk(Extension):
                 PrintStyle().stream(processed_chunk)
         except Exception as e:
             # If masking fails, proceed without masking
-            print(f"Failed to mask reasoning stream chunk: {e}")
+            PrintStyle.error(f"Failed to mask reasoning stream chunk: {e}")
