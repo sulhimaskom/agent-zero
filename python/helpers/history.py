@@ -286,10 +286,15 @@ class Bulk(Record):
         return False
 
     async def summarize(self):
+        # Get output text and filter out vision bytes
+        import re
+        output_text = self.output_text()
+        # Replace base64 image data URLs with placeholder
+        filtered_text = re.sub(r"data:image/[^;]+;base64,[A-Za-z0-9+/=]+", "[Image]", output_text)
         self.summary = await self.history.agent.call_utility_model(
             system=self.history.agent.read_prompt("fw.topic_summary.sys.md"),
             message=self.history.agent.read_prompt(
-                "fw.topic_summary.msg.md", content=self.output_text()
+                "fw.topic_summary.msg.md", content=filtered_text
             ),
         )
         self._tokens = None
