@@ -40,28 +40,52 @@ except Exception as e:
 
 **Verification**:
 - Python syntax check: PASSED
-#PB|
-#QR|---
-#TJ|
-#NP|### 2026-02-25: Secrets and Extensions Bare Exception Fix
-#BV|**Issue**: Bare exception handlers without exception variable capture in secrets management and agent extensions
-#NP|**Root Cause**: Multiple locations in the secrets module and extension hooks were using `except Exception:` without capturing the exception variable, making debugging difficult.
-#NP|**Fix Applied**: Added exception variable capture (`as e`) and logging print statements to 8 critical files.
-#NP|**Files Modified**:
-#NP|- `python/helpers/secrets.py` - _read_secrets_raw method (line 165)
-#NP|- `python/extensions/system_prompt/_10_system_prompt.py` - get_secrets_prompt function (line 71)
-#NP|- `python/extensions/hist_add_before/_10_mask_content.py` - execute method (line 17)
-#NP|- `python/extensions/response_stream_chunk/_10_mask_stream.py` - execute method (line 37)
-#NP|- `python/extensions/reasoning_stream_chunk/_10_mask_stream.py` - execute method (line 37)
-#NP|- `python/extensions/response_stream_end/_10_mask_end.py` - execute method (line 26)
-#NP|- `python/extensions/reasoning_stream_end/_10_mask_end.py` - execute method (line 26)
-#NP|**Verification**:
-#NP|- All 7 files pass Python syntax check
-#NP|- Reduced bare exception count from 52 to 39 in codebase (13 fixed)
-#NP|- Focused on agent domain: extensions (tool execution) and secrets (security)
+
 ---
 
-#TT|**Issue**: [PERFORMANCE] Vision Bytes Sent to Utility LLM - Wastes Tokens (#241)
+### 2026-02-25: Secrets and Extensions Bare Exception Fix
+**Issue**: Bare exception handlers without exception variable capture in secrets management and agent extensions
+
+**Root Cause**: Multiple locations in the secrets module and extension hooks were using `except Exception:` without capturing the exception variable, making debugging difficult.
+
+**Fix Applied**: Added exception variable capture (`as e`) and logging print statements to 8 critical files.
+
+**Files Modified**:
+- `python/helpers/secrets.py` - _read_secrets_raw method (line 165)
+- `python/extensions/system_prompt/_10_system_prompt.py` - get_secrets_prompt function (line 71)
+- `python/extensions/hist_add_before/_10_mask_content.py` - execute method (line 17)
+- `python/extensions/response_stream_chunk/_10_mask_stream.py` - execute method (line 37)
+- `python/extensions/reasoning_stream_chunk/_10_mask_stream.py` - execute method (line 37)
+- `python/extensions/response_stream_end/_10_mask_end.py` - execute method (line 26)
+- `python/extensions/reasoning_stream_end/_10_mask_end.py` - execute method (line 26)
+
+**Verification**:
+- All 7 files pass Python syntax check
+- Reduced bare exception count from 52 to 39 in codebase (13 fixed)
+- Focused on agent domain: extensions (tool execution) and secrets (security)
+
+---
+
+### 2026-02-25: Bare Exception Handlers Fix in Helper Modules (PR #304)
+**Issue**: Bare exception handlers without exception variable capture in helper modules
+
+**Root Cause**: Multiple locations in helper modules were using `except Exception:` without capturing the exception variable.
+
+**Fix Applied**: Added exception variable capture (`as e`) to 3 critical files.
+
+**Files Modified**:
+- `python/helpers/whisper.py` - Line 104: cleanup in temp file removal
+- `python/helpers/print_style.py` - Line 124: secret masking fallback
+- `python/helpers/defer.py` - Line 175: async task cleanup
+
+**Verification**:
+- Python syntax check: PASSED
+- Reduced bare exception count in python/helpers from 21 to 18 (3 fixed)
+
+**Status**: PR #304 ready for merge - creates Issue #309 for remaining 23 files
+
+---
+
 ### 2026-02-25: Vision Bytes Filter Fix
 **Issue**: [PERFORMANCE] Vision Bytes Sent to Utility LLM - Wastes Tokens (#241)
 
@@ -87,11 +111,15 @@ async def summarize(self):
 - Python syntax check passed
 - Code follows existing pattern from summarize_messages() method
 
+---
+
 ## Known Issues (Future Work)
-1. **Issue #234**: Test coverage gap - 5% Python coverage, 0% JS coverage
-2. **Issue #235**: settings.py - 1748-Line Monolith Needs Refactoring  
-3. **Issue #236**: task_scheduler.py - 1284-Line Mixed Concerns
-4. **Issue #237**: scheduler.js - 1579-Line Monolith Needs Splitting
+
+1. **Issue #309**: 23 remaining files with bare exception handlers - continuation after PR #304
+2. **Issue #234**: Test coverage gap - 5% Python coverage, 0% JS coverage
+3. **Issue #235**: settings.py - 1748-Line Monolith Needs Refactoring
+4. **Issue #236**: task_scheduler.py - 1284-Line Mixed Concerns
+5. **Issue #237**: scheduler.js - 1579-Line Monolith Needs Splitting
 
 ## Patterns & Conventions
 - Use regex substitution to filter vision bytes: `r"data:image/[^;]+;base64,[A-Za-z0-9+/=]+"`
