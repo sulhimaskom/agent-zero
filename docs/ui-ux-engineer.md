@@ -79,6 +79,15 @@ This document tracks UI/UX improvements, accessibility standards, and patterns f
 ```
 
 ## Action Items (Next Sprint)
+#ZJ|- [x] Audit all modal close buttons (context.html, history.html - DONE 2026-02-25)
+#YZ|- [ ] Check form validation accessibility
+#MH|- [ ] Review notification toast accessibility
+## Action Items (Next Sprint)
+#ZJ|- [x] Audit all modal close buttons (context.html, history.html - DONE 2026-02-25)
+#YZ|- [ ] Check form validation accessibility
+#MH|- [ ] Review notification toast accessibility
+#VK|- [ ] Test keyboard navigation flow
+KR|
 - [ ] Audit all modal close buttons
 - [ ] Check form validation accessibility
 - [ ] Review notification toast accessibility
@@ -95,6 +104,21 @@ This document tracks UI/UX improvements, accessibility standards, and patterns f
 - Pattern: Both console.error (for devs) AND toast (for users) used together
 
 ### Issue #243 - First-Time Setup Wizard
+#HZ|**Status:** ✅ COMPLETED (2026-02-25)
+#KS|- Setup wizard component exists at setup-wizard-store.js
+#KJ|- Accessibility improvements completed (close button, logo alt, keyboard nav)
+#ZJ|- [x] Audit all modal close buttons (context.html, history.html - DONE)
+#YZ|- [ ] Check form validation accessibility
+#MH|- [ ] Review notification toast accessibility
+#VK|- [ ] Test keyboard navigation flow
+
+### PR #314 - Accessibility Improvements (2026-02-25)
+#HZ|**Status:** ✅ OPEN
+#KS|- Added aria-labels to sidebar quick-actions.html (8 buttons)
+#KJ|- Added aria-labels to chat input bottom-actions.html (6 buttons)
+#ZJ|- Added close buttons with aria-labels to context.html and history.html modals
+#YZ|- Added label association to tunnel-section.html select element
+#MH|- Improves screen reader support and keyboard navigation
 **Status:** 🔄 IN PROGRESS
 - Setup wizard component exists at setup-wizard-store.js
 - Accessibility improvements completed (close button, logo alt, keyboard nav)
