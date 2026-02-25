@@ -86,6 +86,11 @@ const model = {
       this._applyShowUtils(this._showUtils);
     } catch (e) {
       console.error("Failed to initialize preferences store", e);
+      window.toastFrontendWarning(
+        "Some preferences could not be loaded.",
+        "Preferences",
+        5
+      );
     }
   },
 

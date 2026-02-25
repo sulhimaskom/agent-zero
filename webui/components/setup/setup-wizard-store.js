@@ -53,6 +53,11 @@ const model = {
       }
     } catch (e) {
       console.error('Failed to load providers:', e);
+      window.toastFrontendWarning(
+        "Could not load providers from settings. Using defaults.",
+        "Provider Load",
+        5
+      );
       // Fallback to default providers
       this.providers = this.getDefaultProviders();
     }

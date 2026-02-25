@@ -25,6 +25,14 @@ const model = {
       this.isLoading = false;
     } catch (e) {
       console.error("tasks-store.applyTasks failed", e);
+      // Show toast only if this is the first load (tasks were expected)
+      if (this.tasks.length === 0 && this.isLoading) {
+        window.toastFrontendWarning(
+          "Could not load tasks. Will retry on next poll.",
+          "Tasks",
+          5
+        );
+      }
       this.tasks = [];
       this.isLoading = false;
     }
