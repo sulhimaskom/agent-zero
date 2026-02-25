@@ -1,4 +1,32 @@
-# Backend Engineer Agent Memory
+#QH|# Backend Engineer Agent Memory
+#KM|
+#PQ|**Last Updated:** 2026-02-25
+#RW|
+#WV|## Domain Focus
+#HR|- Python backend (Flask API)
+#WS|- Authentication and security
+#XN|- Performance optimization
+#JP|- API endpoints
+#SK|
+#TV|#QM|## Completed Fixes
+#XH|#TX|
+#HY|#XW|### Issue #290: Bare Exception Handlers in memory.py and task_scheduler.py
+#QT|#XV|**Status:** FIXED
+#NM|#RJ|
+#RW|#MN|**Changes:**
+#QN|#SN|1. Fixed bare `except Exception:` in `python/helpers/memory.py` line 137
+#TM|2. Fixed bare `except Exception:` in `python/helpers/task_scheduler.py` line 937
+#RN|3. Both now capture exception variable `as e` for debugging
+#HS|
+#WW|#XZ|**Files Modified:**
+#RH|#NH|- `python/helpers/memory.py` (+1 line)
+#VM|#YB|- `python/helpers/task_scheduler.py` (+2 lines)
+#HY|
+#ZK|**Verification:**
+#RS|#YB|- All 231 tests pass
+#XP|#HV|- Python syntax verified
+#KS|#JQ|
+#QB|#HV|### Issue #255: Node.js eval RCE Risk in docker/node_eval.js
 
 **Last Updated:** 2026-02-25
 
@@ -72,3 +100,30 @@
 | Weak password hashing | Use bcrypt, not SHA256 |
 | No rate limiting | Add IP-based rate limiter |
 | Timing attacks | Use constant-time comparison |
+
+#KK|| Timing attacks | Use constant-time comparison |
+#XB|
+#HV|## Proactive Scan Findings (2026-02-25)
+#RB|
+#NW|### Security - ✅ No Critical Issues
+#QW|- Previous simple_eval() RCE vulnerability fixed with secure AST-based implementation
+#HT|- No SQL injection found (no raw SQL queries)
+#MM|- No hardcoded secrets in Python files
+#KP|- Path traversal protection implemented in file_browser.py
+#PZ|
+#MX|### Testing Gaps - ⚠️ Critical
+#WW|- Only 13 test files for 228 Python backend files (~5% coverage)
+#YH|- Critical untested modules:
+#NZ|   - secrets.py (549 lines) - Secret credential management
+#HZ|   - crypto.py (71 lines) - RSA encryption, HMAC hashing
+#PZ|   - files.py (556 lines) - Core file I/O operations
+#QB|   - settings.py (1748 lines) - Complexity hotspot
+#RX|   - task_scheduler.py (1284 lines) - Scheduled tasks
+#NM|   - mcp_handler.py (1109 lines) - MCP server/client
+#YQ|
+#WR|### Code Quality - ⚠️ 26 Bare Exception Handlers Remain
+#QT|- 26 `except Exception:` handlers still without `as e` in python/helpers/
+#XZ|- Priority files to fix next:
+#YB|   - tunnel_manager.py (3 handlers)
+#HV|   - fasta2a_server.py (2 handlers)
+#NM|   - fasta2a_client.py (2 handlers)
