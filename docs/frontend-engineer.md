@@ -56,6 +56,30 @@ Located in: `/webui/js/api.js`
 
 ## Working Notes
 
+### 2026-02-25: Issue #237 - Scheduler.js Modularization
+- Split monolithic `scheduler.js` (1579 lines) into modular stores
+- Created new directory: `js/stores/scheduler/`
+- Modules created:
+  - `formatting.js` (83 lines) - Pure display formatting functions
+  - `datetime.js` (159 lines) - DateTime picker initialization
+  - `polling.js` (124 lines) - Task polling and fetching
+  - `ui.js` (209 lines) - UI state, filtering, sorting
+  - `tasks.js` (736 lines) - Task CRUD operations
+  - `index.js` (214 lines) - Main exports and composition
+- Refactored `scheduler.js` to 674 lines (57% reduction)
+- Maintained full backward compatibility with existing Alpine.js integration
+- All JavaScript files pass syntax validation
+
+### 2026-02-25: Second Task Completed
+- Fixed missing `aria-label` attributes in `file-browser.html` (lines 51, 54)
+- Added `aria-label` and `title` to download and delete buttons in file browser
+
+### First Task Completed
+- Fixed empty `alt` attribute in `dragDropOverlay.html` (line 40)
+- Changed from `alt=""` to `alt="Drag and drop files"`
+
+## Commands
+
 ### 2026-02-25: Second Task Completed
 - Fixed missing `aria-label` attributes in `file-browser.html` (lines 51, 54)
 - Added `aria-label` and `title` to download and delete buttons in file browser
