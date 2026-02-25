@@ -53,7 +53,7 @@ def get_mcp_tools_prompt(agent: Agent):
         agent.context.log.set_progress(
             "Collecting MCP tools"
         )  # MCP might be initializing, better inform via progress bar
-        tools = MCPConfig.get_instance().get_tools_prompt()
+        tools = MCPConfig.get_instance().get_tools_prompt(agent=agent)
         agent.context.log.set_progress(pre_progress)  # return original progress
         return tools
     return ""
