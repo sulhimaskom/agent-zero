@@ -5,6 +5,8 @@ across multiple areas (main, fragments, solutions, instruments).
 Supports AI filtering and memory consolidation.
 """
 
+# Security: Safe expression evaluation to replace simple_eval (RCE vulnerability)
+import ast
 import json
 import logging
 import os
@@ -26,8 +28,6 @@ from langchain_community.vectorstores.utils import (
 )
 from langchain_core.documents import Document
 from langchain_core.stores import InMemoryByteStore
-# Security: Safe expression evaluation to replace simple_eval (RCE vulnerability)
-import ast
 
 # Allowed AST node types for safe expression evaluation
 ALLOWED_AST_NODES = {

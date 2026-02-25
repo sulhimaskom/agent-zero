@@ -1,3 +1,5 @@
+# Security: Safe expression evaluation to replace simple_eval (RCE vulnerability)
+import ast
 import uuid
 from collections.abc import Sequence
 from typing import Any
@@ -12,8 +14,6 @@ from langchain_community.vectorstores.utils import (
     DistanceStrategy,
 )
 from langchain_core.documents import Document
-# Security: Safe expression evaluation to replace simple_eval (RCE vulnerability)
-import ast
 
 # Allowed AST node types for safe expression evaluation
 ALLOWED_AST_NODES = {
