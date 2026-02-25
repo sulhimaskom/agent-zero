@@ -1,7 +1,7 @@
 # AGENT ZERO - AGENT PROFILES
 
-**Generated:** 2026-01-13
-**Commit:** a99361d
+**Generated:** 2026-02-25
+**Commit:** d7c3076
 **Branch:** custom
 
 ## OVERVIEW
@@ -11,30 +11,31 @@ Agent profiles enable different agent personalities with custom prompts, tools, 
 ```
 agents/
 ├── agent0/              # Default agent profile
-│   ├── prompts/          # Override framework prompts
-│   ├── tools/            # Override default tools
-│   └── extensions/       # Override lifecycle extensions
+│   ├── _context.md     # Agent context configuration
+│   └── prompts/         # Override framework prompts
 ├── brocula/             # Browser console & Lighthouse specialist
-│   ├── prompts/          # BroCula system prompts
-│   ├── tools/            # Browser monitoring tools
-│   └── mcp-servers.json  # MCP server configuration
-├── developer/           # Developer personality
-│   ├── prompts/
-│   ├── tools/
-│   └── extensions/
-├── hacker/              # Security researcher personality
-│   ├── prompts/
-│   ├── tools/
-│   └── extensions/
-├── researcher/          # Research analyst personality
-│   ├── prompts/
-│   ├── tools/
-│   └── extensions/
-├── default/             # Base profile for agents
-│   ├── prompts/
-│   └── tools/
-└── _example/            # Example profile template
-    └── README.md
+│   ├── README.md         # Brocula documentation
+│   ├── brocula.py       # Main brocula script
+│   ├── brocula_loop.py # Brocula loop script
+│   ├── mcp-servers.json # MCP server configuration
+│   ├── prompts/         # BroCula system prompts
+│   ├── reports/        # Generated reports
+│   └── tools/          # Browser monitoring tools
+├── developer/          # Developer personality
+│   ├── _context.md
+│   └── prompts/
+├── hacker/             # Security researcher personality
+│   ├── _context.md
+│   └── prompts/
+├── researcher/         # Research analyst personality
+│   ├── _context.md
+│   └── prompts/
+├── default/            # Base profile for agents
+│   └── _context.md
+└── _example/          # Example profile template
+    ├── extensions/
+    ├── prompts/
+    └── tools/
 ```
 
 ## WHERE TO LOOK
@@ -50,9 +51,14 @@ agents/
 ## CONVENTIONS
 
 ### Profile Structure
-- Each profile has optional: `prompts/`, `tools/`, `extensions/`
+- Each profile has optional: `_context.md`, `prompts/`, `tools/`, `extensions/`
+- `_context.md`: Agent context configuration file (required for agent behavior)
+- `prompts/`: Custom markdown prompts for agent behavior
+- `tools/`: Profile-specific tool overrides
+- `extensions/`: Profile-specific extension overrides
 - Subdirectories mirror default structure: `/prompts/`, `/python/tools/`, `/python/extensions/`
-- No profile = uses default framework behavior
+- No subdirectory = uses default framework behavior
+- All profiles should have `_context.md` for proper agent initialization
 
 ### Override Mechanism
 - **Filename matching**: Same filename replaces default (e.g., `call_subordinate.py` in profile overrides default)
