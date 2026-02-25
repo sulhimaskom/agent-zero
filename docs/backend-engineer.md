@@ -29,7 +29,23 @@
 #XJ|   - Dangerous globals blocked (process, require, Buffer): ReferenceError as expected
 #MV|   - Async/await: PASS
 #HN|
-#HV|### Issue #238: Weak Authentication Hashing - SHA256 Without Salt
+### Issue #271: MCP Handler Has Inline Prompts Instead of External Files
+**Status:** FIXED
+
+**Changes:**
+1. Created new prompt file `prompts/fw.mcp_tools_usage.md` with externalized usage template
+2. Modified `MCPHandler.get_tools_prompt()` to accept optional `agent` parameter
+3. Added logic to load external prompt when agent is provided, with fallback to inline template
+4. Updated `get_mcp_tools_prompt()` in `_10_system_prompt.py` to pass agent
+
+**Files Modified:**
+- `prompts/fw.mcp_tools_usage.md` (new)
+- `python/helpers/mcp_handler.py`
+- `python/extensions/system_prompt/_10_system_prompt.py`
+
+**Key Pattern:** Always provide backward compatibility with inline fallback when externalizing prompts
+
+## Patterns & Conventions
 ### Issue #238: Weak Authentication Hashing - SHA256 Without Salt
 **Status:** FIXED
 
