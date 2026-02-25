@@ -17,6 +17,34 @@ Deliver small, safe, measurable improvements to the security posture of the code
 
 ## Fixed Vulnerabilities
 
+### Issue #255: Node.js eval() in docker node_eval.js - RCE Risk
+**Date Fixed**: 2026-02-25
+**Severity**: HIGH (RCE)
+**Files Changed**: 
+- `docker/run/fs/exe/node_eval.js`
+
+**Vulnerability**: 
+The file used `eval()` with user-controlled code input within a VM context, but the context exposed dangerous globals like `require`, `process`, and `module`. This allowed RCE through malicious code like `require('child_process').execSync('command')`.
+
+**Solution**:
+Implemented a secure sandbox with minimal, safe globals only:
+- REMOVED: `require`, `process`, `module`, `exports` - these allowed RCE
+- KEPT: Safe operations like `console.log`, `Math`, `Array`, `JSON`, `Buffer` (read-only subset)
+- KEPT: Timing functions (`setTimeout`, `setInterval`) without direct process access
+- Added 30-second timeout to prevent infinite loops
+- The `eval()` is still used but now within a properly sandboxed context with NO dangerous globals
+
+**Testing**:
+- `require('fs')` → Blocked with ReferenceError
+- `process.exit(0)` → Blocked with ReferenceError
+- Basic arithmetic → Works
+- Array operations → Works
+- JSON parsing → Works
+- Buffer operations → Works
+- Error handling → Works
+
+---
+
 ### Issue #231: Code Injection via simple_eval() - RCE Risk
 **Date Fixed**: 2026-02-25
 **Severity**: HIGH (RCE)
@@ -42,16 +70,17 @@ Implemented `safe_eval_condition()` - a secure AST-based expression evaluator th
 - Function calls (except `len()`) are blocked
 
 ## Patterns to Avoid
-- Never use `eval()` or `simple_eval()` with user input
+- Never use `eval()` or `simple_eval()` with user input **unless** in a properly sandboxed context
 - Always use allowlists instead of blocklists for security
 - Fail safely - default to denying access
 - Use AST parsing for expression evaluation
+- When using eval() is necessary, remove ALL dangerous globals from the VM context
 
 ## Labels Used
 - `security-engineer`: For PRs from this agent
 - `security`: For security-related issues
 
 ## Future Focus Areas
-- Issue #232: eval() in Node.js
+- ~~Issue #232: eval() in Node.js~~ → **FIXED (Issue #255)**
 - Issue #233: SSH Root Access
 - Issue #238: Weak password hashing
