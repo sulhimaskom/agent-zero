@@ -3,6 +3,21 @@
 This document tracks R&D efforts, learnings, and improvements made to Agent Zero.
 
 ## 2026-02-25
+### Issue Analyzed: Bare Exception Handlers in mcp_server.py
+
+**Problem**: The `_run_chat` function in `python/helpers/mcp_server.py` had a bare `except Exception:` handler that silently swallowed all exceptions when processing attachments without capturing the exception variable.
+
+**Root Cause**: Generic exception handlers catch all exceptions but without capturing the exception object, making debugging difficult when attachment processing fails.
+
+**Solution Applied**:
+- Line 239: Changed `except Exception:` to `except Exception as e:` to capture the exception and include it in the error message
+
+**Files Changed**: `python/helpers/mcp_server.py`
+
+**Status**: Fixed - Reduced bare exception handlers from 32 to 31 across the codebase
+
+---
+
 
 ### Issue Analyzed: Bare Exception Handlers in login.py
 
