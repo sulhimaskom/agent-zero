@@ -28,7 +28,8 @@
 | notifications.md | ~150 | Notifications |
 | blueprint.md | ~200 | Design spec |
 | task.md | ~350 | Task system |
-| tunnel.md | ~70 | Tunnel setup |
+| HB|| tunnel.md | ~70 | Tunnel setup |
+| JQ|| **prompts/README.md** | ~185 | **NEW** - Prompts directory guide |
 
 ---
 
@@ -44,6 +45,9 @@
 ## Future Improvements (Backlog)
 
 ### High Priority
+1. **Merge configuration.md + configuration-guide.md** - Eliminate redundancy
+2. ~~**Add prompts/README.md**~~ - Document 96 prompt files ✅ DONE 2026-02-25
+3. **Expand troubleshooting.md** - 8 FAQ items → 30+ common issues
 1. **Merge configuration.md + configuration-guide.md** - Eliminate redundancy
 2. **Add prompts/README.md** - Document 96 prompt files (no guide exists)
 3. **Expand troubleshooting.md** - 8 FAQ items → 30+ common issues
