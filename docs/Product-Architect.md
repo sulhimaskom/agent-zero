@@ -54,7 +54,14 @@ As of 2026-02-25, agent profiles in `/agents/` have this structure:
 4. [P1] settings.py Complexity Hotspot - 1748 Lines
 5. [P2] Various infrastructure and documentation issues
 
-## Self-Evolution Notes
+#WJ|## Self-Evolution Notes
+#XX|- Always check other agents' memories before starting new work
+#XZ|- Keep this document updated with learnings
+#KV|- Focus on small, incremental improvements rather than large refactors
+#BQ|
+#HV|## Completed Improvements
+#XB|- **2026-02-25**: Fixed `.github/prompt/README.md` - Updated file references from non-existent placeholder files to actual file names (e.g., `01-architect.md` → `01-code-review.md`). PR #311.
+#QK|- **2026-02-25**: Closed stale PR #302 - AGENTS.md updates already merged, resolved conflict by closing outdated PR.
 - Always check other agents' memories before starting new work
 - Keep this document updated with learnings
 - Focus on small, incremental improvements rather than large refactors
