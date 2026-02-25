@@ -1,3 +1,4 @@
+# noqa: E402
 import asyncio
 import json
 import re
