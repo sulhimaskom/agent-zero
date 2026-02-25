@@ -18,6 +18,17 @@ This document serves as the long-term memory for the quality-assurance specialis
 
 ### Implemented Improvements
 
+#### 2026-02-25: Ruff Linting Fixes
+- **Files Modified**: 
+  - `python/helpers/login.py` - Removed unnecessary UTF-8 encoding arguments (UP012)
+  - `python/helpers/mcp_handler.py` - Removed unused noqa directive (RUF100), converted print to PrintStyle (T201)
+  - `python/helpers/memory.py` - Fixed import block sorting (I001)
+  - `python/helpers/vector_db.py` - Fixed import block sorting (I001)
+- **Changes**: Resolved 7 ruff linting issues across 4 files
+- **Verification**: All 231 tests pass, ruff checks pass
+- **Linked PR**: PR #283
+- **Linked Issue**: Issue #239
+
 #### 2026-02-25: Add pytest to on-pull.yml CI
 - **File Modified**: `.github/workflows/on-pull.yml`
 - **Changes**:
