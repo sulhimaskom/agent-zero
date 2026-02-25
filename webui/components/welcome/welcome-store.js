@@ -60,6 +60,18 @@ const model = {
       case "github":
         window.open("https://github.com/agent0ai/agent-zero", "_blank");
         break;
+      case "setup":
+        // Open setup wizard
+        if (window.Alpine && Alpine.store) {
+          const wizardStore = Alpine.store('setupWizardStore');
+          if (wizardStore) {
+            wizardStore.open();
+          }
+        }
+        break;
+    }
+        window.open("https://github.com/agent0ai/agent-zero", "_blank");
+        break;
     }
   },
 };
