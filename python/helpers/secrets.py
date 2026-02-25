@@ -163,7 +163,6 @@ class SecretsManager:
             try:
                 content = files.read_file(path)
             except Exception as e:
-                print(f"Failed to read secrets file {path}: {e}")
                 content = ""
 
             self._raw_snapshots[path] = content
