@@ -11,6 +11,8 @@
     <!-- Reset Chat button with tooltip -->
     <div class="button-wrapper" x-data="{ showTooltip: false }">
       <button class="config-button" id="resetChat"
+              aria-label="Reset chat - clear current conversation and start fresh"
+              @click="$store.chats.resetChat()"
               @click="$store.chats.resetChat()"
               @mouseover="showTooltip = true"
               @mouseleave="showTooltip = false"
@@ -33,6 +35,8 @@
     <!-- New Chat button with tooltip -->
     <div class="button-wrapper" x-data="{ showTooltip: false }">
       <button class="config-button" id="newChat"
+              aria-label="Create a new chat session"
+              @click="$store.chats.newChat()"
               @click="$store.chats.newChat()"
               @mouseover="showTooltip = true"
               @mouseleave="showTooltip = false"
@@ -55,6 +59,8 @@
     <!-- Load Chat button with tooltip -->
     <div class="button-wrapper" x-data="{ showTooltip: false }">
       <button class="config-button" id="loadChats"
+              aria-label="Load a previously saved chat"
+              @click="$store.chats.loadChats()"
               @click="$store.chats.loadChats()"
               @mouseover="showTooltip = true"
               @mouseleave="showTooltip = false"
@@ -76,7 +82,9 @@
 
     <!-- Save Chat button with tooltip -->
     <div class="button-wrapper" x-data="{ showTooltip: false }">
-      <button class="config-button" id="loadChat"
+      <button class="config-button" id="saveChat"
+              aria-label="Save current chat to disk"
+              @click="$store.chats.saveChat()"
               @click="$store.chats.saveChat()"
               @mouseover="showTooltip = true"
               @mouseleave="showTooltip = false"
@@ -99,6 +107,8 @@
     <!-- Restart button with tooltip -->
     <div class="button-wrapper" x-data="{ showTooltip: false }">
       <button class="config-button" id="restart"
+              aria-label="Restart the Agent Zero framework"
+              @click="$store.chats.restart()"
               @click="$store.chats.restart()"
               @mouseover="showTooltip = true"
               @mouseleave="showTooltip = false"
@@ -121,6 +131,8 @@
     <!-- Settings button with tooltip -->
     <div class="button-wrapper" x-data="{ showTooltip: false }">
       <button class="config-button" id="settings"
+              aria-label="Open settings configuration"
+              @click="settingsModalProxy.openModal()"
               @click="settingsModalProxy.openModal()"
               @mouseover="showTooltip = true"
               @mouseleave="showTooltip = false"
@@ -151,6 +163,8 @@
     <!-- Memory button with tooltip -->
     <div class="button-wrapper" x-data="{ showTooltip: false }">
       <button class="config-button" id="memory-dash"
+              aria-label="Manage agent memories and knowledge"
+              @click="openModal('settings/memory/memory-dashboard.html');"
         @click="openModal('settings/memory/memory-dashboard.html');"
         @mouseover="showTooltip = true"
         @mouseleave="showTooltip = false"
@@ -173,6 +187,8 @@
     <!-- Dashboard button with tooltip -->
     <div class="button-wrapper" x-data="{ showTooltip: false }">
       <button class="config-button" id="dashboard"
+              aria-label="Return to welcome dashboard"
+              @click="deselectChat()"
               @click="deselectChat()"
               @mouseover="showTooltip = true"
               @mouseleave="showTooltip = false"

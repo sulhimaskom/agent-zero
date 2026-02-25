@@ -9,6 +9,14 @@
   <div x-data>
     <template x-if="$store.context">
       <div class="context-modal-root">
+        <!-- Header with close button -->
+        <div class="context-modal-header">
+          <h2 class="context-modal-title">Context Window</h2>
+          <button class="modal-close" onclick="closeModal()" aria-label="Close context window">&times;</button>
+        </div>
+
+        <!-- Loading State -->
+      <div class="context-modal-root">
 
         <!-- Loading State -->
         <template x-if="$store.context.isLoading">
@@ -36,6 +44,46 @@
 
   <style>
     .context-modal-root {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+      min-height: 400px;
+    }
+
+    .context-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--spacing-md);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .context-modal-title {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--color-text);
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--color-text-secondary);
+      padding: 0 0.5rem;
+      line-height: 1;
+    }
+
+    .modal-close:hover {
+      color: var(--color-text);
+    }
+
+    .modal-close:focus-visible {
+      outline: 2px solid var(--color-highlight);
+      outline-offset: 2px;
+    }
       display: flex;
       flex-direction: column;
       width: 100%;

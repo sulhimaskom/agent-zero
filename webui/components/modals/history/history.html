@@ -9,6 +9,14 @@
   <div x-data>
     <template x-if="$store.history">
       <div class="history-modal-root">
+        <!-- Header with close button -->
+        <div class="history-modal-header">
+          <h2 class="history-modal-title">Conversation History</h2>
+          <button class="modal-close" onclick="closeModal()" aria-label="Close history">&times;</button>
+        </div>
+
+        <!-- Loading State -->
+      <div class="history-modal-root">
 
         <!-- Loading State -->
         <template x-if="$store.history.isLoading">
@@ -34,7 +42,28 @@
     </template>
   </div>
 
-  <style>
+    .history-modal-root {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      height: 100%;
+      min-height: 400px;
+    }
+
+    .history-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--spacing-md);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .history-modal-title {
+      margin: 0;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--color-text);
+    }
     .history-modal-root {
       display: flex;
       flex-direction: column;
