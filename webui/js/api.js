@@ -1,6 +1,12 @@
 import Logger from './logger.js';
 import { API } from './constants.js';
 
+function showErrorToast(message, title = 'Connection Error') {
+  if (typeof globalThis.toastFrontendError === 'function') {
+    globalThis.toastFrontendError(message, title, 8, '', 20, true);
+  }
+}
+
 // Track if we're in static file mode (no backend)
 let isStaticMode = false;
 let staticModeChecked = false;
@@ -55,6 +61,7 @@ export async function callJsonApi(endpoint, data) {
 
   if (!response.ok) {
     const error = await response.text();
+    showErrorToast(`API Error: ${response.status} - ${endpoint}`, 'Request Failed');
     throw new Error(error);
   }
   const jsonResponse = await response.json();
@@ -177,6 +184,7 @@ async function getCsrfToken() {
     }
   } catch (error) {
     csrfTokenFailed = true;
+    showErrorToast('Backend connection failed. Please check if the server is running.', 'Connection Error');
     // Only log the first error to prevent console spam
     // Log as debug instead of warn to keep console clean in static file mode
     Logger.once('backend_connection_error', () => {
