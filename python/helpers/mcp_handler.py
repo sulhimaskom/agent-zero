@@ -1,4 +1,4 @@
-# noqa: E402
+
 import asyncio
 import json
 import re
@@ -666,7 +666,7 @@ class MCPConfig(BaseModel):
                     try:
                         tools = server.get_tools()
                     except Exception as e:
-                        print(f"Failed to get tools for server {server_name}: {e}")
+                        PrintStyle(font_color="red").print(f"Failed to get tools for server {server_name}: {e}")
                         tools = []
                     return {
                         "name": server.name,
@@ -971,7 +971,7 @@ class MCPClientBase(ABC):
         try:
             log = self.log_file.read()
         except Exception as e:
-            print(f"Failed to read log file: {e}")
+            PrintStyle(font_color="red").print(f"Failed to read log file: {e}")
             log = ""
         return log
 
