@@ -12,7 +12,111 @@ from langchain_community.vectorstores.utils import (
     DistanceStrategy,
 )
 from langchain_core.documents import Document
-from simpleeval import simple_eval
+# Security: Safe expression evaluation to replace simple_eval (RCE vulnerability)
+import ast
+from typing import Any
+
+# Allowed AST node types for safe expression evaluation
+ALLOWED_AST_NODES = {
+    ast.Expression, ast.Compare, ast.BoolOp, ast.UnaryOp,
+    ast.Eq, ast.NotEq, ast.Lt, ast.LtE, ast.Gt, ast.GtE,
+    ast.In, ast.NotIn, ast.Not,
+    ast.Name, ast.Constant, ast.List, ast.Tuple, ast.Set,
+    ast.Call, ast.Attribute, ast.Subscript
+}
+
+# BoolOp and Compare operators are checked via isinstance
+BOOL_OPS = {ast.And, ast.Or}
+CMP_OPS = {ast.Eq, ast.NotEq, ast.Lt, ast.LtE, ast.Gt, ast.GtE, ast.In, ast.NotIn}
+
+
+def _safe_eval_node(node: ast.AST, data: dict) -> any:
+    """Safely evaluate an AST node against the data dictionary."""
+    if isinstance(node, ast.Expression):
+        return _safe_eval_node(node.body, data)
+    elif isinstance(node, ast.Constant):
+        return node.value
+    elif isinstance(node, ast.Name):
+        if node.id in data:
+            return data[node.id]
+        raise NameError(f"Unknown variable: {node.id}")
+    elif isinstance(node, ast.Compare):
+        left = _safe_eval_node(node.left, data)
+        for op, comparator in zip(node.ops, node.comparators):
+            right = _safe_eval_node(comparator, data)
+            if isinstance(op, ast.Eq):
+                left = left == right
+            elif isinstance(op, ast.NotEq):
+                left = left != right
+            elif isinstance(op, ast.Lt):
+                left = left < right
+            elif isinstance(op, ast.LtE):
+                left = left <= right
+            elif isinstance(op, ast.Gt):
+                left = left > right
+            elif isinstance(op, ast.GtE):
+                left = left >= right
+            elif isinstance(op, ast.In):
+                left = left in right
+            elif isinstance(op, ast.NotIn):
+                left = left not in right
+            else:
+                raise ValueError(f"Disallowed operator: {type(op).__name__}")
+        return left
+    elif isinstance(node, ast.BoolOp):
+        values = [_safe_eval_node(v, data) for v in node.values]
+        if isinstance(node.op, ast.And):
+            result = True
+            for v in values:
+                result = result and v
+                if not result:
+                    return False
+            return result
+        elif isinstance(node.op, ast.Or):
+            result = False
+            for v in values:
+                result = result or v
+                if result:
+                    return True
+            return result
+        else:
+            raise ValueError(f"Disallowed bool op: {type(node.op).__name__}")
+    elif isinstance(node, ast.UnaryOp):
+        operand = _safe_eval_node(node.operand, data)
+        if isinstance(node.op, ast.Not):
+            return not operand
+        else:
+            raise ValueError(f"Disallowed unary op: {type(node.op).__name__}")
+    elif isinstance(node, (ast.List, ast.Tuple, ast.Set)):
+        return [_safe_eval_node(e, data) for e in node.elts]
+    elif isinstance(node, ast.Call):
+        if isinstance(node.func, ast.Name) and node.func.id == "len":
+            args = [_safe_eval_node(arg, data) for arg in node.args]
+            return len(*args)
+        raise ValueError("Function calls are not allowed")
+    elif isinstance(node, ast.Attribute):
+        raise ValueError("Attribute access is not allowed")
+    elif isinstance(node, ast.Subscript):
+        value = _safe_eval_node(node.value, data)
+        idx = _safe_eval_node(node.slice, data)
+        return value[idx]
+    else:
+        raise ValueError(f"Disallowed node type: {type(node).__name__}")
+
+
+def safe_eval_condition(condition: str, data: dict) -> any:
+    """Safely evaluate a condition string against a data dictionary.
+    
+    Replaces simple_eval() with a secure AST-based implementation.
+    """
+    try:
+        tree = ast.parse(condition, mode="eval")
+        for node in ast.walk(tree):
+            if type(node) not in ALLOWED_AST_NODES:
+                raise ValueError(f"Disallowed node type: {type(node).__name__}")
+        return _safe_eval_node(tree, data)
+    except Exception:
+        return False
 
 from agent import Agent
 
@@ -135,11 +239,6 @@ def cosine_normalizer(val: float) -> float:
 
 def get_comparator(condition: str):
     def comparator(data: dict[str, Any]):
-        try:
-            result = simple_eval(condition, {}, data)
-            return result
-        except Exception:
-            # PrintStyle.error(f"Error evaluating condition: {e}")
-            return False
-
+        # Use safe_eval_condition instead of simple_eval to prevent RCE
+        return safe_eval_condition(condition, data)
     return comparator
