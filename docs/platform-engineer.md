@@ -32,6 +32,11 @@ Deliver small, safe, measurable improvements strictly inside the platform engine
 
 ## Improvements Log
 
+### 2026-02-25 - pyproject.toml Black Redundancy Removal
+- **Change:** Removed redundant `black` configuration from `pyproject.toml`
+- **Rationale:** Both `ruff-format` and `black` were configured but perform the same function. Ruff is significantly faster and is already configured as the primary formatter. Removed `[tool.black]` section and `black` from dev dependencies.
+- **Impact:** Reduced tooling redundancy, consistent formatting configuration, faster CI
+
 ### 2026-02-25 - Pre-commit Redundancy Removal
 - **Change:** Removed redundant `black` configuration from `.pre-commit-config.yaml`
 - **Rationale:** Both `ruff-format` and `black` were configured but perform the same function. Ruff is significantly faster and is already configured as the primary formatter in `pyproject.toml`.
@@ -41,12 +46,11 @@ Deliver small, safe, measurable improvements strictly inside the platform engine
 
 ### CI/CD
 - GitHub workflows use OpenCode AI agent for automation (innovative approach)
-- No explicit ruff/black/mypy validation steps in CI (AI agents handle it)
+- No explicit ruff/mypy validation steps in CI (AI agents handle it)
 - Consider adding explicit lint validation for faster feedback
 
 ### Python Tooling
-- pyproject.toml is well-configured with ruff, black, mypy
-- Pre-commit config has redundancy (black + ruff-format)
+- pyproject.toml is well-configured with ruff and mypy
 - 176 `# type: ignore` comments in codebase - type safety opportunity
 
 ### Docker
