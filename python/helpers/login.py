@@ -18,13 +18,13 @@ def hash_password(user: str, password: str) -> str:
     # Use username as the salt key for deterministic hashing based on user
     salt = bcrypt.gensalt(rounds=12)
     # Combine user and password for hashing
-    return bcrypt.hashpw(f"{user}:{password}".encode(), salt).decode("utf-8")
+    return bcrypt.hashpw(f"{user}:{password}".encode(), salt).decode()
 
 
 def verify_password(user: str, password: str, stored_hash: str) -> bool:
     """Verify a password against a stored bcrypt hash."""
     try:
-        return bcrypt.checkpw(f"{user}:{password}".encode(), stored_hash.encode("utf-8"))
+        return bcrypt.checkpw(f"{user}:{password}".encode(), stored_hash.encode())
     except Exception:
         return False
 
