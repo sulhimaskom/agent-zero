@@ -21,6 +21,21 @@
                     Start a new conversation or explore the features below.
                 </p>
 
+                <!-- Get Started Button -->
+                <button class="welcome-get-started-btn"
+                        @click="executeAction('setup')"
+                        @keydown.enter.prevent="executeAction('setup')"
+                        @keydown.space.prevent="executeAction('setup')">
+                    <span class="material-symbols-outlined">rocket_launch</span>
+                    Get Started
+                </button>
+
+                <!-- Action Cards -->
+                <h1 class="welcome-title">Welcome to Agent Zero</h1>
+                <p class="welcome-subtitle">
+                    Start a new conversation or explore the features below.
+                </p>
+
                 <!-- Action Cards -->
                 <div class="welcome-actions">
                     <div class="welcome-action-card"
@@ -186,6 +201,51 @@
         }
 
         .welcome-subtitle {
+            font-size: 1rem;
+            margin-bottom: 2rem;
+            color: var(--color-secondary);
+            max-width: 600px;
+            line-height: 1.5;
+            animation: welcome-text-fade 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.35s forwards;
+            opacity: 0;
+        }
+
+        /* Get Started Button */
+        .welcome-get-started-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: white;
+            background: var(--color-primary);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 2rem;
+            animation: welcome-text-fade 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.4s forwards;
+            opacity: 0;
+        }
+
+        .welcome-get-started-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+        }
+
+        .welcome-get-started-btn:focus-visible {
+            outline: 2px solid var(--color-highlight);
+            outline-offset: 2px;
+        }
+
+        .welcome-get-started-btn:active {
+            transform: scale(0.98);
+        }
+
+        .welcome-get-started-btn .material-symbols-outlined {
+            font-size: 1.25rem;
+        }
             font-size: 1rem;
             margin-bottom: 2rem;
             color: var(--color-secondary);

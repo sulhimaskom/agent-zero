@@ -214,6 +214,14 @@
             <div x-data x-show="$store.welcomeStore && $store.welcomeStore.isVisible">
                 <x-component path="welcome/welcome-screen.html"></x-component>
             </div>
+
+            <!-- Setup Wizard Component -->
+            <x-component path="setup/setup-wizard.html"></x-component>
+
+            <!-- Message History (actual messages) -->
+            <div x-data x-show="$store.welcomeStore && $store.welcomeStore.isVisible">
+                <x-component path="welcome/welcome-screen.html"></x-component>
+            </div>
             <!-- Message History (actual messages) -->
             <div id="chat-history" x-data x-show="!$store.welcomeStore || !$store.welcomeStore.isVisible"></div>
 
