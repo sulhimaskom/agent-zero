@@ -1,0 +1,116 @@
+# Dependabot configuration for Agent Zero
+# Automated dependency updates to reduce vulnerability exposure and maintenance burden
+#
+# See: https://docs.github.com/en/code-security/dependabot
+
+version: 2
+
+updates:
+  # Python dependencies
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: UTC
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: deps
+      include: scope
+    labels:
+      - dependencies
+      - python
+    versioning-strategy: widen
+    ignore:
+      # Ignore major version updates for now (require manual testing)
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # Python development dependencies
+  - package-ecosystem: pip
+    directory: /
+    filename: requirements.dev.txt
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: UTC
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: dev-deps
+      include: scope
+    labels:
+      - dependencies
+      - dev
+    versioning-strategy: widen
+
+  # JavaScript/Node.js dependencies
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: UTC
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: deps
+      include: scope
+    labels:
+      - dependencies
+      - javascript
+    versioning-strategy: widen
+
+  # Docker base image updates
+  - package-ecosystem: docker
+    directory: /docker/base
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: UTC
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: docker
+      include: scope
+    labels:
+      - dependencies
+      - docker
+    # Pin base image to specific tag for reproducibility
+    versioning-strategy: pin
+
+  # Docker runtime image updates
+  - package-ecosystem: docker
+    directory: /docker/run
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: UTC
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: docker
+      include: scope
+    labels:
+      - dependencies
+      - docker
+    versioning-strategy: pin
+
+  # Docker local build
+  - package-ecosystem: docker
+    directory: /
+    filename: DockerfileLocal
+    schedule:
+      interval: weekly
+      day: monday
+      time: "09:00"
+      timezone: UTC
+    open-pull-requests-limit: 3
+    commit-message:
+      prefix: docker
+      include: scope
+    labels:
+      - dependencies
+      - docker
+    versioning-strategy: pin
