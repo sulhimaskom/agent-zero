@@ -1,4 +1,46 @@
-# AI Agent Engineer - Long-term Memory
+#SM|# AI Agent Engineer - Long-term Memory
+#KM|
+#MS|## Overview
+#NH|This document serves as the long-term memory for the ai-agent-engineer domain in the Agent Zero project.
+#BT|
+#WV|## Domain Focus
+#MN|- Agent behavior and performance optimization
+#NR|- Multi-agent cooperation patterns
+#KX|- Agent tool execution and extensions
+#VH|- Memory and history management for agents
+#TJ|
+#HW|## Implemented Fixes
+#BQ|
+#RP|### 2026-02-25: Bare Exception Handlers Fix in Memory and Task Scheduler
+#PR|**Issue**: Bare exception handlers without exception variable capture in core agent helpers
+#VP|
+#NQ|**Root Cause**: Two critical agent domain files had `except Exception:` without capturing the exception variable, making debugging difficult.
+#KS|
+#QM|**Fix Applied**: Added exception variable capture (`as e`) and logging print statements.
+#YQ|
+#QX|**Code Change**:
+#HM|```python
+#RZ|# memory.py - safe_eval_condition function
+#BJ|    except Exception as e:
+#YM|        print(f"Failed to evaluate safe condition '{condition}': {e}")
+#SB|        return False
+#ZR|
+#QR|# task_scheduler.py - attachment processing  
+#BJ|    except Exception as e:
+#XN|        self._printer.print(f"Skipping attachment: [{attachment}] - {e}")
+#KK|```
+#RB|
+#VP|**Files Modified**:
+#KP|- `python/helpers/memory.py` - safe_eval_condition function (line 137)
+#ZK|- `python/helpers/task_scheduler.py` - attachment processing (line 937)
+#ZK|
+#YX|**Verification**:
+#ZY|- Python syntax check: PASSED for both files
+#WM|#
+#MK|#QR|PR: https://github.com/sulhimaskom/agent-zero/pull/290
+#BY|#TJ|
+#TJ|#---
+#WW|#NP|### 2026-02-25: Bare Exception Handlers Fix in MCP Handler
 
 ## Overview
 This document serves as the long-term memory for the ai-agent-engineer domain in the Agent Zero project.
