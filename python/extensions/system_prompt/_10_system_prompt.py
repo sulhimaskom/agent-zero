@@ -68,8 +68,9 @@ def get_secrets_prompt(agent: Agent):
         secrets = secrets_manager.get_secrets_for_prompt()
         vars = get_settings()["variables"]
         return agent.read_prompt("agent.system.secrets.md", secrets=secrets, vars=vars)
-    except Exception:
+    except Exception as e:
         # If secrets module is not available or has issues, return empty string
+        print(f"Failed to get secrets prompt: {e}")
         return ""
 
 

@@ -14,9 +14,9 @@ class MaskHistoryContent(Extension):
 
             # Mask the content before adding to history
             content_data["content"] = self._mask_content(content_data["content"], secrets_mgr)
-        except Exception:
+        except Exception as e:
             # If masking fails, proceed without masking
-            pass
+            print(f"Failed to mask history content: {e}")
 
     def _mask_content(self, content, secrets_mgr):
         """Recursively mask secrets in message content."""
