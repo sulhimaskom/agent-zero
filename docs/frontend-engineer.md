@@ -60,6 +60,10 @@ Located in: `/webui/js/api.js`
 - Fixed empty `alt` attribute in `dragDropOverlay.html` (line 40)
 - Changed from `alt=""` to `alt="Drag and drop files"`
 
+### Second Task Completed
+- Added `aria-label="Remove attachment"` to button in `inputPreview.html`
+- This improves accessibility for screen reader users
+
 ## Commands
 
 ### Build/Test
