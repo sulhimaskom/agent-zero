@@ -20,7 +20,7 @@
                                     x-text="$store.projects.getSelectedAbsPath()"></span></strong></span>
                         <div class="projects-input-with-button-wrapper">
                             <input class="projects-form-input projects-disabled" type="text" x-model="$store.projects.selectedProject.name" disabled>
-                            <button class="button icon-button" @click="$store.projects.browseSelected()">
+                            <button class="button icon-button" aria-label="Browse project folder" @click="$store.projects.browseSelected()">
                                 <span class="icon material-symbols-outlined">folder</span>
                                 <span>Browse</span>
                             </button>
