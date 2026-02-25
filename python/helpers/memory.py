@@ -134,7 +134,8 @@ def safe_eval_condition(condition: str, data: dict) -> any:
                 if not (node_type in BOOL_OPS or node_type in CMP_OPS):
                     raise ValueError(f"Disallowed node type: {node_type}")
         return _safe_eval_node(tree, data)
-    except Exception:
+    except Exception as e:
+        return False
         return False
 
 import models  # noqa: E402
