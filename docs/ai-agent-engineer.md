@@ -111,15 +111,17 @@ async def summarize(self):
 - Python syntax check passed
 - Code follows existing pattern from summarize_messages() method
 
----
-
 ## Known Issues (Future Work)
 
 1. **Issue #309**: 23 remaining files with bare exception handlers - continuation after PR #304
 2. **Issue #234**: Test coverage gap - 5% Python coverage, 0% JS coverage
-3. **Issue #235**: settings.py - 1748-Line Monolith Needs Refactoring
+3. **Issue #235**: settings.py - 1748-Line Monolith Needs Refactoring  
 4. **Issue #236**: task_scheduler.py - 1284-Line Mixed Concerns
 5. **Issue #237**: scheduler.js - 1579-Line Monolith Needs Splitting
+
+---
+
+## Patterns & Conventions
 
 ## Patterns & Conventions
 - Use regex substitution to filter vision bytes: `r"data:image/[^;]+;base64,[A-Za-z0-9+/=]+"`
