@@ -135,9 +135,10 @@ def safe_eval_condition(condition: str, data: dict) -> any:
                     raise ValueError(f"Disallowed node type: {node_type}")
         return _safe_eval_node(tree, data)
     except Exception as e:
-        print(f"Failed to evaluate safe condition '{condition}': {e}")
+        logger = logging.getLogger(__name__)
+        logger.exception("Failed to evaluate safe condition")
         return False
-        return False
+
 
 import models  # noqa: E402
 from agent import Agent, AgentContext  # noqa: E402
