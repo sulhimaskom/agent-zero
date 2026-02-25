@@ -10,23 +10,27 @@
 
 ## Completed Fixes
 
-### Issue: Bare Exception Handlers in A2A Protocol Files
-**Status:** FIXED (2026-02-25)
+### Issue #305 + #304: Bare Exception Handlers in defer.py, print_style.py, whisper.py
+**Status:** FIXED
 
 **Changes:**
-1. Fixed bare `except Exception:` in `python/helpers/fasta2a_server.py` line 291
-2. Fixed bare `except Exception:` in `python/helpers/fasta2a_server.py` line 305
-3. Fixed bare `except Exception:` in `python/helpers/fasta2a_client.py` line 79
-4. Fixed bare `except Exception:` in `python/helpers/fasta2a_client.py` line 138
-5. All now capture exception variable `as e` for debugging
+1. Fixed bare `except Exception:` in `python/helpers/defer.py` line 175
+2. Fixed bare `except Exception:` in `python/helpers/print_style.py` line 124
+3. Fixed bare `except Exception:` in `python/helpers/whisper.py` line 104
+4. All now capture exception variable `as e` for debugging
 
 **Files Modified:**
-- `python/helpers/fasta2a_server.py` (+2 lines)
-- `python/helpers/fasta2a_client.py` (+2 lines)
+- `python/helpers/defer.py` (+1 line)
+- `python/helpers/print_style.py` (+1 line)
+- `python/helpers/whisper.py` (+1 line)
 
 **Verification:**
 - Python syntax verified
 - No regressions
+
+---
+
+### Issue #290:
 
 ### Issue #290: Bare Exception Handlers in memory.py and task_scheduler.py
 **Status:** FIXED
@@ -99,6 +103,10 @@
 - Test files in `tests/` directory
 - Follow naming: `test_*.py`
 
+### Exception Handling
+- Always capture exception variable: `except Exception as e:`
+- Never use bare `except Exception:`
+
 ## Common Issues & Solutions
 
 | Issue | Solution |
@@ -106,6 +114,7 @@
 | Weak password hashing | Use bcrypt, not SHA256 |
 | No rate limiting | Add IP-based rate limiter |
 | Timing attacks | Use constant-time comparison |
+| Bare exception handlers | Always use `as e` for debugging |
 
 ## Proactive Scan Findings (2026-02-25)
 
@@ -125,9 +134,16 @@
    - task_scheduler.py (1284 lines) - Scheduled tasks
    - mcp_handler.py (1109 lines) - MCP server/client
 
-### Code Quality - ⚠️ 22 Bare Exception Handlers Remain
-- 22 `except Exception:` handlers still without `as e` in python/ and extensions/
+### Code Quality - Bare Exception Handlers Progress
+- **Fixed in this PR:** 3 handlers in defer.py, print_style.py, whisper.py
+- **Remaining in python/helpers:** ~22 handlers
 - Priority files to fix next:
    - mcp_server.py
    - vector_db.py
-   - files.py
+   - tunnel_manager.py
+   - fasta2a_server.py
+   - fasta2a_client.py
+
+---
+
+## Patterns & Conventions
