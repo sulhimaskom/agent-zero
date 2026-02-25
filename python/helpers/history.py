@@ -286,10 +286,15 @@ class Bulk(Record):
         return False
 
     async def summarize(self):
+        # Replace vision bytes with placeholders before sending to utility
+        content = self.output_text()
+        import re
+        content = re.sub(r"data:image/[^;]+;base64,[A-Za-z0-9+/=]+", "[Image]", content)
+
         self.summary = await self.history.agent.call_utility_model(
             system=self.history.agent.read_prompt("fw.topic_summary.sys.md"),
             message=self.history.agent.read_prompt(
-                "fw.topic_summary.msg.md", content=self.output_text()
+                "fw.topic_summary.msg.md", content=content
             ),
         )
         self._tokens = None
