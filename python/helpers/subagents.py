@@ -86,7 +86,7 @@ def _get_agents_list_from_dir(dir: str, origin: Origin) -> dict[str, SubAgentLis
             agent_data.path = files.get_abs_path(dir, subdir)
             agent_data.origin = [origin]
             result[name] = agent_data
-        except Exception:
+        except Exception as e:
             continue
 
     return result
@@ -159,11 +159,11 @@ def _load_agent_data_from_dir(dir: str, name: str, origin: Origin) -> SubAgent |
     try:
         subagent_json = files.read_file(files.get_abs_path(dir, name, "agent.json"))
         subagent = SubAgent.model_validate_json(subagent_json)
-    except Exception:
+    except Exception as e:
         # backward compatibility (before agent.json existed)
         try:
             context_file = files.read_file(files.get_abs_path(dir, name, "_context.md"))
-        except Exception:
+        except Exception as e:
             context_file = ""
         subagent = SubAgent(
             name=name,
@@ -181,7 +181,7 @@ def _load_agent_data_from_dir(dir: str, name: str, origin: Origin) -> SubAgent |
     prompts_dir = f"{dir}/{name}/prompts"
     try:
         prompts = files.read_text_files_in_dir(prompts_dir, pattern="*.md")
-    except Exception:
+    except Exception as e:
         prompts = {}
 
     subagent.prompts = prompts or {}

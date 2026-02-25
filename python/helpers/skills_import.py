@@ -39,7 +39,7 @@ def _is_within(child: Path, parent: Path) -> bool:
     try:
         child.resolve().relative_to(parent.resolve())
         return True
-    except Exception:
+    except Exception as e:
         return False
 
 
@@ -128,7 +128,7 @@ def build_import_plan(
                 continue
             try:
                 rel = skill_dir.resolve().relative_to(root.resolve())
-            except Exception:
+            except Exception as e:
                 # If relative fails due to symlink oddities, just use leaf folder name
                 rel = Path(skill_dir.name)
             dest_dir = dest_ns_root / rel

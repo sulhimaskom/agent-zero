@@ -262,7 +262,7 @@ async def _run_chat(
                             attachment_filenames.append(attachment)
                         else:
                             _PRINTER.print(f"Skipping attachment: [{attachment}]")
-                    except Exception:
+                    except Exception as e:
                         _PRINTER.print(f"Skipping attachment: [{attachment}]")
 
         _PRINTER.print("User message:")

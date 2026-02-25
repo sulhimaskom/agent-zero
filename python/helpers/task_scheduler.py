@@ -865,7 +865,7 @@ class TaskScheduler:
                                     attachment_filenames.append(attachment)
                                 else:
                                     PrintStyle.warning(f"Skipping attachment: [{attachment}]")
-                            except Exception:
+                            except Exception as e:
                                 PrintStyle.warning(f"Skipping attachment: [{attachment}]")
 
                 self._printer.print("User message:")
@@ -918,7 +918,7 @@ class TaskScheduler:
                 PrintStyle.warning(f"Scheduler Task '{current_task.name}' cancelled by user")
                 try:
                     await asyncio.shield(self.update_task(task_uuid, state=TaskState.IDLE))
-                except Exception:
+                except Exception as e:
                     pass
                 raise
             except Exception as e:
@@ -941,7 +941,7 @@ class TaskScheduler:
                     await asyncio.shield(current_task.on_finish())
                 except asyncio.CancelledError:
                     pass
-                except Exception:
+                except Exception as e:
                     pass
 
                 # Make one final save to ensure all states are persisted
@@ -949,7 +949,7 @@ class TaskScheduler:
                     await asyncio.shield(self._tasks.save())
                 except asyncio.CancelledError:
                     pass
-                except Exception:
+                except Exception as e:
                     pass
 
                 self._unregister_running_task(task_uuid)

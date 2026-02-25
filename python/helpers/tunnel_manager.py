@@ -122,7 +122,7 @@ class TunnelManager:
                 self.tunnel_url = None
                 self.provider = None
                 return True
-            except Exception:
+            except Exception as e:
                 return False
         return False
 

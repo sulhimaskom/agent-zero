@@ -157,7 +157,7 @@ class DeferredTask:
                         self._drain_event_loop_tasks(), self.event_loop_thread.loop
                     )
                     cleanup_future.result()
-                except Exception:
+                except Exception as e:
                     pass
 
             self.event_loop_thread.terminate()

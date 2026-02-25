@@ -312,7 +312,7 @@ def convert_out(settings: Settings) -> SettingsOutput:
     secrets_manager = get_default_secrets_manager()
     try:
         out["settings"]["secrets"] = secrets_manager.get_masked_secrets()
-    except Exception:
+    except Exception as e:
         out["settings"]["secrets"] = ""
 
     # mask API keys before sending to frontend
@@ -456,7 +456,7 @@ def _load_sensitive_settings(settings: Settings):
     secrets_manager = get_default_secrets_manager()
     try:
         settings["secrets"] = secrets_manager.read_secrets_raw()
-    except Exception:
+    except Exception as e:
         settings["secrets"] = ""
 
 

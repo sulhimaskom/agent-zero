@@ -13,7 +13,7 @@ if TYPE_CHECKING:
 
 try:
     import yaml  # type: ignore
-except Exception:  # pragma: no cover
+except Exception as e:  # pragma: no cover
     yaml = None  # type: ignore
 
 
@@ -85,7 +85,7 @@ def discover_skill_md_files(root: Path) -> List[Path]:
             if _is_hidden_path(p.relative_to(root)):
                 continue
             results.append(p)
-        except Exception:
+        except Exception as e:
             # If relative_to fails (weird symlink), fall back to conservative checks
             if p.is_file() and ".git" not in str(p):
                 results.append(p)
@@ -208,7 +208,7 @@ def parse_frontmatter(frontmatter_text: str) -> Tuple[Dict[str, Any], List[str]]
     if yaml is not None:
         try:
             parsed = yaml.safe_load(frontmatter_text)  # type: ignore[attr-defined]
-        except Exception:
+        except Exception as e:
             parsed = None
         if parsed is not None:
             if not isinstance(parsed, dict):
@@ -230,7 +230,7 @@ def skill_from_markdown(
 ) -> Optional[Skill]:
     try:
         text = _read_text(skill_md_path)
-    except Exception:
+    except Exception as e:
         return None
 
     fm, body, fm_errors = split_frontmatter(text)
@@ -503,7 +503,7 @@ def validate_skill(skill: Skill) -> List[str]:
 def validate_skill_md(skill_md_path: Path) -> List[str]:
     try:
         text = _read_text(skill_md_path)
-    except Exception:
+    except Exception as e:
         return ["Unable to read SKILL.md"]
 
     _fm, _body, fm_errors = split_frontmatter(text)

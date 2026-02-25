@@ -141,7 +141,7 @@ class PrintStyle:
                 from python.helpers.secrets import get_secrets_manager
                 self.secrets_mgr = get_secrets_manager()
             text = self.secrets_mgr.mask_values(text)
-        except Exception:
+        except Exception as e:
             # If masking fails, proceed without masking to avoid breaking functionality
             pass
 
@@ -205,7 +205,7 @@ class PrintStyle:
             runtime_module = _get_runtime()
             if not runtime_module.is_development():
                 return
-        except Exception:
+        except Exception as e:
             # If runtime detection fails, default to emitting to avoid hiding logs during development setup
             pass
         prefixed = PrintStyle._prefixed_args("Debug", args)

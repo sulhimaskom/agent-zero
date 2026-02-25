@@ -71,7 +71,7 @@ class BackupService:
             # Get version from git info (same as run_ui.py)
             gitinfo = git.get_git_info()
             return gitinfo.get("version", "development")
-        except Exception:
+        except Exception as e:
             return "unknown"
 
     def _resolve_path(self, pattern_path: str) -> str:
@@ -160,7 +160,7 @@ class BackupService:
             username = getpass.getuser()
             hostname = platform.node()
             return f"{username}@{hostname}"
-        except Exception:
+        except Exception as e:
             return "unknown"
 
     def _count_directories(self, matched_files: List[Dict[str, Any]]) -> int:
@@ -837,6 +837,6 @@ class BackupService:
                     })
 
             return files_to_delete
-        except Exception:
+        except Exception as e:
             # If pattern testing fails, return empty list to avoid breaking restore
             return []

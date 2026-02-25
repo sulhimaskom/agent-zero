@@ -32,7 +32,7 @@ class TTYSession:
         if hasattr(self, "close"):
             try:
                 asyncio.run(self.close())
-            except Exception:
+            except Exception as e:
                 pass
 
     # ── user-facing coroutines ────────────────────────────────────────
@@ -225,7 +225,7 @@ async def _spawn_winpty(cmd, cwd, env, echo):
                     reader.feed_data(data.encode('utf-8') if isinstance(data, str) else data)
             except EOFError:
                 break
-            except Exception:
+            except Exception as e:
                 await asyncio.sleep(0.01)
         reader.feed_eof()
 

@@ -186,7 +186,7 @@ def evaluate_text_conditions(_content: str, **kwargs):
 
         try:
             result = simple_eval(condition, names=kwargs)
-        except Exception:
+        except Exception as e:
             # On evaluation error, do not modify this block
             return text
 
@@ -462,7 +462,7 @@ def move_dir(old_path: str, new_path: str):
     
     try:
         os.rename(abs_old, abs_new)
-    except Exception:
+    except Exception as e:
         pass  # suppress all errors, keep behavior consistent
 
 
@@ -655,7 +655,7 @@ def read_text_files_in_dir(
             # Check if file is binary by reading a small chunk
             content = read_file(file_path)
             result[os.path.basename(file_path)] = content
-        except Exception:
+        except Exception as e:
             continue
     return result
 

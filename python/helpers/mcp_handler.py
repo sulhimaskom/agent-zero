@@ -694,7 +694,7 @@ class MCPConfig(BaseModel):
                 if server.name == server_name:
                     try:
                         tools = server.get_tools()
-                    except Exception:
+                    except Exception as e:
                         tools = []
                     return {
                         "name": server.name,
@@ -997,7 +997,7 @@ class MCPClientBase(ABC):
         self.log_file.seek(0)
         try:
             log = self.log_file.read()
-        except Exception:
+        except Exception as e:
             log = ""
         return log
 
@@ -1008,7 +1008,7 @@ class MCPClientLocal(MCPClientBase):
         if hasattr(self, "log_file") and self.log_file is not None:
             try:
                 self.log_file.close()
-            except Exception:
+            except Exception as e:
                 pass
             self.log_file = None
 

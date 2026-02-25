@@ -122,7 +122,7 @@ def clone_git_project(name: str, git_url: str, git_token: str, data: BasicProjec
     except Exception as e:
         try:
             files.delete_dir(abs_path)
-        except Exception:
+        except Exception as e:
             pass
         raise e
 
@@ -139,7 +139,7 @@ def load_project_header(name: str):
 def _default_file_structure_settings():
     try:
         gitignore = files.read_file("conf/projects.default.gitignore")
-    except Exception:
+    except Exception as e:
         gitignore = ""
     return FileStructureInjectionSettings(
         enabled=True,
@@ -400,7 +400,7 @@ def load_project_variables(name: str):
     try:
         abs_path = files.get_abs_path(get_project_meta_folder(name), "variables.env")
         return files.read_file(abs_path)
-    except Exception:
+    except Exception as e:
         return ""
 
 
@@ -416,7 +416,7 @@ def load_project_subagents(name: str) -> dict[str, SubAgentSettings]:
         if isinstance(data, dict):
             return _normalize_subagents(data)  # type: ignore[arg-type,return-value]
         return {}
-    except Exception:
+    except Exception as e:
         return {}
 
 

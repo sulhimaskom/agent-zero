@@ -65,7 +65,7 @@ class AgentConnection:
                         response.raise_for_status()
                         self._agent_card = response.json()
                         _PRINTER.print(f"Retrieved agent card from {root_url}")
-                    except Exception:
+                    except Exception as e:
                         pass  # swallow, will re-raise below
                 _PRINTER.print(f"[!] Could not connect to {self.agent_url}\n    → Ensure the server is running and reachable.\n    → Full error: {e}")
                 raise RuntimeError(f"Could not retrieve agent card: {e}")
@@ -119,7 +119,7 @@ class AgentConnection:
                 ctx = response.get('result', {}).get('context_id')  # type: ignore[index]
                 if isinstance(ctx, str):
                     self._context_id = ctx
-            except Exception:
+            except Exception as e:
                 pass  # ignore if structure differs
             return response  # type: ignore
         except Exception as e:

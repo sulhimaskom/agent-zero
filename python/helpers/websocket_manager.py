@@ -104,7 +104,7 @@ class WebSocketManager:
         if dispatcher_loop.is_closed():
             try:
                 coro.close()
-            except Exception:  # pragma: no cover - best-effort cleanup
+            except Exception as e:  # pragma: no cover - best-effort cleanup
                 pass
             raise RuntimeError("Dispatcher event loop is closed")
 
@@ -847,7 +847,7 @@ class WebSocketManager:
                 # "Task exception was never retrieved".
                 try:
                     task.add_done_callback(lambda t: t.exception())  # type: ignore[arg-type]
-                except Exception:  # pragma: no cover - defensive
+                except Exception as e:  # pragma: no cover - defensive
                     pass
                 return {
                     "correlationId": correlation_id,

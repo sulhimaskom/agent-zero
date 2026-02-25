@@ -108,7 +108,7 @@ def _truncate_value(val: T) -> T:
     else:
         try:
             raw = json.dumps(val, ensure_ascii=False)
-        except Exception:
+        except Exception as e:
             raw = str(val)
 
     if len(raw) <= VALUE_MAX_LEN:
@@ -430,6 +430,6 @@ class Log:
                 return [self._mask_recursive(item) for item in obj]  # type: ignore
             else:
                 return obj
-        except Exception:
+        except Exception as e:
             # If masking fails, return original object
             return obj
