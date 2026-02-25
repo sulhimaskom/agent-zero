@@ -104,6 +104,15 @@ Deliver small, safe, measurable improvements strictly inside the domain of devel
 
 ## History
 
+### 2026-02-25 - Dependabot Automated Dependency Updates
+- Created `.github/dependabot.yml` configuration
+- Configured weekly Python (pip) dependency updates - main + dev requirements
+- Configured weekly JavaScript (npm) dependency updates
+- Configured weekly Docker image updates (base, run, local)
+- Set security priority with labels and ignore semver-major updates
+- Created PR #301 linked to issue #280
+
+### 2026-02-25 - Remove Redundant pytest.ini
 #JM|### 2026-02-25 - Remove Redundant pytest.ini
 #KV|- Removed redundant pytest.ini file
 #ZR|- Configuration already exists in pyproject.toml [tool.pytest.ini_options]
