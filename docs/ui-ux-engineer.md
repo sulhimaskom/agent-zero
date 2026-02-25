@@ -84,6 +84,25 @@ This document tracks UI/UX improvements, accessibility standards, and patterns f
 - [ ] Review notification toast accessibility
 - [ ] Test keyboard navigation flow
 
+## Issue Tracking
+
+### Issue #240 - Silent API Failures
+**Status:** ✅ SUBSTANTIALLY ADDRESSED (2026-02-25)
+- Toast notification system implemented in notification-store.js
+- Main stores (tunnel, projects, memory-dashboard) use `window.toastFrontendError()`
+- No empty catch blocks found in webui/components
+- Remaining console.error calls are intentional for developer debugging
+- Pattern: Both console.error (for devs) AND toast (for users) used together
+
+### Issue #243 - First-Time Setup Wizard
+**Status:** 🔄 IN PROGRESS
+- Setup wizard component exists at setup-wizard-store.js
+- Accessibility improvements completed (close button, logo alt, keyboard nav)
+- [ ] Audit all modal close buttons
+- [ ] Check form validation accessibility
+- [ ] Review notification toast accessibility
+- [ ] Test keyboard navigation flow
+
 ## References
 - WCAG 2.1 Guidelines
 - MDN Accessibility Documentation
