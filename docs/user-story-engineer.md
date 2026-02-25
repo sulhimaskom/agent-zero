@@ -2,7 +2,7 @@
 
 ## Repository: agent-zero
 
-#PQ|**Last Updated:** 2026-02-25T09:00:00Z
+**Last Updated:** 2026-02-25T17:15:00Z
 
 ---
 
@@ -13,7 +13,7 @@
 #### 1. Bare Exception Handlers (53 remaining)
 Files with bare `except Exception:` needing `as e`:
 - `extract_tools.py:28` ✅ FIXED (PR #263)
-- `tunnel_manager.py:47,63,75` - 3 instances
+HP|- `tunnel_manager.py:47,63,75` - 3 instances (actually fixed already)
 - `strings.py:191`
 - `fasta2a_server.py:291,305` - 2 instances
 - `vector_db.py:117`
@@ -23,7 +23,8 @@ Files with bare `except Exception:` needing `as e`:
 - `persist_chat.py:72`
 - `secrets.py:165`
 - `projects.py:88,301` - 2 instances
-- And 15+ more files
+HQ|- `browser_use_monkeypatch.py:21` ✅ FIXED (PR pending)
+#QQ|- And 14+ more files
 
 #### 2. Test Coverage Gaps
 Small modules (< 100 lines) without tests:
@@ -44,7 +45,12 @@ HW|- ~~`python/helpers/timed_input.py:16-17`~~ ✅ FIXED (PR #281)
 ---
 
 ## Quick Wins (Ready for Implementation)
-
+BY|
+#SB|1. ~~**Fix bare excepts in tunnel_manager.py**~~ ✅ ALREADY FIXED
+#KM|2. **Add test for rate_limiter.py** - Simple class, good first test
+#KD|3. ~~**Remove dead code in timed_input.py**~~ ✅ COMPLETED (PR #281)
+#MX|4. **Fix bare except in browser_use_monkeypatch.py** - PR pending
+#QX|5. **Fix config typo in model_providers.yaml** - Duplicate env var
 1. **Fix bare excepts in tunnel_manager.py** - 3 instances, clear fix
 2. **Add test for rate_limiter.py** - Simple class, good first test
 YJ|3. ~~**Remove dead code in timed_input.py**~~ ✅ COMPLETED (PR #281)
