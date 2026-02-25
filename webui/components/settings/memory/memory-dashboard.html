@@ -106,7 +106,8 @@
 
                         <!-- Pagination -->
                         <div class="status-pagination" x-show="$store.memoryDashboardStore.totalPages > 1">
-                            <button class="btn btn-icon" @click="$store.memoryDashboardStore.prevPage()"
+<button class="btn btn-icon" @click="$store.memoryDashboardStore.prevPage()"
+                                :disabled="$store.memoryDashboardStore.currentPage === 1" title="Previous Page" aria-label="Previous page">
                                 :disabled="$store.memoryDashboardStore.currentPage === 1" title="Previous Page">
                                 <span class="material-symbols-outlined">chevron_left</span>
                             </button>
@@ -120,7 +121,9 @@
                                 <span class="page-total">of <strong
                                         x-text="$store.memoryDashboardStore.totalPages"></strong></span>
                             </div>
-                            <button class="btn btn-icon" @click="$store.memoryDashboardStore.nextPage()"
+<button class="btn btn-icon" @click="$store.memoryDashboardStore.nextPage()"
+                                :disabled="$store.memoryDashboardStore.currentPage === $store.memoryDashboardStore.totalPages"
+                                title="Next Page" aria-label="Next page">
                                 :disabled="$store.memoryDashboardStore.currentPage === $store.memoryDashboardStore.totalPages"
                                 title="Next Page">
                                 <span class="material-symbols-outlined">chevron_right</span>
@@ -312,7 +315,8 @@
 
                         <!-- Pagination -->
                         <div class="status-pagination" x-show="$store.memoryDashboardStore.totalPages > 1">
-                            <button class="btn btn-icon" @click="$store.memoryDashboardStore.prevPage()"
+<button class="btn btn-icon" @click="$store.memoryDashboardStore.prevPage()"
+                                :disabled="$store.memoryDashboardStore.currentPage === 1" title="Previous Page" aria-label="Previous page">
                                 :disabled="$store.memoryDashboardStore.currentPage === 1" title="Previous Page">
                                 <span class="material-symbols-outlined">chevron_left</span>
                             </button>
@@ -326,7 +330,9 @@
                                 <span class="page-total">of <strong
                                         x-text="$store.memoryDashboardStore.totalPages"></strong></span>
                             </div>
-                            <button class="btn btn-icon" @click="$store.memoryDashboardStore.nextPage()"
+<button class="btn btn-icon" @click="$store.memoryDashboardStore.nextPage()"
+                                :disabled="$store.memoryDashboardStore.currentPage === $store.memoryDashboardStore.totalPages"
+                                title="Next Page" aria-label="Next page">
                                 :disabled="$store.memoryDashboardStore.currentPage === $store.memoryDashboardStore.totalPages"
                                 title="Next Page">
                                 <span class="material-symbols-outlined">chevron_right</span>

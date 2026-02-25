@@ -29,6 +29,12 @@ This document tracks UI/UX improvements, accessibility standards, and patterns f
 ### Modals
 - [x] Close button has aria-label (setup-wizard.html - DONE 2026-02-25)
 - [x] Close button has aria-label (full-screen-input.html - DONE 2026-02-25)
+### Chat Attachments
+- [x] Remove attachment button aria-label (inputPreview.html - DONE 2026-02-25)
+
+### Memory Dashboard
+- [x] Pagination prev/next buttons aria-label (memory-dashboard.html - DONE 2026-02-25)
+
 - [ ] Other modals need review
 
 ### Setup Wizard
