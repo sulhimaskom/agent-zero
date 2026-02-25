@@ -1,3 +1,4 @@
+
 import asyncio
 import json
 import re
@@ -665,6 +666,7 @@ class MCPConfig(BaseModel):
                     try:
                         tools = server.get_tools()
                     except Exception as e:
+                        PrintStyle(font_color="red").print(f"Failed to get tools for server {server_name}: {e}")
                         tools = []
                     return {
                         "name": server.name,
@@ -689,36 +691,12 @@ class MCPConfig(BaseModel):
                     tools.append({f"{server.name}.{tool['name']}": tool_copy})
             return tools
 
-    def get_tools_prompt(self, server_name: str = "", agent: Any = None) -> str:
+    def get_tools_prompt(self, server_name: str = "") -> str:
         """Get a prompt for all tools."""
         # just to wait for pending initialization
         with self.__lock:
             pass
 
-        # Try to use external prompt template if agent is provided
-        usage_template = None
-        if agent is not None:
-            try:
-                usage_template = agent.read_prompt(
-                    "fw.mcp_tools_usage.md",
-                    server_name="{server_name}",
-                    tool_name="{tool_name}"
-                )
-            except Exception:
-                pass  # Fallback to inline template
-
-        # Default inline template if external fails or agent not provided
-        if not usage_template:
-            usage_template = (
-                "#### Usage:\n"
-                "```\n"
-                "{\n"
-                '    "thoughts": ["..."],\n'
-                '    "tool_name": "{server_name}.{tool_name}",\n'
-                '    "tool_args": !follow schema above\n'
-                "}\n"
-                "```\n"
-            )
         prompt = '## "Remote (MCP Server) Agent Tools" available:\n\n'
         server_names = []
         for server in self.servers:
@@ -750,12 +728,16 @@ class MCPConfig(BaseModel):
 
                     prompt += "\n"
 
-                    # Use external template or inline fallback
-                    tool_usage = usage_template.format(
-                        server_name=server_name,
-                        tool_name=tool["name"]
+                    prompt += (
+                        f"#### Usage:\n"
+                        f"{{\n"
+                        # f'    "observations": ["..."],\n' # TODO: this should be a prompt file with placeholders
+                        f'    "thoughts": ["..."],\n'
+                        # f'    "reflection": ["..."],\n' # TODO: this should be a prompt file with placeholders
+                        f'    "tool_name": "{server_name}.{tool["name"]}",\n'
+                        f'    "tool_args": !follow schema above\n'
+                        f"}}\n"
                     )
-                    prompt += tool_usage
 
         return prompt
 
@@ -989,6 +971,7 @@ class MCPClientBase(ABC):
         try:
             log = self.log_file.read()
         except Exception as e:
+            PrintStyle(font_color="red").print(f"Failed to read log file: {e}")
             log = ""
         return log
 
