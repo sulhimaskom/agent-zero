@@ -11,6 +11,41 @@ This document serves as the long-term memory for the ai-agent-engineer domain in
 
 ## Implemented Fixes
 
+### 2026-02-25: Bare Exception Handlers Fix in MCP Handler
+**Issue**: Bare exception handlers without exception variable capture in `python/helpers/mcp_handler.py`
+
+**Root Cause**: Two locations were using `except Exception:` without capturing the exception variable, making debugging difficult.
+
+**Fix Applied**: Added exception variable capture (`as e`) and logging print statements.
+
+**Code Change**:
+```python
+# Line 667 - get_server_detail method
+try:
+    tools = server.get_tools()
+except Exception as e:
+    print(f"Failed to get tools for server {server_name}: {e}")
+    tools = []
+
+# Line 971 - get_log method  
+try:
+    log = self.log_file.read()
+except Exception as e:
+    print(f"Failed to read log file: {e}")
+    log = ""
+```
+
+**Files Modified**:
+- `python/helpers/mcp_handler.py` - 2 bare exception handlers fixed
+
+**Verification**:
+- Python syntax check: PASSED
+- Reduced bare exception count from 49 to 47 in codebase
+
+---
+
+### 2026-02-25: Vision Bytes Filter Fix
+
 ### 2026-02-25: Vision Bytes Filter Fix
 **Issue**: [PERFORMANCE] Vision Bytes Sent to Utility LLM - Wastes Tokens (#241)
 
