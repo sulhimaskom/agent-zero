@@ -1,0 +1,51 @@
+# Quality Assurance Documentation
+
+## Overview
+This document serves as the long-term memory for the quality-assurance specialist agent.
+
+## Repository QA Status
+
+### Test Infrastructure
+- **pytest.ini**: Configured with asyncio mode, test discovery patterns
+- **pyproject.toml**: Has dev dependencies (ruff, black, mypy, pytest)
+- **Coverage**: Configured in pyproject.toml but not actively run
+
+### CI/CD Analysis
+- **Current CI**: Uses AI agents (OpenCode) for code review
+- **Missing Gates**: No actual pytest, ruff, black, or mypy execution
+- **Issue #239**: "[INFRA] CI/CD Missing Test and Lint Gates"
+- **Issue #234**: "[TEST] Critical Test Coverage Gap - 5% Python, 0% JS Coverage"
+
+### Implemented Improvements
+
+#### 2026-02-25: Add pytest to on-pull.yml CI
+- **File Modified**: `.github/workflows/on-pull.yml`
+- **Changes**:
+  - Added Python 3.12 setup step
+  - Added pytest and pytest-asyncio installation
+  - Added pytest execution step
+- **Note**: Uses `|| true` to prevent CI failure from test failures (tests may have pre-existing failures)
+- **Linked Issue**: Issue #239
+
+### Future Improvements (P2)
+1. Add ruff lint check to CI
+2. Add black format check to CI
+3. Make pytest failures actually fail the CI (remove `|| true`)
+4. Add JavaScript test framework and tests
+5. Increase Python test coverage from 5% to target 30%
+
+### Test Files Available
+- tests/test_token_caching.py
+- tests/test_fasta2a_client.py
+- tests/test_file_tree_visualize.py
+- tests/test_config_manager.py
+- tests/test_config_validator.py
+- tests/test_constants.py
+- tests/test_health_check.py
+- tests/test_tool_coordinator.py
+- tests/chunk_parser_test.py
+- tests/email_parser_test.py
+- tests/rate_limiter_manual.py
+
+### Workflow Pattern
+The repository uses a unique AI-powered CI (OpenCode agents) rather than traditional lint/test gates. This is intentional but creates gaps in automated quality enforcement.
