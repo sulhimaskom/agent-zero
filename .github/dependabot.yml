@@ -1,0 +1,96 @@
+# Dependabot configuration for automated dependency updates
+# See: https://docs.github.com/en/code-security/dependabot
+
+version: 2
+
+# Python dependencies
+updates:
+  - package-ecosystem: pip
+    directory: /
+    # Check root directory for requirements.txt
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: UTC
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: deps
+      include: scope
+    labels:
+      - dependencies
+      - pip
+    reviewers:
+      - sulhimaskom
+    # Group minor and patch updates together
+    versioning-strategy: increase
+    # Allow these dependencies to be updated automatically
+    allow:
+      # Allow version updates for all dependencies
+      - dependency-type: all
+    # Ignore these dependencies (pin specific versions)
+    ignore:
+      - dependency-name: python
+        versions:
+          - ">=3.13"
+      # Keep Python version pinned in Dockerfiles
+
+  # JavaScript/Node.js dependencies
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: UTC
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: deps
+      include: scope
+    labels:
+      - dependencies
+      - npm
+    reviewers:
+      - sulhimaskom
+    versioning-strategy: increase
+    allow:
+      - dependency-type: all
+
+  # Docker dependencies
+  - package-ecosystem: docker
+    directory: /docker/base
+    schedule:
+      interval: monthly
+      day: monday
+      time: "06:00"
+      timezone: UTC
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: deps
+      include: scope
+    labels:
+      - dependencies
+      - docker
+    reviewers:
+      - sulhimaskom
+
+  - package-ecosystem: docker
+    directory: /docker/run
+    schedule:
+      interval: monthly
+      day: monday
+      time: "06:00"
+      timezone: UTC
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: deps
+      include: scope
+    labels:
+      - dependencies
+      - docker
+    reviewers:
+      - sulhimaskom
+
+# Security updates - always enabled by default
+# These run independently and create PRs for vulnerabilities
+# Target timeline: 48 hours for critical severity
