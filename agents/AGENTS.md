@@ -1,43 +1,48 @@
 # AGENT ZERO - AGENT PROFILES
 
-**Generated:** 2026-01-13
-**Commit:** a99361d
+**Generated:** 2026-02-25
+**Commit:** f7d7f57
 **Branch:** custom
 
 ## OVERVIEW
+
 Agent profiles enable different agent personalities with custom prompts, tools, and extensions. Override defaults via same-filename replacement.
 
 ## STRUCTURE
+
 ```
 agents/
+├── _example/            # Example profile template
+│   ├── prompts/          # Example prompts
+│   ├── tools/            # Example tools
+│   ├── extensions/       # Example extensions
+│   └── README.md         # Profile documentation
 ├── agent0/              # Default agent profile
-│   ├── prompts/          # Override framework prompts
-│   ├── tools/            # Override default tools
-│   └── extensions/       # Override lifecycle extensions
+│   ├── _context.md       # Agent context configuration
+│   └── prompts/          # Override framework prompts
 ├── brocula/             # Browser console & Lighthouse specialist
+│   ├── _context.md       # Agent context configuration
 │   ├── prompts/          # BroCula system prompts
 │   ├── tools/            # Browser monitoring tools
+│   ├── reports/          # Browser reports output
+│   ├── brocula.py        # Main brocula script
+│   ├── brocula_loop.py   # Brocula loop handler
 │   └── mcp-servers.json  # MCP server configuration
-├── developer/           # Developer personality
-│   ├── prompts/
-│   ├── tools/
-│   └── extensions/
-├── hacker/              # Security researcher personality
-│   ├── prompts/
-│   ├── tools/
-│   └── extensions/
-├── researcher/          # Research analyst personality
-│   ├── prompts/
-│   ├── tools/
-│   └── extensions/
 ├── default/             # Base profile for agents
-│   ├── prompts/
-│   └── tools/
-└── _example/            # Example profile template
-    └── README.md
+│   └── _context.md       # Agent context configuration
+├── developer/           # Developer personality
+│   ├── _context.md       # Agent context configuration
+│   └── prompts/          # Developer prompts
+├── hacker/              # Security researcher personality
+│   ├── _context.md       # Agent context configuration
+│   └── prompts/          # Hacker prompts
+└── researcher/          # Research analyst personality
+    ├── _context.md       # Agent context configuration
+    └── prompts/          # Researcher prompts
 ```
 
 ## WHERE TO LOOK
+
 | Task | Location | Notes |
 |------|----------|-------|
 | Create new profile | `agents/{profile}/` | Copy structure from existing profiles |
@@ -50,7 +55,7 @@ agents/
 ## CONVENTIONS
 
 ### Profile Structure
-- Each profile has optional: `prompts/`, `tools/`, `extensions/`
+- Each profile has optional: `_context.md`, `prompts/`, `tools/`, `extensions/`
 - Subdirectories mirror default structure: `/prompts/`, `/python/tools/`, `/python/extensions/`
 - No profile = uses default framework behavior
 
@@ -107,10 +112,13 @@ agents/
 - Dynamic agent switching during conversations
 
 ## COMMANDS
+
 ```bash
 # Create new profile
 cp -r agents/_example agents/my-profile
+
 # Edit prompts/agent.system.main.md to define personality
+
 # Add custom tools/tools/ if needed
 
 # Activate profile in UI
