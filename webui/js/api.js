@@ -1,3 +1,47 @@
+import Logger from './logger.js';
+import { API } from './constants.js';
+
+function showErrorToast(message, title = 'Connection Error') {
+  if (typeof globalThis.toastFrontendError === 'function') {
+    globalThis.toastFrontendError(message, title, 8, '', 20, true);
+  }
+}
+
+// Track if we're in static file mode (no backend)
+let isStaticMode = false;
+let staticModeChecked = false;
+
+/**
+ * Detect if we're running in static file mode (no backend API available)
+ * Checks if the current page is served as a static file without the Flask backend
+ * @returns {boolean} True if running in static mode
+ */
+function detectStaticMode() {
+  // Check for indicators that we're in static file mode:
+  // 1. URL contains file:// protocol
+  // 2. Page is served from common static server ports
+  const url = new URL(window.location.href);
+  if (url.protocol === 'file:') return true;
+  const staticPorts = window.ENV_CONFIG?.STATIC_PORTS || ['8080', '5002', '3000', '5000', '8000', '5500', '3001', '50001', '8888'];
+  if (staticPorts.includes(url.port)) return true;
+
+  // Check if we're on a static file server by looking at the response headers
+  // Static servers typically don't set the same headers as Flask
+  return false;
+}
+
+/**
+ * Get whether we're in static mode (cached)
+ * @returns {boolean}
+ */
+function isStaticFileMode() {
+  if (!staticModeChecked) {
+    isStaticMode = detectStaticMode();
+    staticModeChecked = true;
+  }
+  return isStaticMode;
+}
+
 /**
  * Call a JSON-in JSON-out API endpoint
  * Data is automatically serialized
@@ -17,6 +61,7 @@ export async function callJsonApi(endpoint, data) {
 
   if (!response.ok) {
     const error = await response.text();
+    showErrorToast(`API Error: ${response.status} - ${endpoint}`, 'Request Failed');
     throw new Error(error);
   }
   const jsonResponse = await response.json();
@@ -71,117 +116,80 @@ export async function fetchApi(url, request) {
 
 // csrf token stored locally
 let csrfToken = null;
-let csrfTokenPromise = null;
-let runtimeIdCache = null;
-const CSRF_TIMEOUT_MS = 5000;
-const CSRF_SLOW_WARN_MS = 1500;
-
-export function getRuntimeId() {
-  if (runtimeIdCache) return runtimeIdCache;
-  const injected =
-    window.runtimeInfo &&
-    typeof window.runtimeInfo.id === "string" &&
-    window.runtimeInfo.id.length > 0
-      ? window.runtimeInfo.id
-      : null;
-  return injected;
-}
-
-export function invalidateCsrfToken() {
-  csrfToken = null;
-  csrfTokenPromise = null;
-}
+let csrfTokenFailed = false;
+let csrfTokenErrorLogged = false;
 
 /**
  * Get the CSRF token for API requests
  * Caches the token after first request
  * @returns {Promise<string>} The CSRF token
  */
-export async function getCsrfToken() {
+async function getCsrfToken() {
   if (csrfToken) return csrfToken;
-  if (csrfTokenPromise) return await csrfTokenPromise;
 
-  csrfTokenPromise = (async () => {
-    const startedAt = Date.now();
-    const controller =
-      typeof AbortController !== "undefined" ? new AbortController() : null;
-    let timeoutId = null;
-    let timeoutPromise = null;
-    let response;
+  // Prevent repeated failed requests that spam the console
+  if (csrfTokenFailed) {
+    throw new Error("CSRF token unavailable - backend not running");
+  }
 
-    try {
-      if (controller) {
-        timeoutId = setTimeout(() => controller.abort(), CSRF_TIMEOUT_MS);
-      } else {
-        timeoutPromise = new Promise((_, reject) => {
-          timeoutId = setTimeout(() => {
-            reject(new Error("CSRF token request timed out"));
-          }, CSRF_TIMEOUT_MS);
-        });
-      }
+  // Check if we're in static file mode to avoid unnecessary network errors
+  if (isStaticFileMode()) {
+    csrfTokenFailed = true;
+    Logger.once('static_mode_skip', () => {
+      Logger.debug("Static file mode detected - skipping CSRF token fetch");
+    });
+    throw new Error("Static file mode - no backend available");
+  }
 
-      const fetchOptions = { credentials: "same-origin" };
-      if (controller) {
-        fetchOptions.signal = controller.signal;
-      }
-
-      const fetchPromise = fetch("/csrf_token", fetchOptions);
-      response = timeoutPromise
-        ? await Promise.race([fetchPromise, timeoutPromise])
-        : await fetchPromise;
-    } catch (error) {
-      if (error && error.name === "AbortError") {
-        throw new Error("CSRF token request timed out");
-      }
-      throw error;
-    } finally {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-    }
+  try {
+    const response = await fetch(API.CSRF_TOKEN_ENDPOINT, {
+      credentials: "same-origin",
+    });
 
     if (response.redirected && response.url.endsWith("/login")) {
       // redirect to login
       window.location.href = response.url;
       return;
     }
-    const json = await response.json();
-    if (json.ok) {
-      const runtimeId =
-        typeof json.runtime_id === "string" && json.runtime_id.length > 0
-          ? json.runtime_id
-          : null;
 
+    // Check for 404 or other error status
+    if (!response.ok) {
+      csrfTokenFailed = true;
+      // Log as debug instead of warn to keep console clean in static file mode
+      Logger.once('csrf_error', () => {
+        Logger.debug("Backend API not available - CSRF token endpoint returned", response.status);
+      });
+      throw new Error(`CSRF token endpoint returned ${response.status}`);
+    }
+
+    // Try to parse JSON, but handle non-JSON responses gracefully
+    let json;
+    try {
+      json = await response.json();
+    } catch (parseError) {
+      csrfTokenFailed = true;
+      Logger.once('csrf_json_error', () => {
+        Logger.warn("Backend API not available - CSRF endpoint returned non-JSON response");
+      });
+      throw new Error("Invalid JSON response from CSRF endpoint");
+    }
+
+    if (json.ok) {
       csrfToken = json.token;
-      if (runtimeId) {
-        runtimeIdCache = runtimeId;
-      }
-      const injectedRuntimeId =
-        window.runtimeInfo &&
-        typeof window.runtimeInfo.id === "string" &&
-        window.runtimeInfo.id.length > 0
-          ? window.runtimeInfo.id
-          : null;
-      const cookieRuntimeId = runtimeId || injectedRuntimeId;
-      if (cookieRuntimeId) {
-        document.cookie = `csrf_token_${cookieRuntimeId}=${csrfToken}; SameSite=Strict; Path=/`;
-      } else {
-        console.warn("CSRF runtime id missing; skipping cookie name binding.");
-      }
-      const elapsedMs = Date.now() - startedAt;
-      if (elapsedMs > CSRF_SLOW_WARN_MS && window.runtimeInfo?.isDevelopment) {
-        console.warn(`CSRF token request took ${elapsedMs}ms`);
-      }
+      document.cookie = `csrf_token_${json.runtime_id}=${csrfToken}; SameSite=Strict; Path=/`;
       return csrfToken;
     } else {
       if (json.error) alert(json.error);
       throw new Error(json.error || "Failed to get CSRF token");
     }
-  })();
-
-  try {
-    return await csrfTokenPromise;
-  } finally {
-    csrfTokenPromise = null;
+  } catch (error) {
+    csrfTokenFailed = true;
+    showErrorToast('Backend connection failed. Please check if the server is running.', 'Connection Error');
+    // Only log the first error to prevent console spam
+    // Log as debug instead of warn to keep console clean in static file mode
+    Logger.once('backend_connection_error', () => {
+      Logger.debug("Backend connection not available - API calls will not work:", error.message);
+    });
+    throw error;
   }
 }
