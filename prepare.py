@@ -1,5 +1,4 @@
-import random
-import string
+import secrets
 
 from python.helpers import dotenv, runtime, settings
 from python.helpers.print_style import PrintStyle
@@ -12,7 +11,7 @@ try:
     # generate random root password if not set (for SSH)
     root_pass = dotenv.get_dotenv_value(dotenv.KEY_ROOT_PASSWORD)
     if not root_pass:
-        root_pass = "".join(random.choices(string.ascii_letters + string.digits, k=32))
+        root_pass = secrets.token_urlsafe(24)
         PrintStyle.standard("Changing root password...")
     settings.set_root_password(root_pass)
 
