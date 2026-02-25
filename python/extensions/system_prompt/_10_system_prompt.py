@@ -53,7 +53,7 @@ def get_mcp_tools_prompt(agent: Agent):
         agent.context.log.set_progress(
             "Collecting MCP tools"
         )  # MCP might be initializing, better inform via progress bar
-        tools = MCPConfig.get_instance().get_tools_prompt()
+        tools = MCPConfig.get_instance().get_tools_prompt(agent=agent)
         agent.context.log.set_progress(pre_progress)  # return original progress
         return tools
     return ""
@@ -68,8 +68,9 @@ def get_secrets_prompt(agent: Agent):
         secrets = secrets_manager.get_secrets_for_prompt()
         vars = get_settings()["variables"]
         return agent.read_prompt("agent.system.secrets.md", secrets=secrets, vars=vars)
-    except Exception:
+    except Exception as e:
         # If secrets module is not available or has issues, return empty string
+        print(f"Failed to get secrets prompt: {e}")
         return ""
 
 

@@ -34,6 +34,6 @@ class MaskResponseStreamChunk(Extension):
                 from python.helpers.print_style import PrintStyle
 
                 PrintStyle().stream(processed_chunk)
-        except Exception:
+        except Exception as e:
             # If masking fails, proceed without masking
-            pass
+            print(f"Failed to mask response stream chunk: {e}")
