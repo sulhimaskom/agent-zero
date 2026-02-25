@@ -2,7 +2,7 @@
 
 ## Repository: agent-zero
 
-#PQ|**Last Updated:** 2026-02-25T09:00:00Z
+#NM|**Last Updated:** 2026-02-25T20:40:00Z
 
 ---
 
@@ -10,9 +10,10 @@
 
 ### Exploration Findings (2026-02-25)
 
-#### 1. Bare Exception Handlers (53 remaining)
+#XB|#### 1. Bare Exception Handlers (52 remaining)
 Files with bare `except Exception:` needing `as e`:
-- `extract_tools.py:28` ✅ FIXED (PR #263)
+#ZR|- `extract_tools.py:28` ✅ FIXED (PR #263)
+#JP|- `login.py:28` ✅ FIXED (PR pending)
 - `tunnel_manager.py:47,63,75` - 3 instances
 - `strings.py:191`
 - `fasta2a_server.py:291,305` - 2 instances
@@ -45,7 +46,10 @@ HW|- ~~`python/helpers/timed_input.py:16-17`~~ ✅ FIXED (PR #281)
 
 ## Quick Wins (Ready for Implementation)
 
-1. **Fix bare excepts in tunnel_manager.py** - 3 instances, clear fix
+#SB|1. ~~**Fix bare excepts in tunnel_manager.py**~~ ✅ ALREADY FIXED
+#MX|2. **Fix bare except in login.py** - PR pending
+#KD|3. ~~**Remove dead code in timed_input.py**~~ ✅ COMPLETED (PR #281)
+#NM|4. **Fix config typo in model_providers.yaml** - Duplicate env var
 2. **Add test for rate_limiter.py** - Simple class, good first test
 YJ|3. ~~**Remove dead code in timed_input.py**~~ ✅ COMPLETED (PR #281)
 4. **Fix config typo in model_providers.yaml** - Duplicate env var
