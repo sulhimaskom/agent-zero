@@ -14,7 +14,6 @@ from langchain_community.vectorstores.utils import (
 from langchain_core.documents import Document
 # Security: Safe expression evaluation to replace simple_eval (RCE vulnerability)
 import ast
-from typing import Any
 
 # Allowed AST node types for safe expression evaluation
 ALLOWED_AST_NODES = {
@@ -42,7 +41,7 @@ def _safe_eval_node(node: ast.AST, data: dict) -> any:
         raise NameError(f"Unknown variable: {node.id}")
     elif isinstance(node, ast.Compare):
         left = _safe_eval_node(node.left, data)
-        for op, comparator in zip(node.ops, node.comparators):
+        for op, comparator in zip(node.ops, node.comparators, strict=False):
             right = _safe_eval_node(comparator, data)
             if isinstance(op, ast.Eq):
                 left = left == right
@@ -106,7 +105,7 @@ def _safe_eval_node(node: ast.AST, data: dict) -> any:
 
 def safe_eval_condition(condition: str, data: dict) -> any:
     """Safely evaluate a condition string against a data dictionary.
-    
+
     Replaces simple_eval() with a secure AST-based implementation.
     """
     try:
@@ -118,7 +117,7 @@ def safe_eval_condition(condition: str, data: dict) -> any:
     except Exception:
         return False
 
-from agent import Agent
+from agent import Agent  # noqa: E402
 
 
 class MyFaiss(FAISS):
