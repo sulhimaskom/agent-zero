@@ -17,6 +17,41 @@ Deliver small, safe, measurable improvements to the security posture of the code
 
 ## Fixed Vulnerabilities
 
+### Issue #268: SSH Port 22 Exposed in Production Docker
+**Date Fixed**: 2026-02-25
+**Severity**: MEDIUM (Attack Surface)
+**Files Changed**: 
+- `docker/run/Dockerfile`
+
+**Vulnerability**: 
+The Dockerfile exposed port 22 (SSH) in production, creating unnecessary attack surface even though root login was disabled.
+
+**Solution**:
+- Removed port 22 from the EXPOSE statement
+- Production now only exposes ports 80 (web UI) and 9000-9009 (additional services)
+
+---
+
+### Issue #266: Insecure Password Generation in prepare.py
+**Date Fixed**: 2026-02-25
+**Severity**: HIGH (Credential Security)
+**Files Changed**: 
+- `prepare.py`
+
+**Vulnerability**: 
+The password generation used `random.choices()` from Python's standard `random` module, which is NOT cryptographically secure. This was used to generate root SSH passwords.
+
+**Solution**:
+- Replaced `random.choices()` with `secrets.token_urlsafe(24)`
+- Uses Python's `secrets` module for cryptographically secure random generation
+- Generates ~32 characters of secure random data
+
+**Testing**:
+- Verified secrets module works correctly
+- Password generation produces URL-safe random tokens
+
+---
+
 ### Issue #255: Node.js eval() in docker node_eval.js - RCE Risk
 **Date Fixed**: 2026-02-25
 **Severity**: HIGH (RCE)
@@ -82,5 +117,5 @@ Implemented `safe_eval_condition()` - a secure AST-based expression evaluator th
 
 ## Future Focus Areas
 - ~~Issue #232: eval() in Node.js~~ → **FIXED (Issue #255)**
-- Issue #233: SSH Root Access
-- Issue #238: Weak password hashing
+- ~~Issue #233: SSH Root Access~~ → **FIXED (Issue #268)**
+- ~~Issue #238: Weak password hashing~~ → **FIXED (Issue #266)**
