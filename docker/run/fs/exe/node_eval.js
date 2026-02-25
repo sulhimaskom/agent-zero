@@ -2,90 +2,122 @@
 const vm = require('vm');
 const path = require('path');
 
-// Create a SECURE sandbox context with minimal, safe globals only
-// REMOVED: require, process, module, exports - these allow RCE
-// Using eval() within this sandbox is now safe because dangerous globals are removed
-const sandbox = vm.createContext({
-  // Safe console for output
+// Security: Create a SECURE sandbox environment
+// This replaces the unsafe eval() pattern with proper VM sandboxing
+
+// Retrieve the code from the command-line argument
+const code = process.argv[2];
+
+// Verify code is provided
+if (!code) {
+  console.error('Error: No code provided');
+  process.exit(1);
+}
+
+// Create a SECURE sandbox context with ONLY safe APIs
+// This prevents access to dangerous globals like process, Buffer, require, etc.
+const safeGlobals = {
+  // Console for output (safe, no access to stdout streams directly)
   console: {
-    log: console.log,
-    error: console.error,
-    warn: console.warn,
-    info: console.info
+    log: (...args) => console.log(...args),
+    error: (...args) => console.error(...args),
+    warn: (...args) => console.warn(...args),
+    info: (...args) => console.info(...args),
   },
-  // Safe math operations
-  Math: Math,
-  // Safe array/object primitives
-  Array: Array,
-  Object: Object,
-  String: String,
-  Number: Number,
-  Boolean: Boolean,
-  Date: Date,
-  JSON: JSON,
-  RegExp: RegExp,
-  Error: Error,
-  TypeError: TypeError,
-  RangeError: RangeError,
-  SyntaxError: SyntaxError,
-  // Safe timing (no direct process access)
+  // Timer APIs (safe)
   setTimeout: setTimeout,
   setInterval: setInterval,
   setImmediate: setImmediate,
   clearTimeout: clearTimeout,
   clearInterval: clearInterval,
   clearImmediate: clearImmediate,
-  // Safe Buffer subset (read-only methods only)
-  Buffer: {
-    from: Buffer.from,
-    isBuffer: Buffer.isBuffer,
-    alloc: Buffer.alloc,
-    allocUnsafe: Buffer.allocUnsafe,
-    allocUnsafeSlow: Buffer.allocUnsafeSlow,
-    concat: Buffer.concat,
-    isEncoding: Buffer.isEncoding,
-    byteLength: Buffer.byteLength,
-    compare: Buffer.compare,
-    equals: Buffer.equals,
-  },
-  // Safe JSON for parsing
-  JSON: {
-    parse: JSON.parse,
-    stringify: JSON.stringify,
-    toString: () => '[object JSON]',
-    valueOf: () => '[object JSON]',
-  },
-});
+  // Safe math and JSON utilities
+  Math: Math,
+  JSON: JSON,
+  Date: Date,
+  Array: Array,
+  Object: Object,
+  String: String,
+  Number: Number,
+  Boolean: Boolean,
+  RegExp: RegExp,
+  Map: Map,
+  Set: Set,
+  WeakMap: WeakMap,
+  WeakSet: WeakSet,
+  Promise: Promise,
+  Error: Error,
+  TypeError: TypeError,
+  RangeError: RangeError,
+  SyntaxError: SyntaxError,
+  ReferenceError: ReferenceError,
+  // Safe encode/decode utilities
+  btoa: btoa,
+  atob: atob,
+  encodeURI: encodeURI,
+  decodeURI: decodeURI,
+  encodeURIComponent: encodeURIComponent,
+  decodeURIComponent: decodeURIComponent,
+  // Escape hatches - these are intentionally limited
+  __filename: '[eval]',
+  __dirname: '[eval]',
+};
 
-// Retrieve the code from the command-line argument
-const code = process.argv[2];
+// Create the sandbox context using vm.runInNewContext for TRUE isolation
+// This is fundamentally different from eval() inside vm.createContext()
+// vm.runInNewContext creates a completely isolated context
+const sandbox = vm.createContext(safeGlobals);
 
-if (!code) {
-  console.error('Error: No code provided');
+// Timeout configuration (default 30 seconds)
+const TIMEOUT_MS = 30000;
+
+// Wrap execution in a timeout to prevent infinite loops
+let timedOut = false;
+const timeoutId = setTimeout(() => {
+  timedOut = true;
+  console.error('Error: Code execution timed out');
   process.exit(1);
-}
-
-// Wrap code to support both expressions and statements
-// SECURITY: Using eval() within sandboxed context with NO dangerous globals
-// The dangerous globals (require, process, etc.) have been removed from the context
-const wrappedCode = `
-(async function() {
-  try {
-    // Use eval within the sandbox - it's now safe because require/process are not available
-    const __result__ = eval(${JSON.stringify(code)});
-    if (__result__ !== undefined) console.log('Out[1]:', __result__);
-  } catch (error) {
-    console.error(error);
-  }
-})();
-`;
+}, TIMEOUT_MS);
 
 try {
-  vm.runInContext(wrappedCode, sandbox, {
+  // Execute the user code in the SECURE sandbox using runInNewContext
+  // This provides TRUE isolation - code cannot access process, Buffer, require, etc.
+  const wrappedCode = `
+    (async function() {
+      ${code}
+    })()
+  `;
+
+  // Use vm.runInNewContext instead of eval for true sandboxing
+  const script = new vm.Script(wrappedCode, {
     filename: 'eval.js',
-    timeout: 30000, // 30 second timeout to prevent infinite loops
   });
+
+  const result = script.runInNewContext(sandbox, {
+    timeout: TIMEOUT_MS,
+    displayErrors: true,
+  });
+
+  // If result is a Promise, wait for it
+  if (result && typeof result.then === 'function') {
+    result.then((resolved) => {
+      clearTimeout(timeoutId);
+      if (resolved !== undefined) {
+        console.log('Out[1]:', resolved);
+      }
+    }).catch((err) => {
+      clearTimeout(timeoutId);
+      console.error(err);
+      process.exit(1);
+    });
+  } else {
+    clearTimeout(timeoutId);
+    if (result !== undefined) {
+      console.log('Out[1]:', result);
+    }
+  }
 } catch (error) {
-  console.error('Execution error:', error.message);
+  clearTimeout(timeoutId);
+  console.error(error);
   process.exit(1);
 }

@@ -230,6 +230,11 @@ const model = {
       }
     } catch (error) {
       console.error("Error checking authentication status:", error);
+      window.toastFrontendWarning(
+        "Could not verify authentication status. Proceeding anyway.",
+        "Authentication Check",
+        5
+      );
       // Continue anyway if we can't check auth status
     }
 
@@ -323,6 +328,7 @@ const model = {
           }
         } catch (statusError) {
           console.error("Error checking tunnel status:", statusError);
+          // Don't show additional toast here - the final failure will be shown below
         }
 
         // If we get here, the tunnel really failed to start

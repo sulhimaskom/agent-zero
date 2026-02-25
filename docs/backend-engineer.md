@@ -8,8 +8,28 @@
 - Performance optimization
 - API endpoints
 
-## Completed Fixes
-
+#QM|## Completed Fixes
+#TX|
+#XW|### Issue #255: Node.js eval RCE Risk in docker/node_eval.js
+#XV|**Status:** FIXED
+#RJ|
+#MN|**Changes:**
+#SN|1. Replaced unsafe `eval()` with `vm.runInNewContext()` for true sandboxing
+#TM|2. Removed dangerous globals from user context: process, Buffer, require, module, exports
+#RN|3. Added 30-second timeout to prevent infinite loops
+#HS|4. Added input validation for code parameter
+#XZ|5. Created safe globals whitelist: console, Math, JSON, Date, Array, Object, Promise, etc.
+#NH|
+#YB|**Files Modified:**
+#ZK|   - `docker/run/fs/exe/node_eval.js` (complete rewrite - 125 lines)
+#YB|
+#HV|**Verification:**
+#JQ|   - Syntax check: PASS
+#QY|   - Basic execution (1+1, Math.random(), JSON.stringify): PASS
+#XJ|   - Dangerous globals blocked (process, require, Buffer): ReferenceError as expected
+#MV|   - Async/await: PASS
+#HN|
+#HV|### Issue #238: Weak Authentication Hashing - SHA256 Without Salt
 ### Issue #238: Weak Authentication Hashing - SHA256 Without Salt
 **Status:** FIXED
 

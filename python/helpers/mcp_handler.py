@@ -664,7 +664,8 @@ class MCPConfig(BaseModel):
                 if server.name == server_name:
                     try:
                         tools = server.get_tools()
-                    except Exception:
+                    except Exception as e:
+                        print(f"Failed to get tools for server {server_name}: {e}")
                         tools = []
                     return {
                         "name": server.name,
@@ -968,7 +969,8 @@ class MCPClientBase(ABC):
         self.log_file.seek(0)
         try:
             log = self.log_file.read()
-        except Exception:
+        except Exception as e:
+            print(f"Failed to read log file: {e}")
             log = ""
         return log
 
