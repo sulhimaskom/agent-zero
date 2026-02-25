@@ -14,7 +14,7 @@
 
 ### Accessibility (a11y)
 - [x] Empty `alt` attributes on images - should have meaningful text or `role="presentation"`
-- [ ] Buttons without `aria-label` or `title` attributes
+- [x] Buttons without `aria-label` or `title` attributes (file-browser fixed, more scanning needed)
 - [ ] Form inputs without labels
 - [ ] Color contrast issues
 - [ ] Keyboard navigation
@@ -50,11 +50,15 @@ Located in: `/webui/js/api.js`
 
 ## Known Issues (2026-02-25)
 
-1. **Accessibility**: Many icon buttons lack `aria-label` attributes
+1. **Accessibility**: Many icon buttons lacked `aria-label` attributes (partially fixed)
 2. **Console statements**: ~148 console.log statements across 76 files (many in vendor code)
 3. **TODO comments**: ~80 TODO/FIXME comments across frontend files
 
 ## Working Notes
+
+### 2026-02-25: Second Task Completed
+- Fixed missing `aria-label` attributes in `file-browser.html` (lines 51, 54)
+- Added `aria-label` and `title` to download and delete buttons in file browser
 
 ### First Task Completed
 - Fixed empty `alt` attribute in `dragDropOverlay.html` (line 40)
