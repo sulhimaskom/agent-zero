@@ -13,6 +13,9 @@
         <!-- Pause/Resume Agent button with tooltip -->
         <div class="button-wrapper" x-data="{ showTooltip: false }">
             <button class="text-button"
+                    aria-label="Pause or resume agent processing (Ctrl+Space)"
+                    data-keyboard-shortcut="ctrl+space"
+                    @click="$store.chatInput.pauseAgent(!$store.chatInput.paused)"
                     data-keyboard-shortcut="ctrl+space"
                     @click="$store.chatInput.pauseAgent(!$store.chatInput.paused)"
                     @mouseover="showTooltip = true"
@@ -40,6 +43,9 @@
         <!-- Import Knowledge button with tooltip -->
         <div class="button-wrapper" x-data="{ showTooltip: false }">
             <button class="text-button"
+                    aria-label="Import documents into knowledge base (Ctrl+K)"
+                    data-keyboard-shortcut="ctrl+k"
+                    @click="$store.chatInput.loadKnowledge()"
                     data-keyboard-shortcut="ctrl+k"
                     @click="$store.chatInput.loadKnowledge()"
                     @mouseover="showTooltip = true"
@@ -60,6 +66,9 @@
         <!-- Files button with tooltip -->
         <div class="button-wrapper" x-data="{ showTooltip: false }">
             <button class="text-button" id="work_dir_browser"
+                    aria-label="Browse and manage files in the workspace (Ctrl+O)"
+                    data-keyboard-shortcut="ctrl+o"
+                    @click="$store.chatInput.browseFiles()"
                     data-keyboard-shortcut="ctrl+o"
                     @click="$store.chatInput.browseFiles()"
                     @mouseover="showTooltip = true"
@@ -81,6 +90,9 @@
         <!-- History button with tooltip -->
         <div class="button-wrapper" x-data="{ showTooltip: false }">
             <button class="text-button" id="history_inspect"
+                    aria-label="View conversation history and past messages (Ctrl+H)"
+                    data-keyboard-shortcut="ctrl+h"
+                    @click="$store.history.open()"
                     data-keyboard-shortcut="ctrl+h"
                     @click="$store.history.open()"
                     @mouseover="showTooltip = true"
@@ -101,6 +113,9 @@
         <!-- Context button with tooltip -->
         <div class="button-wrapper" x-data="{ showTooltip: false }">
             <button class="text-button" id="ctx_window"
+                    aria-label="Manage conversation context and settings (Ctrl+Shift+C)"
+                    data-keyboard-shortcut="ctrl+shift+c"
+                    @click="$store.context.open()"
                     data-keyboard-shortcut="ctrl+shift+c"
                     @click="$store.context.open()"
                     @mouseover="showTooltip = true"
@@ -123,6 +138,9 @@
         <!-- Nudge button with tooltip -->
         <div class="button-wrapper" x-data="{ showTooltip: false }">
             <button class="text-button" id="nudges_window"
+                    aria-label="Send a nudge to get the agent's attention (Ctrl+N)"
+                    data-keyboard-shortcut="ctrl+n"
+                    @click="$store.chatInput.nudge()"
                     data-keyboard-shortcut="ctrl+n"
                     @click="$store.chatInput.nudge()"
                     @mouseover="showTooltip = true"
