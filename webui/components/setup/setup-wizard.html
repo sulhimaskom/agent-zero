@@ -1,0 +1,730 @@
+<html>
+<head>
+    <script type="module">
+        import { store } from "/components/setup/setup-wizard-store.js";
+    </script>
+</head>
+
+<body>
+    <div x-data="setupWizardStore" x-show="isOpen">
+        <template x-teleport="body">
+            <div x-show="isOpen" class="modal-overlay" @click.self="close()"
+                @keydown.escape.window="close()" x-transition>
+                <div class="modal-container wizard-modal">
+                    <!-- Wizard Header -->
+                    <div class="modal-header wizard-header">
+                        <h2>Setup Wizard</h2>
+                        <button class="modal-close" @click="close()" aria-label="Close wizard">&times;</button>
+                    </div>
+
+                    <!-- Progress Bar -->
+                    <div class="wizard-progress">
+                        <div class="wizard-progress-bar" :style="`width: ${progress}%`"></div>
+                    </div>
+
+                    <!-- Step Indicators -->
+                    <div class="wizard-steps">
+                        <template x-for="(step, index) in steps" :key="step.id">
+                            <div class="wizard-step" 
+                                 :class="{ 
+                                     'active': currentStep === index, 
+                                     'completed': currentStep > index,
+                                     'current': currentStep === index 
+                                 }"
+                                 @click="currentStep > index && goToStep(index)">
+                                <div class="wizard-step-number">
+                                    <span x-show="currentStep > index">✓</span>
+                                    <span x-show="currentStep <= index" x-text="index + 1"></span>
+                                </div>
+                                <div class="wizard-step-title" x-text="step.title"></div>
+                            </div>
+                        </template>
+                    </div>
+
+                    <!-- Wizard Content -->
+                    <div class="modal-content wizard-content">
+                        
+                        <!-- Step 0: Welcome -->
+                        <div x-show="currentStep === 0" class="wizard-step-content">
+                            <div class="wizard-welcome">
+                                <img src="./public/darkSymbol.svg" alt="Agent Zero Logo" class="wizard-logo" loading="eager" width="80" height="80" />
+                                <h3>Welcome to Agent Zero!</h3>
+                                <p>Let's get you set up in just a few steps. This guided wizard will help you configure your AI provider and API keys.</p>
+                                <div class="wizard-features">
+                                    <div class="wizard-feature">
+                                        <span class="material-symbols-outlined">verified</span>
+                                        <span>Secure API key setup</span>
+                                    </div>
+                                    <div class="wizard-feature">
+                                        <span class="material-symbols-outlined">bolt</span>
+                                        <span>Quick configuration</span>
+                                    </div>
+                                    <div class="wizard-feature">
+                                        <span class="material-symbols-outlined">psychology</span>
+                                        <span>Recommended models</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 1: Provider Selection -->
+                        <div x-show="currentStep === 1" class="wizard-step-content">
+                            <h3>Choose Your AI Provider</h3>
+                            <p class="wizard-description">Select the AI provider you'd like to use. Each provider offers different models and pricing.</p>
+                            
+                            <div class="provider-grid">
+                                <template x-for="provider in providers" :key="provider.id">
+                                    <div class="provider-card" 
+                                         :class="{ 'selected': selectedProvider === provider.id }"
+                                         @click="selectProvider(provider.id)"
+                                         @keydown.enter.prevent="selectProvider(provider.id)"
+                                         tabindex="0"
+                                         role="button"
+                                         :aria-pressed="selectedProvider === provider.id">
+                                        <div class="provider-name" x-text="provider.name"></div>
+                                        <div class="provider-description" x-text="provider.description"></div>
+                                        <div class="provider-check" x-show="selectedProvider === provider.id">
+                                            <span class="material-symbols-outlined">check_circle</span>
+                                        </div>
+                                    </div>
+                                </template>
+                            </div>
+                            
+                            <div x-show="validationError && currentStep === 1" class="wizard-error" x-text="validationError"></div>
+                        </div>
+
+                        <!-- Step 2: API Key -->
+                        <div x-show="currentStep === 2" class="wizard-step-content">
+                            <h3>Enter Your API Key</h3>
+                            <p class="wizard-description">
+                                Enter your <span x-text="selectedProvider"></span> API key. 
+                                This key will be stored securely and used to authenticate requests.
+                            </p>
+                            
+                            <div class="wizard-input-group">
+                                <label for="apiKey" x-text="selectedProvider?.toUpperCase() + ' API Key'"></label>
+                                <input 
+                                    type="password" 
+                                    id="apiKey" 
+                                    x-model="apiKey"
+                                    @keydown.enter.prevent="validateApiKey()"
+                                    placeholder="Enter your API key..."
+                                    class="wizard-input"
+                                    autocomplete="off"
+                                />
+                            </div>
+                            
+                            <div class="wizard-hint">
+                                <span class="material-symbols-outlined">info</span>
+                                <span>Don't have an API key? <a :href="getProviderKeyUrl(selectedProvider)" target="_blank">Get one here</a></span>
+                            </div>
+                            
+                            <div x-show="validationError && currentStep === 2" class="wizard-error" x-text="validationError"></div>
+                            
+                            <div x-show="isValidating" class="wizard-loading">
+                                <span class="spinner"></span>
+                                <span>Validating API key...</span>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Model Selection -->
+                        <div x-show="currentStep === 3" class="wizard-step-content">
+                            <h3>Select Your Models</h3>
+                            <p class="wizard-description">Choose the models you'd like to use for different tasks.</p>
+                            
+                            <div class="model-section">
+                                <h4>Chat Model <span class="required">*</span></h4>
+                                <p class="model-section-description">Used for main conversations and agent interactions.</p>
+                                <div class="model-grid">
+                                    <template x-for="model in chatModels" :key="model.id">
+                                        <div class="model-card"
+                                             :class="{ 'selected': selectedChatModel?.id === model.id }"
+                                             @click="selectedChatModel = model"
+                                             @keydown.enter.prevent="selectedChatModel = model"
+                                             tabindex="0"
+                                             role="button"
+                                             :aria-pressed="selectedChatModel?.id === model.id">
+                                            <div class="model-name" x-text="model.name"></div>
+                                            <div class="model-description" x-text="model.description"></div>
+                                            <div class="model-check" x-show="selectedChatModel?.id === model.id">
+                                                <span class="material-symbols-outlined">check_circle</span>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                            
+                            <div class="model-section">
+                                <h4>Utility Model (Optional)</h4>
+                                <p class="model-section-description">Used for memory consolidation and background tasks.</p>
+                                <div class="model-grid">
+                                    <template x-for="model in utilModels" :key="model.id">
+                                        <div class="model-card"
+                                             :class="{ 'selected': selectedUtilModel?.id === model.id }"
+                                             @click="selectedUtilModel = model"
+                                             @keydown.enter.prevent="selectedUtilModel = model"
+                                             tabindex="0"
+                                             role="button"
+                                             :aria-pressed="selectedUtilModel?.id === model.id">
+                                            <div class="model-name" x-text="model.name"></div>
+                                            <div class="model-description" x-text="model.description"></div>
+                                            <div class="model-check" x-show="selectedUtilModel?.id === model.id">
+                                                <span class="material-symbols-outlined">check_circle</span>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
+                            
+                            <div x-show="validationError && currentStep === 3" class="wizard-error" x-text="validationError"></div>
+                        </div>
+
+                        <!-- Step 4: Review -->
+                        <div x-show="currentStep === 4" class="wizard-step-content">
+                            <h3>Review Configuration</h3>
+                            <p class="wizard-description">Please review your setup before completing.</p>
+                            
+                            <div class="review-card">
+                                <div class="review-item">
+                                    <span class="review-label">AI Provider</span>
+                                    <span class="review-value" x-text="selectedProvider"></span>
+                                </div>
+                                <div class="review-item">
+                                    <span class="review-label">Chat Model</span>
+                                    <span class="review-value" x-text="selectedChatModel?.name"></span>
+                                </div>
+                                <div class="review-item" x-show="selectedUtilModel">
+                                    <span class="review-label">Utility Model</span>
+                                    <span class="review-value" x-text="selectedUtilModel?.name"></span>
+                                </div>
+                                <div class="review-item">
+                                    <span class="review-label">API Key</span>
+                                    <span class="review-value">••••••••<span x-text="apiKey.slice(-4)"></span></span>
+                                </div>
+                            </div>
+                            
+                            <div class="wizard-note">
+                                <span class="material-symbols-outlined">info</span>
+                                <span>You can change these settings anytime from the Settings page.</span>
+                            </div>
+                            
+                            <div x-show="validationError && currentStep === 4" class="wizard-error" x-text="validationError"></div>
+                            
+                            <div x-show="isValidating" class="wizard-loading">
+                                <span class="spinner"></span>
+                                <span>Saving configuration...</span>
+                            </div>
+                        </div>
+
+                        <!-- Completion -->
+                        <div x-show="isComplete" class="wizard-step-content wizard-success">
+                            <span class="material-symbols-outlined success-icon">check_circle</span>
+                            <h3>Setup Complete!</h3>
+                            <p>Your Agent Zero is now configured and ready to use.</p>
+                        </div>
+
+                    </div>
+
+                    <!-- Wizard Footer -->
+                    <div class="modal-footer wizard-footer" x-show="!isComplete">
+                        <button 
+                            type="button" 
+                            class="btn btn-cancel"
+                            @click="currentStep === 0 ? skip() : prevStep()"
+                            x-text="currentStep === 0 ? 'Skip' : 'Back'"
+                        ></button>
+                        
+                        <button 
+                            type="button" 
+                            class="btn btn-secondary"
+                            @click="currentStep === 2 ? validateApiKey() : nextStep()"
+                            x-show="currentStep === 2"
+                        >
+                            Validate Key
+                        </button>
+                        
+                        <button 
+                            type="button" 
+                            class="btn btn-ok"
+                            @click="currentStep < totalSteps - 1 ? nextStep() : complete()"
+                            :disabled="isValidating || (currentStep === 1 && !selectedProvider) || (currentStep === 2 && !apiKey) || (currentStep === 3 && !selectedChatModel)"
+                            x-text="currentStep < totalSteps - 1 ? 'Next' : 'Complete Setup'"
+                        ></button>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+
+    <script>
+        // Helper function to get provider key URL
+        function getProviderKeyUrl(providerId) {
+            const urls = {
+                'openai': 'https://platform.openai.com/api-keys',
+                'anthropic': 'https://console.anthropic.com/',
+                'google': 'https://aistudio.google.com/app/apikey',
+                'deepseek': 'https://platform.deepseek.com/',
+                'openrouter': 'https://openrouter.ai/keys',
+                'ollama': 'https://ollama.com/',
+                'lm_studio': 'https://lmstudio.ai/',
+                'azure': 'https://azure.microsoft.com/',
+                'groq': 'https://console.groq.com/',
+                'mistral': 'https://console.mistral.ai/'
+            };
+            return urls[providerId] || '#';
+        }
+        
+        // Register the helper function globally
+        window.getProviderKeyUrl = getProviderKeyUrl;
+    </script>
+
+    <style>
+        /* Wizard Modal */
+        .wizard-modal {
+            max-width: 680px;
+            width: 95%;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .wizard-header {
+            border-bottom: 1px solid var(--color-border);
+            padding: 1rem 1.5rem;
+        }
+
+        .wizard-header h2 {
+            margin: 0;
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
+
+        /* Progress Bar */
+        .wizard-progress {
+            height: 4px;
+            background: var(--color-border);
+            position: relative;
+        }
+
+        .wizard-progress-bar {
+            height: 100%;
+            background: var(--color-primary);
+            transition: width 0.3s ease;
+        }
+
+        /* Steps Indicator */
+        .wizard-steps {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            background: var(--color-panel);
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .wizard-step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            flex: 1;
+            position: relative;
+        }
+
+        .wizard-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 14px;
+            left: 60%;
+            width: 80%;
+            height: 2px;
+            background: var(--color-border);
+        }
+
+        .wizard-step.completed:not(:last-child)::after {
+            background: var(--color-primary);
+        }
+
+        .wizard-step-number {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--color-border);
+            color: var(--color-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+        }
+
+        .wizard-step.active .wizard-step-number {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .wizard-step.completed .wizard-step-number {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .wizard-step-title {
+            font-size: 0.7rem;
+            color: var(--color-secondary);
+            margin-top: 0.4rem;
+            text-align: center;
+        }
+
+        .wizard-step.active .wizard-step-title {
+            color: var(--color-primary);
+            font-weight: 500;
+        }
+
+        /* Content Area */
+        .wizard-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+
+        .wizard-step-content {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .wizard-step-content h3 {
+            margin: 0 0 0.5rem 0;
+            font-size: 1.25rem;
+            font-weight: 500;
+        }
+
+        .wizard-description {
+            color: var(--color-secondary);
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        /* Welcome Step */
+        .wizard-welcome {
+            text-align: center;
+            padding: 1rem 0;
+        }
+
+        .wizard-logo {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 1rem;
+        }
+
+        .wizard-welcome h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .wizard-welcome p {
+            color: var(--color-secondary);
+            max-width: 400px;
+            margin: 0 auto 1.5rem;
+            line-height: 1.6;
+        }
+
+        .wizard-features {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .wizard-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--color-secondary);
+            font-size: 0.9rem;
+        }
+
+        .wizard-feature .material-symbols-outlined {
+            color: var(--color-primary);
+        }
+
+        /* Provider Grid */
+        .provider-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .provider-card {
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .provider-card:hover {
+            border-color: var(--color-primary);
+            background: var(--color-message-bg);
+        }
+
+        .provider-card.selected {
+            border-color: var(--color-primary);
+            background: var(--color-message-bg);
+            box-shadow: 0 0 0 1px var(--color-primary);
+        }
+
+        .provider-card:focus-visible {
+            outline: 2px solid var(--color-highlight);
+            outline-offset: 2px;
+        }
+
+        .provider-name {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .provider-description {
+            font-size: 0.8rem;
+            color: var(--color-secondary);
+        }
+
+        .provider-check {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            color: var(--color-primary);
+        }
+
+        /* Input Group */
+        .wizard-input-group {
+            margin-bottom: 1rem;
+        }
+
+        .wizard-input-group label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .wizard-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            background: var(--color-background);
+            color: var(--color-text);
+            font-size: 0.95rem;
+        }
+
+        .wizard-input:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+        }
+
+        .wizard-hint {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--color-secondary);
+        }
+
+        .wizard-hint a {
+            color: var(--color-primary);
+            text-decoration: none;
+        }
+
+        .wizard-hint a:hover {
+            text-decoration: underline;
+        }
+
+        /* Model Selection */
+        .model-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .model-section h4 {
+            margin: 0 0 0.25rem 0;
+            font-weight: 500;
+        }
+
+        .model-section .required {
+            color: #ef4444;
+        }
+
+        .model-section-description {
+            font-size: 0.85rem;
+            color: var(--color-secondary);
+            margin-bottom: 0.75rem;
+        }
+
+        .model-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .model-card {
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .model-card:hover {
+            border-color: var(--color-primary);
+            background: var(--color-message-bg);
+        }
+
+        .model-card.selected {
+            border-color: var(--color-primary);
+            background: var(--color-message-bg);
+        }
+
+        .model-name {
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .model-description {
+            font-size: 0.75rem;
+            color: var(--color-secondary);
+        }
+
+        .model-check {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            color: var(--color-primary);
+        }
+
+        /* Review Card */
+        .review-card {
+            background: var(--color-panel);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .review-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .review-item:last-child {
+            border-bottom: none;
+        }
+
+        .review-label {
+            color: var(--color-secondary);
+        }
+
+        .review-value {
+            font-weight: 500;
+            text-transform: capitalize;
+        }
+
+        .wizard-note {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: var(--color-message-bg);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            color: var(--color-secondary);
+        }
+
+        /* Error & Loading */
+        .wizard-error {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 6px;
+            color: #dc2626;
+            font-size: 0.9rem;
+        }
+
+        .wizard-loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding: 0.75rem;
+            color: var(--color-secondary);
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--color-border);
+            border-top-color: var(--color-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Success State */
+        .wizard-success {
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            color: #22c55e;
+            margin-bottom: 1rem;
+        }
+
+        .wizard-success h3 {
+            font-size: 1.5rem;
+            color: #22c55e;
+        }
+
+        /* Footer */
+        .wizard-footer {
+            display: flex;
+            justify-content: space-between;
+            padding: 1rem 1.5rem;
+            border-top: 1px solid var(--color-border);
+            background: var(--color-panel);
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .wizard-steps {
+                padding: 0.75rem;
+            }
+            
+            .wizard-step-title {
+                display: none;
+            }
+            
+            .provider-grid,
+            .model-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</body>
+</html>
