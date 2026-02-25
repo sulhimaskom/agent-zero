@@ -22,6 +22,10 @@ from python.helpers.extract_tools import load_classes_from_folder
 from python.helpers.files import get_abs_path
 from python.helpers.print_style import PrintStyle
 
+# Simple rate limiter for login attempts (synchronous, thread-safe)
+login_attempt_lock = threading.Lock()
+login_attempts: dict[str, list[float]] = {}  # IP -> list of timestamps
+
 logging.getLogger().setLevel(logging.WARNING)
 
 
@@ -157,6 +161,29 @@ def requires_auth(f):
     return decorated
 
 
+
+def check_login_rate_limit(ip: str, max_attempts: int = 5, timeframe: int = 60) -> bool:
+    """Check if IP has exceeded login attempts. Returns True if rate limited."""
+    now = time.time()
+    cutoff = now - timeframe
+
+    with login_attempt_lock:
+        # Clean old attempts
+        if ip in login_attempts:
+            login_attempts[ip] = [t for t in login_attempts[ip] if t > cutoff]
+
+        # Check if exceeded
+        if ip in login_attempts and len(login_attempts[ip]) >= max_attempts:
+            return True
+
+        # Record this attempt
+        if ip not in login_attempts:
+            login_attempts[ip] = []
+        login_attempts[ip].append(now)
+
+        return False
+
+
 def csrf_protect(f):
     @wraps(f)
     async def decorated(*args, **kwargs):
@@ -174,12 +201,20 @@ def csrf_protect(f):
 @webapp.route("/login", methods=["GET", "POST"])
 async def login_handler():
     error = None
-    if request.method == "POST":
+    # Check rate limiting by IP
+    client_ip = request.remote_addr or request.headers.get("X-Forwarded-For", "unknown")
+    if check_login_rate_limit(client_ip, max_attempts=5, timeframe=60):
+        error = "Too many login attempts. Please try again later."
+    elif request.method == "POST":
         user = dotenv.get_dotenv_value("AUTH_LOGIN")
         password = dotenv.get_dotenv_value("AUTH_PASSWORD")
+        stored_hash = login.get_credentials_hash()
 
-        if request.form["username"] == user and request.form["password"] == password:
-            session["authentication"] = login.get_credentials_hash()
+        # Use bcrypt to verify password (constant-time)
+        username_input = request.form.get("username", "")
+        password_input = request.form.get("password", "")
+        if stored_hash and login.verify_password(username_input, password_input, stored_hash):
+            session["authentication"] = stored_hash
             return redirect(url_for("serve_index"))
         else:
             error = "Invalid Credentials. Please try again."
