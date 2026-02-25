@@ -25,4 +25,4 @@ class MaskResponseStreamEnd(Extension):
                 agent.set_data(filter_key, None)
         except Exception as e:
             # If masking fails, proceed without masking
-            print(f"Failed to finalize response stream mask: {e}")
+            PrintStyle.error(f"Failed to finalize response stream mask: {e}")

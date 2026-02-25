@@ -3,6 +3,7 @@ import threading
 from flaredantic import FlareConfig, FlareTunnel, ServeoConfig, ServeoTunnel
 
 from python.helpers.constants import Network, Timeouts
+from python.helpers.print_style import PrintStyle
 
 
 # Singleton to manage the tunnel instance
@@ -45,8 +46,7 @@ class TunnelManager:
                     self.tunnel_url = self.tunnel.tunnel_url
                     self.is_running = True
                 except Exception as e:
-                    import sys
-                    print(f"Tunnel error: {e}", file=sys.stderr)
+                    PrintStyle.error(f"Tunnel error: {e}")
 
             tunnel_thread = threading.Thread(target=run_tunnel)
             tunnel_thread.daemon = True
@@ -62,8 +62,7 @@ class TunnelManager:
 
             return self.tunnel_url
         except (ValueError, RuntimeError) as e:
-            import sys
-            print(f"Failed to start tunnel: {e}", file=sys.stderr)
+            PrintStyle.error(f"Failed to start tunnel: {e}")
             return None
 
     def stop_tunnel(self):
@@ -76,8 +75,7 @@ class TunnelManager:
                 self.provider = None
                 return True
             except Exception as e:
-                import sys
-                print(f"Failed to stop tunnel: {e}", file=sys.stderr)
+                PrintStyle.error(f"Failed to stop tunnel: {e}")
                 return False
         return False
 

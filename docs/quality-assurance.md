@@ -30,6 +30,19 @@ This document serves as the long-term memory for the quality-assurance specialis
 
 ### Implemented Improvements
 
+#### 2026-02-25: Ruff T201 Print Statement Fixes
+- **Files Modified**:
+  - `python/extensions/hist_add_before/_10_mask_content.py` - Converted print to PrintStyle.error
+  - `python/extensions/reasoning_stream_chunk/_10_mask_stream.py` - Converted print to PrintStyle.error
+  - `python/extensions/reasoning_stream_end/_10_mask_end.py` - Converted print to PrintStyle.error
+  - `python/extensions/response_stream_chunk/_10_mask_stream.py` - Converted print to PrintStyle.error
+  - `python/extensions/response_stream_end/_10_mask_end.py` - Converted print to PrintStyle.error
+  - `python/extensions/system_prompt/_10_system_prompt.py` - Converted print to PrintStyle.error
+  - `python/helpers/secrets.py` - Converted print to PrintStyle.error
+  - `python/helpers/tunnel_manager.py` - Converted 3 print statements to PrintStyle.error (removed unused sys imports)
+- **Changes**: Resolved 10 ruff T201 (print statement) errors across 8 files
+- **Verification**: All 231 tests pass, ruff checks pass
+
 #### 2026-02-25: Ruff Linting Fixes
 - **Files Modified**: 
   - `python/helpers/login.py` - Removed unnecessary UTF-8 encoding arguments (UP012)

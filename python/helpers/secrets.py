@@ -13,6 +13,7 @@ from dotenv.parser import parse_stream
 from python.helpers import files
 from python.helpers.constants import TmpPaths
 from python.helpers.errors import RepairableException
+from python.helpers.print_style import PrintStyle
 
 if TYPE_CHECKING:
     from agent import AgentContext
@@ -163,7 +164,7 @@ class SecretsManager:
             try:
                 content = files.read_file(path)
             except Exception as e:
-                print(f"Failed to read secrets file {path}: {e}")
+                PrintStyle.error(f"Failed to read secrets file {path}: {e}")
                 content = ""
 
             self._raw_snapshots[path] = content
