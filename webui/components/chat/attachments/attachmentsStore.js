@@ -218,6 +218,10 @@ const model = {
         attachment.url = e.target.result;
         this.addAttachment(attachment);
       };
+      reader.onerror = () => {
+        console.error("Failed to read clipboard image:", reader.error);
+        window.toastFrontendError("Failed to load clipboard image. Please try again.", "Clipboard Error");
+      };
       reader.readAsDataURL(file);
     } catch (error) {
       console.error("Failed to handle clipboard image:", error);
