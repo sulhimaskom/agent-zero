@@ -50,7 +50,7 @@ class TestFormatError:
         """Test format_error returns formatted error with traceback"""
         e = ValueError("test error")
         result = format_error(e, start_entries=6, end_entries=4)
-        
+
         assert "test error" in result
         assert "ValueError" in result
 
@@ -59,10 +59,10 @@ class TestFormatError:
         # Create exception with deep stack trace
         def deep_function():
             raise ValueError("deep error")
-        
+
         def middle_function():
             deep_function()
-        
+
         try:
             middle_function()
         except ValueError as e:
@@ -117,7 +117,7 @@ class TestRepairableException:
         """Test RepairableException can be raised with message"""
         with pytest.raises(RepairableException) as exc_info:
             raise RepairableException("repairable error")
-        
+
         assert str(exc_info.value) == "repairable error"
 
     def test_repairable_exception_can_hold_data(self):
