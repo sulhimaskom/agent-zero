@@ -5,7 +5,7 @@
         import { store } from "/components/chat/scroll-to-bottom/scroll-to-bottom-store.min.js";
         // Ensure store is registered with Alpine before component renders
         if (globalThis.Alpine && globalThis.Alpine.store && !globalThis.Alpine.store('scrollToBottom')) {
-            console.warn('scrollToBottom store not registered in Alpine, re-registering...');
+            // Store not available - component will handle gracefully via x-show checks
         }
     </script>
 </head>

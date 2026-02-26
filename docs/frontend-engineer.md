@@ -20,6 +20,8 @@
 - [ ] Keyboard navigation
 
 ### Code Quality
+- [x] Console statements left in production code (scroll-to-bottom-button.html fixed)
+- [ ] TODO/FIXME comments
 - [ ] Console statements left in production code
 - [ ] TODO/FIXME comments
 - [ ] Unused variables/imports
@@ -55,6 +57,14 @@ Located in: `/webui/js/api.js`
 3. **TODO comments**: ~80 TODO/FIXME comments across frontend files
 
 ## Working Notes
+
+### 2026-02-26: Remove console.warn from scroll-to-bottom-button.html
+- Removed development debugging message that leaked internal state to browser console
+- File: `webui/components/chat/scroll-to-bottom/scroll-to-bottom-button.html` (line 8)
+- Replaced with comment explaining graceful handling via x-show checks
+- Keeps the conditional check but removes unnecessary warning output
+
+### 2026-02-25: Issue #237 - Scheduler.js Modularization
 
 ### 2026-02-25: Issue #237 - Scheduler.js Modularization
 - Split monolithic `scheduler.js` (1579 lines) into modular stores
