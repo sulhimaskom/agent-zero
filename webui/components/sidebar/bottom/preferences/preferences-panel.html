@@ -23,42 +23,42 @@
             <li x-data>
               <span>Autoscroll</span>
               <label class="switch">
-                <input id="auto-scroll-switch" type="checkbox" x-model="$store.preferences.autoScroll">
+                <input id="auto-scroll-switch" type="checkbox" x-model="$store.preferences.autoScroll" aria-label="Autoscroll">
                 <span class="slider"></span>
               </label>
             </li>
             <li x-data>
               <span class="switch-label">Dark mode</span>
               <label class="switch">
-                <input type="checkbox" x-model="$store.preferences.darkMode">
+                <input id="dark-mode-switch" type="checkbox" x-model="$store.preferences.darkMode" aria-label="Dark mode">
                 <span class="slider"></span>
               </label>
             </li>
             <li x-data>
               <span class="switch-label">Speech</span>
               <label class="switch">
-                <input type="checkbox" x-model="$store.preferences.speech">
+                <input id="speech-switch" type="checkbox" x-model="$store.preferences.speech" aria-label="Speech">
                 <span class="slider"></span>
               </label>
             </li>
             <li x-data>
               <span>Show thoughts</span>
               <label class="switch">
-                <input type="checkbox" x-model="$store.preferences.showThoughts">
+                <input id="show-thoughts-switch" type="checkbox" x-model="$store.preferences.showThoughts" aria-label="Show thoughts">
                 <span class="slider"></span>
               </label>
             </li>
             <li x-data>
               <span>Show JSON</span>
               <label class="switch">
-                <input type="checkbox" x-model="$store.preferences.showJson">
+                <input id="show-json-switch" type="checkbox" x-model="$store.preferences.showJson" aria-label="Show JSON">
                 <span class="slider"></span>
               </label>
             </li>
             <li x-data>
               <span>Show utility messages</span>
               <label class="switch">
-                <input type="checkbox" x-model="$store.preferences.showUtils">
+                <input id="show-utils-switch" type="checkbox" x-model="$store.preferences.showUtils" aria-label="Show utility messages">
                 <span class="slider"></span>
               </label>
             </li>

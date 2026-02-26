@@ -52,6 +52,7 @@
                             min="0" max="1" step="0.01" />
                     </div>
 
+                    <label for="search-input" class="visually-hidden">Search memory</label>
                     <input type="text" id="search-input" x-model="$store.memoryDashboardStore.searchQuery"
                         placeholder="Search memory content..."
                         @keyup.enter="$store.memoryDashboardStore.searchMemories()" />
