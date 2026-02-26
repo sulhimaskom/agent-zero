@@ -12,6 +12,17 @@ DX-Engineer focuses on improving Developer Experience - making the codebase easi
 
 ## Completed Work
 
+### 2026-02-26: Node Version Configuration
+- Added `.nvmrc` file specifying Node.js 20 (matching CI configuration)
+- Enables automatic Node version switching with `nvm use`
+- Ensures developers use the same Node version as CI
+
+### 2026-02-26: Package.json Cleanup
+- Fixed duplicate `name` and `description` entries in root `package.json`
+- Added proper project description: "Agent Zero - Multi-agent AI framework with Python backend and JavaScript frontend"
+- Added `workspaces` configuration for monorepo structure
+- Updated keywords for better discoverability
+
 ### 2026-02-26: ESLint Configuration for JavaScript
 - Added `eslint.config.js` (flat config format for ESLint v9+)
 - Added ESLint dev dependencies: `eslint` and `globals`

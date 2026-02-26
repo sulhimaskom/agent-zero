@@ -1,17 +1,17 @@
 {
-  "name": "agent-zero-webui",
+  "name": "agent-zero",
   "version": "0.9.7",
-  "type": "module",
-  "description": "Agent Zero WebUI - Vanilla JS frontend with no Node dependencies",
-  "name": "agent-zero-webui",
-  "version": "0.9.7",
-  "description": "Agent Zero WebUI - Vanilla JS frontend with no Node dependencies",
+  "description": "Agent Zero - Multi-agent AI framework with Python backend and JavaScript frontend",
   "private": true,
+  "workspaces": [
+    ".",
+    "webui"
+  ],
   "scripts": {
     "lint": "eslint webui/",
     "lint:fix": "eslint webui/ --fix"
   },
-  "keywords": ["agent-zero", "webui"],
+  "keywords": ["agent-zero", "ai", "framework"],
   "license": "MIT",
   "devDependencies": {
     "eslint": "^9.0.0",
