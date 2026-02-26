@@ -1,5 +1,7 @@
 # Troubleshooting and FAQ
 
+> Last Updated: 2026-02-26
+
 This page addresses frequently asked questions (FAQ) and provides troubleshooting steps for common issues encountered while using Agent Zero.
 
 ---

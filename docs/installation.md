@@ -1,10 +1,26 @@
 # Users installation guide for Windows, macOS and Linux
 
+> Last Updated: 2026-02-26
+
 Click to open a video to learn how to install Agent Zero:
 
 [![Easy Installation guide](/docs/res/easy_ins_vid.png)](https://www.youtube.com/watch?v=w5v5Kjx51hs)
 
 The following user guide provides instructions for installing and running Agent Zero using Docker, which is the primary runtime environment for the framework. For developers and contributors, we also provide instructions for setting up the [full development environment](#in-depth-guide-for-full-binaries-installation).
+---
+
+## Table of Contents
+
+- [Windows, macOS and Linux Setup Guide](#windows-macos-and-linux-setup-guide)
+  - [Install Docker Desktop](#install-docker-desktop)
+  - [Create and Run Container](#create-and-run-container)
+  - [Access the Web UI](#access-the-web-ui)
+  - [Configure API Keys](#configure-api-keys)
+- [Settings Configuration](#settings-configuration)
+- [Important Considerations](#important-considerations)
+- [Installing and Using Ollama (Local Models)](#installing-and-using-ollama-local-models)
+- [Using Agent Zero on your mobile device](#using-agent-zero-on-your-mobile-device)
+- [In-Depth Guide for Full Binaries Installation](#in-depth-guide-for-full-binaries-installation)
 
 
 ## Windows, macOS and Linux Setup Guide

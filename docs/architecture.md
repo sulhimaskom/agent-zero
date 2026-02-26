@@ -1,4 +1,6 @@
 # Architecture Overview
+
+> Last Updated: 2026-02-26
 Agent Zero is built on a flexible and modular architecture designed for extensibility and customization. This section outlines the key components and the interactions between them.
 ## Table of Contents
 

@@ -1,5 +1,7 @@
 # Extensibility framework in Agent Zero
 
+> Last Updated: 2026-02-26
+
 > [!NOTE]
 > Agent Zero is built with extensibility in mind. It provides a framework for creating custom extensions, agents, instruments, and tools that can be used to enhance the functionality of the framework.
 

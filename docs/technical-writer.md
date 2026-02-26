@@ -13,21 +13,21 @@
 | File | Lines | Purpose |
 |------|-------|---------|
 | README.md | 69 | Index/TOC |
-| installation.md | ~600 | Setup guide |
-| usage.md | ~500 | User guide |
-| development.md | ~300 | Dev environment |
-| extensibility.md | ~400 | Extensions |
-| connectivity.md | ~596 | API, MCP, A2A (with inline TOC) |
-| architecture.md | ~408 | System design |
-| configuration.md | ~443 | Config guide (merged) |
-| troubleshooting.md | ~280 | FAQ (expanded) |
-| quickstart.md | 57 | Quick intro (with metadata) |
-| contribution.md | 33 | Contributing (with metadata) |
-| mcp_setup.md | ~300 | MCP setup |
+| installation.md | ~441 | Setup guide (with inline TOC) |
+| usage.md | ~366 | User guide (with inline TOC) |
+| development.md | ~158 | Dev environment (with metadata) |
+| extensibility.md | ~310 | Extensions (with metadata) |
+| connectivity.md | ~598 | API, MCP, A2A (with inline TOC) |
+| architecture.md | ~427 | System design (with inline TOC) |
+| configuration.md | ~446 | Config guide (merged, with metadata) |
+| troubleshooting.md | ~281 | FAQ (expanded, with metadata) |
+| quickstart.md | 59 | Quick intro (with metadata) |
+| contribution.md | 35 | Contributing (with metadata) |
+| mcp_setup.md | ~148 | MCP setup (with metadata) |
 | notifications.md | ~150 | Notifications |
 | blueprint.md | ~200 | Design spec |
 | task.md | ~350 | Task system |
-| tunnel.md | 60 | Tunnel setup (with metadata) |
+| tunnel.md | 62 | Tunnel setup (with metadata) |
 | prompts/README.md | ~185 | Prompts directory guide |
 | **a2a_protocol.md** | 149 | **NEW** - A2A Protocol docs |
 
@@ -72,6 +72,24 @@
 - **Fix:** Added "> Last Updated: 2026-02-26" metadata to three key docs
 - **Status:** ✅ Completed 2026-02-26
 
+### 8. DONE: Extended "Last Updated" metadata to all user-facing docs
+- **Files:** docs/installation.md, docs/usage.md, docs/development.md, docs/extensibility.md, docs/troubleshooting.md, docs/configuration.md, docs/connectivity.md, docs/architecture.md, docs/mcp_setup.md
+- **Issue:** Key user-facing docs missing timestamp metadata
+- **Fix:** Added "> Last Updated: 2026-02-26" metadata to 9 additional docs
+- **Status:** ✅ Completed 2026-02-26
+
+### 9. DONE: installation.md inline TOC
+- **File:** docs/installation.md
+- **Issue:** 439-line doc without navigation aid
+- **Fix:** Added inline Table of Contents linking to all 6 major sections
+- **Status:** ✅ Completed 2026-02-26
+
+### 10. DONE: usage.md inline TOC
+- **File:** docs/usage.md
+- **Issue:** 364-line doc without navigation aid
+- **Fix:** Added inline Table of Contents linking to all 7 major sections with subsections
+- **Status:** ✅ Completed 2026-02-26
+
 ---
 
 ## Future Improvements (Backlog)
@@ -83,9 +101,12 @@
 4. ~~**Add A2A protocol documentation**~~ ✅ DONE (PR #306)
 
 ### Medium Priority
-5. ~~**Add "last updated" metadata** to doc headers~~ ✅ quickstart.md, contribution.md, tunnel.md done
+5. ~~**Add "last updated" metadata** to doc headers~~ ✅ All 12 user-facing docs now have metadata
+   - quickstart.md, contribution.md, tunnel.md ✅
+   - installation.md, usage.md, development.md, extensibility.md ✅
+   - troubleshooting.md, configuration.md, connectivity.md, architecture.md, mcp_setup.md ✅
 6. **Create API reference** - Expand connectivity.md into REST docs
-7. ~~**Add inline TOCs** for long docs~~ ✅ architecture.md, connectivity.md done
+7. ~~**Add inline TOCs** for long docs~~ ✅ architecture.md, connectivity.md, installation.md, usage.md done
 
 ### Low Priority
 8. **Security section** - Document SSH root, password changes
@@ -108,7 +129,6 @@
 ---
 
 ## Notes
-
 - This is a prompt-driven framework - prompts in `/prompts/` control behavior
 - Documentation is comprehensive but some areas need expansion
 - AGENTS.md is auto-generated knowledge base

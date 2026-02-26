@@ -1,5 +1,7 @@
 # Agent Zero: MCP Server Integration Guide
 
+> Last Updated: 2026-02-26
+
 This guide explains how to configure and utilize external tool providers through the Model Context Protocol (MCP) with Agent Zero. This allows Agent Zero to leverage tools hosted by separate local or remote MCP-compliant servers.
 
 ## What are MCP Servers?

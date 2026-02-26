@@ -1,4 +1,6 @@
 # Development manual for Agent Zero
+
+> Last Updated: 2026-02-26
 This guide will show you how to setup a local development environment for Agent Zero in a VS Code compatible IDE, including proper debugger.
 
 

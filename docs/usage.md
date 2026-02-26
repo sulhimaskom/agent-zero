@@ -1,5 +1,25 @@
 # Usage Guide
+
+> Last Updated: 2026-02-26
 This guide explores usage and configuration scenarios for Agent Zero. You can consider this as a reference post-installation guide.
+---
+
+## Table of Contents
+
+- [Basic Operations](#basic-operations)
+  - [Restart Framework](#restart-framework)
+  - [Action Buttons](#action-buttons)
+  - [File Attachments](#file-attachments)
+- [Tool Usage](#tool-usage)
+- [Example of Tools Usage: Web Search and Code Execution](#example-of-tools-usage-web-search-and-code-execution)
+- [Multi-Agent Cooperation](#multi-agent-cooperation)
+- [Prompt Engineering](#prompt-engineering)
+- [Voice Interface](#voice-interface)
+  - [Speech-to-Text](#speech-to-text)
+  - [Text-to-Speech](#text-to-speech)
+- [Mathematical Expressions](#mathematical-expressions)
+- [File Browser](#file-browser)
+- [Backup & Restore](#backup--restore)
 
 ![Utility Message with Solutions](res/memory-man.png)
 
