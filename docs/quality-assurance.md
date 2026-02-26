@@ -29,6 +29,19 @@ This document serves as the long-term memory for the quality-assurance specialis
 
 ### Implemented Improvements
 
+#### 2026-02-26: Add tests for rate_limiter.py module
+- **File Created**: `tests/test_rate_limiter.py`
+- **Test Coverage**: 18 tests covering:
+  - Initialization: default, custom timeframe, custom limits, non-int coercion
+  - Add method: single value, multiple values same key, multiple keys, new key creation
+  - Cleanup: removes old entries, keeps recent entries, handles empty values
+  - GetTotal: returns sum, unknown key returns zero, empty key returns zero
+  - Wait: exits when under limit, with callback, respects multiple keys
+  - Integration: full rate limiting flow
+- **Verification**: All 284 tests pass (266 original + 18 new)
+- **Linked PR**: #361
+- **Lint**: ruff clean
+
 #### 2026-02-26: Add tests for dirty_json.py module
 - **File Created**: `tests/test_dirty_json.py`
 - **Test Coverage**: 35 tests covering:
@@ -109,6 +122,7 @@ This document serves as the long-term memory for the quality-assurance specialis
 - tests/chunk_parser_test.py
 - tests/email_parser_test.py
 - tests/rate_limiter_manual.py
+- tests/test_rate_limiter.py (NEW - 18 tests)
 
 ### Workflow Pattern
 The repository uses a unique AI-powered CI (OpenCode agents) rather than traditional lint/test gates. This is intentional but creates gaps in automated quality enforcement.
