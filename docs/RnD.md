@@ -4,6 +4,28 @@ This document tracks R&D efforts, learnings, and improvements made to Agent Zero
 
 ## 2026-02-26
 
+### Issue: Memory Leak - 71 addEventListener vs 17 removeEventListener
+
+**Problem**: Frontend JavaScript had unbalanced event listener registration - 71 addEventListener calls but only 17 removeEventListener, indicating potential memory leaks.
+
+**Root Cause**: Alpine.js stores (attachmentsStore.js, speech-store.js) registered event listeners without providing cleanup methods, causing listeners to persist for app lifetime.
+
+**Solution Applied**:
+- attachmentsStore.js: Added `_eventHandlers` storage object and `cleanup()` method
+  - 7 event listeners now have cleanup (dragenter, dragover, dragleave, drop, paste, defaults x4)
+- speech-store.js: Added `_settingsUpdatedHandler` property and `cleanup()` method
+  - settings-updated listener now has cleanup
+
+**Files Changed**:
+- `webui/components/chat/attachments/attachmentsStore.js`
+- `webui/components/chat/speech/speech-store.js`
+
+**Status**: Fixed - Added cleanup methods, improved removeEventListener count from 17 to 24 in source files
+
+---
+
+## 2026-02-26
+
 ### Issue Analyzed: Bare Exception Handlers in vector_db.py, files.py, and brocula modules
 
 **Problem**: Multiple Python files had bare `except Exception:` handlers that silently swallowed all exceptions without capturing the exception variable, making debugging difficult.
