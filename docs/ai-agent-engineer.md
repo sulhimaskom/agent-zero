@@ -113,7 +113,51 @@ async def summarize(self):
 
 ---
 
+### 2026-02-26: Complete Bare Exception Handlers Fix (PR #331)
+**Issue**: Issue #309 - Fix remaining bare exception handlers (26 files)
+
+**Root Cause**: After previous PRs, there were still 26 locations across 22 files using bare `except Exception:` without capturing the exception variable.
+
+**Fix Applied**: Used AST-aware search and replace to change all `except Exception:` to `except Exception as e:`.
+
+**Files Modified** (22 files, 26 handlers):
+- `python/helpers/vector_db.py` - Line 117
+- `python/helpers/files.py` - Line 540
+- `python/helpers/tty_session.py` - Line 230
+- `python/helpers/shell_ssh.py` - Line 89
+- `python/helpers/backup.py` - Line 938
+- `python/helpers/persist_chat.py` - Line 72
+- `python/helpers/defer.py` - Line 175
+- `python/helpers/file_browser.py` - Line 263
+- `python/helpers/log.py` - Lines 82, 336
+- `python/helpers/print_style.py` - Line 124
+- `python/helpers/projects.py` - Lines 88, 301
+- `python/helpers/whisper.py` - Line 104
+- `python/helpers/browser_use_monkeypatch.py` - Line 21
+- `python/tools/browser_agent.py` - Lines 220, 408, 434
+- `python/tools/scheduler.py` - Line 65
+- `python/api/memory_dashboard.py` - Line 144
+- `python/api/tunnel_proxy.py` - Line 31
+- `python/api/csrf_token.py` - Line 109
+- `python/api/poll.py` - Line 22
+- `python/extensions/user_message_ui/_10_update_check.py` - Line 52
+- `python/extensions/monologue_start/_60_rename_chat.py` - Line 44
+- `python/extensions/response_stream/_20_live_response.py` - Line 37
+
+**Verification**:
+- Python syntax check: PASSED
+- Zero bare exception handlers remaining in python/ directory
+- PR #331 created with ai-agent-engineer label, linked to Issue #309
+
+---
+
 ## Known Issues (Future Work)
+
+1. ~~**Issue #309**: 23 remaining files with bare exception handlers~~ - FIXED in PR #331
+2. **Issue #234**: Test coverage gap - 5% Python coverage, 0% JS coverage
+3. **Issue #235**: settings.py - 1748-Line Monolith Needs Refactoring
+4. **Issue #236**: task_scheduler.py - 1284-Line Mixed Concerns
+5. **Issue #237**: scheduler.js - 1579-Line Monolith Needs Splitting
 
 1. **Issue #309**: 23 remaining files with bare exception handlers - continuation after PR #304
 2. **Issue #234**: Test coverage gap - 5% Python coverage, 0% JS coverage
