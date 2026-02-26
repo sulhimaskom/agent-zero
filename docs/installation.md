@@ -4,7 +4,30 @@ Click to open a video to learn how to install Agent Zero:
 
 [![Easy Installation guide](/docs/res/easy_ins_vid.png)](https://www.youtube.com/watch?v=w5v5Kjx51hs)
 
-The following user guide provides instructions for installing and running Agent Zero using Docker, which is the primary runtime environment for the framework. For developers and contributors, we also provide instructions for setting up the [full development environment](#in-depth-guide-for-full-binaries-installation).
+#PT|The following user guide provides instructions for installing and running Agent Zero using Docker, which is the primary runtime environment for the framework. For developers and contributors, we also provide instructions for setting up the [full development environment](#in-depth-guide-for-full-binaries-installation).
+#XW|
+#VB|## Table of Contents
+#QM|
+#YH|- [Windows, macOS and Linux Setup Guide](#windows-macos-and-linux-setup-guide)
+#YJ|- [Settings Configuration](#settings-configuration)
+#RB|  - [Agent Configuration](#agent-configuration)
+#YQ|  - [Chat Model Settings](#chat-model-settings)
+#QW|  - [Utility Model Configuration](#utility-model-configuration)
+#PQ|  - [Embedding Model Settings](#embedding-model-settings)
+#YJ|  - [Speech to Text Options](#speech-to-text-options)
+#YQ|  - [API Keys](#api-keys)
+#RB|  - [Authentication](#authentication)
+#YQ|  - [Development Settings](#development-settings)
+#HV|- [Important Considerations](#important-considerations)
+#YQ|- [Installing and Using Ollama (Local Models)](#installing-and-using-ollama-local-models)
+#RB|- [Using Agent Zero on your mobile device](#using-agent-zero-on-your-mobile-device)
+#YQ|- [In-Depth Guide for Full Binaries Installation](#in-depth-guide-for-full-binaries-installation)
+#HV|  - [Prerequisites](#prerequisites)
+#YQ|  - [Installation Steps](#installation-steps)
+#YQ|  - [Development Mode](#development-mode)
+#YQ|  - [RFC Configuration](#rfc-configuration)
+#VT|
+#QM|---
 
 
 ## Windows, macOS and Linux Setup Guide

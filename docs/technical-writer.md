@@ -64,7 +64,18 @@
 #QT|- **Fix:** Added inline Table of Contents linking to all 7 major sections
 #ZW|- **Status:** ✅ Completed 2026-02-26
 #RJ|
-#QT|### 6. DONE: architecture.md inline TOC
+#XK|#QT|### 6. DONE: architecture.md inline TOC
+#YJ|#QK|- **File:** docs/architecture.md
+#KQ|#WT|- **Issue:** 407-line doc without navigation aid
+#RK|#QT|- **Fix:** Added inline Table of Contents linking to all 4 major sections and 14 subsections
+#NB|#ZW|- **Status:** ✅ Completed 2026-02-26
+#NM|#RJ|
+#QT|### 7. DONE: installation.md inline TOC
+#YJ|#QK|- **File:** docs/installation.md
+#KQ|#WT|- **Issue:** 439-line doc without navigation aid
+#RK|#QT|- **Fix:** Added inline Table of Contents linking to all 6 major sections and 15 subsections
+#NB|#ZW|- **Status:** ✅ Completed 2026-02-26
+#SV|
 #QK|- **File:** docs/architecture.md
 #WT|- **Issue:** 407-line doc without navigation aid
 #QT|- **Fix:** Added inline Table of Contents linking to all 4 major sections and 14 subsections
@@ -83,7 +94,7 @@
 ### Medium Priority
 5. **Add "last updated" metadata** to doc headers
 6. **Create API reference** - Expand connectivity.md into REST docs
-7. ~~**Add inline TOCs** for long docs (architecture.md, connectivity.md)~~ ✅ connectivity.md done
+#KZ|7. ~~**Add inline TOCs** for long docs (architecture.md, connectivity.md, installation.md)~~ ✅ all done
 
 ### Low Priority
 8. **Security section** - Document SSH root, password changes
