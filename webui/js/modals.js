@@ -294,29 +294,58 @@ export function scrollModal(id) {
 globalThis.scrollModal = scrollModal;
 
 // Handle modal content loading from clicks
-document.addEventListener("click", async (e) => {
-  const modalTrigger = e.target.closest("[data-modal-content]");
-  if (modalTrigger) {
-    e.preventDefault();
-    if (
-      modalTrigger.hasAttribute("disabled") ||
-      modalTrigger.classList.contains("disabled")
-    ) {
-      return;
-    }
-    const modalPath = modalTrigger.getAttribute("href");
-    await openModal(modalPath);
-  }
-});
+// Store handler references for cleanup to prevent memory leaks
+let _modalClickHandler = null;
+let _modalKeydownHandler = null;
 
-// Close modal on escape key (closes only the top modal)
-document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && modalStack.length > 0) {
-    closeModal();
-  }
-});
+function setupModalHandlers() {
+    _modalClickHandler = async (e) => {
+        const modalTrigger = e.target.closest("[data-modal-content]");
+        if (modalTrigger) {
+            e.preventDefault();
+            if (
+                modalTrigger.hasAttribute("disabled") ||
+                modalTrigger.classList.contains("disabled")
+            ) {
+                return;
+            }
+            const modalPath = modalTrigger.getAttribute("href");
+            await openModal(modalPath);
+        }
+    };
+
+    _modalKeydownHandler = (e) => {
+        if (e.key === "Escape" && modalStack.length > 0) {
+            closeModal();
+        }
+    };
+
+    document.addEventListener("click", _modalClickHandler);
+    document.addEventListener("keydown", _modalKeydownHandler);
+}
+
+function cleanupModalHandlers() {
+    if (_modalClickHandler) {
+        document.removeEventListener("click", _modalClickHandler);
+        _modalClickHandler = null;
+    }
+    if (_modalKeydownHandler) {
+        document.removeEventListener("keydown", _modalKeydownHandler);
+        _modalKeydownHandler = null;
+    }
+}
+
+// Setup handlers
+setupModalHandlers();
+
+// Cleanup on page unload
+window.addEventListener("beforeunload", cleanupModalHandlers);
 
 // also export as global function
+export function cleanup() {
+    cleanupModalHandlers();
+}
+
 globalThis.openModal = openModal;
 globalThis.closeModal = closeModal;
 globalThis.scrollModal = scrollModal;

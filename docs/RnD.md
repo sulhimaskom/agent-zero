@@ -4,6 +4,34 @@ This document tracks R&D efforts, learnings, and improvements made to Agent Zero
 
 ## 2026-02-26
 
+### Issue: Memory Leak - Document-level Event Listeners in modals.js
+
+**Problem**: Frontend JavaScript had unbalanced event listener registration in modals.js - 6 addEventListener calls (click + keydown on document) but 0 removeEventListener, indicating memory leaks.
+
+**Root Cause**: modals.js registered global click and keydown event listeners without providing cleanup methods, causing listeners to persist for app lifetime.
+
+**Solution Applied**:
+- modals.js: Refactored inline event listeners to named functions stored in module-level variables (`_modalClickHandler`, `_modalKeydownHandler`)
+- Added `setupModalHandlers()` function to register handlers
+- Added `cleanupModalHandlers()` function to remove handlers
+- Added `window.addEventListener("beforeunload", cleanupModalHandlers)` for automatic cleanup on page unload
+- Added exported `cleanup()` function for manual cleanup
+
+**Files Changed**:
+- `webui/js/modals.js`
+
+**Status**: Fixed - Added cleanup methods, improved removeEventListener count from 0 to 2 in source files
+
+---
+
+## 2026-02-26
+
+### Issue: Memory Leak - 71 addEventListener vs 17 removeEventListener
+
+This document tracks R&D efforts, learnings, and improvements made to Agent Zero.
+
+## 2026-02-26
+
 ### Issue: Memory Leak - 71 addEventListener vs 17 removeEventListener
 
 **Problem**: Frontend JavaScript had unbalanced event listener registration - 71 addEventListener calls but only 17 removeEventListener, indicating potential memory leaks.
