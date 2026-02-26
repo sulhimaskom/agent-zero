@@ -30,6 +30,12 @@ Deliver small, safe, measurable improvements strictly inside the platform engine
 - ZERO warnings
 - Small atomic diff
 
+### 2026-02-26 - Docker Health Check Addition
+NW|- **Change:** Added HEALTHCHECK directive to `docker/run/Dockerfile`
+JH|- **Rationale:** Addresses Issue #275 - No Health Checks in Docker Images. The Flask web service on port 80 now has proper health monitoring. Uses curl to verify the main web endpoint is responding.
+XZ|- **Impact:** Docker can now monitor container health, enables better orchestration, supports docker-compose health checks, improved container reliability
+
+
 ## Improvements Log
 
 ### 2026-02-25 - pyproject.toml Black Redundancy Removal
