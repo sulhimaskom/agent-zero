@@ -29,7 +29,7 @@
 #MK|- [ ] Large file sizes
 #MH|- [ ] Inefficient DOM manipulation
 #QM|- [ ] Missing lazy loading
-#WV|- [x] Event listener memory leaks - scheduler.js fixed
+- [x] Event listener memory leaks - multiple files fixed
 #ZR|
 #ZR|## Common Patterns
 #MV|
@@ -54,7 +54,7 @@
 #TZ|1. **Accessibility**: Many icon buttons lacked `aria-label` attributes (partially fixed)
 #YH|2. **Console statements**: ~148 console.log statements across 76 files (many in vendor code)
 #MT|3. **TODO comments**: ~80 TODO/FIXME comments across frontend files
-#KR|4. **Memory leaks**: Event listener imbalance - 71 addEventListener vs 17 removeEventListener (partially fixed)
+4. **Memory leaks**: Event listener imbalance - 71 addEventListener vs 17 removeEventListener (fixed in 5 files)
 #ZS|
 #ZS|## Working Notes
 #HQ|
@@ -64,7 +64,16 @@
 #SB|- Added `removeEventListener` in `$cleanup` to properly clean up when component is destroyed
 #JX|- This prevents click handlers from accumulating when scheduler component is reinitialized
 #JQ|- Regenerated minified version: `webui/js/scheduler.min.js`
-#KB|- JavaScript syntax validated with `node --check`
+### 2026-02-26: Issue #317 - Additional Memory Leak Fixes
+- Fixed 5 more files with event listener memory leaks
+- Files fixed:
+  - `scroll-to-bottom-store.js` - Added `_scrollHandler` reference and `$cleanup()` method
+  - `notification-toast-stack.html` - Added `_keyboardHandler` and cleanup in x-data
+  - `keyboard-shortcut-hint.html` - Added `_keydownHandler`, `_clickHandler` and `$cleanup()`
+  - `chat-top.html` - Added `_scrollHandler` and `$cleanup()` in x-data
+  - `tasks-list.html` - Added `_scrollHandler` and `$cleanup()` in inline x-data
+- All handlers now have corresponding removeEventListener calls
+- JavaScript syntax validated with `node --check`
 #KB|
 #KM|### 2026-02-26: Remove console.warn from scroll-to-bottom-button.html
 #TN|- Removed development debugging message that leaked internal state to browser console

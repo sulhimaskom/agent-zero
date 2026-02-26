@@ -26,13 +26,26 @@
             const chatHistory = document.getElementById('chat-history');
             if (!chatHistory) return;
 
-            chatHistory.addEventListener('scroll', () => {
+            // Store handler reference for cleanup
+            this._scrollHandler = () => {
                 this.updateScrollState(chatHistory);
-            });
+            };
+
+            chatHistory.addEventListener('scroll', this._scrollHandler);
 
             // Initial state check
             this.updateScrollState(chatHistory);
         },
+
+        $cleanup() {
+            // Remove scroll listener to prevent memory leaks
+            const chatHistory = document.getElementById('chat-history');
+            if (chatHistory && this._scrollHandler) {
+                chatHistory.removeEventListener('scroll', this._scrollHandler);
+                this._scrollHandler = null;
+            }
+        }
+    }" x-init="init()" @cleanup="$cleanup()">
 
         updateScrollState(chatHistory) {
             const tolerancePx = 10;

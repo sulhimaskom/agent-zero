@@ -7,17 +7,28 @@
 </head>
 <body>
     <div x-data="{
+        _keyboardHandler: null,
         init() {
             this.setupKeyboardHandler();
         },
         setupKeyboardHandler() {
-            document.addEventListener('keydown', (e) => {
+            // Store handler reference for cleanup
+            this._keyboardHandler = (e) => {
                 if (e.key === 'Escape' && $store.notificationStore.toastStack.length > 0) {
                     e.preventDefault();
                     $store.notificationStore.dismissNewestToast();
                 }
-            });
+            };
+            document.addEventListener('keydown', this._keyboardHandler);
+        },
+        $cleanup() {
+            // Remove keyboard listener to prevent memory leaks
+            if (this._keyboardHandler) {
+                document.removeEventListener('keydown', this._keyboardHandler);
+                this._keyboardHandler = null;
+            }
         }
+    }" x-init="init()" @cleanup="$cleanup()">
     }">
         <template x-if="$store.notificationStore">
             <!-- Toast Stack Container -->

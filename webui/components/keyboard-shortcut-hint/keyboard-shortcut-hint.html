@@ -41,9 +41,59 @@
                 isVisible: false,
                 hideTimer: null,
                 hasBeenDismissed: false,
+                _keydownHandler: null,
+                _clickHandler: null,
 
                 init() {
                     this.setupKeyboardHandler();
+                },
+
+                setupKeyboardHandler() {
+                    // Store handler references for cleanup
+                    this._keydownHandler = (e) => {
+                        // Only show if not dismissed and not in input field
+                        if (this.hasBeenDismissed || this.isInputField(e.target)) {
+                            return;
+                        }
+
+                        // Show hint on modifier key press (Ctrl/Cmd)
+                        if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey) {
+                            // Don't show if they're already pressing ?
+                            if (e.key !== '?') {
+                                this.showHint();
+                            }
+                        }
+
+                        // Dismiss if user presses ? (they've discovered it!)
+                        if (e.key === '?' && !this.isInputField(e.target)) {
+                            this.dismissPermanently();
+                        }
+                    };
+
+                    // Dismiss on any click
+                    this._clickHandler = () => {
+                        this.hideHint();
+                    };
+
+                    document.addEventListener('keydown', this._keydownHandler);
+                    document.addEventListener('click', this._clickHandler);
+                },
+
+                $cleanup() {
+                    // Remove event listeners to prevent memory leaks
+                    if (this._keydownHandler) {
+                        document.removeEventListener('keydown', this._keydownHandler);
+                        this._keydownHandler = null;
+                    }
+                    if (this._clickHandler) {
+                        document.removeEventListener('click', this._clickHandler);
+                        this._clickHandler = null;
+                    }
+                    // Clear any pending timer
+                    if (this.hideTimer) {
+                        clearTimeout(this.hideTimer);
+                        this.hideTimer = null;
+                    }
                 },
 
                 setupKeyboardHandler() {

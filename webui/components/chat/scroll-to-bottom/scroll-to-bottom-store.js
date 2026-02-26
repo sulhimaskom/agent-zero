@@ -20,7 +20,8 @@ const model = {
     setupScrollListener() {
         let ticking = false;
 
-        this.chatHistory.addEventListener("scroll", () => {
+        // Store handler reference for cleanup
+        this._scrollHandler = () => {
             if (!ticking) {
                 window.requestAnimationFrame(() => {
                     this.checkScrollPosition();
@@ -28,11 +29,27 @@ const model = {
                 });
                 ticking = true;
             }
-        }, { passive: true });
+        };
+
+        this.chatHistory.addEventListener("scroll", this._scrollHandler, { passive: true });
+    },
+
+    $cleanup() {
+        // Remove scroll listener to prevent memory leaks
+        if (this.chatHistory && this._scrollHandler) {
+            this.chatHistory.removeEventListener("scroll", this._scrollHandler);
+            this._scrollHandler = null;
+        }
+        // Cleanup MutationObserver if stored
+        if (this._messageObserver) {
+            this._messageObserver.disconnect();
+            this._messageObserver = null;
+        }
     },
 
     setupMessageObserver() {
-        new MutationObserver((mutations) => {
+        // Store observer reference for cleanup
+        this._messageObserver = new MutationObserver((mutations) => {
             let messagesAdded = false;
 
             mutations.forEach((mutation) => {
@@ -50,7 +67,9 @@ const model = {
             if (messagesAdded && this.isVisible) {
                 this.newMessageCount++;
             }
-        }).observe(this.chatHistory, {
+        });
+
+        this._messageObserver.observe(this.chatHistory, {
             childList: true,
             subtree: true
         });
