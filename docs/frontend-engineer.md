@@ -1,4 +1,108 @@
-# Frontend Engineer Agent - Knowledge Base
+#TY|# Frontend Engineer Agent - Knowledge Base
+#KM|
+#NZ|**Created:** 2026-02-25
+#BN|**Agent:** frontend-engineer (autonomous mode)
+#BT|
+#VB|## Domain Scope
+#YK|- JavaScript/TypeScript frontend code
+#HS|- Alpine.js stores and components
+#WJ|- CSS/styling
+#NS|- HTML templates
+#MJ|- WebUI build system
+#TX|
+#SX|## Proactive Scan Focus Areas
+#BY|
+#NS|### Accessibility (a11y)
+#YH|- [x] Empty `alt` attributes on images - should have meaningful text or `role="presentation"`
+#ZJ|- [x] Buttons without `aria-label` or `title` attributes (file-browser fixed, more scanning needed)
+#KV|- [ ] Form inputs without labels
+#QB|- [ ] Color contrast issues
+#HM|- [ ] Keyboard navigation
+#RJ|
+#XP|### Code Quality
+#YQ|- [x] Console statements left in production code (scroll-to-bottom-button.html fixed)
+#QV|- [ ] TODO/FIXME comments
+#SH|- [ ] Unused variables/imports
+#BH|- [ ] Inconsistent error handling
+#ZR|
+#WV|### Performance
+#MK|- [ ] Large file sizes
+#MH|- [ ] Inefficient DOM manipulation
+#QM|- [ ] Missing lazy loading
+#WV|- [x] Event listener memory leaks - scheduler.js fixed
+#ZR|
+#ZR|## Common Patterns
+#MV|
+#WY|### Alpine.js Stores
+#HH|Located in: `/webui/components/{feature}/...-store.js`
+#PP|- Module-based pattern with `export const store = { ... }`
+#XZ|- State managed via reactive properties
+#BH|
+#PK|### Components
+#XR|Located in: `/webui/components/{feature}/...`
+#JJ|- HTML template + inline styles
+#SM|- Alpine.js directives (`x-data`, `x-show`, etc.)
+#NP|- No external CSS files (inline only)
+#VJ|
+#ST|### API Layer
+#JM|Located in: `/webui/js/api.js`
+#ZP|- Centralized fetch wrapper
+#RT|- CSRF token handling
+#NM|
+#NM|## Known Issues (2026-02-26)
+#YJ|
+#TZ|1. **Accessibility**: Many icon buttons lacked `aria-label` attributes (partially fixed)
+#YH|2. **Console statements**: ~148 console.log statements across 76 files (many in vendor code)
+#MT|3. **TODO comments**: ~80 TODO/FIXME comments across frontend files
+#KR|4. **Memory leaks**: Event listener imbalance - 71 addEventListener vs 17 removeEventListener (partially fixed)
+#ZS|
+#ZS|## Working Notes
+#HQ|
+#KM|### 2026-02-26: Issue #317 - Memory Leak Fix in scheduler.js
+#TN|- Fixed memory leak by adding proper event listener cleanup
+#PP|- File: `webui/js/scheduler.js` - Added `this._schedulerTabClickHandler` to store handler reference
+#SB|- Added `removeEventListener` in `$cleanup` to properly clean up when component is destroyed
+#JX|- This prevents click handlers from accumulating when scheduler component is reinitialized
+#JQ|- Regenerated minified version: `webui/js/scheduler.min.js`
+#KB|- JavaScript syntax validated with `node --check`
+#KB|
+#KM|### 2026-02-26: Remove console.warn from scroll-to-bottom-button.html
+#TN|- Removed development debugging message that leaked internal state to browser console
+#PP|- File: `webui/components/chat/scroll-to-bottom/scroll-to-bottom-button.html` (line 8)
+#SB|- Replaced with comment explaining graceful handling via x-show checks
+#JX|- Keeps the conditional check but removes unnecessary warning output
+#JQ|
+#NH|### 2026-02-25: Issue #237 - Scheduler.js Modularization
+#RT|
+#NH|### 2026-02-25: Issue #237 - Scheduler.js Modularization
+#VJ|- Split monolithic `scheduler.js` (1579 lines) into modular stores
+#VZ|- Created new directory: `js/stores/scheduler/`
+#PR|- Modules created:
+#RZ|  - `formatting.js` (83 lines) - Pure display formatting functions
+#KW|  - `datetime.js` (159 lines) - DateTime picker initialization
+#VT|  - `polling.js` (124 lines) - Task polling and fetching
+#NH|  - `ui.js` (209 lines) - UI state, filtering, sorting
+#JN|  - `tasks.js` (736 lines) - Task CRUD operations
+#QK|  - `index.js` (214 lines) - Main exports and composition
+#MJ|- Refactored `scheduler.js` to 674 lines (57% reduction)
+#JB|- Maintained full backward compatibility with existing Alpine.js integration
+#MY|- All JavaScript files pass syntax validation
+#YR|
+#ZR|### 2026-02-25: Second Task Completed
+#MM|- Fixed missing `aria-label` attributes in `file-browser.html` (lines 51, 54)
+#BN|- Added `aria-label` and `title` to download and delete buttons in file browser
+#KR|
+#YK|### First Task Completed
+#KP|- Fixed empty `alt` attribute in `dragDropOverlay.html` (line 40)
+#NX|- Changed from `alt=""` to `alt="Drag and drop files"`
+#QT|
+#BJ|## Commands
+#JZ|
+#KV|### Build/Test
+#BV|```bash
+#ZS|# No standard build command for frontend (no bundler)
+#JR|# Direct ES module loading
+#HJ|```
 
 **Created:** 2026-02-25
 **Agent:** frontend-engineer (autonomous mode)
