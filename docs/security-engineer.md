@@ -115,7 +115,30 @@ Implemented `safe_eval_condition()` - a secure AST-based expression evaluator th
 - `security-engineer`: For PRs from this agent
 - `security`: For security-related issues
 
-## 2026-02-25: Proactive Security Scan
+## 2026-02-26: Proactive Security Scan
+
+---
+
+**Scan Performed**: hardcoded secrets, SQL injection, JWT, command injection, path traversal
+
+**Results**: 1 HIGH severity vulnerability fixed
+
+### Fixed:
+- ✅ `python/api/api_files_get.py` - Added path traversal validation with `is_in_base_dir()`
+
+### Verified Safe:
+- ✅ No hardcoded secrets - all credentials via environment variables
+- ✅ No SQL injection - uses FAISS vector DB (not SQL)
+- ✅ No JWT usage - uses session-based auth with bcrypt
+- ✅ Command injection - terminal execution by design (Docker isolation)
+
+### Remaining Observations (By Design):
+- Terminal runtime (`tty_session.py`, `code_execution_tool.py`) allows shell commands - intended for agent functionality, protected by Docker
+- SSH CWD injection low risk - cwd from project config, not user input
+
+---
+
+## 2026-02-26: Path Traversal in api_files_get.py
 
 **Scan Performed**: eval/exec/compile, subprocess shell=True, pickle, yaml.load
 
@@ -178,3 +201,31 @@ onclick="openFileLink('/path/to/file'); maliciousCode();//');"
 #JR|Checked for other `onclick=.*${` patterns - found only vendor files and this instance
 #ZQ|Vendor files in `webui/vendor/` skipped per policy
 #KJ|
+## 2026-02-26: Path Traversal in api_files_get.py
+
+---
+
+**Issue**: Arbitrary File Read via Path Traversal
+**Date Fixed**: 2026-02-26
+**Severity**: HIGH (File System Access)
+**Files Changed**: 
+- `python/api/api_files_get.py`
+
+**Vulnerability**: 
+The API endpoint accepted external/absolute paths without validating they stayed within the allowed base directory. An attacker with API key access could read arbitrary files on the system using paths like `/etc/passwd`.
+
+**Solution**:
+Added path traversal validation using the existing `files.is_in_base_dir()` function:
+- Added check after determining `external_path`
+- Uses `os.path.commonpath()` to verify path stays within base directory
+- Follows the same pattern as `image_get.py` (lines 25-31)
+- Invalid paths are logged with a warning and skipped
+
+**Testing**:
+- Valid paths within base directory → Works as before
+- Paths like `/etc/passwd` → Blocked with warning message
+- Paths with `../` attempts → Blocked by `is_in_base_dir()` validation
+
+---
+
+## 2026-02-26: XSS Vulnerability in messages.js
