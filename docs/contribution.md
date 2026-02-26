@@ -1,5 +1,8 @@
 # Contributing to Agent Zero
 
+> Last Updated: 2026-02-26
+
+
 Contributions to improve Agent Zero are very welcome!  This guide outlines how to contribute code, documentation, or other improvements.
 
 ## Getting Started
