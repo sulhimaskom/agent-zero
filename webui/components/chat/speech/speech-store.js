@@ -952,6 +952,17 @@ class MicrophoneInput {
       );
       return false;
     }
+  },
+
+  // Stored event handler reference for cleanup (prevents memory leaks)
+  _settingsUpdatedHandler: null,
+
+  // Cleanup event listeners to prevent memory leaks
+  cleanup() {
+    if (this._settingsUpdatedHandler) {
+      document.removeEventListener("settings-updated", this._settingsUpdatedHandler);
+      this._settingsUpdatedHandler = null;
+    }
   }
 }
 
@@ -960,6 +971,8 @@ export const store = createStore("speech", model);
 // Initialize speech store
 // window.speechStore = speechStore;
 
-// Event listeners
-document.addEventListener("settings-updated", () => store.loadSettings());
+// Event listeners - store handler reference for cleanup
+const settingsUpdatedHandler = () => store.loadSettings();
+document.addEventListener("settings-updated", settingsUpdatedHandler);
+store._settingsUpdatedHandler = settingsUpdatedHandler;
 // document.addEventListener("DOMContentLoaded", () => speechStore.init());

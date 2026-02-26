@@ -10,6 +10,16 @@ const model = {
   dragFileCount: 0,
   showDropSuccess: false,
 
+  // Stored event handler references for cleanup (prevents memory leaks)
+  _eventHandlers: {
+    dragenter: null,
+    dragover: null,
+    dragleave: null,
+    drop: null,
+    paste: null,
+    dragDefaults: [],
+  },
+
   async init() {
     await this.initialize();
   },
@@ -72,100 +82,104 @@ const model = {
   setupDragDropHandlers() {
     let dragCounter = 0;
 
-    // Prevent default drag behaviors
-    ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
-      document.addEventListener(
-        eventName,
-        (e) => {
-          e.preventDefault();
-          e.stopPropagation();
-        },
-        false
-      );
+    // Store handler references for cleanup
+    const dragDefaultsHandler = (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
+    
+    // Prevent default drag behaviors - store reference for cleanup
+    // Create separate handlers for each event to allow proper removal
+    const dragDefaults = {
+      dragenter: (e) => { e.preventDefault(); e.stopPropagation(); },
+      dragover: (e) => { e.preventDefault(); e.stopPropagation(); },
+      dragleave: (e) => { e.preventDefault(); e.stopPropagation(); },
+      drop: (e) => { e.preventDefault(); e.stopPropagation(); },
+    };
+    Object.entries(dragDefaults).forEach(([eventName, handler]) => {
+      document.addEventListener(eventName, handler, false);
+      this._eventHandlers.dragDefaults.push({ eventName, handler });
     });
 
-    document.addEventListener(
-      "dragenter",
-      (e) => {
-        dragCounter++;
-        if (dragCounter === 1) {
-          let fileCount = 0;
-          if (e.dataTransfer) {
-            if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
-              fileCount = e.dataTransfer.items.length;
-            } else if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-              fileCount = e.dataTransfer.files.length;
-            }
-          }
-          this.dragFileCount = fileCount;
-          this.showDragDropOverlay();
-        }
-      },
-      false
-    );
-
-    document.addEventListener(
-      "dragover",
-      (e) => {
-        if (this.dragDropOverlayVisible && e.dataTransfer) {
-          let fileCount = 0;
+    // Store dragenter handler
+    const dragenterHandler = (e) => {
+      dragCounter++;
+      if (dragCounter === 1) {
+        let fileCount = 0;
+        if (e.dataTransfer) {
           if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
-            for (let i = 0; i < e.dataTransfer.items.length; i++) {
-              if (e.dataTransfer.items[i].kind === 'file') {
-                fileCount++;
-              }
-            }
+            fileCount = e.dataTransfer.items.length;
           } else if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
             fileCount = e.dataTransfer.files.length;
           }
-          if (fileCount !== this.dragFileCount) {
-            this.dragFileCount = fileCount;
+        }
+        this.dragFileCount = fileCount;
+        this.showDragDropOverlay();
+      }
+    };
+    document.addEventListener("dragenter", dragenterHandler, false);
+    this._eventHandlers.dragenter = dragenterHandler;
+
+    // Store dragover handler
+    const dragoverHandler = (e) => {
+      if (this.dragDropOverlayVisible && e.dataTransfer) {
+        let fileCount = 0;
+        if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
+          for (let i = 0; i < e.dataTransfer.items.length; i++) {
+            if (e.dataTransfer.items[i].kind === 'file') {
+              fileCount++;
+            }
           }
+        } else if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+          fileCount = e.dataTransfer.files.length;
         }
-      },
-      false
-    );
+        if (fileCount !== this.dragFileCount) {
+          this.dragFileCount = fileCount;
+        }
+      }
+    };
+    document.addEventListener("dragover", dragoverHandler, false);
+    this._eventHandlers.dragover = dragoverHandler;
 
-    document.addEventListener(
-      "dragleave",
-      (e) => {
-        dragCounter--;
-        if (dragCounter === 0) {
+    // Store dragleave handler
+    const dragleaveHandler = (e) => {
+      dragCounter--;
+      if (dragCounter === 0) {
+        this.hideDragDropOverlay();
+        this.dragFileCount = 0;
+      }
+    };
+    document.addEventListener("dragleave", dragleaveHandler, false);
+    this._eventHandlers.dragleave = dragleaveHandler;
+
+    // Store drop handler
+    const dropHandler = (e) => {
+      dragCounter = 0;
+      const files = e.dataTransfer.files;
+      const fileCount = files.length;
+
+      this.handleFiles(files);
+
+      if (fileCount > 0) {
+        this.showDropSuccess = true;
+        setTimeout(() => {
+          this.showDropSuccess = false;
           this.hideDragDropOverlay();
           this.dragFileCount = 0;
-        }
-      },
-      false
-    );
-
-    document.addEventListener(
-      "drop",
-      (e) => {
-        dragCounter = 0;
-        const files = e.dataTransfer.files;
-        const fileCount = files.length;
-
-        this.handleFiles(files);
-
-        if (fileCount > 0) {
-          this.showDropSuccess = true;
-          setTimeout(() => {
-            this.showDropSuccess = false;
-            this.hideDragDropOverlay();
-            this.dragFileCount = 0;
-          }, 1200);
-        } else {
-          this.hideDragDropOverlay();
-          this.dragFileCount = 0;
-        }
-      },
-      false
-    );
+        }, 1200);
+      } else {
+        this.hideDragDropOverlay();
+        this.dragFileCount = 0;
+      }
+    };
+    document.addEventListener("drop", dropHandler, false);
+    this._eventHandlers.drop = dropHandler;
   },
 
   // Setup paste event handler for clipboard images
   setupPasteHandler() {
-    document.addEventListener("paste", (e) => {
+    // Store handler reference for cleanup
+    const pasteHandler = (e) => {
       const items = e.clipboardData.items;
       let imageFound = false;
 
@@ -190,7 +204,9 @@ const model = {
       ) {
         return;
       }
-    });
+    };
+    document.addEventListener("paste", pasteHandler);
+    this._eventHandlers.paste = pasteHandler;
   },
 
   // Handle clipboard image pasting
@@ -442,6 +458,36 @@ const model = {
         return v.toString(16);
       }
     );
+  },
+
+  // Cleanup all event listeners to prevent memory leaks
+  cleanup() {
+    // Remove drag and drop event listeners
+    if (this._eventHandlers.dragenter) {
+      document.removeEventListener("dragenter", this._eventHandlers.dragenter);
+      this._eventHandlers.dragenter = null;
+    }
+    if (this._eventHandlers.dragover) {
+      document.removeEventListener("dragover", this._eventHandlers.dragover);
+      this._eventHandlers.dragover = null;
+    }
+    if (this._eventHandlers.dragleave) {
+      document.removeEventListener("dragleave", this._eventHandlers.dragleave);
+      this._eventHandlers.dragleave = null;
+    }
+    if (this._eventHandlers.drop) {
+      document.removeEventListener("drop", this._eventHandlers.drop);
+      this._eventHandlers.drop = null;
+    }
+    if (this._eventHandlers.paste) {
+      document.removeEventListener("paste", this._eventHandlers.paste);
+      this._eventHandlers.paste = null;
+    }
+    // Remove drag defaults
+    this._eventHandlers.dragDefaults.forEach(({ eventName, handler }) => {
+      document.removeEventListener(eventName, handler);
+    });
+    this._eventHandlers.dragDefaults = [];
   },
 
 };
