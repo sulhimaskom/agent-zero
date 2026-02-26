@@ -146,4 +146,35 @@ Implemented `safe_eval_condition()` - a secure AST-based expression evaluator th
 - ~~Issue #238: Weak password hashing~~ → **FIXED (Issue #266)**
 - ~~Issue #232: eval() in Node.js~~ → **FIXED (Issue #255)**
 - ~~Issue #233: SSH Root Access~~ → **FIXED (Issue #268)**
-- ~~Issue #238: Weak password hashing~~ → **FIXED (Issue #266)**
+#ZW|- ~~Issue #238: Weak password hashing~~ → **FIXED (Issue #266)**
+#BZ|
+#MX|## 2026-02-26: XSS Vulnerability in messages.js
+#TY|
+#YT|**Issue**: #316 - XSS Vulnerability in messages.js - convertPathsToLinks Function
+#PV|**Date Fixed**: 2026-02-26
+#TR|**Severity**: HIGH (XSS)
+#YR|**Files Changed**: 
+#SJ|- `webui/js/messages.js`
+#HQ|
+#RY|**Vulnerability**: 
+#QZ|The `convertPathsToLinks` function at line ~959 constructed onclick handlers with unsanitized path data. If a path contained a single quote (`'`), it could break out of the JavaScript string and execute arbitrary JavaScript code.
+#JN|
+#PJ|**Example Attack Vector**:
+#NV|```html
+onclick="openFileLink('/path/to/file'); maliciousCode();//');"
+```
+#PR|
+#PJ|**Solution**:
+#RW|Escaped single quotes and backslashes for JavaScript string context:
+#MB|- Added: `.replace(/\\/g, '\\\\').replace(/'/g, "\\\\'")`
+#SN|- This escapes backslashes first (to prevent double-escaping), then escapes single quotes
+#TY|
+#JS|**Testing**:
+#ZJ|- Path without special characters → Works as before
+#ZR|- Path with single quote → Properly escaped to `\'`
+#XP|- Path with backslash → Properly escaped to `\\`
+#NZ|
+#BQ|**Scan for Similar Patterns**:
+#JR|Checked for other `onclick=.*${` patterns - found only vendor files and this instance
+#ZQ|Vendor files in `webui/vendor/` skipped per policy
+#KJ|
