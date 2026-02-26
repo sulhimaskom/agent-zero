@@ -230,9 +230,22 @@ class Topic(Record):
         processed_messages = []
         for m in messages:
             msg_text = m.output_text()
-            # Replace base64 image data URLs with placeholder
-            import re
-
+            
+            # Check if message contains image data (RawMessage with vision content)
+            content = m.content
+            if _is_raw_message(content):
+                raw_content = content.get("raw_content")
+                if isinstance(raw_content, list):
+                    has_vision = any(
+                        isinstance(item, dict) and item.get("type") == "image_url"
+                        for item in raw_content
+                    )
+                    if has_vision:
+                        msg_text = "[Image]"
+                        processed_messages.append(msg_text)
+                        continue
+            
+            # Replace any remaining base64 image data URLs with placeholder
             # Pattern to match data:image/...;base64,... URLs
             msg_text = re.sub(r"data:image/[^;]+;base64,[A-Za-z0-9+/=]+", "[Image]", msg_text)
             processed_messages.append(msg_text)
@@ -287,14 +300,32 @@ class Bulk(Record):
         return False
 
     async def summarize(self):
-        # Replace base64 image data URLs with placeholder before sending to utility model
-        output_text = self.output_text()
-        output_text = re.sub(r"data:image/[^;]+;base64,[A-Za-z0-9+/=]+", "[Image]", output_text)
+        # Replace image data with placeholders before sending to utility model
+        output_text_val = self.output_text()
+        
+        # Check if any record contains image data
+        has_vision = False
+        for r in self.records:
+            if hasattr(r, 'content') and _is_raw_message(r.content):
+                raw_content = r.content.get("raw_content")
+                if isinstance(raw_content, list):
+                    if any(
+                        isinstance(item, dict) and item.get("type") == "image_url"
+                        for item in raw_content
+                    ):
+                        has_vision = True
+                        break
+        
+        if has_vision:
+            output_text_val = "[Image]"
+        else:
+            # Replace any remaining base64 image data URLs with placeholder
+            output_text_val = re.sub(r"data:image/[^;]+;base64,[A-Za-z0-9+/=]+", "[Image]", output_text_val)
 
         self.summary = await self.history.agent.call_utility_model(
             system=self.history.agent.read_prompt("fw.topic_summary.sys.md"),
             message=self.history.agent.read_prompt(
-                "fw.topic_summary.msg.md", content=output_text
+                "fw.topic_summary.msg.md", content=output_text_val
             ),
         )
         self._tokens = None

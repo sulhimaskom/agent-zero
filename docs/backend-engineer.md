@@ -1,3 +1,41 @@
+#QH|# Backend Engineer Agent Memory
+#KM|
+#KY|**Last Updated:** 2026-02-26
+#RW|
+#WV|## Domain Focus
+#HR|- Python backend (Flask API)
+#WS|- Authentication and security
+#XN|- Performance optimization
+#JP|- API endpoints
+#SK|
+#QM|## Completed Fixes
+#TX|
+#SQ|### Issue #274: Vision Bytes Sent to Utility LLM - Performance Inefficiency
+#TN|**Status:** FIXED (2026-02-26)
+#RJ|
+#MN|**Problem:**
+#PR|Image/vision data was being sent to utility LLM during message summarization,
+#VR|causing unnecessary cost and latency. The original code used regex to replace
+#YR|base64 image data, but the regex pattern didn't match because RawMessage
+#WK|content uses a preview string, not the actual base64 data.
+#SY|
+#HT|**Changes:**
+#VK|1. Fixed `Topic.summarize_messages()` method:
+#XW|   - Check if message content is RawMessage with vision data
+#RR|   - Directly replace with "[Image]" placeholder when image_url type detected
+#ZR|   - Fallback to regex for any remaining base64 data URLs
+#NM|2. Fixed `Bulk.summarize()` method:
+#TY|   - Same logic applied for bulk record summarization
+#JQ|
+#HT|**Files Modified:**
+#VV|- python/helpers/history.py (+32 lines)
+#XN|
+#NT|**Verification:**
+#TP|- All 266 tests pass
+#RR|- Python syntax verified
+#PY|- No regressions
+#BJ|
+#SQ|### Issue #277: Unpinned Dependencies Risk
 # Backend Engineer Agent Memory
 
 **Last Updated:** 2026-02-26
