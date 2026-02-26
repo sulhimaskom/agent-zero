@@ -102,6 +102,12 @@ Deliver small, safe, measurable improvements strictly inside the domain of devel
 - Positive review feedback
 - Measurable improvement in CI/CD or developer experience
 
+### 2026-02-26 - Remove Duplicate Dependencies from requirements.dev.txt
+- Removed duplicate httpx, mcp, and pydantic from requirements.dev.txt
+- These dependencies are already in requirements.txt
+- Simplifies dependency management (3 fewer lines to maintain)
+- Follows pattern of previous PRs (#327, #298)
+
 ## History
 #HT|
 ### 2026-02-26 - Remove Duplicate pytest Dependencies
