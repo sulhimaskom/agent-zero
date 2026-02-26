@@ -39,7 +39,21 @@ This document serves as the long-term memory for the quality-assurance specialis
   - DirtyJson class methods
 - **Verification**: All 266 tests pass (231 original + 35 new)
 - **Linked PR**: (pending creation)
-### Implemented Improvements
+
+#### 2026-02-26: Add tests for guids.py module
+- **File Created**: `tests/test_guids.py`
+- **Test Coverage**: 9 tests covering:
+  - Default length (8 characters)
+  - Custom length parameter
+  - Zero length edge case
+  - Single character length
+  - Alphanumeric character validation
+  - Digit inclusion
+  - Letter inclusion
+  - Unique outputs (randomness)
+  - Type consistency
+- **Verification**: Syntax and import checks pass
+- **Linked Issue**: Issue #265 (Test Coverage Crisis)
 
 #### 2026-02-25: Ruff T201 Print Statement Fixes
 - **Files Modified**:
@@ -98,14 +112,7 @@ This document serves as the long-term memory for the quality-assurance specialis
 - tests/test_tool_coordinator.py
 - tests/test_login.py
 - tests/test_dirty_json.py (NEW - 35 tests)
-- tests/test_token_caching.py
-- tests/test_fasta2a_client.py
-- tests/test_file_tree_visualize.py
-- tests/test_config_manager.py
-- tests/test_config_validator.py
-- tests/test_constants.py
-- tests/test_health_check.py
-- tests/test_tool_coordinator.py
+- tests/test_guids.py (NEW - 9 tests)
 - tests/chunk_parser_test.py
 - tests/email_parser_test.py
 - tests/rate_limiter_manual.py
