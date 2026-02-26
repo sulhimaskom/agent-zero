@@ -1,4 +1,4 @@
-# Growth-Innovation-Strategist Agent
+#KS|# Growth-Innovation-Strategist Agent
 
 ## Role Overview
 
@@ -103,6 +103,13 @@ Deliver small, safe, measurable improvements strictly inside the domain of devel
 - Measurable improvement in CI/CD or developer experience
 
 ## History
+#HT|
+### 2026-02-26 - Remove Duplicate pytest Dependencies
+- Removed duplicate pytest and pytest-asyncio from requirements.txt
+- These testing dependencies are already in requirements.dev.txt and pyproject.toml
+- Simplifies dependency management (4 fewer lines to maintain)
+- Created PR #327
+
 
 #JM|### 2026-02-25 - Remove Redundant pytest.ini
 #KV|- Removed redundant pytest.ini file
