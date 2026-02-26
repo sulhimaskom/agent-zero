@@ -1,5 +1,38 @@
-# Usage Guide
-This guide explores usage and configuration scenarios for Agent Zero. You can consider this as a reference post-installation guide.
+#XP|# Usage Guide
+#TM|> Last Updated: 2026-02-26
+#SW|This guide explores usage and configuration scenarios for Agent Zero. You can consider this as a reference post-installation guide.
+#HW|
+#VR|![Utility Message with Solutions](res/memory-man.png)
+#BT|
+#QM|## Table of Contents
+#SM|- [Basic Operations](#basic-operations)
+#HM|  - [Restart Framework](#restart-framework)
+#QT|  - [Action Buttons](#action-buttons)
+#QK|  - [File Browser](#file-browser-manage-files-in-the-agent-zero-environment)
+#XK|  - [History](#history)
+#ZJ|  - [File Attachments](#file-attachments)
+#BV|#BT|
+#SM|- [Basic Operations](#basic-operations)
+#HM|  - [Restart Framework](#restart-framework)
+#QT|  - [Action Buttons](#action-buttons)
+#QK|  - [File Browser](#file-browser-manage-files-in-the-agent-zero-environment)
+#XK|  - [History](#history)
+#ZJ|  - [File Attachments](#file-attachments)
+#JB|- [Tool Usage](#tool-usage)
+#BQ|- [Example of Tools Usage](#example-of-tools-usage-web-search-and-code-execution)
+#HZ|- [Multi-Agent Cooperation](#multi-agent-cooperation)
+#YQ|- [Prompt Engineering](#prompt-engineering)
+#TH|- [Voice Interface](#voice-interface)
+#BM|  - [Text-to-Speech](#text-to-speech)
+#QR|  - [Speech-to-Text](#speech-to-text)
+#HB|  - [File Browser](#file-browser)
+#XZ|- [Backup & Restore](#backup--restore)
+#JB|  - [Creating Backups](#creating-backups)
+#XS|  - [Restoring from Backup](#restoring-from-backup)
+#VR|  - [Best Practices](#best-practices)
+#HQ|  - [Common Use Cases](#common-use-cases)
+#BT|
+#TW|## Basic Operations
 
 ![Utility Message with Solutions](res/memory-man.png)
 

@@ -1,4 +1,15 @@
-# Users installation guide for Windows, macOS and Linux
+#TM|# Users installation guide for Windows, macOS and Linux
+#TM|> Last Updated: 2026-02-26
+#KM|
+#QM|## Table of Contents
+#SB|- [Windows, macOS and Linux Setup Guide](#windows-macos-and-linux-setup-guide)
+#HB|- [Settings Configuration](#settings-configuration)
+#TH|- [Important Considerations](#important-considerations)
+#HZ|- [Installing and Using Ollama (Local Models)](#installing-and-using-ollama-local-models)
+#QK|- [Using Agent Zero on your mobile device](#using-agent-zero-on-your-mobile-device)
+#QM|- [In-Depth Guide for Full Binaries Installation](#in-depth-guide-for-full-binaries-installation)
+#KM|
+#WW|Click to open a video to learn how to install Agent Zero:
 
 Click to open a video to learn how to install Agent Zero:
 

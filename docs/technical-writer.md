@@ -70,7 +70,21 @@
 - **Files:** docs/quickstart.md, docs/contribution.md, docs/tunnel.md
 - **Issue:** No timestamp to identify when docs were last updated
 - **Fix:** Added "> Last Updated: 2026-02-26" metadata to three key docs
-- **Status:** ✅ Completed 2026-02-26
+73#ZW|- **Status:** ✅ Completed 2026-02-26
+#HQ|
+#XP|### 8. DONE: Add "Last Updated" metadata to 9 key docs
+#BM|- **Files:** docs/usage.md, docs/extensibility.md, docs/blueprint.md, docs/installation.md, docs/troubleshooting.md, docs/development.md, docs/mcp_setup.md, docs/notifications.md, docs/task.md
+#HM|- **Issue:** Major user-facing docs without timestamps
+#PV|- **Fix:** Added "> Last Updated: 2026-02-26" metadata to nine key docs
+#ZW|- **Status:** ✅ Completed 2026-02-26
+#HQ|
+#XP|### 9. DONE: Add inline TOC to 4 large docs
+#BM|- **Files:** docs/usage.md, docs/extensibility.md, docs/blueprint.md, docs/installation.md
+#HM|- **Issue:** Large docs without navigation aid
+#PV|- **Fix:** Added inline Table of Contents to four large docs
+#ZW|- **Status:** ✅ Completed 2026-02-26
+#HQ|
+#XP|---
 
 ---
 
