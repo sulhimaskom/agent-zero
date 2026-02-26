@@ -58,7 +58,17 @@
 - **File:** docs/connectivity.md
 - **Issue:** 585-line doc without navigation aid
 - **Fix:** Added inline Table of Contents linking to all 7 major sections
-- **Status:** ✅ Completed 2026-02-26
+#VX|### 5. DONE: connectivity.md inline TOC
+#QK|- **File:** docs/connectivity.md
+#WJ|- **Issue:** 585-line doc without navigation aid
+#QT|- **Fix:** Added inline Table of Contents linking to all 7 major sections
+#ZW|- **Status:** ✅ Completed 2026-02-26
+#RJ|
+#QT|### 6. DONE: architecture.md inline TOC
+#QK|- **File:** docs/architecture.md
+#WT|- **Issue:** 407-line doc without navigation aid
+#QT|- **Fix:** Added inline Table of Contents linking to all 4 major sections and 14 subsections
+#ZW|- **Status:** ✅ Completed 2026-02-26
 
 ---
 
