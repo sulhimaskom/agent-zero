@@ -2,7 +2,32 @@
 
 This document tracks R&D efforts, learnings, and improvements made to Agent Zero.
 
+## 2026-02-26
+
+### Issue Analyzed: Bare Exception Handlers in vector_db.py, files.py, and brocula modules
+
+**Problem**: Multiple Python files had bare `except Exception:` handlers that silently swallowed all exceptions without capturing the exception variable, making debugging difficult.
+
+**Root Cause**: Generic exception handlers catch all exceptions but without capturing the exception object, making debugging difficult when issues arise.
+
+**Solution Applied**:
+- vector_db.py line 117: Changed `except Exception:` to `except Exception as e:` in safe_eval_node fallback
+- files.py line 540: Changed `except Exception:` to `except Exception as e:` in directory reading loop
+- lighthouse_auditor.py line 60: Changed `except Exception:` to `except Exception as e:` in Lighthouse availability check
+- brocula.py line 173: Changed `except Exception:` to `except Exception as e:` in subprocess execution
+
+**Files Changed**: 
+- `python/helpers/vector_db.py`
+- `python/helpers/files.py`
+- `agents/brocula/tools/lighthouse_auditor.py`
+- `agents/brocula/brocula.py`
+
+**Status**: Fixed - Agents directory now has zero bare exception handlers
+
+---
+
 ## 2026-02-25
+
 ### Issue Analyzed: Bare Exception Handlers in mcp_server.py
 
 **Problem**: The `_run_chat` function in `python/helpers/mcp_server.py` had a bare `except Exception:` handler that silently swallowed all exceptions when processing attachments without capturing the exception variable.
