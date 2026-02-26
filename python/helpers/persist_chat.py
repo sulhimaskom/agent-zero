@@ -69,7 +69,7 @@ def load_tmp_chats():
             data = json.loads(js)
             ctx = _deserialize_context(data)
             ctxids.append(ctx.id)
-        except Exception:
+        except Exception as e:
             pass
     return ctxids
 

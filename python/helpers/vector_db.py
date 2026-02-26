@@ -114,7 +114,7 @@ def safe_eval_condition(condition: str, data: dict) -> any:
             if type(node) not in ALLOWED_AST_NODES:
                 raise ValueError(f"Disallowed node type: {type(node).__name__}")
         return _safe_eval_node(tree, data)
-    except Exception:
+    except Exception as e:
         return False
 
 from agent import Agent  # noqa: E402

@@ -85,7 +85,7 @@ def load_project_header(name: str):
 def _default_file_structure_settings():
     try:
         gitignore = files.read_file("conf/projects.default.gitignore")
-    except Exception:
+    except Exception as e:
         gitignore = ""
     return FileStructureInjectionSettings(
         enabled=True,
@@ -298,7 +298,7 @@ def load_project_variables(name: str):
     try:
         abs_path = files.get_abs_path(get_project_meta_folder(name), "variables.env")
         return files.read_file(abs_path)
-    except Exception:
+    except Exception as e:
         return ""
 
 
