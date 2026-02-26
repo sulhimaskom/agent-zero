@@ -12,14 +12,14 @@
         <template x-if="$store.projects && $store.chats && $store.chats.selectedContext">
             <div>
                 <template x-if="$store.chats.selectedContext.project?.name">
-                    <button @click="open = !open" type="button" class="button project-dropdown-button">
+                    <button @click="open = !open" type="button" class="button project-dropdown-button" aria-label="Open project options">
                         <span class="project-color-ball" :style="$store.chats.selectedContext.project.color ? { backgroundColor: $store.chats.selectedContext.project.color } : { border: '1px solid var(--color-border)' }"></span>
                         <span x-text="$store.chats.selectedContext.project.title"></span>
                         <span class="icon material-symbols-outlined">arrow_drop_down</span>
                     </button>
                 </template>
                 <template x-if="!$store.chats.selectedContext.project?.name">
-                    <button @click="open = !open" type="button" class="button project-dropdown-button">
+                    <button @click="open = !open" type="button" class="button project-dropdown-button" aria-label="Open project options">
                         No project
                         <span class="icon material-symbols-outlined">arrow_drop_down</span>
                     </button>
