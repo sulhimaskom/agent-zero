@@ -1,11 +1,20 @@
 {
   "name": "agent-zero-webui",
   "version": "0.9.7",
+  "type": "module",
+  "description": "Agent Zero WebUI - Vanilla JS frontend with no Node dependencies",
+  "name": "agent-zero-webui",
+  "version": "0.9.7",
   "description": "Agent Zero WebUI - Vanilla JS frontend with no Node dependencies",
   "private": true,
   "scripts": {
-    "test": "echo 'No tests configured - frontend uses vanilla JS'"
+    "lint": "eslint webui/",
+    "lint:fix": "eslint webui/ --fix"
   },
   "keywords": ["agent-zero", "webui"],
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^9.0.0",
+    "globals": "^15.0.0"
+  }
 }
