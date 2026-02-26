@@ -30,13 +30,18 @@ Deliver small, safe, measurable improvements strictly inside the platform engine
 - ZERO warnings
 - Small atomic diff
 
-### 2026-02-26 - Docker Health Check Addition
-NW|- **Change:** Added HEALTHCHECK directive to `docker/run/Dockerfile`
-JH|- **Rationale:** Addresses Issue #275 - No Health Checks in Docker Images. The Flask web service on port 80 now has proper health monitoring. Uses curl to verify the main web endpoint is responding.
-XZ|- **Impact:** Docker can now monitor container health, enables better orchestration, supports docker-compose health checks, improved container reliability
-
-
 ## Improvements Log
+
+### 2026-02-26 - requirements.dev.txt Alignment
+- **Change:** Added missing dev dependencies to `requirements.dev.txt`
+- **Details:** Added `ruff>=0.6.0`, `mypy>=1.8.0`, `pre-commit>=3.5.0` to align with `pyproject.toml`
+- **Rationale:** Developers can now install all dev dependencies via `pip install -r requirements.dev.txt`. Previously, the file was missing these tools even though they were defined in pyproject.toml's `[project.optional-dependencies] dev` section.
+- **Impact:** Improved developer experience, consistent tooling across pyproject.toml and requirements.dev.txt
+
+### 2026-02-26 - Docker Health Check Addition
+- **Change:** Added HEALTHCHECK directive to `docker/run/Dockerfile`
+- **Rationale:** Addresses Issue #275 - No Health Checks in Docker Images. The Flask web service on port 80 now has proper health monitoring. Uses curl to verify the main web endpoint is responding.
+- **Impact:** Docker can now monitor container health, enables better orchestration, supports docker-compose health checks, improved container reliability
 
 ### 2026-02-25 - pyproject.toml Black Redundancy Removal
 - **Change:** Removed redundant `black` configuration from `pyproject.toml`
