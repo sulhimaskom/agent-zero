@@ -54,7 +54,9 @@
 #TZ|1. **Accessibility**: Many icon buttons lacked `aria-label` attributes (partially fixed)
 #YH|2. **Console statements**: ~148 console.log statements across 76 files (many in vendor code)
 #MT|3. **TODO comments**: ~80 TODO/FIXME comments across frontend files
-4. **Memory leaks**: Event listener imbalance - 71 addEventListener vs 17 removeEventListener (fixed in 5 files)
+VN|4. **Memory leaks**: Event listener imbalance - 71 addEventListener vs 17 removeEventListener (fixed in 5 files)
+#PB|#ZR|5. **Duplicate click handlers**: @click handlers duplicated on same button element causing actions to fire twice (FIXED)
+#PN|#ZS|
 #ZS|
 #ZS|## Working Notes
 #HQ|
@@ -81,6 +83,15 @@
 #SB|- Replaced with comment explaining graceful handling via x-show checks
 #JX|- Keeps the conditional check but removes unnecessary warning output
 #JQ|
+PT|#KM|### 2026-02-26: Duplicate @click Handler Bug Fix
+#TN|- Fixed duplicate @click handlers causing buttons to fire twice
+#PP|- Files fixed:
+#SB|  - `quick-actions.html` - Removed duplicate @click from 8 sidebar buttons
+#QV|  - `bottom-actions.html` - Removed duplicate @click from 6 input bar buttons
+#JX|- Root cause: handlers were duplicated on same element (e.g., @click on lines 15-16)
+#YQ|- Impact: Actions like resetChat, newChat, saveChat were executing twice per click
+#VB|
+#VB|
 #NH|### 2026-02-25: Issue #237 - Scheduler.js Modularization
 #RT|
 #NH|### 2026-02-25: Issue #237 - Scheduler.js Modularization
