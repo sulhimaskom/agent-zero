@@ -9,6 +9,17 @@ This guide covers the different ways to connect to Agent Zero from external appl
 The API token is automatically generated from your username and password. This same token is used for External API endpoints, MCP server connections, and A2A communication. The token will change if you update your credentials.
 
 ---
+## Table of Contents
+
+- [External API Endpoints](#external-api-endpoints)
+  - [`POST /api_message`](#post-api_message)
+  - [`GET/POST /api_log_get`](#getpost-apilogget)
+  - [`POST /api_terminate_chat`](#post-apiterminate_chat)
+  - [`POST /api_reset_chat`](#post-apireset_chat)
+  - [`POST /api_files_get`](#post-apifilesget)
+- [MCP Server Connectivity](#mcp-server-connectivity)
+- [A2A (Agent-to-Agent) Connectivity](#a2a-agent-to-agent-connectivity)
+
 
 ## External API Endpoints
 

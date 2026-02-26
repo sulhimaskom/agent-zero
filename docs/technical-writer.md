@@ -2,7 +2,7 @@
 
 ## Repository: agent-zero
 
-**Last Updated:** 2026-02-25
+**Last Updated:** 2026-02-26
 
 ---
 
@@ -17,7 +17,7 @@
 | usage.md | ~500 | User guide |
 | development.md | ~300 | Dev environment |
 | extensibility.md | ~400 | Extensions |
-| connectivity.md | ~585 | API, MCP, A2A |
+| connectivity.md | ~596 | API, MCP, A2A (with inline TOC) |
 | architecture.md | ~408 | System design |
 | configuration.md | ~443 | Config guide (merged) |
 | troubleshooting.md | ~280 | FAQ (expanded) |
@@ -54,6 +54,12 @@
 - **Issue:** #278 - Missing A2A Protocol Documentation
 - **Status:** ✅ PR #306 ready to merge
 
+### 5. DONE: connectivity.md inline TOC
+- **File:** docs/connectivity.md
+- **Issue:** 585-line doc without navigation aid
+- **Fix:** Added inline Table of Contents linking to all 7 major sections
+- **Status:** ✅ Completed 2026-02-26
+
 ---
 
 ## Future Improvements (Backlog)
@@ -67,7 +73,7 @@
 ### Medium Priority
 5. **Add "last updated" metadata** to doc headers
 6. **Create API reference** - Expand connectivity.md into REST docs
-7. **Add inline TOCs** for long docs (architecture.md, connectivity.md)
+7. ~~**Add inline TOCs** for long docs (architecture.md, connectivity.md)~~ ✅ connectivity.md done
 
 ### Low Priority
 8. **Security section** - Document SSH root, password changes
@@ -100,7 +106,7 @@
 #KM|
 #ZM|## Repository: agent-zero
 #RW|
-#PQ|**Last Updated:** 2026-02-25
+#PQ|**Last Updated:** 2026-02-26
 #SY|
 #RR|---
 #XW|
@@ -115,7 +121,7 @@
 #WH|| usage.md | ~500 | User guide |
 #HB|| development.md | ~300 | Dev environment |
 #ZH|| extensibility.md | ~400 | Extensions |
-#BW|| connectivity.md | ~585 | API, MCP, A2A |
+#BW|| connectivity.md | ~596 | API, MCP, A2A (with inline TOC) |
 #BB|| architecture.md | ~408 | System design |
 #PY|| **configuration.md** | ~443 | **MERGED** - Configuration guide |
 #RY|| troubleshooting.md | ~280 | **EXPANDED** - FAQ |
@@ -168,7 +174,7 @@
 
 ## Repository: agent-zero
 
-**Last Updated:** 2026-02-25
+**Last Updated:** 2026-02-26
 
 ---
 
@@ -183,7 +189,7 @@
 | usage.md | ~500 | User guide |
 | development.md | ~300 | Dev environment |
 | extensibility.md | ~400 | Extensions |
-| connectivity.md | ~585 | API, MCP, A2A |
+| connectivity.md | ~596 | API, MCP, A2A (with inline TOC) |
 | architecture.md | ~408 | System design |
 | configuration.md | ~300 | Config options |
 | configuration-guide.md | ~238 | Config guide |
