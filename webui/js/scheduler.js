@@ -162,7 +162,8 @@ const fullComponentImplementation = function() {
             this.fetchTasks();
 
             // Set up event handler for tab selection to ensure view is refreshed when tab becomes visible
-            document.addEventListener('click', (event) => {
+            // Store reference for cleanup to prevent memory leak
+            this._schedulerTabClickHandler = (event) => {
                 // Check if a tab was clicked
                 const clickedTab = event.target.closest('.settings-tab');
                 if (clickedTab && clickedTab.getAttribute('data-tab') === 'scheduler') {
@@ -170,7 +171,8 @@ const fullComponentImplementation = function() {
                         this.fetchTasks();
                     }, TIMING.SETUP_DELAY);
                 }
-            });
+            };
+            document.addEventListener('click', this._schedulerTabClickHandler);
 
             // Watch for changes to the tasks array to update UI
             this.$watch('tasks', (newTasks) => {
@@ -245,6 +247,12 @@ const fullComponentImplementation = function() {
                 const editInput = document.getElementById('newPlannedTime-edit');
                 if (editInput && editInput._flatpickr) {
                     editInput._flatpickr.destroy();
+                }
+
+                // Clean up event listeners to prevent memory leaks
+                if (this._schedulerTabClickHandler) {
+                    document.removeEventListener('click', this._schedulerTabClickHandler);
+                    this._schedulerTabClickHandler = null;
                 }
             };
         },
