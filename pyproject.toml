@@ -249,19 +249,3 @@ filterwarnings = [
     "ignore::PendingDeprecationWarning",
 ]
 
-[tool.coverage.run]
-source = ["python"]
-omit = [
-    "*/tests/*",
-    "*/test_*",
-    "webui/*",
-]
-
-[tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "raise AssertionError",
-    "raise NotImplementedError",
-    "if __name__ == .__main__.:",
-]
