@@ -9,6 +9,7 @@ from initialize import initialize_agent
 from python.helpers import files, history
 from python.helpers.constants import Paths
 from python.helpers.log import Log, LogItem
+from python.helpers.print_style import PrintStyle
 
 CHATS_FOLDER = Paths.CHATS_FOLDER
 LOG_SIZE = Paths.CHAT_LOG_SIZE
@@ -70,6 +71,7 @@ def load_tmp_chats():
             ctx = _deserialize_context(data)
             ctxids.append(ctx.id)
         except Exception as e:
+            PrintStyle(font_color="yellow").print(f"Failed to deserialize chat {file}: {e}")
             pass
     return ctxids
 

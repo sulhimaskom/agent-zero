@@ -406,6 +406,7 @@ class BrowserAgent(Tool):
                     await self.state.task.execute_inside(_get_update)
 
             except Exception as e:
+                PrintStyle(font_color="yellow").print(f"Browser get_update error: {e}")
                 pass
 
         return result

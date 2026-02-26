@@ -136,7 +136,6 @@ def safe_eval_condition(condition: str, data: dict) -> any:
         return _safe_eval_node(tree, data)
     except Exception as e:
         return False
-        return False
 
 import models  # noqa: E402
 from agent import Agent, AgentContext  # noqa: E402

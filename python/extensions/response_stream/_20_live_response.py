@@ -1,4 +1,6 @@
 from agent import LoopData
+from agent import LoopData
+from python.helpers import errors
 from python.helpers.extension import Extension
 
 
@@ -35,4 +37,10 @@ class LiveResponse(Extension):
             log_item = loop_data.params_temporary["log_item_response"]
             log_item.update(content=parsed["tool_args"]["text"])
         except Exception as e:
+            err = errors.format_error(e)
+            self.agent.context.log.log(
+                type="error",
+                heading="Live response extension error:",
+                content=err,
+            )
             pass
