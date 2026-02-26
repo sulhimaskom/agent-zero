@@ -13,6 +13,30 @@
 ## Proactive Scan Focus Areas
 
 ### Error Handling
+- [ ] Bare `except:` handlers - 71 instances found across 34 files (NEEDS FIX)
+- [ ] Empty except blocks with only `pass`
+- [ ] Uncaught exceptions in async code
+- [ ] Missing error handling in API endpoints
+
+### Code Quality
+- [ ] TODO/FIXME comments
+- [ ] Type hinting missing
+- [ ] Inconsistent exception handling patterns
+- [ ] Hardcoded credentials or secrets
+
+### Security
+- [ ] Path traversal vulnerabilities
+- [ ] SQL injection risks
+- [ ] Input validation
+- [ ] Authentication/authorization issues
+
+### Performance
+- [ ] Inefficient database queries
+- [ ] Missing caching
+- [ ] Blocking I/O operations
+- [ ] Memory leaks
+
+## Common Patterns
 - [x] Bare `except:` handlers - should catch specific exceptions
 - [ ] Empty except blocks with only `pass`
 - [ ] Uncaught exceptions in async code
@@ -57,6 +81,18 @@ Located in: `python/helpers/`
 - Return meaningful error messages to callers
 
 ## Known Issues (2026-02-26)
+
+1. **Bare except handlers**: 2 files with bare `except:` found and fixed (files.py, git.py)
+2. **TODO comments**: ~16 TODO/FIXME comments across Python files
+3. **Previous PR #340**: Fixed 26 bare exception handlers in test and helper files
+4. **REMAINING ISSUE**: 71 bare `except Exception:` handlers found across 34 Python files - needs systematic fix
+
+## Working Notes
+
+### Third Task Completed (2026-02-26)
+- Fixed 6 bare `except Exception:` handlers in python/helpers/git.py
+- Changed all to `except Exception as e:` for better debugging
+- PR #371 created
 
 1. **Bare except handlers**: 2 files with bare `except:` found and fixed (files.py, git.py)
 2. **TODO comments**: ~16 TODO/FIXME comments across Python files
