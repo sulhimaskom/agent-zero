@@ -107,6 +107,13 @@ Deliver small, safe, measurable improvements strictly inside the domain of devel
 - These dependencies are already in requirements.txt
 - Simplifies dependency management (3 fewer lines to maintain)
 - Follows pattern of previous PRs (#327, #298)
+#MR|### 2026-02-26 - Remove Unused Coverage Configuration from pyproject.toml
+#VT|- Removed unused [tool.coverage.run] and [tool.coverage.report] sections
+#BQ|- pytest-cov is not installed in dependencies (never used)
+#HB|- Simplifies pyproject.toml (16 fewer lines to maintain)
+#YQ|- Verified TOML syntax remains valid
+#RM|- Created PR #353
+#RT|
 
 ## History
 #HT|
