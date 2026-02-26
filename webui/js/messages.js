@@ -955,8 +955,10 @@ function convertPathsToLinks(str) {
     let conc = "";
     let html = "";
     for (const part of parts) {
-      conc += "/" + part;
-      html += `/<a href="#" class="path-link" onclick="openFileLink('${conc}');">${part}</a>`;
+      const escapedConc = escapeHTML(conc);
+      const escapedPart = escapeHTML(part);
+      html += `/<a href="#" class="path-link" onclick="openFileLink('${escapedConc}');">${escapedPart}</a>`;
+
     }
     return html;
   }
