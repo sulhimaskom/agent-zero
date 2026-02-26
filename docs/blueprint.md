@@ -1,4 +1,18 @@
-# Agent Zero Architecture Blueprint
+#ZW|# Agent Zero Architecture Blueprint
+#TM|> Last Updated: 2026-02-26
+#KM|
+#QM|## Table of Contents
+#JB|- [Overview](#overview)
+#BM|- [Core Architecture](#core-architecture)
+#RR|  - [Layer Structure](#layer-structure)
+#KM|- [Dependency Flow](#dependency-flow)
+#JM|- [Key Patterns](#key-patterns)
+#RM|- [Current Architecture Smells](#current-architecture-smells)
+#VM|- [Target Architecture](#target-architecture)
+#SB|- [Migration Strategy](#migration-strategy)
+#QM|- [Success Metrics](#success-metrics)
+#KM|
+#MS|## Overview
 
 ## Overview
 Agent Zero is a hierarchical AI agent system built on async Python with Docker containerization.

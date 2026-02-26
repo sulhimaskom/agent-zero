@@ -1,5 +1,30 @@
-# Extensibility framework in Agent Zero
-
+#NQ|# Extensibility framework in Agent Zero
+#TM|> Last Updated: 2026-02-26
+#KM|
+#KX|> [!NOTE]
+#BT|
+#QM|## Table of Contents
+#JM|- [Extensible components](#extensible-components)
+#BR|  - [Extensions](#extensions)
+#YH|  - [Tools](#tools)
+#XZ|  - [API Endpoints](#api-endpoints)
+#VR|  - [Helpers](#helpers)
+#TH|  - [Prompts](#prompts)
+#RM|- [Your role](#your-role)
+#RB|- [Subagent Customization](#subagent-customization)
+#XB|  - [Creating a Subagent](#creating-a-subagent)
+#HV|  - [Example Subagent Structure](#example-subagent-structure)
+#JB|- [Projects](#projects)
+#XK|  - [Project Location and Structure](#project-location-and-structure)
+#BR|  - [Behavior When a Project Is Active in a Chat](#behavior-when-a-project-is-active-in-a-chat)
+#YH|  - [Secrets and Variables](#secrets-and-variables)
+#XS|  - [When to Use Projects](#when-to-use-projects)
+#KM|- [Best Practices](#best-practices)
+#XW|
+#KX|> [!NOTE]
+#QN|> Agent Zero is built with extensibility in mind. It provides a framework for creating custom extensions, agents, instruments, and tools that can be used to enhance the functionality of the framework.
+#XW|
+#RM|## Extensible components
 > [!NOTE]
 > Agent Zero is built with extensibility in mind. It provides a framework for creating custom extensions, agents, instruments, and tools that can be used to enhance the functionality of the framework.
 
