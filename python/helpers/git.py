@@ -49,7 +49,7 @@ def get_git_info():
             short_tag = "-".join(tag_split[:-1])
         else:
             short_tag = tag
-    except Exception:
+    except Exception as e:
         tag = ""
 
     version = branch[0].upper() + " " + ( short_tag or commit_hash[:7] )
@@ -70,7 +70,7 @@ def get_version():
     try:
         git_info = get_git_info()
         return str(git_info.get("short_tag", "")).strip() or "unknown"
-    except Exception:
+    except Exception as e:
         return "unknown"
 
 
@@ -114,13 +114,13 @@ def get_repo_status(repo_path: str) -> dict:
         try:
             if repo.remotes:
                 remote_url = strip_auth_from_url(repo.remotes.origin.url)
-        except Exception:
+        except Exception as e:
             pass
         
         # Current branch
         try:
             current_branch = repo.active_branch.name if not repo.head.is_detached else f"HEAD@{repo.head.commit.hexsha[:7]}"
-        except Exception:
+        except Exception as e:
             current_branch = "unknown"
         
         # Check dirty status, excluding A0 metadata
@@ -146,7 +146,7 @@ def get_repo_status(repo_path: str) -> dict:
                 "author": str(commit.author),
                 "date": datetime.fromtimestamp(commit.committed_date).strftime('%Y-%m-%d %H:%M')
             }
-        except Exception:
+        except Exception as e:
             pass
         
         return {
