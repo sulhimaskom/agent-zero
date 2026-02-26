@@ -881,7 +881,7 @@ class Config:
     AGENT_ZERO_REPO_URL = get_env_str("A0_AGENT_ZERO_REPO_URL", ExternalUrls.AGENT_ZERO_REPO)
 
     # Venice.ai configuration
-    VENICE_API_BASE = get_env_str("A0_VENICE_API_BASE", ExternalUrls.VENICE_API_BASE)
+    VENICE_API_BASE = get_env_str("VENICE_API_BASE", ExternalUrls.VENICE_API_BASE)
     A0_VENICE_API_BASE = get_env_str("A0_VENICE_API_BASE", ExternalUrls.A0_VENICE_API_BASE)
 
     # OpenRouter configuration
