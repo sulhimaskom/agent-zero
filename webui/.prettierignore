@@ -1,0 +1,10 @@
+vendor/**
+**/*.min.js
+**/*.min.css
+index.min.js
+index.min.css
+login.min.css
+components/_examples/**
+js/transformers@3.0.2.js
+js/transformers@3.0.2.min.js
+components/welcome/welcome-store.js
