@@ -70,7 +70,18 @@ import {
     resetTaskState as resetTaskStateModule,
     deleteTask as deleteTaskModule
 } from './stores/scheduler/tasks.js';
+}
+// Module-level reference to the global scheduler tab click handler for cleanup
+let _globalSchedulerTabClickHandler = null;
 
+// Cleanup function for the global scheduler tab click handler
+function cleanupGlobalSchedulerTabHandler() {
+    if (_globalSchedulerTabClickHandler) {
+        document.removeEventListener('click', _globalSchedulerTabClickHandler);
+        _globalSchedulerTabClickHandler = null;
+        Logger.debug('Cleaned up global scheduler tab click handler');
+    }
+}
 const showToast = function(message, type = 'info') {
     // Use new frontend notification system
     switch (type.toLowerCase()) {
@@ -637,7 +648,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         // Create a global event listener for clicks on the scheduler tab
-        document.addEventListener('click', function(e) {
+        // Store reference for cleanup to prevent memory leak
+        _globalSchedulerTabClickHandler = function(e) {
             // Find if the click was on the scheduler tab or its children
             const schedulerTab = e.target.closest('.settings-tab[title="Task Scheduler"]');
             if (!schedulerTab) return;
@@ -673,9 +685,13 @@ document.addEventListener('DOMContentLoaded', function() {
             } catch (err) {
                 Logger.error('Error handling scheduler tab click:', err);
             }
-        }, true); // Use capture phase to intercept before Alpine.js handlers
+        };
+        document.addEventListener('click', _globalSchedulerTabClickHandler, true); // Use capture phase to intercept before Alpine.js handlers
     };
 
     // Initialize the tab handling
     setupSchedulerTab();
 });
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', cleanupGlobalSchedulerTabHandler);
