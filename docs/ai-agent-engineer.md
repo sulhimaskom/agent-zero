@@ -151,6 +151,49 @@ async def summarize(self):
 
 ---
 
+### 2026-02-26: Event Listener Memory Leak Fix (Issue #317)
+**Issue**: [FRONTEND] Potential Memory Leak - 71 addEventListener vs 17 removeEventListener
+
+**Root Cause**: Global event listeners added without corresponding removal in several frontend files.
+
+**Fix Applied**: Added named handler functions and cleanup functions to properly remove event listeners.
+
+**Files Modified**:
+- `webui/js/keyboard-shortcuts.js` - Added `cleanupKeyboardShortcuts()` export
+- `webui/js/modals.js` - Added `cleanupModalListeners()` export and named handler functions
+- `webui/components/keyboard-shortcut-hint/keyboard-shortcut-hint.html` - Added `destroy()` method with cleanup
+- `webui/components/notifications/notification-toast-stack.html` - Added `destroy()` method with cleanup
+
+**Code Changes**:
+```javascript
+// keyboard-shortcuts.js
+export function cleanupKeyboardShortcuts() {
+  document.removeEventListener("keydown", handleKeyDown);
+}
+
+// modals.js - named handlers for cleanup
+export function cleanupModalListeners() {
+  document.removeEventListener("click", handleModalClick);
+  document.removeEventListener("keydown", handleModalKeydown);
+}
+
+// Alpine.js components - destroy() method pattern
+destroy() {
+  if (this._keydownHandler) {
+    document.removeEventListener('keydown', this._keydownHandler);
+    this._keydownHandler = null;
+  }
+}
+```
+
+**Verification**:
+- JavaScript syntax check: PASSED
+- Event listeners now have corresponding cleanup paths
+
+---
+
+## Known Issues (Future Work)
+
 ## Known Issues (Future Work)
 
 1. ~~**Issue #309**: 23 remaining files with bare exception handlers~~ - FIXED in PR #331

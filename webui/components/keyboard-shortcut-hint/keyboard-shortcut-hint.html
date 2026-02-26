@@ -41,6 +41,64 @@
                 isVisible: false,
                 hideTimer: null,
                 hasBeenDismissed: false,
+                _keydownHandler: null,
+                _clickHandler: null,
+
+                init() {
+                    this.setupKeyboardHandler();
+                },
+
+                destroy() {
+                    // Clean up event listeners when component is destroyed
+                    if (this._keydownHandler) {
+                        document.removeEventListener('keydown', this._keydownHandler);
+                        this._keydownHandler = null;
+                    }
+                    if (this._clickHandler) {
+                        document.removeEventListener('click', this._clickHandler);
+                        this._clickHandler = null;
+                    }
+                    if (this.hideTimer) {
+                        clearTimeout(this.hideTimer);
+                        this.hideTimer = null;
+                    }
+                },
+
+                setupKeyboardHandler() {
+                    // Store handler references for cleanup
+                    this._keydownHandler = (e) => {
+                        // Only show if not dismissed and not in input field
+                        if (this.hasBeenDismissed || this.isInputField(e.target)) {
+                            return;
+                        }
+
+                        // Show hint on modifier key press (Ctrl/Cmd)
+                        if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey) {
+                            // Don't show if they're already pressing ?
+                            if (e.key !== '?') {
+                                this.showHint();
+                            }
+                        }
+
+                        // Dismiss if user presses ? (they've discovered it!)
+                        if (e.key === '?' && !this.isInputField(e.target)) {
+                            this.dismissPermanently();
+                        }
+                    };
+
+                    this._clickHandler = () => {
+                        this.hideHint();
+                    };
+
+                    // Show hint when user presses Ctrl or Cmd (indicates they're looking for shortcuts)
+                    document.addEventListener('keydown', this._keydownHandler);
+
+                    // Dismiss on any click
+                    document.addEventListener('click', this._clickHandler);
+                },
+                isVisible: false,
+                hideTimer: null,
+                hasBeenDismissed: false,
 
                 init() {
                     this.setupKeyboardHandler();

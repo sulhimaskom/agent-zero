@@ -143,12 +143,9 @@ export function openModal(modalPath) {
       loadingDiv.textContent = 'Loading...';
       modal.body.appendChild(loadingDiv);
 
-      // Already added to stack above
-
       // Use importComponent to load the modal content
       // This handles all HTML, styles, scripts and nested components
-      // Updated path to use the new folder structure with modal.html
-      const componentPath = modalPath; // `modals/${modalPath}/modal.html`;
+      const componentPath = modalPath;
 
       // Use importComponent which now returns the parsed document
       importComponent(componentPath, modal.body)
@@ -185,7 +182,6 @@ export function openModal(modalPath) {
         });
 
       // Add modal to stack and show it
-      // Add modal to stack
       modal.path = modalPath;
       modalStack.push(modal);
       modal.element.classList.add("show");
@@ -232,27 +228,6 @@ export function closeModal(modalPath = null) {
   // First remove the show class to trigger the transition
   modal.element.classList.remove("show");
 
-  // commented out to prevent race conditions
-
-  // // Remove the modal element from DOM after animation
-  // modal.element.addEventListener(
-  //   "transitionend",
-  //   () => {
-  //     // Make sure the modal is completely removed from the DOM
-  //     if (modal.element.parentNode) {
-  //       modal.element.parentNode.removeChild(modal.element);
-  //     }
-  //   },
-  //   { once: true }
-  // );
-
-  // // Fallback in case the transition event doesn't fire
-  // setTimeout(() => {
-  //   if (modal.element.parentNode) {
-  //     modal.element.parentNode.removeChild(modal.element);
-  //   }
-  // }, 500); // 500ms should be enough for the transition to complete
-
   // remove immediately
   if (modal.element.parentNode) {
     modal.element.parentNode.removeChild(modal.element);
@@ -293,8 +268,8 @@ export function scrollModal(id) {
 // Make scrollModal globally available
 globalThis.scrollModal = scrollModal;
 
-// Handle modal content loading from clicks
-document.addEventListener("click", async (e) => {
+// Named handlers for global event listeners (allows cleanup)
+function handleModalClick(e) {
   const modalTrigger = e.target.closest("[data-modal-content]");
   if (modalTrigger) {
     e.preventDefault();
@@ -305,18 +280,29 @@ document.addEventListener("click", async (e) => {
       return;
     }
     const modalPath = modalTrigger.getAttribute("href");
-    await openModal(modalPath);
+    openModal(modalPath);
   }
-});
+}
 
-// Close modal on escape key (closes only the top modal)
-document.addEventListener("keydown", (e) => {
+function handleModalKeydown(e) {
   if (e.key === "Escape" && modalStack.length > 0) {
     closeModal();
   }
-});
+}
 
-// also export as global function
+// Handle modal content loading from clicks
+document.addEventListener("click", handleModalClick);
+
+// Close modal on escape key (closes only the top modal)
+document.addEventListener("keydown", handleModalKeydown);
+
+// Cleanup function to remove global event listeners
+export function cleanupModalListeners() {
+  document.removeEventListener("click", handleModalClick);
+  document.removeEventListener("keydown", handleModalKeydown);
+}
+
+// Also export as global functions
 globalThis.openModal = openModal;
 globalThis.closeModal = closeModal;
 globalThis.scrollModal = scrollModal;

@@ -7,6 +7,32 @@
 </head>
 <body>
     <div x-data="{
+        _keydownHandler: null,
+
+        init() {
+            this.setupKeyboardHandler();
+        },
+
+        destroy() {
+            // Clean up event listener when component is destroyed
+            if (this._keydownHandler) {
+                document.removeEventListener('keydown', this._keydownHandler);
+                this._keydownHandler = null;
+            }
+        },
+
+        setupKeyboardHandler() {
+            // Store handler reference for cleanup
+            this._keydownHandler = (e) => {
+                if (e.key === 'Escape' && $store.notificationStore.toastStack.length > 0) {
+                    e.preventDefault();
+                    $store.notificationStore.dismissNewestToast();
+                }
+            };
+            document.addEventListener('keydown', this._keydownHandler);
+        }
+    }">
+    <div x-data="{
         init() {
             this.setupKeyboardHandler();
         },
