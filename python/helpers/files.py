@@ -445,8 +445,8 @@ def delete_dir(relative_path: str):
 
                 # try again after changing permissions
                 shutil.rmtree(abs_path, ignore_errors=True)
-            except:
-                # suppress all errors - we're ensuring no errors propagate
+            except OSError:
+                # suppress permission errors - we're ensuring no errors propagate
                 pass
 
 
