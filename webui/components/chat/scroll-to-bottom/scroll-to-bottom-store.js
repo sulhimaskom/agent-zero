@@ -5,6 +5,8 @@ const model = {
     newMessageCount: 0,
     chatHistory: null,
     lastScrollHeight: 0,
+    _scrollHandler: null,
+    _messageObserver: null,
 
     init() {
         setTimeout(() => {
