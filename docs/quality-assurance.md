@@ -27,7 +27,18 @@ This document serves as the long-term memory for the quality-assurance specialis
 - **QA Comment**: [Link to review](https://github.com/sulhimaskom/agent-zero/pull/283#issuecomment-3959146535)
 - **Notes**: Pre-existing test infrastructure issue fixed (pytest-asyncio missing)
 
+### Implemented Improvements
 
+#### 2026-02-26: Add tests for dirty_json.py module
+- **File Created**: `tests/test_dirty_json.py`
+- **Test Coverage**: 35 tests covering:
+  - Basic parsing: objects, arrays, strings, numbers, booleans, null, undefined
+  - Edge cases: empty strings, trailing commas, comments, unquoted strings, nesting
+  - try_parse fallback function
+  - stringify function
+  - DirtyJson class methods
+- **Verification**: All 266 tests pass (231 original + 35 new)
+- **Linked PR**: (pending creation)
 ### Implemented Improvements
 
 #### 2026-02-25: Ruff T201 Print Statement Fixes
@@ -77,6 +88,16 @@ This document serves as the long-term memory for the quality-assurance specialis
 - **Recommendation**: Focus on type safety and exception handling in high-traffic modules (settings.py, task_scheduler.py, mcp_handler.py)
 
 ### Test Files Available
+- tests/test_token_caching.py
+- tests/test_fasta2a_client.py
+- tests/test_file_tree_visualize.py
+- tests/test_config_manager.py
+- tests/test_config_validator.py
+- tests/test_constants.py
+- tests/test_health_check.py
+- tests/test_tool_coordinator.py
+- tests/test_login.py
+- tests/test_dirty_json.py (NEW - 35 tests)
 - tests/test_token_caching.py
 - tests/test_fasta2a_client.py
 - tests/test_file_tree_visualize.py
