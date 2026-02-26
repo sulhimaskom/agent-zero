@@ -1,6 +1,23 @@
 # Architecture Overview
 Agent Zero is built on a flexible and modular architecture designed for extensibility and customization. This section outlines the key components and the interactions between them.
+## Table of Contents
 
+- [System Architecture](#system-architecture)
+  - [Architectural Evolution](#architectural-evolution)
+- [Runtime Architecture](#runtime-architecture)
+- [Implementation Details](#implementation-details)
+  - [Directory Structure](#directory-structure)
+  - [Key Files](#key-files)
+- [Core Components](#core-components)
+  - [Agents](#1-agents)
+  - [Tools](#2-tools)
+  - [Memory System](#3-memory-system)
+  - [Prompts](#4-prompts)
+  - [Knowledge](#5-knowledge)
+  - [Instruments](#6-instruments)
+  - [Extensions](#7-extensions)
+
+---
 ## System Architecture
 This simplified diagram illustrates the hierarchical relationship between agents and their interaction with tools, extensions, instruments, prompts, memory and knowledge base.
 
