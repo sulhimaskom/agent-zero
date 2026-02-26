@@ -1,5 +1,8 @@
 # Agent Zero Tunnel Feature
 
+> Last Updated: 2026-02-26
+
+
 The tunnel feature in Agent Zero allows you to expose your local Agent Zero instance to the internet using Flaredantic tunnels. This makes it possible to share your Agent Zero instance with others without requiring them to install and run Agent Zero themselves.
 
 ## How It Works

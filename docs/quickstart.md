@@ -1,4 +1,7 @@
 # Quick Start
+
+> Last Updated: 2026-02-26
+
 This guide provides a quick introduction to using Agent Zero. We'll cover launching the web UI, starting a new chat, and running a simple task.
 
 ## Launching the Web UI
