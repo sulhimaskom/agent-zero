@@ -54,7 +54,15 @@ Located in: `/webui/js/api.js`
 2. **Console statements**: ~148 console.log statements across 76 files (many in vendor code)
 3. **TODO comments**: ~80 TODO/FIXME comments across frontend files
 
-## Working Notes
+### 2026-02-26: Issue #316 - XSS Vulnerability Fix
+MM|- Fixed XSS vulnerability in `convertPathsToLinks` function (`webui/js/messages.js`)
+BN|- Added `escapeHTML()` calls to sanitize `conc` and `part` variables before inserting into HTML
+JW|- Prevents XSS attacks via malicious path strings (e.g., `/test');alert('xss');//`)
+NX|- Used existing `escapeHTML()` function which was previously not used in this function
+KB|- JavaScript syntax validation passed
+VB|- PR #325 created with `frontend-engineer` label
+
+
 
 ### 2026-02-25: Issue #237 - Scheduler.js Modularization
 - Split monolithic `scheduler.js` (1579 lines) into modular stores
