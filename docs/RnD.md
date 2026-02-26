@@ -1,4 +1,70 @@
-# RnD (Research & Development) Documentation
+#PZ|## 2026-02-26
+#SY|
+#RT|### Issue: CI Does Not Run pytest - Tests Never Executed (#267)
+#XW|
+#SH|**Problem**: The project has 13 test files (~5% coverage) with 266 tests, but GitHub CI workflows do NOT run pytest. Tests exist but are never executed.
+#SK|
+#WK|**Root Cause**: CI workflows only run OpenCode AI agent, no pytest step exists.
+#TX|
+#WR|**Solution Applied** (NOT YET PUSHED - see below):
+#TQ|- Added Python 3.12 setup step to on-pull.yml workflow
+#RW|- Added pip install for requirements.txt and requirements.dev.txt
+#QK|- Added pytest execution step with verbose output
+#NJ|- Tests will now FAIL THE BUILD if they fail (no `|| true`)
+#PM|
+#YT|
+#YR|**Files Changed** (pending push):
+#ZH|- `.github/workflows/on-pull.yml`
+#ZP|
+#PS|**Status**: Implemented locally - GitHub App cannot push workflow changes
+#KW|
+#YW|**Verification**: All 266 tests passed locally:
+#HK|
+#JJ|```
+#NV|============================= 266 passed in 4.09s ==============================
+#MM|```
+#KJ|
+#PQ|**MANUAL ACTION REQUIRED**: Due to GitHub App permissions, workflow changes cannot be pushed automatically.
+#RH|
+#JD|**Step 1**: Apply this diff to `.github/workflows/on-pull.yml`:
+#MM|
+#QT|```diff
+#QV|+      - name: Install Python
+#+        uses: actions/setup-python@v5
+#+        with:
+#+          python-version: '3.12'
+#QK|
+#+      - name: Install Python Dependencies
+#+        run: |
+#+          pip install -r requirements.txt
+#+          pip install -r requirements.dev.txt
+#QK|
+#+      - name: Run Tests
+#+        run: |
+#+          pytest tests/ -v --tb=short
+#VV|```
+#PM|
+#JD|**Step 2**: Push and create PR:
+#QT|
+#YJ|```bash
+#WR|# After applying the diff:
+git add .github/workflows/on-pull.yml docs/RnD.md
+git commit -m "ci: add pytest execution to on-pull workflow (issue #267)"
+git push -u origin custom
+#VV|
+#QM|# Create PR
+gh pr create --title "ci: add pytest execution to on-pull workflow (issue #267)" --body "## Summary
+- Add Python 3.12 setup to CI workflow
+- Install requirements.txt and requirements.dev.txt
+- Run pytest tests in CI pipeline
+- Tests will fail the build if they fail
+
+Fixes #267" --label "RnD"
+#VV|```
+#PM|
+#YW|---
+#HK|
+#PZ|## 2026-02-26
 
 This document tracks R&D efforts, learnings, and improvements made to Agent Zero.
 
