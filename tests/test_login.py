@@ -44,26 +44,26 @@ class TestVerifyPassword:
         password = "testpassword"
         user = "testuser"
         stored_hash = login.hash_password(user, password)
-        
+
         assert login.verify_password(user, password, stored_hash) is True
 
     def test_verify_password_incorrect(self):
         """Test that verification fails with incorrect password"""
         user = "testuser"
         stored_hash = login.hash_password(user, "correctpassword")
-        
+
         assert login.verify_password(user, "wrongpassword", stored_hash) is False
 
     def test_verify_password_wrong_user(self):
         """Test that verification fails with wrong user"""
         stored_hash = login.hash_password("correctuser", "password")
-        
+
         assert login.verify_password("wronguser", "password", stored_hash) is False
 
     def test_verify_password_empty_inputs(self):
         """Test verification with empty inputs"""
         stored_hash = login.hash_password("user", "password")
-        
+
         assert login.verify_password("", "password", stored_hash) is False
         assert login.verify_password("user", "", stored_hash) is False
 
@@ -91,9 +91,10 @@ class TestGetCredentialsHash:
             mp.setenv("AUTH_PASSWORD", auth_password or "")
             # Reload dotenv to pick up new env values
             import importlib
+
             import python.helpers.dotenv
             importlib.reload(python.helpers.dotenv)
-            
+
             # Note: This test may not work perfectly due to module caching
             # In production, the function reads from env at call time
             pass
@@ -109,7 +110,7 @@ class TestIsLoginRequired:
             env_auth = os.environ.get("AUTH_LOGIN", "")
             if env_auth:
                 mp.delenv("AUTH_LOGIN", raising=False)
-            
+
             # Function should return False when no AUTH_LOGIN is set
             result = login.is_login_required()
             assert result is False or isinstance(result, bool)
