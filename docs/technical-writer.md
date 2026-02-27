@@ -106,6 +106,22 @@
   - Docker Security (non-root, updates)
 - **Status:** ✅ Completed 2026-02-27
 
+### 13. DONE: Fix inconsistent link in architecture.md
+- **File:** docs/architecture.md
+- **Issue:** Link text used path instead of readable name: `[docs/blueprint.md](./blueprint.md)`
+- **Fix:** Changed to `[Blueprint](./blueprint.md)` for consistency
+- **Status:** ✅ Completed 2026-02-27
+
+---
+- **File:** docs/installation.md
+- **Issue:** No consolidated security guidance for users
+- **Fix:** Added new "Security Best Practices" section covering:
+  - Authentication (UI credentials, strong passwords)
+  - Network Exposure (SSH, reverse proxy, firewall)
+  - API Keys and Secrets (secure handling, scoping, rotation)
+  - Docker Security (non-root, updates)
+- **Status:** ✅ Completed 2026-02-27
+
 ---
 
 ## Future Improvements (Backlog)
