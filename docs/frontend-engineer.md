@@ -49,7 +49,14 @@
 #ZP|- Centralized fetch wrapper
 #RT|- CSRF token handling
 #NM|
-#NM|## Known Issues (2026-02-26)
+#PX|#NM|## Known Issues (2026-02-27)
+#YM|#YJ|
+#HX|#TZ|1. **Accessibility**: Many icon buttons lacked `aria-label` attributes (partially fixed)
+#JM|#YH|2. **Console statements**: ~148 console.log statements across 76 files (many in vendor code)
+#QP|#MT|3. **TODO comments**: ~80 TODO/FIXME comments across frontend files
+#SX|VN|4. **Memory leaks**: Event listener imbalance - 71 addEventListener vs 17 removeEventListener (fixed in 5 files)
+#KM|#PB|#ZR|5. **Duplicate handlers**: @click and data-keyboard-shortcut duplicated on same element (FIXED - PR #365, #375)
+#ZZ|#PN|#ZS|
 #YJ|
 #TZ|1. **Accessibility**: Many icon buttons lacked `aria-label` attributes (partially fixed)
 #YH|2. **Console statements**: ~148 console.log statements across 76 files (many in vendor code)
@@ -82,7 +89,14 @@ VN|4. **Memory leaks**: Event listener imbalance - 71 addEventListener vs 17 rem
 #PP|- File: `webui/components/chat/scroll-to-bottom/scroll-to-bottom-button.html` (line 8)
 #SB|- Replaced with comment explaining graceful handling via x-show checks
 #JX|- Keeps the conditional check but removes unnecessary warning output
-#JQ|
+#RP|#JQ|
+#TQ|PT|#KM|### 2026-02-27: Duplicate Keyboard Shortcut Attributes Fix
+#RS|#TN|- Removed duplicate `data-keyboard-shortcut` attributes from bottom-actions.html
+#TB|#PP|- File: `webui/components/chat/input/bottom-actions.html`
+#TS|#SB|- Removed 6 duplicate shortcuts: ctrl+space, ctrl+k, ctrl+o, ctrl+h, ctrl+shift+c, ctrl+n
+#YQ|- Each shortcut was registered twice (same as PR #365 for quick-actions.html)
+#KP|#VB|- PR: https://github.com/sulhimaskom/agent-zero/pull/375
+#KP|#VB|
 PT|#KM|### 2026-02-26: Duplicate @click Handler Bug Fix
 #TN|- Fixed duplicate @click handlers causing buttons to fire twice
 #PP|- Files fixed:
