@@ -82,14 +82,22 @@
                                 This URL will persist until you stop the tunnel or restart the Docker container.
                             </div>
                             <div class="stop-tunnel-container">
+                                <button class="btn btn-danger" @click="$store.tunnelStore.stopTunnel()" aria-label="Stop Tunnel">
                                 <button class="btn btn-danger" aria-label="Stop Tunnel" @click="$store.tunnelStore.stopTunnel()">
+=======
+                                <button class="btn btn-danger" @click="$store.tunnelStore.stopTunnel()" aria-label="Stop Tunnel">
+>>>>>>> 2528669f (fix: improve accessibility - add aria-label to buttons)
                                     <span class="icon material-symbols-outlined">stop_circle</span> Stop Tunnel
                                 </button>
                             </div>
                         </div>
                         <!-- Generate tunnel button when no link exists -->
                         <div class="tunnel-actions" x-show="!$store.tunnelStore.linkGenerated">
+                            <button class="btn btn-ok" @click="$store.tunnelStore.generateLink()" aria-label="Create Tunnel">
                             <button class="btn btn-ok" aria-label="Create Tunnel" @click="$store.tunnelStore.generateLink()">
+=======
+                            <button class="btn btn-ok" @click="$store.tunnelStore.generateLink()" aria-label="Create Tunnel">
+>>>>>>> 2528669f (fix: improve accessibility - add aria-label to buttons)
                                 <span class="icon material-symbols-outlined">play_circle</span> Create Tunnel
                             </button>
                         </div>
