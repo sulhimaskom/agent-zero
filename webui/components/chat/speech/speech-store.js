@@ -3,8 +3,6 @@ import { updateChatInput, sendMessage } from "/index.js";
 import { sleep } from "/js/sleep.js";
 import { store as microphoneSettingStore } from "/components/settings/speech/microphone-setting-store.js";
 import * as shortcuts from "/js/shortcuts.js";
-import { TIMING, SPEECH, API_ENDPOINTS } from "/js/constants.js";
-import Logger from "/js/logger.js";
 
 const Status = {
   INACTIVE: "inactive",
@@ -21,11 +19,11 @@ const model = {
   _initialized: false,
 
   // STT Settings
-  stt_model_size: SPEECH.DEFAULT_MODEL_SIZE,
-  stt_language: SPEECH.DEFAULT_LANGUAGE,
-  stt_silence_threshold: SPEECH.SILENCE_THRESHOLD,
-  stt_silence_duration: SPEECH.SILENCE_DURATION,
-  stt_waiting_timeout: SPEECH.WAITING_TIMEOUT,
+  stt_model_size: "tiny",
+  stt_language: "en",
+  stt_silence_threshold: 0.05,
+  stt_silence_duration: 1000,
+  stt_waiting_timeout: 2000,
 
   // TTS Settings
   tts_kokoro: false,
@@ -76,6 +74,7 @@ const model = {
       if (device != this.selectedDevice) {
         this.selectedDevice = device;
         this.microphoneInput = null;
+        console.log("Device changed, microphoneInput reset");
       }
 
       if (!this.microphoneInput) {
@@ -96,6 +95,9 @@ const model = {
   async init() {
     // Guard against multiple initializations
     if (this._initialized) {
+      console.log(
+        "[Speech Store] Already initialized, skipping duplicate init()"
+      );
       return;
     }
 
@@ -108,29 +110,24 @@ const model = {
   // Load settings from server
   async loadSettings() {
     try {
-      const response = await fetchApi(API_ENDPOINTS.SETTINGS_GET, { method: "POST" });
+      const response = await fetchApi("/settings_get", { method: "POST" });
       const data = await response.json();
-      const speechSection = data.settings.sections.find(
-        (s) => s.title === "Speech"
-      );
+      const settings = data?.settings || {};
 
-      if (speechSection) {
-        speechSection.fields.forEach((field) => {
-          if (this.hasOwnProperty(field.id)) {
-            this[field.id] = field.value;
-          }
-        });
+      if (settings) {
+        this.stt_model_size = settings.stt_model_size ?? this.stt_model_size;
+        this.stt_language = settings.stt_language ?? this.stt_language;
+        this.stt_silence_threshold =
+          settings.stt_silence_threshold ?? this.stt_silence_threshold;
+        this.stt_silence_duration =
+          settings.stt_silence_duration ?? this.stt_silence_duration;
+        this.stt_waiting_timeout =
+          settings.stt_waiting_timeout ?? this.stt_waiting_timeout;
+        this.tts_kokoro = settings.tts_kokoro ?? this.tts_kokoro;
       }
     } catch (error) {
-      // Silently ignore backend unavailable errors - they're expected when server is down
-      const isBackendUnavailable = error.message?.includes('CSRF token unavailable') ||
-                                   error.message?.includes('CSRF token endpoint returned') ||
-                                   error.message?.includes('backend not running') ||
-                                   error.message?.includes('Failed to fetch');
-      if (!isBackendUnavailable) {
-        window.toastFetchError("Failed to load speech settings", error);
-        Logger.error("Failed to load speech settings:", error);
-      }
+      window.toastFetchError("Failed to load speech settings", error);
+      console.error("Failed to load speech settings:", error);
     }
   },
 
@@ -145,6 +142,7 @@ const model = {
     const enableAudio = () => {
       if (!this.userHasInteracted) {
         this.userHasInteracted = true;
+        console.log("User interaction detected - audio playback enabled");
 
         // Create a dummy audio context to "unlock" audio
         try {
@@ -152,7 +150,7 @@ const model = {
             window.webkitAudioContext)();
           this.audioContext.resume();
         } catch (e) {
-          Logger.debug("AudioContext not available");
+          console.log("AudioContext not available");
         }
       }
     };
@@ -209,6 +207,7 @@ const model = {
     if (this.ttsStream.chunks.length == 0) return;
 
     // if stream was already running, just updating chunks is enough
+    // The running loop will pick up the new chunks automatically
     if (this.ttsStream.running) return;
     else this.ttsStream.running = true; // proceed to running phase
 
@@ -218,22 +217,40 @@ const model = {
 
     const spoken = [];
 
-    // loop chunks from last spoken chunk index
-    for (
-      let i = this.ttsStream.lastChunkIndex + 1;
-      i < this.ttsStream.chunks.length;
-      i++
-    ) {
+    // continuously loop until all chunks are spoken and stream is finished
+    while (true) {
+      // check if we should stop
+      if (terminator()) break;
+
+      // get the next chunk index to speak
+      const nextIndex = this.ttsStream.lastChunkIndex + 1;
+
+      // if no more chunks available, check if we should wait or exit
+      if (nextIndex >= this.ttsStream.chunks.length) {
+        // if stream is finished, we're done
+        if (this.ttsStream.finished) break;
+        // otherwise wait a bit for more chunks to arrive
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        continue;
+      }
+
       // do not speak the last chunk until finished (it is being generated)
-      if (i == this.ttsStream.chunks.length - 1 && !this.ttsStream.finished)
-        break;
+      if (
+        nextIndex == this.ttsStream.chunks.length - 1 &&
+        !this.ttsStream.finished
+      ) {
+        // wait a bit for more content or finish signal
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        continue;
+      }
 
       // set the index of last spoken chunk
-      this.ttsStream.lastChunkIndex = i;
+      this.ttsStream.lastChunkIndex = nextIndex;
 
       // speak the chunk
-      spoken.push(this.ttsStream.chunks[i]);
-      await this._speak(this.ttsStream.chunks[i], i > 0, () => terminator());
+      const chunk = this.ttsStream.chunks[nextIndex];
+      spoken.push(chunk);
+      await this._speak(chunk, nextIndex > 0, () => terminator());
     }
 
     // at the end, finish stream data
@@ -378,9 +395,10 @@ const model = {
     shortcuts.frontendNotification({
       type: "info",
       message: "Click anywhere to enable audio playback",
-      displayTime: TIMING.TOAST_DISPLAY,
+      displayTime: 5000,
       frontendOnly: true,
     });
+    console.log("Please click anywhere on the page to enable audio playback");
   },
 
   // Browser TTS
@@ -389,8 +407,8 @@ const model = {
     while (waitForPrevious && this.isSpeaking) await sleep(25);
     if (terminator && terminator()) return;
 
-    // stop previous if any
-    this.stopAudio();
+    // stop previous only if not waiting for it
+    if (!waitForPrevious) this.stopAudio();
 
     this.browserUtterance = new SpeechSynthesisUtterance(text);
     this.browserUtterance.onstart = () => {
@@ -413,8 +431,8 @@ const model = {
       while (waitForPrevious && this.isSpeaking) await sleep(25);
       if (terminator && terminator()) return;
 
-      // stop previous if any
-      this.stopAudio();
+      // stop previous only if not waiting for it
+      if (!waitForPrevious) this.stopAudio();
 
       if (response.success) {
         if (response.audio_parts) {
@@ -502,59 +520,33 @@ const model = {
     const codePlaceholder = SUB + "code" + SUB;
     const tablePlaceholder = SUB + "table" + SUB;
 
-    // Helper function to handle both closed and unclosed patterns
-    // replacement can be a string or null (to remove)
-    function handlePatterns(
-      inputText,
-      closedPattern,
-      unclosedPattern,
-      replacement
-    ) {
-      // Process closed patterns first
-      let processed = inputText.replace(closedPattern, replacement || "");
-
-      // If the text changed, it means we found and replaced closed patterns
-      if (processed !== inputText) {
-        return processed;
-      } else {
-        // No closed patterns found, check for unclosed ones
-        const unclosedMatch = inputText.match(unclosedPattern);
-        if (unclosedMatch) {
-          // Replace the unclosed pattern
-          return inputText.replace(unclosedPattern, replacement || "");
-        }
-      }
-
-      // No patterns found, return original
-      return inputText;
-    }
-
-    // Handle code blocks
-    text = handlePatterns(
-      text,
-      /```(?:[a-zA-Z0-9]*\n)?[\s\S]*?```/g, // closed code blocks
-      /```(?:[a-zA-Z0-9]*\n)?[\s\S]*$/g, // unclosed code blocks
-      codePlaceholder
-    );
+    // Handle code blocks BEFORE HTML parsing (markdown code blocks)
+    text = text.replace(/```(?:[a-zA-Z0-9]*\n)?[\s\S]*?```/g, codePlaceholder); // closed code blocks
+    text = text.replace(/```(?:[a-zA-Z0-9]*\n)?[\s\S]*$/g, codePlaceholder); // unclosed code blocks
 
     // Replace inline code ticks with content preserved
     text = text.replace(/`([^`]*)`/g, "$1"); // remove backticks but keep content
 
-    // Handle HTML tags
-    text = handlePatterns(
-      text,
-      /<[a-zA-Z][a-zA-Z0-9]*>.*?<\/[a-zA-Z][a-zA-Z0-9]*>/gs, // closed HTML tags
-      /<[a-zA-Z][a-zA-Z0-9]*>[\s\S]*$/g, // unclosed HTML tags
-      "" // remove HTML tags completely
-    );
+    // Parse HTML using browser's DOMParser to properly extract text content
+    try {
+      const parser = new DOMParser();
+      // Wrap in a div to handle fragments
+      const doc = parser.parseFromString(`<div>${text}</div>`, 'text/html');
 
-    // Handle self-closing HTML tags
-    text = handlePatterns(
-      text,
-      /<[a-zA-Z][a-zA-Z0-9]*(\/| [^>]*\/>)/g, // complete self-closing tags
-      /<[a-zA-Z][a-zA-Z0-9]* [^>]*$/g, // incomplete self-closing tags
-      ""
-    );
+      // Replace <pre> and <code> tags with placeholder before extracting text
+      doc.querySelectorAll('pre, code').forEach(el => {
+        el.textContent = codePlaceholder;
+      });
+
+      // Extract text content (this strips all HTML tags properly)
+      text = doc.body.textContent || "";
+    } catch (e) {
+      // Fallback: simple tag stripping if DOMParser fails
+      console.warn("[Speech Store] DOMParser failed, using fallback:", e);
+      text = text.replace(/<pre[^>]*>[\s\S]*?<\/pre>/gi, codePlaceholder);
+      text = text.replace(/<code[^>]*>[\s\S]*?<\/code>/gi, codePlaceholder);
+      text = text.replace(/<[^>]+>/g, ''); // strip remaining tags
+    }
 
     // Remove markdown links: [label](url) → label
     text = text.replace(/\[([^\]]+)\]\([^\)]+\)/g, "$1");
@@ -688,6 +680,8 @@ class MicrophoneInput {
 
     const oldStatus = this._status;
     this._status = newStatus;
+    console.log(`Mic status changed from ${oldStatus} to ${newStatus}`);
+
     this.handleStatusChange(oldStatus, newStatus);
   }
 
@@ -781,7 +775,8 @@ class MicrophoneInput {
   handleRecordingState() {
     if (!this.hasStartedRecording && this.mediaRecorder.state !== "recording") {
       this.hasStartedRecording = true;
-      this.mediaRecorder.start(SPEECH.RECORDER_CHUNK_SIZE);
+      this.mediaRecorder.start(1000);
+      console.log("Speech started");
     }
     if (this.waitingTimer) {
       clearTimeout(this.waitingTimer);
@@ -890,11 +885,12 @@ class MicrophoneInput {
       const text = this.filterResult(result.text || "");
 
       if (text) {
+        console.log("Transcription:", result.text);
         await this.updateCallback(result.text, true);
       }
     } catch (error) {
       window.toastFetchError("Transcription error", error);
-      Logger.error("Transcription error:", error);
+      console.error("Transcription error:", error);
     } finally {
       this.audioChunks = [];
       this.status = Status.LISTENING;
@@ -924,6 +920,7 @@ class MicrophoneInput {
       ok = true;
     }
     if (ok) return text;
+    else console.log(`Discarding transcription: ${text}`);
   }
 
   // Toggle microphone between active and inactive states
@@ -945,23 +942,12 @@ class MicrophoneInput {
       await navigator.mediaDevices.getUserMedia({ audio: true });
       return true;
     } catch (err) {
-      Logger.error("Error accessing microphone:", err);
+      console.error("Error accessing microphone:", err);
       toast(
         "Microphone access denied. Please enable microphone access in your browser settings.",
         "error"
       );
       return false;
-    }
-  },
-
-  // Stored event handler reference for cleanup (prevents memory leaks)
-  _settingsUpdatedHandler: null,
-
-  // Cleanup event listeners to prevent memory leaks
-  cleanup() {
-    if (this._settingsUpdatedHandler) {
-      document.removeEventListener("settings-updated", this._settingsUpdatedHandler);
-      this._settingsUpdatedHandler = null;
     }
   }
 }
@@ -971,8 +957,6 @@ export const store = createStore("speech", model);
 // Initialize speech store
 // window.speechStore = speechStore;
 
-// Event listeners - store handler reference for cleanup
-const settingsUpdatedHandler = () => store.loadSettings();
-document.addEventListener("settings-updated", settingsUpdatedHandler);
-store._settingsUpdatedHandler = settingsUpdatedHandler;
+// Event listeners
+document.addEventListener("settings-updated", () => store.loadSettings());
 // document.addEventListener("DOMContentLoaded", () => speechStore.init());
