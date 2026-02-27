@@ -1,52 +1,63 @@
-#QH|# Backend Engineer Agent Memory
-#KM|
-#KY|**Last Updated:** 2026-02-26
-#RW|
-#WV|## Domain Focus
-#HR|- Python backend (Flask API)
-#WS|- Authentication and security
-#XN|- Performance optimization
-#JP|- API endpoints
-#SK|
-#QM|## Completed Fixes
-#TX|
-#SQ|### Issue #274: Vision Bytes Sent to Utility LLM - Performance Inefficiency
-#TN|**Status:** FIXED (2026-02-26)
-#RJ|
-#MN|**Problem:**
-#PR|Image/vision data was being sent to utility LLM during message summarization,
-#VR|causing unnecessary cost and latency. The original code used regex to replace
-#YR|base64 image data, but the regex pattern didn't match because RawMessage
-#WK|content uses a preview string, not the actual base64 data.
-#SY|
-#HT|**Changes:**
-#VK|1. Fixed `Topic.summarize_messages()` method:
-#XW|   - Check if message content is RawMessage with vision data
-#RR|   - Directly replace with "[Image]" placeholder when image_url type detected
-#ZR|   - Fallback to regex for any remaining base64 data URLs
-#NM|2. Fixed `Bulk.summarize()` method:
-#TY|   - Same logic applied for bulk record summarization
-#JQ|
-#HT|**Files Modified:**
-#VV|- python/helpers/history.py (+32 lines)
-#XN|
-#NT|**Verification:**
-#TP|- All 266 tests pass
-#RR|- Python syntax verified
-#PY|- No regressions
-#BJ|
-#SQ|### Issue #277: Unpinned Dependencies Risk
 # Backend Engineer Agent Memory
 
-**Last Updated:** 2026-02-26
+**Last Updated:** 2026-02-27
 
 ## Domain Focus
 - Python backend (Flask API)
+- JavaScript/TypeScript frontend linting
 - Authentication and security
 - Performance optimization
 - API endpoints
 
 ## Completed Fixes
+
+### Issue: ESLint Syntax Error in speech-store.js
+**Status:** FIXED (2026-02-27)
+
+**Problem:**
+- File: `webui/components/chat/speech/speech-store.js`
+- Invalid trailing comma after class method: `},` should be `}`
+- Invalid TypeScript-like property syntax in JavaScript class: `_settingsUpdatedHandler: null,` should be `_settingsUpdatedHandler = null;`
+- These errors prevented ESLint from passing (0 errors required)
+
+**Changes:**
+1. Reverted speech-store.js to origin/main version which passes linting
+2. Applied commit: `fix(speech): revert syntax changes that break linting`
+
+**Files Modified:**
+- webui/components/chat/speech/speech-store.js (reverted to origin/main)
+
+**Verification:**
+- Lint passes with 0 errors
+- 4937 warnings (style issues, can be fixed incrementally)
+- PR #367 updated with fix
+
+**Note:** The custom branch improvements (using constants, Logger instead of console.log) need to be re-applied with proper ES2022 syntax in a follow-up PR.
+
+### Issue #274: Vision Bytes Sent to Utility LLM - Performance Inefficiency
+**Status:** FIXED (2026-02-26)
+
+**Problem:**
+Image/vision data was being sent to utility LLM during message summarization,
+causing unnecessary cost and latency. The original code used regex to replace
+base64 image data, but the regex pattern didn't match because RawMessage
+content uses a preview string, not the actual base64 data.
+
+**Changes:**
+1. Fixed `Topic.summarize_messages()` method:
+   - Check if message content is RawMessage with vision data
+   - Directly replace with "[Image]" placeholder when image_url type detected
+   - Fallback to regex for any remaining base64 data URLs
+2. Fixed `Bulk.summarize()` method:
+   - Same logic applied for bulk record summarization
+
+**Files Modified:**
+- python/helpers/history.py (+32 lines)
+
+**Verification:**
+- All 266 tests pass
+- Python syntax verified
+- No regressions
 
 ### Issue #277: Unpinned Dependencies Risk
 **Status:** FIXED (PR #355) - 2026-02-26
@@ -166,6 +177,11 @@
 - Always use login.verify_password() for verification
 - Rate limit login attempts: 5 per minute per IP
 
+### JavaScript/TypeScript
+- Use ES2022 class field syntax: `_property = value` not `_property: value`
+- No trailing commas after class methods
+- Follow ESLint rules in webui/eslint.config.js
+
 ### Testing
 - pytest for unit tests
 - Test files in tests/ directory
@@ -178,8 +194,14 @@
 | Weak password hashing | Use bcrypt, not SHA256 |
 | No rate limiting | Add IP-based rate limiter |
 | Timing attacks | Use constant-time comparison |
+| ESLint syntax errors | Check for trailing commas in classes, proper ES2022 syntax |
 
-## Proactive Scan Findings (2026-02-26)
+## Proactive Scan Findings (2026-02-27)
+
+### JavaScript Linting
+- Added .nvmrc (Node 20) and webui/package.json (ESLint + Prettier)
+- Initial lint run: 0 errors, 4937 warnings (style issues)
+- Fixed critical syntax error in speech-store.js
 
 ### Security - No Critical Issues
 - Previous simple_eval() RCE vulnerability fixed with secure AST-based implementation
