@@ -1,6 +1,6 @@
 # UI/UX Engineer - Long-term Memory
 
-**Last Updated:** 2026-02-26
+> Last Updated: 2026-02-26
 **Agent:** ui-ux-engineer
 
 ## Overview

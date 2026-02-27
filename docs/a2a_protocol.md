@@ -1,6 +1,6 @@
 # A2A Protocol Documentation
 
-**Last Updated:** 2026-02-25
+> Last Updated: 2026-02-26
 
 ---
 

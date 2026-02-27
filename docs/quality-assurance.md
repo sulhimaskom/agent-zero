@@ -1,5 +1,5 @@
 # Quality Assurance Documentation
-**Last Updated:** 2026-02-27
+> Last Updated: 2026-02-27
 #### 2026-02-27: Add tests for errors.py module
 - **File Created**: `tests/test_errors.py`
 - **Test Coverage**: 16 tests covering:

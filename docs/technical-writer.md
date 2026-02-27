@@ -2,7 +2,7 @@
 
 ## Repository: agent-zero
 
-**Last Updated:** 2026-02-27
+> Last Updated: 2026-02-27
 
 ---
 
@@ -124,7 +124,15 @@
   - Best practices (assertions, naming, docstrings)
 - **Status:** ✅ Completed 2026-02-27
 - **Also:** Added to docs/README.md index (quick links + TOC)
-#BJ|
+127#HT|#BJ|
+#YX|
+#SM|### 15. DONE: Standardize "Last Updated" metadata format
+#XZ|- **Files:** a2a_protocol.md, security-engineer.md, DX-engineer.md, Product-Architect.md, Growth-Innovation-Strategist.md, backend-engineer.md, modular-configuration-analysis.md, ai-agent-engineer.md, quality-assurance.md, platform-engineer.md, frontend-engineer.md, ui-ux-engineer.md, RnD.md, user-story-engineer.md
+#HB|- **Issue:** 14 files used non-standard `**Last Updated:**` (bold) format instead of `> Last Updated:` (blockquote)
+#QM|- **Also:** user-story-engineer.md had 5 duplicate timestamps scattered throughout
+#JK|- **Fix:** Converted all to standard `> Last Updated: YYYY-MM-DD` format and removed duplicates
+#BV|- **Status:** ✅ Completed 2026-02-27
+#YX|
 
 ---
 - **File:** docs/installation.md
