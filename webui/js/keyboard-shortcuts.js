@@ -1,64 +1,64 @@
-import { store as chatInputStore } from "/components/chat/input/input-store.min.js";
-import { store as historyStore } from "/components/modals/history/history-store.min.js";
-import { store as contextStore } from "/components/modals/context/context-store.min.js";
+import { store as chatInputStore } from '/components/chat/input/input-store.min.js';
+import { store as historyStore } from '/components/modals/history/history-store.min.js';
+import { store as contextStore } from '/components/modals/context/context-store.min.js';
 
 const shortcuts = {
-  "ctrl+space": {
+  'ctrl+space': {
     handler: () => {
       if (chatInputStore && typeof chatInputStore.pauseAgent === 'function') {
         chatInputStore.pauseAgent(!chatInputStore.paused);
       }
     },
-    description: "Pause/Resume Agent",
+    description: 'Pause/Resume Agent',
   },
-  "ctrl+k": {
+  'ctrl+k': {
     handler: () => {
       if (chatInputStore && typeof chatInputStore.loadKnowledge === 'function') {
         chatInputStore.loadKnowledge();
       }
     },
-    description: "Import Knowledge",
+    description: 'Import Knowledge',
   },
-  "ctrl+o": {
+  'ctrl+o': {
     handler: () => {
       if (chatInputStore && typeof chatInputStore.browseFiles === 'function') {
         chatInputStore.browseFiles();
       }
     },
-    description: "Browse Files",
+    description: 'Browse Files',
   },
-  "ctrl+h": {
+  'ctrl+h': {
     handler: () => {
       if (historyStore && typeof historyStore.open === 'function') {
         historyStore.open();
       }
     },
-    description: "Open History",
+    description: 'Open History',
   },
-  "ctrl+shift+c": {
+  'ctrl+shift+c': {
     handler: () => {
       if (contextStore && typeof contextStore.open === 'function') {
         contextStore.open();
       }
     },
-    description: "Open Context",
+    description: 'Open Context',
   },
-  "ctrl+n": {
+  'ctrl+n': {
     handler: () => {
       if (chatInputStore && typeof chatInputStore.nudge === 'function') {
         chatInputStore.nudge();
       }
     },
-    description: "Send Nudge",
+    description: 'Send Nudge',
   },
-  "?": {
+  '?': {
     handler: () => {
-      const kbStore = globalThis.Alpine?.store("keyboardShortcuts");
+      const kbStore = globalThis.Alpine?.store('keyboardShortcuts');
       if (kbStore && typeof kbStore.open === 'function') {
         kbStore.open();
       }
     },
-    description: "Show Keyboard Shortcuts",
+    description: 'Show Keyboard Shortcuts',
   },
 };
 
@@ -66,7 +66,7 @@ function isInputField(element) {
   if (!element) return false;
 
   const tagName = element.tagName.toLowerCase();
-  const inputTypes = ["input", "textarea", "select"];
+  const inputTypes = ['input', 'textarea', 'select'];
 
   if (inputTypes.includes(tagName)) {
     return true;
@@ -76,13 +76,13 @@ function isInputField(element) {
     return true;
   }
 
-  const textInputRoles = ["textbox", "searchbox", "combobox"];
-  const role = element.getAttribute("role");
+  const textInputRoles = ['textbox', 'searchbox', 'combobox'];
+  const role = element.getAttribute('role');
   if (role && textInputRoles.includes(role)) {
     return true;
   }
 
-  if (element.classList && element.classList.contains("ace_editor")) {
+  if (element.classList && element.classList.contains('ace_editor')) {
     return true;
   }
 
@@ -92,18 +92,18 @@ function isInputField(element) {
 function getKeyCombo(event) {
   const parts = [];
 
-  if (event.ctrlKey) parts.push("ctrl");
-  if (event.altKey) parts.push("alt");
-  if (event.shiftKey) parts.push("shift");
-  if (event.metaKey) parts.push("meta");
+  if (event.ctrlKey) parts.push('ctrl');
+  if (event.altKey) parts.push('alt');
+  if (event.shiftKey) parts.push('shift');
+  if (event.metaKey) parts.push('meta');
 
   let key = event.key.toLowerCase();
-  if (key === " ") {
-    key = "space";
+  if (key === ' ') {
+    key = 'space';
   }
   parts.push(key);
 
-  return parts.join("+");
+  return parts.join('+');
 }
 
 function handleKeyDown(event) {
@@ -126,7 +126,7 @@ function handleKeyDown(event) {
 }
 
 export function initKeyboardShortcuts() {
-  document.addEventListener("keydown", handleKeyDown);
+  document.addEventListener('keydown', handleKeyDown);
 }
 
 export function getRegisteredShortcuts() {

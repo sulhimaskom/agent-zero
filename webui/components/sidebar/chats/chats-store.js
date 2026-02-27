@@ -1,4 +1,4 @@
-import { createStore } from "/js/AlpineStore.js";
+import { createStore } from '/js/AlpineStore.js';
 import {
   sendJsonData,
   getContext,
@@ -9,14 +9,14 @@ import {
   toast,
   justToast,
   getConnectionStatus,
-} from "/index.js";
-import { store as notificationStore } from "/components/notifications/notification-store.min.js";
-import { store as tasksStore } from "/components/sidebar/tasks/tasks-store.min.js";
+} from '/index.js';
+import { store as notificationStore } from '/components/notifications/notification-store.min.js';
+import { store as tasksStore } from '/components/sidebar/tasks/tasks-store.min.js';
 import { RETRY, TIMING } from '/js/constants.js';
 
 const model = {
   contexts: [],
-  selected: "",
+  selected: '',
   selectedContext: null,
   isLoading: true,
 
@@ -32,7 +32,7 @@ const model = {
   init() {
     // Initialize from localStorage
     try {
-      const lastSelectedChat = localStorage.getItem("lastSelectedChat");
+      const lastSelectedChat = localStorage.getItem('lastSelectedChat');
       if (lastSelectedChat) {
         this.selectChat(lastSelectedChat);
         // this.selected = lastSelectedChat;
@@ -46,7 +46,7 @@ const model = {
   applyContexts(contextsList) {
     // Sort by created_at time (newer first)
     this.contexts = contextsList.sort(
-      (a, b) => (b.created_at || 0) - (a.created_at || 0)
+      (a, b) => (b.created_at || 0) - (a.created_at || 0),
     );
     this.isLoading = false;
   },
@@ -72,7 +72,7 @@ const model = {
   // Delete a chat
   async killChat(id) {
     if (!id) {
-      console.error("No chat ID provided for deletion");
+      console.error('No chat ID provided for deletion');
       return;
     }
 
@@ -83,7 +83,7 @@ const model = {
       }
 
       // Delete the chat on the server
-      await sendJsonData("/chat_remove", { context: id });
+      await sendJsonData('/chat_remove', { context: id });
 
       // Update the UI - remove from contexts
       const updatedContexts = this.contexts.filter((ctx) => ctx.id !== id);
@@ -92,10 +92,10 @@ const model = {
       this.contexts = [...updatedContexts];
 
       // Show success notification
-      justToast("Chat deleted successfully", "success", TIMING.NOTIFICATION_DISPLAY, "chat-removal");
+      justToast('Chat deleted successfully', 'success', TIMING.NOTIFICATION_DISPLAY, 'chat-removal');
     } catch (e) {
-      console.error("Error deleting chat:", e);
-      toastFetchError("Error deleting chat", e);
+      console.error('Error deleting chat:', e);
+      toastFetchError('Error deleting chat', e);
     }
   },
 
@@ -123,8 +123,8 @@ const model = {
   async resetChat(ctxid = null) {
     try {
       const context = ctxid || this.selected || getContext();
-      await sendJsonData("/chat_reset", {
-        context
+      await sendJsonData('/chat_reset', {
+        context,
       });
 
       // Increment reset counter
@@ -134,7 +134,7 @@ const model = {
 
       updateAfterScroll();
     } catch (e) {
-      toastFetchError("Error resetting chat", e);
+      toastFetchError('Error resetting chat', e);
     }
   },
 
@@ -143,8 +143,8 @@ const model = {
     try {
 
       // first create a new chat on the backend
-      const response = await sendJsonData("/chat_create", {
-        current_context: this.selected
+      const response = await sendJsonData('/chat_create', {
+        current_context: this.selected,
       });
 
       if (response.ok) {
@@ -162,7 +162,7 @@ const model = {
       // // UX: scroll-to-top
       // requestAnimationFrame(() => this._scrollChatsToTop());
     } catch (e) {
-      toastFetchError("Error creating new chat", e);
+      toastFetchError('Error creating new chat', e);
     }
   },
 
@@ -181,19 +181,19 @@ const model = {
   async loadChats() {
     try {
       const fileContents = await this.readJsonFiles();
-      const response = await sendJsonData("/chat_load", { chats: fileContents });
+      const response = await sendJsonData('/chat_load', { chats: fileContents });
 
       if (!response) {
-        toast("No response returned.", "error");
+        toast('No response returned.', 'error');
       } else {
         // Set context to first loaded chat
         if (response.ctxids?.[0]) {
           setContext(response.ctxids[0]);
         }
-        toast("Chats loaded.", "success");
+        toast('Chats loaded.', 'success');
       }
     } catch (e) {
-      toastFetchError("Error loading chats", e);
+      toastFetchError('Error loading chats', e);
     }
   },
 
@@ -201,25 +201,25 @@ const model = {
   async saveChat() {
     try {
       const context = this.selected || getContext();
-      const response = await sendJsonData("/chat_export", { ctxid: context });
+      const response = await sendJsonData('/chat_export', { ctxid: context });
 
       if (!response) {
-        toast("No response returned.", "error");
+        toast('No response returned.', 'error');
       } else {
-        this.downloadFile(response.ctxid + ".json", response.content);
-        toast("Chat file downloaded.", "success");
+        this.downloadFile(`${response.ctxid  }.json`, response.content);
+        toast('Chat file downloaded.', 'success');
       }
     } catch (e) {
-      toastFetchError("Error saving chat", e);
+      toastFetchError('Error saving chat', e);
     }
   },
 
   // Helper: read JSON files
   readJsonFiles() {
     return new Promise((resolve, reject) => {
-      const input = document.createElement("input");
-      input.type = "file";
-      input.accept = ".json";
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
       input.multiple = true;
 
       input.click();
@@ -252,8 +252,8 @@ const model = {
 
   // Helper: download file
   downloadFile(filename, content) {
-    const blob = new Blob([content], { type: "application/json" });
-    const link = document.createElement("a");
+    const blob = new Blob([content], { type: 'application/json' });
+    const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.href = url;
     link.download = filename;
@@ -281,7 +281,7 @@ const model = {
     // if not found in contexts, try to find in tasks < not nice, will need refactor later
     if(!this.selectedContext) this.selectedContext = tasksStore.tasks.find((ctx) => ctx.id === contextId);
     try {
-      localStorage.setItem("lastSelectedChat", contextId);
+      localStorage.setItem('lastSelectedChat', contextId);
     } catch (e) {
       // Silent fail in private browsing mode
     }
@@ -294,27 +294,27 @@ const model = {
       const connectionStatus = getConnectionStatus();
       if (connectionStatus === false) {
         await notificationStore.frontendError(
-          "Backend disconnected, cannot restart.",
-          "Restart Error"
+          'Backend disconnected, cannot restart.',
+          'Restart Error',
         );
         return;
       }
 
       // Try to initiate restart
-      const resp = await sendJsonData("/restart", {});
+      const resp = await sendJsonData('/restart', {});
     } catch (e) {
       // Show restarting message
-      await notificationStore.frontendInfo("Restarting...", "System Restart", 9999, "restart");
+      await notificationStore.frontendInfo('Restarting...', 'System Restart', 9999, 'restart');
 
       let retries = 0;
       const maxRetries = RETRY.MAX_RETRIES; // From constants
 
       while (retries < maxRetries) {
         try {
-          const resp = await sendJsonData("/health", {});
+          const resp = await sendJsonData('/health', {});
           // Server is back up
           await new Promise((resolve) => setTimeout(resolve, RETRY.INTERVAL_MS));
-          await notificationStore.frontendSuccess("Restarted", "System Restart", 5, "restart");
+          await notificationStore.frontendSuccess('Restarted', 'System Restart', 5, 'restart');
           return;
         } catch (e) {
           // Server still down, keep waiting
@@ -325,15 +325,15 @@ const model = {
 
       // Restart failed or timed out
       await notificationStore.frontendError(
-        "Restart timed out or failed",
-        "Restart Error",
+        'Restart timed out or failed',
+        'Restart Error',
         8,
-        "restart"
+        'restart',
       );
     }
-  }
+  },
 };
 
-const store = createStore("chats", model);
+const store = createStore('chats', model);
 
 export { store };

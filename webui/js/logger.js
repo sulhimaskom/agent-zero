@@ -70,7 +70,7 @@ const Logger = {
       this._loggedKeys.add(key);
       logFn();
     }
-  }
+  },
 };
 
 // Make available globally

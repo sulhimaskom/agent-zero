@@ -36,7 +36,7 @@ const STATIC_ASSETS = [
   '/vendor/flatpickr/flatpickr.min.css',
   '/vendor/katex/katex.min.js',
   '/vendor/katex/katex.min.css',
-  '/public/favicon.svg'
+  '/public/favicon.svg',
 ];
 
 // Install event - cache static assets
@@ -44,7 +44,7 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => cache.addAll(STATIC_ASSETS))
-      .catch(() => {})
+      .catch(() => {}),
   );
   self.skipWaiting();
 });
@@ -56,9 +56,9 @@ self.addEventListener('activate', (event) => {
       Promise.all(
         cacheNames
           .filter((name) => name !== CACHE_NAME)
-          .map((name) => caches.delete(name))
-      )
-    )
+          .map((name) => caches.delete(name)),
+      ),
+    ),
   );
   self.clients.claim();
 });
@@ -103,7 +103,7 @@ self.addEventListener('fetch', (event) => {
         })
         .catch(() => cachedResponse);
       return cachedResponse || fetchPromise;
-    })
+    }),
   );
 });
 

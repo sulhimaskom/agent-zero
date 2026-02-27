@@ -27,13 +27,13 @@ export const API = {
   A2A_PORT: getEnvConfig('A2A_PORT', 50101),
 
   // Hosts - Configurable via window.ENV_CONFIG
-  LOCALHOST: getEnvConfig('LOCALHOST', "127.0.0.1"),
-  HOSTNAME: getEnvConfig('HOSTNAME', "localhost"),
+  LOCALHOST: getEnvConfig('LOCALHOST', '127.0.0.1'),
+  HOSTNAME: getEnvConfig('HOSTNAME', 'localhost'),
 
   // Endpoints
-  CSRF_TOKEN_ENDPOINT: getEnvConfig('CSRF_TOKEN_ENDPOINT', "/csrf_token"),
-  POLL_ENDPOINT: "/poll",
-  LOGIN_ENDPOINT: "/login",
+  CSRF_TOKEN_ENDPOINT: getEnvConfig('CSRF_TOKEN_ENDPOINT', '/csrf_token'),
+  POLL_ENDPOINT: '/poll',
+  LOGIN_ENDPOINT: '/login',
 
   STATIC_PORTS: getEnvConfig('STATIC_PORTS', ['8080', '5002', '3000', '5000', '8000', '5500', '3001', '50001']),
 
@@ -150,13 +150,13 @@ export const LIMITS = {
 // =============================================================================
 
 export const EXTENSIONS = {
-  MARKDOWN: ".md",
-  PYTHON: ".py",
-  JAVASCRIPT: ".js",
-  JSON: ".json",
-  YAML: ".yaml",
-  YML: ".yml",
-  TEXT: ".txt",
+  MARKDOWN: '.md',
+  PYTHON: '.py',
+  JAVASCRIPT: '.js',
+  JSON: '.json',
+  YAML: '.yaml',
+  YML: '.yml',
+  TEXT: '.txt',
 };
 
 // =============================================================================
@@ -165,28 +165,28 @@ export const EXTENSIONS = {
 
 export const COLORS = {
   // Primary colors
-  PRIMARY_BLUE: "#1B4F72",
-  PRIMARY_LIGHT_BLUE: "#85C1E9",
+  PRIMARY_BLUE: '#1B4F72',
+  PRIMARY_LIGHT_BLUE: '#85C1E9',
 
   // Semantic colors
-  SUCCESS: "#008000",
-  WARNING: "#FFA500",
-  ERROR: "#E74C3C",
-  INFO: "#0000FF",
-  DEBUG: "#808080",
-  HINT: "#6C3483",
+  SUCCESS: '#008000',
+  WARNING: '#FFA500',
+  ERROR: '#E74C3C',
+  INFO: '#0000FF',
+  DEBUG: '#808080',
+  HINT: '#6C3483',
 
   // Accent colors
-  AGENT_PURPLE: "#6C3483",
-  SETTINGS_PURPLE: "#6734C3",
-  SETTINGS_DARK: "#334455",
-  MCP_MAGENTA: "#CC34C3",
-  MCP_ERROR_RED: "#AA4455",
-  FILES_GREEN: "#2ECC71",
-  STREAM_MINT: "#b3ffd9",
+  AGENT_PURPLE: '#6C3483',
+  SETTINGS_PURPLE: '#6734C3',
+  SETTINGS_DARK: '#334455',
+  MCP_MAGENTA: '#CC34C3',
+  MCP_ERROR_RED: '#AA4455',
+  FILES_GREEN: '#2ECC71',
+  STREAM_MINT: '#b3ffd9',
 
   // Background
-  BG_WHITE: "white",
+  BG_WHITE: 'white',
 };
 
 // =============================================================================
@@ -194,32 +194,32 @@ export const COLORS = {
 // =============================================================================
 
 export const STORAGE_KEYS = {
-  CSRF_TOKEN: "csrf_token",
-  SETTINGS: "a0_settings",
-  THEME: "a0_theme",
-  LANGUAGE: "a0_language",
+  CSRF_TOKEN: 'csrf_token',
+  SETTINGS: 'a0_settings',
+  THEME: 'a0_theme',
+  LANGUAGE: 'a0_language',
 
   // UI state keys
-  DARK_MODE: "darkMode",
-  SPEECH: "speech",
-  LAST_SELECTED_CHAT: "lastSelectedChat",
-  LAST_SELECTED_TASK: "lastSelectedTask",
-  SIDEBAR_SECTIONS: "sidebarSections",
-  SETTINGS_ACTIVE_TAB: "settingsActiveTab",
-  SCHEDULER_VIEW_MODE: "scheduler_view_mode",
-  BACKUP_PREVIEW_MODE: "backupPreviewMode",
+  DARK_MODE: 'darkMode',
+  SPEECH: 'speech',
+  LAST_SELECTED_CHAT: 'lastSelectedChat',
+  LAST_SELECTED_TASK: 'lastSelectedTask',
+  SIDEBAR_SECTIONS: 'sidebarSections',
+  SETTINGS_ACTIVE_TAB: 'settingsActiveTab',
+  SCHEDULER_VIEW_MODE: 'scheduler_view_mode',
+  BACKUP_PREVIEW_MODE: 'backupPreviewMode',
 
   // Device/Feature keys
-  MICROPHONE_SELECTED_DEVICE: "microphoneSelectedDevice",
-  MESSAGE_RESIZE_SETTINGS: "messageResizeSettings",
+  MICROPHONE_SELECTED_DEVICE: 'microphoneSelectedDevice',
+  MESSAGE_RESIZE_SETTINGS: 'messageResizeSettings',
 
   // Feature-specific keys
-  TUNNEL_URL: "agent_zero_tunnel_url",
-  MEMORY_DASHBOARD_THRESHOLD: "memoryDashboard_threshold",
-  MEMORY_DASHBOARD_LIMIT: "memoryDashboard_limit",
+  TUNNEL_URL: 'agent_zero_tunnel_url',
+  MEMORY_DASHBOARD_THRESHOLD: 'memoryDashboard_threshold',
+  MEMORY_DASHBOARD_LIMIT: 'memoryDashboard_limit',
 
   // Debug keys
-  DEBUG: "debug",
+  DEBUG: 'debug',
 };
 
 // =============================================================================
@@ -228,19 +228,19 @@ export const STORAGE_KEYS = {
 
 export const EVENTS = {
   // Message events
-  MESSAGE_RECEIVED: "message:received",
-  MESSAGE_SENT: "message:sent",
-  MESSAGE_UPDATED: "message:updated",
+  MESSAGE_RECEIVED: 'message:received',
+  MESSAGE_SENT: 'message:sent',
+  MESSAGE_UPDATED: 'message:updated',
 
   // System events
-  CONNECTED: "system:connected",
-  DISCONNECTED: "system:disconnected",
-  ERROR: "system:error",
+  CONNECTED: 'system:connected',
+  DISCONNECTED: 'system:disconnected',
+  ERROR: 'system:error',
 
   // UI events
-  MODAL_OPEN: "ui:modal:open",
-  MODAL_CLOSE: "ui:modal:close",
-  NOTIFICATION_SHOW: "ui:notification:show",
+  MODAL_OPEN: 'ui:modal:open',
+  MODAL_CLOSE: 'ui:modal:close',
+  NOTIFICATION_SHOW: 'ui:notification:show',
 };
 
 // =============================================================================
@@ -248,11 +248,11 @@ export const EVENTS = {
 // =============================================================================
 
 export const HTTP_METHODS = {
-  GET: "GET",
-  POST: "POST",
-  PUT: "PUT",
-  DELETE: "DELETE",
-  PATCH: "PATCH",
+  GET: 'GET',
+  POST: 'POST',
+  PUT: 'PUT',
+  DELETE: 'DELETE',
+  PATCH: 'PATCH',
 };
 
 // =============================================================================
@@ -260,10 +260,10 @@ export const HTTP_METHODS = {
 // =============================================================================
 
 export const CONTENT_TYPES = {
-  JSON: "application/json",
-  FORM_DATA: "multipart/form-data",
-  TEXT: "text/plain",
-  HTML: "text/html",
+  JSON: 'application/json',
+  FORM_DATA: 'multipart/form-data',
+  TEXT: 'text/plain',
+  HTML: 'text/html',
 };
 
 // =============================================================================
@@ -272,26 +272,26 @@ export const CONTENT_TYPES = {
 
 export const API_ENDPOINTS = {
   // Settings endpoints
-  SETTINGS_GET: "/api/settings_get",
-  SETTINGS_SAVE: "/api/settings_save",
-  TEST_CONNECTION: "/api/test_connection",
+  SETTINGS_GET: '/api/settings_get',
+  SETTINGS_SAVE: '/api/settings_save',
+  TEST_CONNECTION: '/api/test_connection',
 
   // Chat endpoints
-  MESSAGE_ASYNC: "/message_async",
-  CHAT_LOAD: "/chat_load",
-  CHAT_FILES_PATH_GET: "/chat_files_path_get",
+  MESSAGE_ASYNC: '/message_async',
+  CHAT_LOAD: '/chat_load',
+  CHAT_FILES_PATH_GET: '/chat_files_path_get',
 
   // Poll endpoint
-  POLL: "/poll",
+  POLL: '/poll',
 
   // Scheduler endpoints
-  SCHEDULER_TASKS_LIST: "/scheduler_tasks_list",
+  SCHEDULER_TASKS_LIST: '/scheduler_tasks_list',
 
   // Tunnel endpoints
-  TUNNEL_PROXY: "/tunnel_proxy",
+  TUNNEL_PROXY: '/tunnel_proxy',
 
   // Notification endpoints
-  NOTIFICATION_CREATE: "/notification_create",
+  NOTIFICATION_CREATE: '/notification_create',
 };
 
 // =============================================================================
@@ -318,13 +318,13 @@ export const QR_CODE = {
 
 export const DEFAULTS = {
   // Scheduler
-  SCHEDULER_VIEW_MODE: "list",
-  SETTINGS_TAB: "agent",
-  BACKUP_PREVIEW_MODE: "grouped",
+  SCHEDULER_VIEW_MODE: 'list',
+  SETTINGS_TAB: 'agent',
+  BACKUP_PREVIEW_MODE: 'grouped',
 
   // Memory dashboard
-  MEMORY_THRESHOLD: "0.6",
-  MEMORY_LIMIT: "1000",
+  MEMORY_THRESHOLD: '0.6',
+  MEMORY_LIMIT: '1000',
 
   // Notification
   MAX_TOASTS: 5,
@@ -339,7 +339,7 @@ export const DEFAULTS = {
 // =============================================================================
 
 export const Selectors = {
-  CONTAINER: ".container",
+  CONTAINER: '.container',
 };
 
 // =============================================================================
@@ -348,18 +348,18 @@ export const Selectors = {
 
 export const MESSAGES = {
   // Success messages
-  TUNNEL_CREATED: "Tunnel created successfully",
-  TUNNEL_URL_COPIED: "Tunnel URL copied to clipboard!",
-  CHAT_DELETED: "Chat deleted successfully",
-  CHATS_LOADED: "Chats loaded.",
-  BACKUP_CREATED: "Backup created and downloaded successfully!",
-  COPIED_TO_CLIPBOARD: "Copied to clipboard!",
+  TUNNEL_CREATED: 'Tunnel created successfully',
+  TUNNEL_URL_COPIED: 'Tunnel URL copied to clipboard!',
+  CHAT_DELETED: 'Chat deleted successfully',
+  CHATS_LOADED: 'Chats loaded.',
+  BACKUP_CREATED: 'Backup created and downloaded successfully!',
+  COPIED_TO_CLIPBOARD: 'Copied to clipboard!',
 
   // Progress messages
-  CREATING_TUNNEL: "Creating tunnel...",
+  CREATING_TUNNEL: 'Creating tunnel...',
 
   // Button labels
-  SAVE: "Save",
-  CANCEL: "Cancel",
-  COPY: "Copy to clipboard",
+  SAVE: 'Save',
+  CANCEL: 'Cancel',
+  COPY: 'Copy to clipboard',
 };

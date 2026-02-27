@@ -1,6 +1,6 @@
-import { createStore } from "/js/AlpineStore.js";
-import { fetchApi } from "/js/api.js";
-import { store as imageViewerStore } from "../../modals/image-viewer/image-viewer-store.js";
+import { createStore } from '/js/AlpineStore.js';
+import { fetchApi } from '/js/api.js';
+import { store as imageViewerStore } from '../../modals/image-viewer/image-viewer-store.js';
 
 const model = {
   // State properties
@@ -60,7 +60,7 @@ const model = {
         existing.name === newAttachment.name &&
         existing.file &&
         newAttachment.file &&
-        existing.file.size === newAttachment.file.size
+        existing.file.size === newAttachment.file.size,
     );
     return !isDuplicate;
   },
@@ -87,7 +87,7 @@ const model = {
       e.preventDefault();
       e.stopPropagation();
     };
-    
+
     // Prevent default drag behaviors - store reference for cleanup
     // Create separate handlers for each event to allow proper removal
     const dragDefaults = {
@@ -117,7 +117,7 @@ const model = {
         this.showDragDropOverlay();
       }
     };
-    document.addEventListener("dragenter", dragenterHandler, false);
+    document.addEventListener('dragenter', dragenterHandler, false);
     this._eventHandlers.dragenter = dragenterHandler;
 
     // Store dragover handler
@@ -138,7 +138,7 @@ const model = {
         }
       }
     };
-    document.addEventListener("dragover", dragoverHandler, false);
+    document.addEventListener('dragover', dragoverHandler, false);
     this._eventHandlers.dragover = dragoverHandler;
 
     // Store dragleave handler
@@ -149,7 +149,7 @@ const model = {
         this.dragFileCount = 0;
       }
     };
-    document.addEventListener("dragleave", dragleaveHandler, false);
+    document.addEventListener('dragleave', dragleaveHandler, false);
     this._eventHandlers.dragleave = dragleaveHandler;
 
     // Store drop handler
@@ -172,7 +172,7 @@ const model = {
         this.dragFileCount = 0;
       }
     };
-    document.addEventListener("drop", dropHandler, false);
+    document.addEventListener('drop', dropHandler, false);
     this._eventHandlers.drop = dropHandler;
   },
 
@@ -186,7 +186,7 @@ const model = {
       // First, check if there are any images in the clipboard
       for (let i = 0; i < items.length; i++) {
         const item = items[i];
-        if (item.type.indexOf("image") !== -1) {
+        if (item.type.indexOf('image') !== -1) {
           imageFound = true;
           const blob = item.getAsFile();
           if (blob) {
@@ -200,12 +200,12 @@ const model = {
       // If no images found and we're in an input field, let normal text paste happen
       if (
         !imageFound &&
-        (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA")
+        (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')
       ) {
         return;
       }
     };
-    document.addEventListener("paste", pasteHandler);
+    document.addEventListener('paste', pasteHandler);
     this._eventHandlers.paste = pasteHandler;
   },
 
@@ -217,14 +217,14 @@ const model = {
       const filename = `clipboard-${guid}.png`;
 
       // Create file object from blob
-      const file = new File([blob], filename, { type: "image/png" });
+      const file = new File([blob], filename, { type: 'image/png' });
 
       // Create attachment object
       const attachment = {
-        file: file,
-        type: "image",
+        file,
+        type: 'image',
         name: filename,
-        extension: "png",
+        extension: 'png',
         displayInfo: this.getAttachmentDisplayInfo(file),
       };
 
@@ -235,12 +235,12 @@ const model = {
         this.addAttachment(attachment);
       };
       reader.onerror = () => {
-        console.error("Failed to read clipboard image:", reader.error);
-        window.toastFrontendError("Failed to load clipboard image. Please try again.", "Clipboard Error");
+        console.error('Failed to read clipboard image:', reader.error);
+        window.toastFrontendError('Failed to load clipboard image. Please try again.', 'Clipboard Error');
       };
       reader.readAsDataURL(file);
     } catch (error) {
-      console.error("Failed to handle clipboard image:", error);
+      console.error('Failed to handle clipboard image:', error);
     }
   },
 
@@ -248,20 +248,20 @@ const model = {
   handleFileUpload(event) {
     const files = event.target.files;
     this.handleFiles(files);
-    event.target.value = ""; // clear uploader selection to fix issue where same file is ignored the second time
+    event.target.value = ''; // clear uploader selection to fix issue where same file is ignored the second time
   },
 
   // File handling logic (moved from index.js)
   handleFiles(files) {
     Array.from(files).forEach((file) => {
-      const ext = file.name.split(".").pop().toLowerCase();
-      const isImage = ["jpg", "jpeg", "png", "bmp", "gif", "webp", "svg"].includes(
-        ext
+      const ext = file.name.split('.').pop().toLowerCase();
+      const isImage = ['jpg', 'jpeg', 'png', 'bmp', 'gif', 'webp', 'svg'].includes(
+        ext,
       );
 
       const attachment = {
-        file: file,
-        type: isImage ? "image" : "file",
+        file,
+        type: isImage ? 'image' : 'file',
         name: file.name,
         extension: ext,
         displayInfo: this.getAttachmentDisplayInfo(file),
@@ -285,7 +285,7 @@ const model = {
   // Get attachments for sending message
   getAttachmentsForSending() {
     return this.attachments.map((attachment) => {
-      if (attachment.type === "image") {
+      if (attachment.type === 'image') {
         return {
           ...attachment,
           url: URL.createObjectURL(attachment.file),
@@ -309,20 +309,20 @@ const model = {
 
   // Check if file is an image based on extension
   isImageFile(filename) {
-    const imageExtensions = ["jpg", "jpeg", "png", "gif", "bmp", "webp", "svg"];
-    const extension = filename.split(".").pop().toLowerCase();
+    const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg'];
+    const extension = filename.split('.').pop().toLowerCase();
     return imageExtensions.includes(extension);
   },
 
   // Get attachment preview URL (server URL for persistence, blob URL for current session)
   getAttachmentPreviewUrl(attachment) {
     // If attachment has a name and we're dealing with a server-stored file
-    if (typeof attachment === "string") {
+    if (typeof attachment === 'string') {
       // attachment is just a filename (from loaded chat)
       return this.getServerImgUrl(attachment);
     } else if (attachment.name && attachment.file) {
       // attachment is an object from current session
-      if (attachment.type === "image") {
+      if (attachment.type === 'image') {
         // For images, use blob URL for current session preview
         return attachment.url || URL.createObjectURL(attachment.file);
       } else {
@@ -334,63 +334,63 @@ const model = {
   },
 
   getFilePreviewUrl(filename) {
-    const extension = filename.split(".").pop().toLowerCase();
+    const extension = filename.split('.').pop().toLowerCase();
     const types = {
       // Archive files
-      zip: "archive",
-      rar: "archive",
-      "7z": "archive",
-      tar: "archive",
-      gz: "archive",
+      zip: 'archive',
+      rar: 'archive',
+      '7z': 'archive',
+      tar: 'archive',
+      gz: 'archive',
       // Document files
-      pdf: "document",
-      doc: "document",
-      docx: "document",
-      txt: "document",
-      rtf: "document",
-      odt: "document",
+      pdf: 'document',
+      doc: 'document',
+      docx: 'document',
+      txt: 'document',
+      rtf: 'document',
+      odt: 'document',
       // Code files
-      py: "code",
-      js: "code",
-      html: "code",
-      css: "code",
-      json: "code",
-      xml: "code",
-      md: "code",
-      yml: "code",
-      yaml: "code",
-      sql: "code",
-      sh: "code",
-      bat: "code",
+      py: 'code',
+      js: 'code',
+      html: 'code',
+      css: 'code',
+      json: 'code',
+      xml: 'code',
+      md: 'code',
+      yml: 'code',
+      yaml: 'code',
+      sql: 'code',
+      sh: 'code',
+      bat: 'code',
       // Spreadsheet files
-      xls: "document",
-      xlsx: "document",
-      csv: "document",
+      xls: 'document',
+      xlsx: 'document',
+      csv: 'document',
       // Presentation files
-      ppt: "document",
-      pptx: "document",
-      odp: "document",
+      ppt: 'document',
+      pptx: 'document',
+      odp: 'document',
     };
-    const type = types[extension] || "file";
+    const type = types[extension] || 'file';
     return `/public/${type}.svg`;
   },
 
   // Enhanced method to get attachment display info for UI
   getAttachmentDisplayInfo(attachment) {
-    if (typeof attachment === "string") {
+    if (typeof attachment === 'string') {
       // attachment is filename only (from persistent storage)
       const filename = attachment;
-      const extension = filename.split(".").pop();
+      const extension = filename.split('.').pop();
       const isImage = this.isImageFile(filename);
       const previewUrl = isImage
         ? this.getServerImgUrl(filename)
         : this.getFilePreviewUrl(filename);
 
       return {
-        filename: filename,
+        filename,
         extension: extension.toUpperCase(),
-        isImage: isImage,
-        previewUrl: previewUrl,
+        isImage,
+        previewUrl,
         clickHandler: () => {
           if (this.isImageFile(filename)) {
             imageViewerStore.open(this.getServerImgUrl(filename), { name: filename });
@@ -403,17 +403,17 @@ const model = {
       // attachment is object (from current session)
       const isImage = this.isImageFile(attachment.name);
       const filename = attachment.name;
-      const extension = filename.split(".").pop() || "";
+      const extension = filename.split('.').pop() || '';
       const previewUrl = isImage
         ? this.getServerImgUrl(attachment.name)
         : this.getFilePreviewUrl(attachment.name);
       return {
-        filename: filename,
+        filename,
         extension: extension.toUpperCase(),
-        isImage: attachment.type === "image",
-        previewUrl: previewUrl,
+        isImage: attachment.type === 'image',
+        previewUrl,
         clickHandler: () => {
-          if (attachment.type === "image") {
+          if (attachment.type === 'image') {
             const imageUrl = this.getServerImgUrl(attachment.name);
             imageViewerStore.open(imageUrl, { name: attachment.name });
           } else {
@@ -427,15 +427,15 @@ const model = {
   async downloadAttachment(filename) {
     try {
       const path = this.getServerFileUrl(filename);
-      const response = await fetchApi("/download_work_dir_file?path=" + path);
+      const response = await fetchApi(`/download_work_dir_file?path=${  path}`);
 
       if (!response.ok) {
-        throw new Error("Network response was not ok");
+        throw new Error('Network response was not ok');
       }
 
       const blob = await response.blob();
 
-      const link = document.createElement("a");
+      const link = document.createElement('a');
       link.href = window.URL.createObjectURL(blob);
       link.download = filename;
       document.body.appendChild(link);
@@ -443,20 +443,20 @@ const model = {
       document.body.removeChild(link);
       window.URL.revokeObjectURL(link.href);
     } catch (error) {
-      window.toastFetchError("Error downloading file", error);
-      alert("Error downloading file");
+      window.toastFetchError('Error downloading file', error);
+      alert('Error downloading file');
     }
   },
 
   // Generate GUID for unique filenames
   generateGUID() {
-    return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(
       /[xy]/g,
-      function (c) {
+      (c) => {
         const r = (Math.random() * 16) | 0;
-        const v = c == "x" ? r : (r & 0x3) | 0x8;
+        const v = c == 'x' ? r : (r & 0x3) | 0x8;
         return v.toString(16);
-      }
+      },
     );
   },
 
@@ -464,23 +464,23 @@ const model = {
   cleanup() {
     // Remove drag and drop event listeners
     if (this._eventHandlers.dragenter) {
-      document.removeEventListener("dragenter", this._eventHandlers.dragenter);
+      document.removeEventListener('dragenter', this._eventHandlers.dragenter);
       this._eventHandlers.dragenter = null;
     }
     if (this._eventHandlers.dragover) {
-      document.removeEventListener("dragover", this._eventHandlers.dragover);
+      document.removeEventListener('dragover', this._eventHandlers.dragover);
       this._eventHandlers.dragover = null;
     }
     if (this._eventHandlers.dragleave) {
-      document.removeEventListener("dragleave", this._eventHandlers.dragleave);
+      document.removeEventListener('dragleave', this._eventHandlers.dragleave);
       this._eventHandlers.dragleave = null;
     }
     if (this._eventHandlers.drop) {
-      document.removeEventListener("drop", this._eventHandlers.drop);
+      document.removeEventListener('drop', this._eventHandlers.drop);
       this._eventHandlers.drop = null;
     }
     if (this._eventHandlers.paste) {
-      document.removeEventListener("paste", this._eventHandlers.paste);
+      document.removeEventListener('paste', this._eventHandlers.paste);
       this._eventHandlers.paste = null;
     }
     // Remove drag defaults
@@ -492,6 +492,6 @@ const model = {
 
 };
 
-const store = createStore("chatAttachments", model);
+const store = createStore('chatAttachments', model);
 
 export { store };

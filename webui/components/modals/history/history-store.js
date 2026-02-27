@@ -1,4 +1,4 @@
-import { createStore } from "/js/AlpineStore.js";
+import { createStore } from '/js/AlpineStore.js';
 
 const model = {
   // State
@@ -47,8 +47,8 @@ const model = {
       this.scheduleEditorInit();
 
     } catch (error) {
-      console.error("History fetch error:", error);
-      this.error = error?.message || "Failed to load history";
+      console.error('History fetch error:', error);
+      this.error = error?.message || 'Failed to load history';
       this.isLoading = false;
       this.updateModalTitle(); // Show error in title
     }
@@ -63,9 +63,9 @@ const model = {
   },
 
   initEditor() {
-    const container = document.getElementById("history-viewer-container");
+    const container = document.getElementById('history-viewer-container');
     if (!container) {
-      console.warn("History container not found, deferring editor init");
+      console.warn('History container not found, deferring editor init');
       return;
     }
 
@@ -76,25 +76,25 @@ const model = {
 
     // Check if ACE is available
     if (!window.ace?.edit) {
-      console.error("ACE editor not available");
-      this.error = "Editor library not loaded";
+      console.error('ACE editor not available');
+      this.error = 'Editor library not loaded';
       return;
     }
 
-    const editorInstance = window.ace.edit("history-viewer-container");
+    const editorInstance = window.ace.edit('history-viewer-container');
     if (!editorInstance) {
-      console.error("Failed to create ACE editor instance");
+      console.error('Failed to create ACE editor instance');
       return;
     }
 
     this.editor = editorInstance;
 
     // Configure theme based on dark mode (legacy parity: != "false")
-    const darkMode = window.localStorage?.getItem("darkMode");
-    const theme = darkMode !== "false" ? "ace/theme/github_dark" : "ace/theme/tomorrow";
+    const darkMode = window.localStorage?.getItem('darkMode');
+    const theme = darkMode !== 'false' ? 'ace/theme/github_dark' : 'ace/theme/tomorrow';
 
     this.editor.setTheme(theme);
-    this.editor.session.setMode("ace/mode/markdown");
+    this.editor.session.setMode('ace/mode/markdown');
     this.editor.setValue(this.historyData, -1); // -1 moves cursor to start
     this.editor.setReadOnly(true);
     this.editor.clearSelection();
@@ -102,7 +102,7 @@ const model = {
 
   updateModalTitle() {
     window.requestAnimationFrame(() => {
-      const modalTitles = document.querySelectorAll(".modal.show .modal-title");
+      const modalTitles = document.querySelectorAll('.modal.show .modal-title');
       if (!modalTitles.length) return;
 
       // Get the last (topmost) modal title
@@ -110,9 +110,9 @@ const model = {
       if (!title) return;
 
       if (this.error) {
-        title.textContent = "History – Error";
+        title.textContent = 'History – Error';
       } else if (this.isLoading) {
-        title.textContent = "History (loading…)";
+        title.textContent = 'History (loading…)';
       } else {
         title.textContent = `History ~${this.tokenCount} tokens`;
       }
@@ -128,5 +128,5 @@ const model = {
   },
 };
 
-export const store = createStore("history", model);
+export const store = createStore('history', model);
 

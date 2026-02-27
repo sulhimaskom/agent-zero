@@ -1,5 +1,5 @@
-import { createStore } from "/js/AlpineStore.js";
-import { DEFAULTS, TIMING } from "/js/constants.js";
+import { createStore } from '/js/AlpineStore.js';
+import { DEFAULTS, TIMING } from '/js/constants.js';
 
 // Global function references
 const sendJsonData = globalThis.sendJsonData;
@@ -106,7 +106,7 @@ const model = {
 
     try {
       // Get resolved default patterns from backend
-      const response = await sendJsonData("backup_get_defaults", {});
+      const response = await sendJsonData('backup_get_defaults', {});
 
       if (response.success) {
         // Use patterns from backend with resolved absolute paths
@@ -116,16 +116,16 @@ const model = {
         return {
           backup_name: `agent-zero-backup-${timestamp.slice(0, 10)}`,
           include_hidden: false,
-          include_patterns: include_patterns,
-          exclude_patterns: exclude_patterns,
+          include_patterns,
+          exclude_patterns,
           backup_config: {
             compression_level: 6,
-            integrity_check: true
-          }
+            integrity_check: true,
+          },
         };
       }
     } catch (error) {
-      console.warn("Failed to get default patterns from backend, using fallback");
+      console.warn('Failed to get default patterns from backend, using fallback');
     }
 
     // Fallback patterns (will be overridden by backend on first use)
@@ -134,35 +134,35 @@ const model = {
       include_hidden: false,
       include_patterns: [
         // These will be replaced with resolved absolute paths by backend
-        "# Loading default patterns from backend..."
+        '# Loading default patterns from backend...',
       ],
       exclude_patterns: [],
       backup_config: {
         compression_level: 6,
-        integrity_check: true
-      }
+        integrity_check: true,
+      },
     };
   },
 
   // Editor Management - Following Agent Zero ACE editor patterns
   async initBackupEditor() {
-    const container = document.getElementById("backup-metadata-editor");
+    const container = document.getElementById('backup-metadata-editor');
     if (container) {
-      const editor = ace.edit("backup-metadata-editor");
+      const editor = ace.edit('backup-metadata-editor');
 
-      let dark = "true";
+      let dark = 'true';
       try {
-        dark = localStorage.getItem("darkMode");
+        dark = localStorage.getItem('darkMode');
       } catch (e) {
         // Silent fail in private browsing mode
       }
-      if (dark != "false") {
-        editor.setTheme("ace/theme/github_dark");
+      if (dark != 'false') {
+        editor.setTheme('ace/theme/github_dark');
       } else {
-        editor.setTheme("ace/theme/tomorrow");
+        editor.setTheme('ace/theme/tomorrow');
       }
 
-      editor.session.setMode("ace/mode/json");
+      editor.session.setMode('ace/mode/json');
 
       // Initialize with default backup metadata
       const defaultMetadata = await this.getDefaultBackupMetadata();
@@ -183,23 +183,23 @@ const model = {
   },
 
   async initRestoreEditor() {
-    const container = document.getElementById("restore-metadata-editor");
+    const container = document.getElementById('restore-metadata-editor');
     if (container) {
-      const editor = ace.edit("restore-metadata-editor");
+      const editor = ace.edit('restore-metadata-editor');
 
-      let dark = "true";
+      let dark = 'true';
       try {
-        dark = localStorage.getItem("darkMode");
+        dark = localStorage.getItem('darkMode');
       } catch (e) {
         // Silent fail in private browsing mode
       }
-      if (dark != "false") {
-        editor.setTheme("ace/theme/github_dark");
+      if (dark != 'false') {
+        editor.setTheme('ace/theme/github_dark');
       } else {
-        editor.setTheme("ace/theme/tomorrow");
+        editor.setTheme('ace/theme/tomorrow');
       }
 
-      editor.session.setMode("ace/mode/json");
+      editor.session.setMode('ace/mode/json');
       editor.setValue('{}');
       editor.clearSelection();
 
@@ -232,8 +232,8 @@ const model = {
       editor.clearSelection();
       editor.navigateFileStart();
     } catch (error) {
-      console.error("Failed to format JSON:", error);
-      this.error = "Invalid JSON: " + error.message;
+      console.error('Failed to format JSON:', error);
+      this.error = `Invalid JSON: ${  error.message}`;
     }
   },
 
@@ -254,11 +254,11 @@ const model = {
       const patternsString = this.convertPatternsToString(metadata.include_patterns, metadata.exclude_patterns);
 
       // Get grouped preview for better UX
-      const response = await sendJsonData("backup_preview_grouped", {
+      const response = await sendJsonData('backup_preview_grouped', {
         patterns: patternsString,
         include_hidden: metadata.include_hidden || false,
         max_depth: 3,
-        search_filter: this.fileSearchFilter
+        search_filter: this.fileSearchFilter,
       });
 
       if (response.success) {
@@ -375,7 +375,7 @@ const model = {
     } else {
       const search = this.fileSearchFilter.toLowerCase();
       this.filteredPreviewFiles = this.previewFiles.filter(file =>
-        file.path.toLowerCase().includes(search)
+        file.path.toLowerCase().includes(search),
       );
     }
   },
@@ -424,8 +424,8 @@ const model = {
           include_patterns: metadata.include_patterns,
           exclude_patterns: metadata.exclude_patterns,
           include_hidden: metadata.include_hidden || false,
-          backup_name: metadata.backup_name
-        })
+          backup_name: metadata.backup_name,
+        }),
       });
 
       if (response.ok) {
@@ -465,7 +465,7 @@ const model = {
       const response = await fetchApi('/backup_download', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ backup_path: backupPath })
+        body: JSON.stringify({ backup_path: backupPath }),
       });
 
       if (response.ok) {
@@ -525,10 +525,10 @@ const model = {
       const metadata = this.backupMetadataConfig;
       const patternsString = this.convertPatternsToString(metadata.include_patterns, metadata.exclude_patterns);
 
-      const response = await sendJsonData("backup_test", {
+      const response = await sendJsonData('backup_test', {
         patterns: patternsString,
         include_hidden: metadata.include_hidden || false,
-        max_files: DEFAULTS.BACKUP_MAX_FILES
+        max_files: DEFAULTS.BACKUP_MAX_FILES,
       });
 
       if (response.success) {
@@ -570,7 +570,7 @@ const model = {
 
       const response = await fetchApi('/backup_restore_preview', {
         method: 'POST',
-        body: formData
+        body: formData,
       });
 
       const result = await response.json();
@@ -637,7 +637,7 @@ const model = {
 
       const response = await fetchApi('/backup_inspect', {
         method: 'POST',
-        body: formData
+        body: formData,
       });
 
       const result = await response.json();
@@ -676,9 +676,9 @@ const model = {
     // Check Agent Zero version compatibility
     // Note: Both backup and current versions are obtained via git.get_git_info()
     const backupVersion = this.backupMetadata.agent_zero_version;
-    const currentVersion = "current"; // Retrieved from git.get_git_info() on backend
+    const currentVersion = 'current'; // Retrieved from git.get_git_info() on backend
 
-    if (backupVersion !== currentVersion && backupVersion !== "development") {
+    if (backupVersion !== currentVersion && backupVersion !== 'development') {
       warnings.push(`Backup created with Agent Zero ${backupVersion}, current version is ${currentVersion}`);
     }
 
@@ -722,7 +722,7 @@ const model = {
 
       const response = await fetchApi('/backup_restore', {
         method: 'POST',
-        body: formData
+        body: formData,
       });
 
       const result = await response.json();
@@ -753,7 +753,7 @@ const model = {
 
         // Log errors
         if (result.errors && result.errors.length > 0) {
-          this.addFileOperation(`\nErrors during restoration:`);
+          this.addFileOperation('\nErrors during restoration:');
           result.errors.forEach((error, index) => {
             this.addFileOperation(`${index + 1}. ${error.original_path}: ${error.error}`);
           });
@@ -837,8 +837,8 @@ const model = {
   formatDate(dateString) {
     if (!dateString) return 'Unknown';
     return new Date(dateString).toLocaleDateString();
-  }
+  },
 };
 
-const store = createStore("backupStore", model);
+const store = createStore('backupStore', model);
 export { store };

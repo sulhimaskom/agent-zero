@@ -23,7 +23,7 @@ export async function importComponent(path, targetElement) {
 
   try {
     if (!targetElement) {
-      throw new Error("Target element is required");
+      throw new Error('Target element is required');
     }
 
     // Show loading indicator (safe DOM creation)
@@ -33,8 +33,8 @@ export async function importComponent(path, targetElement) {
     targetElement.appendChild(loadingDiv);
 
     // full component url
-    const trimmedPath = path.replace(/^\/+/, "");
-    const componentUrl = trimmedPath.startsWith("components/") ? trimmedPath : "components/" + trimmedPath;
+    const trimmedPath = path.replace(/^\/+/, '');
+    const componentUrl = trimmedPath.startsWith('components/') ? trimmedPath : `components/${  trimmedPath}`;
 
     // get html from cache or fetch it
     let html;
@@ -44,7 +44,7 @@ export async function importComponent(path, targetElement) {
       const response = await fetch(componentUrl);
       if (!response.ok) {
         throw new Error(
-          `Error loading component ${path}: ${response.statusText}`
+          `Error loading component ${path}: ${response.statusText}`,
         );
       }
       html = await response.text();
@@ -52,28 +52,28 @@ export async function importComponent(path, targetElement) {
       componentCache[componentUrl] = html;
     }
     const parser = new DOMParser();
-    const doc = parser.parseFromString(html, "text/html");
+    const doc = parser.parseFromString(html, 'text/html');
 
     const allNodes = [
-      ...doc.querySelectorAll("style"),
-      ...doc.querySelectorAll("script"),
+      ...doc.querySelectorAll('style'),
+      ...doc.querySelectorAll('script'),
       ...doc.body.childNodes,
     ];
 
     const loadPromises = [];
-    let blobCounter = 0;
+    const blobCounter = 0;
 
     for (const node of allNodes) {
-      if (node.nodeName === "SCRIPT") {
+      if (node.nodeName === 'SCRIPT') {
         const isModule =
-          node.type === "module" || node.getAttribute("type") === "module";
+          node.type === 'module' || node.getAttribute('type') === 'module';
 
         if (isModule) {
           if (node.src) {
             // For <script type="module" src="..." use dynamic import
             const resolvedUrl = new URL(
               node.src,
-              globalThis.location.origin
+              globalThis.location.origin,
             ).toString();
 
             // Check if module is already in cache
@@ -85,31 +85,31 @@ export async function importComponent(path, targetElement) {
           } else {
             // For inline module scripts, append directly to DOM
             // This lets the browser handle imports natively without blob URLs
-            const script = document.createElement("script");
-            script.type = "module";
-            
+            const script = document.createElement('script');
+            script.type = 'module';
+
             // Get script content and transform imports to absolute URLs
-            let content = node.textContent || "";
+            let content = node.textContent || '';
             content = content.replace(
               /import\s+([^'"]+)\s+from\s+["']([^"']+)["']/g,
               (match, bindings, importPath) => {
                 if (!/^https?:\/\//.test(importPath)) {
                   const absoluteUrl = new URL(
                     importPath,
-                    globalThis.location.origin
+                    globalThis.location.origin,
                   ).href;
                   return `import ${bindings} from "${absoluteUrl}"`;
                 }
                 return match;
-              }
+              },
             );
-            
+
             script.textContent = content;
             targetElement.appendChild(script);
           }
         } else {
           // Non-module script
-          const script = document.createElement("script");
+          const script = document.createElement('script');
           Array.from(node.attributes || []).forEach((attr) => {
             script.setAttribute(attr.name, attr.value);
           });
@@ -126,12 +126,12 @@ export async function importComponent(path, targetElement) {
           targetElement.appendChild(script);
         }
       } else if (
-        node.nodeName === "STYLE" ||
-        (node.nodeName === "LINK" && node.rel === "stylesheet")
+        node.nodeName === 'STYLE' ||
+        (node.nodeName === 'LINK' && node.rel === 'stylesheet')
       ) {
         const clone = node.cloneNode(true);
 
-        if (clone.tagName === "LINK" && clone.rel === "stylesheet") {
+        if (clone.tagName === 'LINK' && clone.rel === 'stylesheet') {
           const promise = new Promise((resolve, reject) => {
             clone.onload = resolve;
             clone.onerror = reject;
@@ -161,7 +161,7 @@ export async function importComponent(path, targetElement) {
     // Return parsed document
     return doc;
   } catch (error) {
-    console.error("Error importing component:", error);
+    console.error('Error importing component:', error);
     throw error;
   } finally {
     // Release the lock when done, regardless of success or failure
@@ -177,35 +177,35 @@ export async function loadComponents(roots = [document.documentElement]) {
 
     // Find all top-level components and load them in parallel
     const components = rootElements.flatMap((root) =>
-      Array.from(root.querySelectorAll("x-component"))
+      Array.from(root.querySelectorAll('x-component')),
     );
 
     if (components.length === 0) return;
 
     await Promise.all(
       components.map(async (component) => {
-        const path = component.getAttribute("path");
+        const path = component.getAttribute('path');
         if (!path) {
-          console.error("x-component missing path attribute:", component);
+          console.error('x-component missing path attribute:', component);
           return;
         }
         await importComponent(path, component);
-      })
+      }),
     );
   } catch (error) {
-    console.error("Error loading components:", error);
+    console.error('Error loading components:', error);
   }
 }
 
 // Function to traverse parents and collect x-component attributes
 export function getParentAttributes(el) {
   let element = el;
-  let attrs = {};
+  const attrs = {};
 
   while (element) {
     if (element.tagName.toLowerCase() === 'x-component') {
       // Get all attributes
-      for (let attr of element.attributes) {
+      for (const attr of element.attributes) {
         try {
           // Try to parse as JSON first
           attrs[attr.name] = JSON.parse(attr.value);
@@ -236,8 +236,8 @@ const observer = new MutationObserver((mutations) => {
       if (node.nodeType === 1) {
         // ELEMENT_NODE
         // Check if this node or its descendants contain x-component(s)
-        if (node.matches?.("x-component")) {
-          importComponent(node.getAttribute("path"), node);
+        if (node.matches?.('x-component')) {
+          importComponent(node.getAttribute('path'), node);
         } else if (node.querySelectorAll) {
           loadComponents([node]);
         }
