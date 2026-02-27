@@ -27,10 +27,13 @@ RUN echo "cache buster $CACHE_DATE" && bash /ins/install_A02.sh $BRANCH
 # post installation steps
 RUN bash /ins/post_install.sh $BRANCH
 
-# Expose ports
-EXPOSE 22 80 9000-9009
+# Expose ports (removed port 22 for security)
+EXPOSE 80 9000-9009
 
 RUN chmod +x /exe/initialize.sh /exe/run_A0.sh /exe/run_searxng.sh /exe/run_tunnel_api.sh
+
+# Switch to non-root user (defined in base image)
+USER agentzero
 
 # initialize runtime and switch to supervisord
 CMD ["/exe/initialize.sh", "$BRANCH"]

@@ -1,7 +1,6 @@
 # Use the latest slim version of Kali Linux
 FROM kalilinux/kali-rolling
 
-
 # Set locale to en_US.UTF-8 and timezone to UTC
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y locales tzdata
 RUN sed -i -e 's/# \(en_US\.UTF-8 .*\)/\1/' /etc/locale.gen && \
@@ -35,6 +34,19 @@ RUN bash /ins/configure_ssh.sh
 
 # after install
 RUN bash /ins/after_install.sh
+
+# Create non-root user for security (principle of least privilege)
+RUN groupadd -g 1000 agentzero && \
+    useradd -r -u 1000 -g agentzero -d /home/agentzero -s /bin/bash agentzero && \
+    mkdir -p /home/agentzero && \
+    chown -R agentzero:agentzero /home/agentzero
+
+# Set ownership for runtime directories
+RUN mkdir -p /var/run /tmp /var/log && \
+    chown -R agentzero:agentzero /var/run /tmp /var/log
+
+# Switch to non-root user
+USER agentzero
 
 # Keep container running infinitely
 CMD ["tail", "-f", "/dev/null"]
