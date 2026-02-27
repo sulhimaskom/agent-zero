@@ -1,4 +1,5 @@
 import { store as chatInputStore } from '/components/chat/input/input-store.min.js';
+import Logger from '/js/logger.js';
 import { store as historyStore } from '/components/modals/history/history-store.min.js';
 import { store as contextStore } from '/components/modals/context/context-store.min.js';
 
@@ -120,7 +121,7 @@ function handleKeyDown(event) {
     try {
       shortcut.handler();
     } catch (error) {
-      console.error(`Error executing keyboard shortcut "${keyCombo}":`, error);
+      Logger.error(`Error executing keyboard shortcut "${keyCombo}":`, error);
     }
   }
 }

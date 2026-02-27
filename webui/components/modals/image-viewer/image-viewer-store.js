@@ -1,4 +1,5 @@
 import { createStore } from '/js/AlpineStore.js';
+import Logger from '/js/logger.js';
 
 const model = {
   // State
@@ -55,7 +56,7 @@ const model = {
         this.setupAutoRefresh();
       }
     } catch (error) {
-      console.error('Image viewer error:', error);
+      Logger.error('Image viewer error:', error);
       this.imageError = true;
     }
   },
@@ -94,7 +95,7 @@ const model = {
         this.imageLoaded = false; // Trigger reload animation
       }
     } catch (err) {
-      console.error('Failed to preload image:', err);
+      Logger.error('Failed to preload image:', err);
     }
   },
 

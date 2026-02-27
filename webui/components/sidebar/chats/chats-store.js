@@ -1,4 +1,5 @@
 import { createStore } from '/js/AlpineStore.js';
+import Logger from '/js/logger.js';
 import {
   sendJsonData,
   getContext,
@@ -72,7 +73,7 @@ const model = {
   // Delete a chat
   async killChat(id) {
     if (!id) {
-      console.error('No chat ID provided for deletion');
+      Logger.error('No chat ID provided for deletion');
       return;
     }
 
@@ -94,7 +95,7 @@ const model = {
       // Show success notification
       justToast('Chat deleted successfully', 'success', TIMING.NOTIFICATION_DISPLAY, 'chat-removal');
     } catch (e) {
-      console.error('Error deleting chat:', e);
+      Logger.error('Error deleting chat:', e);
       toastFetchError('Error deleting chat', e);
     }
   },

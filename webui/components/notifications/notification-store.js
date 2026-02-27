@@ -283,7 +283,7 @@ const model = {
           notification_ids: [notificationId],
         });
       } catch (error) {
-        console.error('Failed to sync notification read status:', error);
+        Logger.error('Failed to sync notification read status:', error);
         // Don't revert the UI change - user experience should not be affected
       }
     }
@@ -309,7 +309,7 @@ const model = {
         mark_all: true,
       });
     } catch (error) {
-      console.error('Failed to sync mark all as read:', error);
+      Logger.error('Failed to sync mark all as read:', error);
     }
   },
 
@@ -325,7 +325,7 @@ const model = {
     try {
       await API.callJsonApi('notifications_clear', null);
     } catch (error) {
-      console.error('Failed to clear notifications:', error);
+      Logger.error('Failed to clear notifications:', error);
     }
   },
 
@@ -447,11 +447,11 @@ const model = {
       if (response.success) {
         return response.notification_id;
       } else {
-        console.error('Failed to create notification:', response.error);
+        Logger.error('Failed to create notification:', response.error);
         return null;
       }
     } catch (error) {
-      console.error('Error creating notification:', error);
+      Logger.error('Error creating notification:', error);
       return null;
     }
   },

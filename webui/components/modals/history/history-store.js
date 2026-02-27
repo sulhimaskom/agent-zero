@@ -1,4 +1,5 @@
 import { createStore } from '/js/AlpineStore.js';
+import Logger from '/js/logger.js';
 
 const model = {
   // State
@@ -47,7 +48,7 @@ const model = {
       this.scheduleEditorInit();
 
     } catch (error) {
-      console.error('History fetch error:', error);
+      Logger.error('History fetch error:', error);
       this.error = error?.message || 'Failed to load history';
       this.isLoading = false;
       this.updateModalTitle(); // Show error in title
@@ -65,7 +66,7 @@ const model = {
   initEditor() {
     const container = document.getElementById('history-viewer-container');
     if (!container) {
-      console.warn('History container not found, deferring editor init');
+      Logger.warn('History container not found, deferring editor init');
       return;
     }
 
@@ -76,14 +77,14 @@ const model = {
 
     // Check if ACE is available
     if (!window.ace?.edit) {
-      console.error('ACE editor not available');
+      Logger.error('ACE editor not available');
       this.error = 'Editor library not loaded';
       return;
     }
 
     const editorInstance = window.ace.edit('history-viewer-container');
     if (!editorInstance) {
-      console.error('Failed to create ACE editor instance');
+      Logger.error('Failed to create ACE editor instance');
       return;
     }
 

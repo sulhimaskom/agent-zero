@@ -1,4 +1,5 @@
 import { createStore } from '/js/AlpineStore.js';
+import Logger from '/js/logger.js';
 import { fetchApi } from '/js/api.js';
 import { store as imageViewerStore } from '../../modals/image-viewer/image-viewer-store.js';
 
@@ -235,12 +236,12 @@ const model = {
         this.addAttachment(attachment);
       };
       reader.onerror = () => {
-        console.error('Failed to read clipboard image:', reader.error);
+        Logger.error('Failed to read clipboard image:', reader.error);
         window.toastFrontendError('Failed to load clipboard image. Please try again.', 'Clipboard Error');
       };
       reader.readAsDataURL(file);
     } catch (error) {
-      console.error('Failed to handle clipboard image:', error);
+      Logger.error('Failed to handle clipboard image:', error);
     }
   },
 

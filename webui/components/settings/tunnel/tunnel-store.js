@@ -36,7 +36,7 @@ const model = {
         correctLevel: QRCode.CorrectLevel.M,
       });
     } catch (error) {
-      console.error('Error generating QR code:', error);
+      Logger.error('Error generating QR code:', error);
       qrContainer.innerHTML =
         '<div class="qr-error">QR code generation failed</div>';
     }
@@ -122,7 +122,7 @@ const model = {
                                    error.message?.includes('backend not running') ||
                                    error.message?.includes('Failed to fetch');
       if (!isBackendUnavailable) {
-        console.error('Error checking tunnel status:', error);
+        Logger.error('Error checking tunnel status:', error);
       }
       this.tunnelLink = '';
       this.linkGenerated = false;
@@ -161,14 +161,14 @@ const model = {
         // Check if stopping was successful
         const stopData = await stopResponse.json();
         if (!stopData.success) {
-          console.warn("Warning: Couldn't stop existing tunnel cleanly");
+          Logger.warn("Warning: Couldn't stop existing tunnel cleanly");
           // Continue anyway since we want to create a new one
         }
 
         // Then generate a new one
         await this.generateLink();
       } catch (error) {
-        console.error('Error refreshing tunnel:', error);
+        Logger.error('Error refreshing tunnel:', error);
         window.toastFrontendError('Error refreshing tunnel', 'Tunnel Error');
         this.isLoading = false;
         this.loadingText = '';
@@ -229,7 +229,7 @@ const model = {
         }
       }
     } catch (error) {
-      console.error('Error checking authentication status:', error);
+      Logger.error('Error checking authentication status:', error);
       window.toastFrontendWarning(
         'Could not verify authentication status. Proceeding anyway.',
         'Authentication Check',
@@ -327,7 +327,7 @@ const model = {
             return;
           }
         } catch (statusError) {
-          console.error('Error checking tunnel status:', statusError);
+          Logger.error('Error checking tunnel status:', statusError);
           // Don't show additional toast here - the final failure will be shown below
         }
 
@@ -335,11 +335,11 @@ const model = {
         const errorMessage =
           data.message || 'Failed to create tunnel. Please try again.';
         window.toastFrontendError(errorMessage, 'Tunnel Error');
-        console.error('Tunnel creation failed:', data);
+        Logger.error('Tunnel creation failed:', data);
       }
     } catch (error) {
       window.toastFrontendError('Error creating tunnel', 'Tunnel Error');
-      console.error('Error creating tunnel:', error);
+      Logger.error('Error creating tunnel:', error);
     } finally {
       this.isLoading = false;
       this.loadingText = '';
@@ -409,7 +409,7 @@ const model = {
         }
       } catch (error) {
         window.toastFrontendError('Error stopping tunnel', 'Tunnel Error');
-        console.error('Error stopping tunnel:', error);
+        Logger.error('Error stopping tunnel:', error);
 
         // Reset stop button
         stopButton.innerHTML = originalStopContent;
@@ -437,7 +437,7 @@ const model = {
         );
       })
       .catch((err) => {
-        console.error('Failed to copy URL: ', err);
+        Logger.error('Failed to copy URL: ', err);
         window.dispatchEvent(new CustomEvent('copy-error', {
           detail: { component: 'tunnel' },
         }));

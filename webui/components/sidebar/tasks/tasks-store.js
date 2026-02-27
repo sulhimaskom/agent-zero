@@ -1,4 +1,5 @@
 import { createStore } from '/js/AlpineStore.js';
+import Logger from '/js/logger.js';
 import { store as chatsStore } from '/components/sidebar/chats/chats-store.js';
 
 // Tasks sidebar store: tasks list and selected task id
@@ -24,7 +25,7 @@ const model = {
       }
       this.isLoading = false;
     } catch (e) {
-      console.error('tasks-store.applyTasks failed', e);
+      Logger.error('tasks-store.applyTasks failed', e);
       // Show toast only if this is the first load (tasks were expected)
       if (this.tasks.length === 0 && this.isLoading) {
         window.toastFrontendWarning(

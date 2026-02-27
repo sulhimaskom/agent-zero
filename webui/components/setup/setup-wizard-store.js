@@ -1,4 +1,5 @@
 import { createStore } from '/js/AlpineStore.js';
+import Logger from '/js/logger.js';
 import { sendJsonData } from '/js/api.js';
 import { API_ENDPOINTS } from '/js/constants.js';
 
@@ -52,7 +53,7 @@ const model = {
         }
       }
     } catch (e) {
-      console.error('Failed to load providers:', e);
+      Logger.error('Failed to load providers:', e);
       window.toastFrontendWarning(
         'Could not load providers from settings. Using defaults.',
         'Provider Load',

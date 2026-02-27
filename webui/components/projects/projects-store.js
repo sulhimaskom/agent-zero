@@ -1,4 +1,5 @@
 import { createStore } from '/js/AlpineStore.js';
+import Logger from '/js/logger.js';
 import * as api from '/js/api.js';
 import * as modals from '/js/modals.js';
 import * as notifications from '/components/notifications/notification-store.min.js';
@@ -131,7 +132,7 @@ const model = {
         );
       }
     } catch (error) {
-      console.error('Error activating project:', error);
+      Logger.error('Error activating project:', error);
       notifications.toastFrontendError(
         `Error activating project: ${  error}`,
         'Error activating project',
@@ -170,7 +171,7 @@ const model = {
         );
       }
     } catch (error) {
-      console.error('Error deactivating project:', error);
+      Logger.error('Error deactivating project:', error);
       notifications.toastFrontendError(
         `Error deactivating project: ${  error}`,
         'Error deactivating project',
@@ -220,7 +221,7 @@ const model = {
         );
       }
     } catch (error) {
-      console.error('Error deleting project:', error);
+      Logger.error('Error deleting project:', error);
       notifications.toastFrontendError(
         `Error deleting project: ${  error}`,
         'Error deleting project',
@@ -247,7 +248,7 @@ const model = {
                                    error.message?.includes('Failed to fetch') ||
                                    error.message?.includes('Static file mode');
       if (!isBackendUnavailable) {
-        console.error('Error loading projects list:', error);
+        Logger.error('Error loading projects list:', error);
       }
     } finally {
       this.loading = false;
@@ -293,7 +294,7 @@ const model = {
         return null;
       }
     } catch (error) {
-      console.error('Error saving project:', error);
+      Logger.error('Error saving project:', error);
       notifications.toastFrontendError(
         `Error saving project: ${  error}`,
         'Error saving project',
@@ -425,7 +426,7 @@ const model = {
       this.fileStructureTestOutput = response.data;
       shortcuts.openModal('projects/project-file-structure-test.html');
     } catch (error) {
-      console.error('Error testing file structure:', error);
+      Logger.error('Error testing file structure:', error);
       shortcuts.frontendNotification({
         type: shortcuts.NotificationType.ERROR,
         message: 'Error testing file structure',

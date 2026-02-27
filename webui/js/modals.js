@@ -1,4 +1,5 @@
 // Import the component loader and page utilities
+import Logger from '/js/logger.js';
 import { importComponent } from '/js/components.min.js';
 import { UI } from './constants.min.js';
 
@@ -176,7 +177,7 @@ export function openModal(modalPath) {
           });
         })
         .catch((error) => {
-          console.error('Error loading modal content:', error);
+          Logger.error('Error loading modal content:', error);
           modal.body.textContent = '';
           const errorDiv = document.createElement('div');
           errorDiv.className = 'error';
@@ -194,7 +195,7 @@ export function openModal(modalPath) {
       // Update modal z-indexes
       updateModalZIndexes();
     } catch (error) {
-      console.error('Error loading modal content:', error);
+      Logger.error('Error loading modal content:', error);
       resolve();
     }
   });

@@ -1,4 +1,5 @@
 import { createStore } from '/js/AlpineStore.js';
+import Logger from '/js/logger.js';
 import { getContext } from '/index.js';
 import * as API from '/js/api.js';
 import { openModal, closeModal } from '/js/modals.js';
@@ -121,7 +122,7 @@ const memoryDashboardStore = {
         this.selectedMemorySubdir = 'default';
       }
     } catch (error) {
-      console.error('Failed to get current memory subdirectory:', error);
+      Logger.error('Failed to get current memory subdirectory:', error);
       this.selectedMemorySubdir = 'default';
     }
   },
@@ -164,7 +165,7 @@ const memoryDashboardStore = {
       if (!this.memorySubdirs.includes(this.selectedMemorySubdir)) {
         this.selectedMemorySubdir = 'default';
       }
-      console.error('Memory subdirectory loading error:', error);
+      Logger.error('Memory subdirectory loading error:', error);
     } finally {
       this.loadingSubdirs = false;
     }
@@ -244,7 +245,7 @@ const memoryDashboardStore = {
           this.message = null;
         } else {
           // For silent updates, just log the error but don't break the UI
-          console.warn('Memory dashboard polling failed:', response.error);
+          Logger.warn('Memory dashboard polling failed:', response.error);
         }
       }
     } catch (error) {
@@ -252,10 +253,10 @@ const memoryDashboardStore = {
         this.error = error.message || 'Failed to search memories';
         this.memories = [];
         this.message = null;
-        console.error('Memory search error:', error);
+        Logger.error('Memory search error:', error);
       } else {
         // For silent updates, just log the error but don't break the UI
-        console.warn('Memory dashboard polling error:', error);
+        Logger.warn('Memory dashboard polling error:', error);
       }
     } finally {
       if (!silent) {
@@ -554,7 +555,7 @@ ${memory.content_full}
             justToast('Copied to clipboard!', 'success');
         })
         .catch((err) => {
-          console.error('Clipboard copy failed:', err);
+          Logger.error('Clipboard copy failed:', err);
           this.fallbackCopyToClipboard(text, toastSuccess, memoryId);
         });
     } else {
@@ -579,7 +580,7 @@ ${memory.content_full}
       if(toastSuccess)
         justToast('Copied to clipboard!', 'success');
     } catch (err) {
-      console.error('Fallback clipboard copy failed:', err);
+      Logger.error('Fallback clipboard copy failed:', err);
       justToast('Failed to copy to clipboard', 'error');
     }
     document.body.removeChild(textArea);
@@ -638,7 +639,7 @@ ${memory.content_full}
         justToast(`Failed to delete memory: ${response.error}`, 'error');
       }
     } catch (error) {
-      console.error('Memory deletion error:', error);
+      Logger.error('Memory deletion error:', error);
       justToast('Failed to delete memory', 'error');
     }
   },
@@ -681,7 +682,7 @@ ${memory.content_full}
 
       justToast('Memory export completed', 'success');
     } catch (error) {
-      console.error('Memory export error:', error);
+      Logger.error('Memory export error:', error);
       justToast('Failed to export memories', 'error');
     }
   },
@@ -751,7 +752,7 @@ ${memory.content_full}
       this.editMode = false;
       this.editMemoryBackup = null; // discard backup
     } catch (error) {
-      console.error('Error confirming edit mode:', error);
+      Logger.error('Error confirming edit mode:', error);
       justToast('Failed to save memory changes.', 'error');
     }
   },

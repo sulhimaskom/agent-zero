@@ -1,4 +1,5 @@
 import { createStore } from '/js/AlpineStore.js';
+import Logger from '/js/logger.js';
 import { DEFAULTS, TIMING } from '/js/constants.js';
 
 // Global function references
@@ -125,7 +126,7 @@ const model = {
         };
       }
     } catch (error) {
-      console.warn('Failed to get default patterns from backend, using fallback');
+      Logger.warn('Failed to get default patterns from backend, using fallback');
     }
 
     // Fallback patterns (will be overridden by backend on first use)
@@ -232,7 +233,7 @@ const model = {
       editor.clearSelection();
       editor.navigateFileStart();
     } catch (error) {
-      console.error('Failed to format JSON:', error);
+      Logger.error('Failed to format JSON:', error);
       this.error = `Invalid JSON: ${  error.message}`;
     }
   },
@@ -478,7 +479,7 @@ const model = {
         window.URL.revokeObjectURL(url);
       }
     } catch (error) {
-      console.error('Download error:', error);
+      Logger.error('Download error:', error);
     }
   },
 
