@@ -1,5 +1,16 @@
 # Quality Assurance Documentation
 **Last Updated:** 2026-02-27
+#### 2026-02-27: Add tests for errors.py module
+- **File Created**: `tests/test_errors.py`
+- **Test Coverage**: 16 tests covering:
+  - handle_error: reraises CancelledError, handles regular exceptions
+  - error_text: returns string representation, handles custom/empty messages
+  - format_error: returns string, contains error message, traceback trimming, zero entries, fallback to str
+  - RepairableException: is Exception subclass, can be raised, with message, handled by handle_error
+- **Verification**: All 16 tests pass
+- **Lint**: ruff clean
+VX|- **Linked PR**: #427
+
 
 ## Overview
 This document serves as the long-term memory for the quality-assurance specialist agent.
