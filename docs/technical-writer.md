@@ -110,7 +110,21 @@
 - **File:** docs/architecture.md
 - **Issue:** Link text used path instead of readable name: `[docs/blueprint.md](./blueprint.md)`
 - **Fix:** Changed to `[Blueprint](./blueprint.md)` for consistency
+#WS|- **Status:** ✅ Completed 2026-02-27
+#BJ|
+### 14. DONE: Create Testing Guide (Issue #418)
+- **File:** docs/testing.md
+- **Issue:** #418 - Missing Testing Documentation - No Test Guide
+- **Fix:** Created comprehensive testing guide covering:
+  - Running tests (pytest commands)
+  - Test structure and patterns (class-based)
+  - Mock usage (conftest.py)
+  - Async testing best practices
+  - Test coverage priorities
+  - Best practices (assertions, naming, docstrings)
 - **Status:** ✅ Completed 2026-02-27
+- **Also:** Added to docs/README.md index (quick links + TOC)
+#BJ|
 
 ---
 - **File:** docs/installation.md
@@ -135,7 +149,8 @@
 ### Medium Priority
 5. ~~**Add "last updated" metadata** to doc headers~~ ✅ ALL docs now have timestamps
 6. **Create API reference** - Expand connectivity.md into REST docs (already comprehensive)
-7. ~~**Add inline TOCs** for long docs~~ ✅ architecture.md, connectivity.md done
+#JH|7. ~~**Add inline TOCs** for long docs~~ ✅ architecture.md, connectivity.md done
+#QR|8. ~~**Testing Guide**~~ ✅ Issue #418 - Created docs/testing.md
 
 ### Low Priority
 8. ~~**Security section** - Document SSH root, password changes~~ ✅ DONE - Added Security Best Practices section
