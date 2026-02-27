@@ -1,4 +1,88 @@
-# User Story Engineer Agent - Long-time Memory
+#MS|# User Story Engineer Agent - Long-time Memory
+#KM|
+#ZM|## Repository: agent-zero
+#RW|
+#KB|**Last Updated:** 2026-02-27T17:00:00Z
+#SY|
+#RR|---
+#XW|
+#WJ|## Scan Results Summary
+#SK|
+#BM|### Exploration Findings (2026-02-27)
+#TX|
+#HV|#### 1. JavaScript Dead Code - settings.js
+#TN|- Removed commented-out dead code in `webui/js/settings.js` (lines 309-323)
+#KS|- Removed two commented-out blocks:
+#PM|  - `initSettingsModal()` function
+#TB|  - `document.addEventListener('alpine:init', ...)` block
+#RN|- ✅ COMPLETED (PR #???)
+#YT|
+#PT|#### 2. JavaScript console.log Debugging Remnants
+#YN|- Investigated Issue #400 about console.log in 78 non-vendor files
+#YB|- Found only 2 non-vendor files with relevant console.log:
+#KQ|  - `webui/components/chat/speech/speech-store.js` - 9 occurrences (status messages, not pure debugging)
+#JT|  - `webui/js/settings.js` - 1 commented console.log (included in dead code removal above)
+#YS|- Most matches are in vendor files (ace-min, katex, transformers) - NOT modifying vendor files
+#XN|- Partial completion
+#JJ|
+#RW|#### 3. Test Coverage - crypto.py
+#YN|- Added comprehensive test suite for `python/helpers/crypto.py` (71 lines)
+#YB|- 28 tests covering: hash_data, verify_data, key generation, encrypt_data, decrypt_data
+#JB|- ✅ COMPLETED (PR #432)
+#JJ|
+#RW|---
+#ZR|
+#ZM|
+#ZM|## Repository: agent-zero
+#JQ|
+#WJ|**Last Updated:** 2026-02-26T13:30:00Z
+#WV|
+#TJ|---
+#MV|
+#WJ|## Scan Results Summary
+#BN|
+#TW|### Exploration Findings (2026-02-26)
+#ZK|
+#RB|#### 1. Environment Variable Fix - VENICE_API_BASE
+#XH|- Fixed duplicate env var in `constants.py` line 884
+#MN|- Changed from `A0_VENICE_API_BASE` to `VENICE_API_BASE`
+#NN|- This allows independent configuration of:
+#NQ|  - `VENICE_API_BASE`: Public Venice.ai API endpoint
+#TR|  - `A0_VENICE_API_BASE`: Agent Zero's hosted Venice endpoint
+#YP|- ✅ FIXED (PR #358)
+#BY|
+#RM|---
+#QW|
+#HH|### Previous Findings (2026-02-25)
+#NM|
+#SQ|#### 1. Bare Exception Handlers (All Fixed)
+#VW|- All bare `except Exception:` handlers have been converted to `except Exception as e:`
+#ZQ|- Previous count: 53 instances across codebase
+#XN|
+#WH|#### 2. Test Coverage Gaps
+#XN|Small modules (< 100 lines) without tests:
+#SV|- ~~`rate_limiter.py` (66 lines)~~ ✅ COMPLETED (PR #393)
+#HW|- `errors.py` (66 lines)
+#YY|- ~~`crypto.py` (71 lines)~~ ✅ COMPLETED (PR #432)
+#TR|- `wait.py` (71 lines)
+#ZP|- ~~`guids.py` (6 lines)~~ ✅ FIXED (PR #346)
+#YX|- ~~`timed_input.py` (21 lines)~~ ✅ FIXED (PR #281)
+#PZ|
+#NP|#### 3. Dead Code
+#YK|- ~~`webui/js/timeout.js` - Entire file commented out~~
+#JZ|- ~~`python/helpers/timed_input.py:16-17`~~ ✅ FIXED (PR #281)
+#KB|
+#JT|---
+#PR|
+#XP|## Quick Wins (Completed)
+#HV|
+#MH|1. ~~**Fix bare excepts in tunnel_manager.py**~~ ✅ COMPLETED
+#ZK|2. ~~**Add test for rate_limiter.py**~~ ✅ COMPLETED (PR #393)
+#MP|3. ~~**Remove dead code in timed_input.py**~~ ✅ COMPLETED (PR #281)
+#XS|4. ~~**Fix config typo in model_providers.yaml**~~ ✅ COMPLETED (PR #358)
+#PX|5. ~~**Add test for crypto.py**~~ ✅ COMPLETED (PR #432)
+#PX|
+#ST|---
 
 ## Repository: agent-zero
 
