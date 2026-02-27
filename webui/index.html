@@ -1057,12 +1057,12 @@
                                         x-effect="$el.style.display = (!isLoading && filteredTasks.length > 0) ? '' : 'none'">
                                         <thead>
                                             <tr>
-                                                <th @click="changeSort('name')">
+                                                <th @click="changeSort('name')" @keydown.enter.prevent="changeSort('name')" @keydown.space.prevent="changeSort('name')" tabindex="0" role="button" aria-label="Sort by name">
                                                     Name
                                                     <span class="scheduler-sort-indicator" x-show="sortField === 'name'"
                                                         :class="{'scheduler-sort-desc': sortDirection === 'desc'}">↑</span>
                                                 </th>
-                                                <th @click="changeSort('state')">
+                                                <th @click="changeSort('state')" @keydown.enter.prevent="changeSort('state')" @keydown.space.prevent="changeSort('state')" tabindex="0" role="button" aria-label="Sort by state">
                                                     State
                                                     <span class="scheduler-sort-indicator"
                                                         x-show="sortField === 'state'"
@@ -1071,7 +1071,7 @@
                                                 <th>Type</th>
                                                 <th>Project</th>
                                                 <th>Schedule</th>
-                                                <th @click="changeSort('last_run')">
+                                                <th @click="changeSort('last_run')" @keydown.enter.prevent="changeSort('last_run')" @keydown.space.prevent="changeSort('last_run')" tabindex="0" role="button" aria-label="Sort by last run">
                                                     Last Run
                                                     <span class="scheduler-sort-indicator"
                                                         x-show="sortField === 'last_run'"
@@ -1082,7 +1082,7 @@
                                         </thead>
                                         <tbody>
                                             <template x-for="task in filteredTasks" :key="task.uuid">
-                                                <tr @click="showTaskDetail(task.uuid)">
+                                                <tr @click="showTaskDetail(task.uuid)" @keydown.enter.prevent="showTaskDetail(task.uuid)" @keydown.space.prevent="showTaskDetail(task.uuid)" tabindex="0" role="button" :aria-label="'View task: ' + task.name">
                                                     <td>
                                                         <span x-text="task.name"></span>
                                                     </td>

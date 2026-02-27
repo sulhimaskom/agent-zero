@@ -1,6 +1,6 @@
 # UI/UX Engineer - Long-term Memory
 
-**Last Updated:** 2026-02-25
+**Last Updated:** 2026-02-26
 **Agent:** ui-ux-engineer
 
 ## Overview
@@ -79,16 +79,7 @@ This document tracks UI/UX improvements, accessibility standards, and patterns f
 ```
 
 ## Action Items (Next Sprint)
-#ZJ|- [x] Audit all modal close buttons (context.html, history.html - DONE 2026-02-25)
-#YZ|- [ ] Check form validation accessibility
-#MH|- [ ] Review notification toast accessibility
-## Action Items (Next Sprint)
-#ZJ|- [x] Audit all modal close buttons (context.html, history.html - DONE 2026-02-25)
-#YZ|- [ ] Check form validation accessibility
-#MH|- [ ] Review notification toast accessibility
-#VK|- [ ] Test keyboard navigation flow
-KR|
-- [ ] Audit all modal close buttons
+- [x] Audit all modal close buttons (context.html, history.html - DONE 2026-02-25)
 - [ ] Check form validation accessibility
 - [ ] Review notification toast accessibility
 - [ ] Test keyboard navigation flow
@@ -104,28 +95,34 @@ KR|
 - Pattern: Both console.error (for devs) AND toast (for users) used together
 
 ### Issue #243 - First-Time Setup Wizard
-#HZ|**Status:** ✅ COMPLETED (2026-02-25)
-#KS|- Setup wizard component exists at setup-wizard-store.js
-#KJ|- Accessibility improvements completed (close button, logo alt, keyboard nav)
-#ZJ|- [x] Audit all modal close buttons (context.html, history.html - DONE)
-#YZ|- [ ] Check form validation accessibility
-#MH|- [ ] Review notification toast accessibility
-#VK|- [ ] Test keyboard navigation flow
-
-### PR #314 - Accessibility Improvements (2026-02-25)
-#HZ|**Status:** ✅ OPEN
-#KS|- Added aria-labels to sidebar quick-actions.html (8 buttons)
-#KJ|- Added aria-labels to chat input bottom-actions.html (6 buttons)
-#ZJ|- Added close buttons with aria-labels to context.html and history.html modals
-#YZ|- Added label association to tunnel-section.html select element
-#MH|- Improves screen reader support and keyboard navigation
-**Status:** 🔄 IN PROGRESS
+**Status:** ✅ COMPLETED (2026-02-25)
 - Setup wizard component exists at setup-wizard-store.js
 - Accessibility improvements completed (close button, logo alt, keyboard nav)
-- [ ] Audit all modal close buttons
-- [ ] Check form validation accessibility
-- [ ] Review notification toast accessibility
-- [ ] Test keyboard navigation flow
+
+### PR #314 - Accessibility Improvements (2026-02-25)
+**Status:** ✅ COMPLETED
+- Added aria-labels to sidebar quick-actions.html (8 buttons)
+- Added aria-labels to chat input bottom-actions.html (6 buttons)
+- Added close buttons with aria-labels to context.html and history.html modals
+- Added label association to tunnel-section.html select element
+- Improves screen reader support and keyboard navigation
+
+## Completed Work
+
+### Scheduler Table Accessibility (2026-02-26)
+**Status:** ✅ COMPLETED
+
+Fixed keyboard accessibility issues in the scheduler task table (`webui/index.html`):
+
+1. **Table Headers (th elements)** - Added keyboard support to sortable columns:
+   - Name column header (line 1060): Added `@keydown.enter.prevent`, `@keydown.space.prevent`, `tabindex="0"`, `role="button"`, `aria-label="Sort by name"`
+   - State column header (line 1065): Added `@keydown.enter.prevent`, `@keydown.space.prevent`, `tabindex="0"`, `role="button"`, `aria-label="Sort by state"`
+   - Last Run column header (line 1074): Added `@keydown.enter.prevent`, `@keydown.space.prevent`, `tabindex="0"`, `role="button"`, `aria-label="Sort by last run"`
+
+2. **Table Rows (tr elements)** - Added keyboard support to task rows:
+   - Task row (line 1085): Added `@keydown.enter.prevent`, `@keydown.space.prevent`, `tabindex="0"`, `role="button"`, `:aria-label="'View task: ' + task.name"`
+
+**Impact:** Users can now navigate and interact with the scheduler table using keyboard (Tab, Enter, Space) instead of only mouse clicks.
 
 ## References
 - WCAG 2.1 Guidelines
