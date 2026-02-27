@@ -16,8 +16,6 @@
                     aria-label="Pause or resume agent processing (Ctrl+Space)"
                     data-keyboard-shortcut="ctrl+space"
                     @click="$store.chatInput.pauseAgent(!$store.chatInput.paused)"
-                    data-keyboard-shortcut="ctrl+space"
-                    @mouseover="showTooltip = true"
                     @mouseleave="showTooltip = false"
                     @focus="showTooltip = true"
                     @blur="showTooltip = false">
@@ -45,8 +43,6 @@
                     aria-label="Import documents into knowledge base (Ctrl+K)"
                     data-keyboard-shortcut="ctrl+k"
                     @click="$store.chatInput.loadKnowledge()"
-                    data-keyboard-shortcut="ctrl+k"
-                    @mouseover="showTooltip = true"
                     @mouseleave="showTooltip = false"
                     @focus="showTooltip = true"
                     @blur="showTooltip = false">
@@ -67,8 +63,6 @@
                     aria-label="Browse and manage files in the workspace (Ctrl+O)"
                     data-keyboard-shortcut="ctrl+o"
                     @click="$store.chatInput.browseFiles()"
-                    data-keyboard-shortcut="ctrl+o"
-                    @mouseover="showTooltip = true"
                     @mouseleave="showTooltip = false"
                     @focus="showTooltip = true"
                     @blur="showTooltip = false">
@@ -90,8 +84,6 @@
                     aria-label="View conversation history and past messages (Ctrl+H)"
                     data-keyboard-shortcut="ctrl+h"
                     @click="$store.history.open()"
-                    data-keyboard-shortcut="ctrl+h"
-                    @mouseover="showTooltip = true"
                     @mouseleave="showTooltip = false"
                     @focus="showTooltip = true"
                     @blur="showTooltip = false">
@@ -112,8 +104,6 @@
                     aria-label="Manage conversation context and settings (Ctrl+Shift+C)"
                     data-keyboard-shortcut="ctrl+shift+c"
                     @click="$store.context.open()"
-                    data-keyboard-shortcut="ctrl+shift+c"
-                    @mouseover="showTooltip = true"
                     @mouseleave="showTooltip = false"
                     @focus="showTooltip = true"
                     @blur="showTooltip = false">
@@ -136,8 +126,6 @@
                     aria-label="Send a nudge to get the agent's attention (Ctrl+N)"
                     data-keyboard-shortcut="ctrl+n"
                     @click="$store.chatInput.nudge()"
-                    data-keyboard-shortcut="ctrl+n"
-                    @mouseover="showTooltip = true"
                     @mouseleave="showTooltip = false"
                     @focus="showTooltip = true"
                     @blur="showTooltip = false">
