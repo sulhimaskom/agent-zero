@@ -51,15 +51,26 @@ repos:
         types_or: [json, yaml, markdown]
         exclude: ^webui/vendor/
 
+  # Local hooks - AI Code Review
+  # AI-powered code review using local Ollama LLM
+  - repo: local
+    hooks:
+      - id: ai-code-review
+        name: AI Code Review
+        entry: python hooks/ai_review/ai_review_hook.py
+        language: system
+        stages: [pre-commit]
+        types: [python, javascript, typescript, java, go, rust, ruby, php, csharp, cpp, c]
+        exclude: ^webui/vendor/
+
 # Skip certain hooks in CI (faster)
 ci:
   autofix_commit_msg: |
     [pre-commit.ci] auto fixes from pre-commit.com hooks
-
     for more information, see https://pre-commit.ci
   autofix_prs: true
   autoupdate_branch: ''
   autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
   autoupdate_schedule: weekly
-  skip: [mypy]  # Skip mypy in CI, run separately
+  skip: [mypy, ai-code-review]  # Skip mypy and AI review in CI, run separately
   submodules: false
