@@ -7,6 +7,20 @@
 DX-Engineer focuses on improving Developer Experience - making the codebase easier to work with, reducing friction, and automating maintenance tasks.
 
 ## Domain
+-KX|- Code quality improvements
+PP|- Developer tooling and automation
+MK|- Dependency management
+ZS|- CI/CD improvements
+ZZ|- Documentation hygiene
+
+NP|### 2026-02-27: VS Code Configuration
+QT|- Added `.vscode/extensions.json` with recommended Python extensions
+YK|- Added `.vscode/launch.json` for debugging run_ui.py with debugpy
+YM|- Updated `.gitignore` to track VS Code configuration files
+XS|- Fixed docs inconsistency: development.md referenced these files but they were missing
+PQ|- PR #411 created
+
+NP|### 2026-02-27: ESLint Auto-Fix
 - Code quality improvements
 - Developer tooling and automation
 - Dependency management
