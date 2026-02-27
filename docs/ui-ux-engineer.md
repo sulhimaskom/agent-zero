@@ -170,3 +170,21 @@ Fixed keyboard accessibility issue in image viewer zoom controls (`webui/compone
    - Added background change on focus for additional visual feedback
 
 **Impact:** Keyboard users can now see which zoom button is focused when navigating with Tab key.
+
+### Welcome Screen Duplicate Content Fix (2026-02-27)
+**Status:** ✅ COMPLETED
+
+Fixed duplicate content bug in welcome screen (`webui/components/welcome/welcome-screen.html`):
+
+1. **Removed Duplicate Title and Subtitle** - Lines 33-38 contained duplicate "Welcome to Agent Zero" title and subtitle that was already displayed at lines 19-22.
+
+**Impact:** Eliminates visual redundancy and improves user experience on the welcome screen.
+
+### Memory Dashboard Accessibility (2026-02-27)
+**Status:** ✅ COMPLETED
+
+Added missing aria-label to Clear button in memory dashboard (`webui/components/settings/memory/memory-dashboard.html`):
+
+1. **Clear Button** - Added `aria-label="Clear search"` to improve screen reader accessibility.
+
+**Impact:** Screen readers will now properly announce the Clear button function.
