@@ -21,7 +21,7 @@ class Delegation(Tool):
             if agent_profile:
                 config.profile = agent_profile
 
-            # crate agent
+            # create agent
             sub = Agent(self.agent.number + 1, config, self.agent.context)
             # register superior/subordinate
             sub.set_data(Agent.DATA_NAME_SUPERIOR, self.agent)
