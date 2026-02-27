@@ -3,6 +3,11 @@ import { updateChatInput, sendMessage } from "/index.js";
 import { sleep } from "/js/sleep.js";
 import { store as microphoneSettingStore } from "/components/settings/speech/microphone-setting-store.js";
 import * as shortcuts from "/js/shortcuts.js";
+import { Logger } from "/js/logger.js";
+import { updateChatInput, sendMessage } from "/index.js";
+import { sleep } from "/js/sleep.js";
+import { store as microphoneSettingStore } from "/components/settings/speech/microphone-setting-store.js";
+import * as shortcuts from "/js/shortcuts.js";
 
 const Status = {
   INACTIVE: "inactive",
@@ -74,7 +79,7 @@ const model = {
       if (device != this.selectedDevice) {
         this.selectedDevice = device;
         this.microphoneInput = null;
-        console.log("Device changed, microphoneInput reset");
+      Logger.debug("Device changed, microphoneInput reset");
       }
 
       if (!this.microphoneInput) {
@@ -95,7 +100,9 @@ const model = {
   async init() {
     // Guard against multiple initializations
     if (this._initialized) {
-      console.log(
+      Logger.debug(
+        "[Speech Store] Already initialized, skipping duplicate init()"
+      );
         "[Speech Store] Already initialized, skipping duplicate init()"
       );
       return;
@@ -142,7 +149,7 @@ const model = {
     const enableAudio = () => {
       if (!this.userHasInteracted) {
         this.userHasInteracted = true;
-        console.log("User interaction detected - audio playback enabled");
+        Logger.info("User interaction detected - audio playback enabled");
 
         // Create a dummy audio context to "unlock" audio
         try {
@@ -150,7 +157,7 @@ const model = {
             window.webkitAudioContext)();
           this.audioContext.resume();
         } catch (e) {
-          console.log("AudioContext not available");
+          Logger.warn("AudioContext not available");
         }
       }
     };
@@ -398,7 +405,7 @@ const model = {
       displayTime: 5000,
       frontendOnly: true,
     });
-    console.log("Please click anywhere on the page to enable audio playback");
+    Logger.info("Please click anywhere on the page to enable audio playback");
   },
 
   // Browser TTS
@@ -680,7 +687,7 @@ class MicrophoneInput {
 
     const oldStatus = this._status;
     this._status = newStatus;
-    console.log(`Mic status changed from ${oldStatus} to ${newStatus}`);
+    Logger.debug(`Mic status changed from ${oldStatus} to ${newStatus}`);
 
     this.handleStatusChange(oldStatus, newStatus);
   }
@@ -776,7 +783,7 @@ class MicrophoneInput {
     if (!this.hasStartedRecording && this.mediaRecorder.state !== "recording") {
       this.hasStartedRecording = true;
       this.mediaRecorder.start(1000);
-      console.log("Speech started");
+      Logger.debug("Speech started");
     }
     if (this.waitingTimer) {
       clearTimeout(this.waitingTimer);
@@ -885,7 +892,7 @@ class MicrophoneInput {
       const text = this.filterResult(result.text || "");
 
       if (text) {
-        console.log("Transcription:", result.text);
+        Logger.debug("Transcription:", result.text);
         await this.updateCallback(result.text, true);
       }
     } catch (error) {
@@ -920,7 +927,7 @@ class MicrophoneInput {
       ok = true;
     }
     if (ok) return text;
-    else console.log(`Discarding transcription: ${text}`);
+    else Logger.debug(`Discarding transcription: ${text}`);
   }
 
   // Toggle microphone between active and inactive states
