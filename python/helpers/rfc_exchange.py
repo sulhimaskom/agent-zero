@@ -1,3 +1,9 @@
+"""RFC Exchange utilities for Agent Zero.
+
+Handles root password retrieval and encryption for development environments.
+"""
+
+
 from python.helpers import crypto, dotenv, runtime
 
 

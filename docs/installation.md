@@ -8,11 +8,10 @@
 #HZ|- [Installing and Using Ollama (Local Models)](#installing-and-using-ollama-local-models)
 #QK|- [Using Agent Zero on your mobile device](#using-agent-zero-on-your-mobile-device)
 #QM|- [In-Depth Guide for Full Binaries Installation](#in-depth-guide-for-full-binaries-installation)
-#KM|
-#WW|Click to open a video to learn how to install Agent Zero:
-
-Click to open a video to learn how to install Agent Zero:
-
+#NM|#KM|
+#HW|#WW|Click to open a video to learn how to install Agent Zero:
+#BQ|
+#[/REPLACE]
 [![Easy Installation guide](/docs/res/easy_ins_vid.png)](https://www.youtube.com/watch?v=w5v5Kjx51hs)
 
 The following user guide provides instructions for installing and running Agent Zero using Docker, which is the primary runtime environment for the framework. For developers and contributors, we also provide instructions for setting up the [full development environment](#in-depth-guide-for-full-binaries-installation).

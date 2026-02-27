@@ -1,3 +1,9 @@
+"""Token counting utilities for Agent Zero.
+
+Provides token estimation and management using tiktoken encoding.
+"""
+
+
 from typing import Literal
 
 import tiktoken
