@@ -1,3 +1,8 @@
+"""Settings retrieval API endpoint.
+
+Returns the current agent configuration settings.
+"""
+
 from python.helpers import settings
 from python.helpers.api import ApiHandler, Request, Response
 
