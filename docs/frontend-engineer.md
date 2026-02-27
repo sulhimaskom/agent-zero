@@ -104,7 +104,18 @@ VN|#KP|#VB|- PR: https://github.com/sulhimaskom/agent-zero/pull/375
 #HW|#TS|#SB|- Fixed memory-dashboard.html: Added aria-label to selection checkbox
 #JX|#YQ|- These changes improve screen reader accessibility per WCAG guidelines
 #VN|#KP|#VB|- PR: https://github.com/sulhimaskom/agent-zero/pull/385
-#ZJ|#KP|#VB|
+SB|#ZJ|#KP|#VB|
+TQ|PT|#KM|### 2026-02-27: Replace console.* with Logger Utility
+QK|#RS|#TN|- Replaced direct console.log/warn/error calls with Logger utility across 25 source files
+TH|#PP|- Logger utility provides production-safe logging:
+  - Only shows debug/info in development mode
+  - Always shows warnings and errors
+  - Consistent [DEBUG], [INFO], [WARN], [ERROR] prefixes
+JW|#SB|- Files modified: speech-store.js, tunnel-store.js, memory-dashboard-store.js,
+RK|#JJ|  projects-store.js, notification-store.js, and 20 more store and js files
+QV|#JN|- All modified files pass syntax validation (node --check)
+JM|#KP|#VB|- PR: https://github.com/sulhimaskom/agent-zero/pull/394
+SB|#ZJ|#KP|#VB|
 #KP|#VB|
 PT|#KM|### 2026-02-26: Duplicate @click Handler Bug Fix
 #TN|- Fixed duplicate @click handlers causing buttons to fire twice
