@@ -230,7 +230,7 @@ class Topic(Record):
         processed_messages = []
         for m in messages:
             msg_text = m.output_text()
-            
+
             # Check if message contains image data (RawMessage with vision content)
             content = m.content
             if _is_raw_message(content):
@@ -244,7 +244,7 @@ class Topic(Record):
                         msg_text = "[Image]"
                         processed_messages.append(msg_text)
                         continue
-            
+
             # Replace any remaining base64 image data URLs with placeholder
             # Pattern to match data:image/...;base64,... URLs
             msg_text = re.sub(r"data:image/[^;]+;base64,[A-Za-z0-9+/=]+", "[Image]", msg_text)
@@ -302,7 +302,7 @@ class Bulk(Record):
     async def summarize(self):
         # Replace image data with placeholders before sending to utility model
         output_text_val = self.output_text()
-        
+
         # Check if any record contains image data
         has_vision = False
         for r in self.records:
@@ -315,7 +315,7 @@ class Bulk(Record):
                     ):
                         has_vision = True
                         break
-        
+
         if has_vision:
             output_text_val = "[Image]"
         else:
