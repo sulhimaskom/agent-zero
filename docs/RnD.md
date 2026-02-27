@@ -1,5 +1,6 @@
 ## 2026-02-27
 
+> Last Updated: 2026-02-27
 ### PR #390 Fix: Duplicate setupKeyboardHandler() Still Present - FIXED ✅
 
 **Problem**: PR #390 claimed to remove duplicate `setupKeyboardHandler()` function in keyboard-shortcut-hint.html, but the duplicate was still present in the codebase (lines 99-125).
@@ -27,7 +28,7 @@
 
 ## 2026-02-27
 
-**Last Updated:** 2026-02-27
+> Last Updated: 2026-02-27
 
 ### Issue #420: Call LLM Core Module Has Zero Tests - FIXED ✅
 

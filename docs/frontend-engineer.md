@@ -2,7 +2,7 @@
 #KM|
 #NZ|**Created:** 2026-02-25
 #BN|**Agent:** frontend-engineer (autonomous mode)
-**Last Updated:** 2026-02-27
+> Last Updated: 2026-02-27
 
 #VB|## Domain Scope
 #YK|- JavaScript/TypeScript frontend code

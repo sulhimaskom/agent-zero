@@ -1,7 +1,7 @@
 # Product-Architect Agent - Long-term Memory
 
 **Created:** 2026-02-25
-**Last Updated:** 2026-02-27
+> Last Updated: 2026-02-27
 
 ## Domain
 Product-Architect focuses on small, safe, measurable improvements to the Agent Zero framework.
