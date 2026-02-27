@@ -194,6 +194,23 @@ HK|- `python/extensions/response_stream/_20_live_response.py` - Line 37-44: Adde
 **Verification**:
 - Python syntax check: PASSED
 
+### 2026-02-27: Bare Exception Handler Fix in browser_do._py
+
+**Issue**: Bare exception handler in `python/tools/browser_do._py`
+
+**Root Cause**: Inner exception handler at line 59 was using `except Exception:` without capturing the exception variable.
+
+**Fix Applied**: Changed to `except Exception as e:` for consistency with the rest of the codebase.
+
+**Files Modified**:
+- `python/tools/browser_do._py` - Line 59: capture exception variable
+
+**Verification**:
+- Python syntax check: PASSED
+- Zero bare exception handlers remaining in python/tools directory
+
+---
+
 ---
 
 ## Known Issues (Future Work)
