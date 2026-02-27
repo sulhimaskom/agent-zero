@@ -229,3 +229,44 @@ Added path traversal validation using the existing `files.is_in_base_dir()` func
 ---
 
 ## 2026-02-26: XSS Vulnerability in messages.js
+## 2026-02-27: Additional XSS Vulnerabilities in messages.js
+
+---
+
+**Issue**: Additional XSS vulnerabilities found via proactive security scan
+**Date Fixed**: 2026-02-27
+**Severity**: MEDIUM (XSS)
+**Files Changed**: 
+- `webui/js/messages.js`
+
+**Vulnerabilities Fixed**:
+
+### 1. Line 430 - heading innerHTML injection
+The `heading` variable was inserted directly into innerHTML without escaping:
+```javascript
+// Before:
+headingElement.innerHTML = `${heading} <span class='icon material-symbols-outlined'>person</span>`;
+
+// After:
+headingElement.innerHTML = `${escapeHTML(heading)} <span class='icon material-symbols-outlined'>person</span>`;
+```
+
+### 2. Line 959 - part variable in convertPathsToLinks
+The `part` variable (visible link text) was inserted without HTML escaping:
+```javascript
+// Before:
+html += `/<a href="#" class="path-link" onclick="openFileLink('${conc.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}');">${part}</a>`;
+
+// After:
+html += `/<a href="#" class="path-link" onclick="openFileLink('${conc.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}');">${escapeHTML(part)}</a>`;
+```
+
+**Testing**:
+- JavaScript syntax validated with `node --check`
+- Uses existing `escapeHTML()` function already in the codebase
+
+**Scan Summary**:
+- ✅ No eval/exec/compile with user input
+- ✅ No shell=True in subprocess calls
+- ✅ Path traversal protection via is_in_base_dir()
+- ✅ Terminal runtime (tty_session.py) - by design, Docker-isolated
