@@ -1,3 +1,29 @@
+## 2026-02-27 (Session 2)
+
+### Issue: Memory Leak - Duplicate Function Overriding Cleanup (keyboard-shortcut-hint.html)
+
+**Problem**: keyboard-shortcut-hint.html had a duplicate `setupKeyboardHandler()` function definition. The second definition (lines 99-125) used anonymous event handlers without storing references, overriding the first proper implementation (lines 51-80) that had handler references and `$cleanup()` method.
+
+**Root Cause**: Code duplication - developer added new implementation without removing old one, causing:
+- 2 anonymous event listeners without cleanup (keydown, click)
+- Memory leak every time the component initialized
+
+**Solution Applied**:
+- Removed duplicate `setupKeyboardHandler()` function (27 lines)
+- Restored proper implementation with handler references
+- Event listeners now properly cleaned up via `$cleanup()` method
+
+**Files Changed**:
+- `webui/components/keyboard-shortcut-hint/keyboard-shortcut-hint.html`
+
+**Impact**:
+- Before: 5 addEventListener vs 2 removeEventListener (3 leaked)
+- After: 3 addEventListener vs 2 removeEventListener (1 Alpine lifecycle event doesn't need cleanup)
+
+**Status**: Fixed - Memory leak resolved
+
+---
+
 ## 2026-02-27
 **Last Updated:** 2026-02-27
 
