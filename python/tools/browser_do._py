@@ -56,7 +56,7 @@
 #                 dom = await self.state.browser.get_clean_dom()
 #                 response = f"Error:\n{response}\n\nDOM:\n{dom}"
 #                 self.log.update(screenshot=screenshot)
-#             except Exception:
+#             except Exception as e:
 #                 pass
 
 #         self.cleanup_history()
