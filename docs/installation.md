@@ -216,10 +216,47 @@ Agent Zero provides a comprehensive settings interface to customize various aspe
 - **RFC Password:** Configure password for remote function calls
 Learn more about Remote Function Calls and their purpose [here](#7-configure-agent-zero-rfc).
 
-> [!IMPORTANT]
-> Always keep your API keys and passwords secure.
 
-# Choosing Your LLMs
+
+## Security Best Practices
+
+When running Agent Zero, especially in production or exposed to the internet, follow these security guidelines:
+
+### Authentication
+
+- **Always set UI credentials:** Configure a strong username and password in Settings > Authentication before exposing Agent Zero to the internet. Without authentication, anyone can access your instance.
+
+- **Use strong passwords:** Choose long, unique passwords for both the UI login and any SSH/RFC access.
+
+### Network Exposure
+
+- **Don't expose SSH port 22:** The SSH service is intended for development and RFC connections between local instances. Do not expose port 22 to the public internet.
+
+- **Use a reverse proxy with TLS:** If exposing Agent Zero publicly, put it behind a reverse proxy (like nginx or Caddy) with HTTPS enabled.
+
+- **Restrict access via firewall:** If using Agent Zero locally, consider firewall rules to limit who can access the web UI and API.
+
+### API Keys and Secrets
+
+- **Keep API keys secure:** Never commit API keys to version control. Use environment variables or the secrets system.
+
+- **Scope secrets to projects:** If using the Projects feature, scope sensitive variables to the specific project that needs them.
+
+- **Rotate credentials periodically:** Change passwords and regenerate API tokens periodically.
+
+### Docker Security
+
+- **Run as non-root when possible:** The default container runs as root for SSH functionality. If you don't need SSH access, consider running as a non-root user.
+
+- **Keep Docker updated:** Regularly update your Docker installation and the Agent Zero image to get security patches.
+
+> [!TIP]
+> For production deployments, review the Docker security best practices and consider using tools like Docker Bench for Security.
+
+> [!WARNING]
+> Agent Zero is a powerful tool that can execute arbitrary code and access your filesystem. Always run in an isolated environment (like Docker) and be cautious about what you ask the agent to do.
+
+## Choosing Your LLMs
 The Settings page is the control center for selecting the Large Language Models (LLMs) that power Agent Zero.  You can choose different LLMs for different roles:
 
 | LLM Role | Description |

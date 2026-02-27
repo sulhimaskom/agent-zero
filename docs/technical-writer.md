@@ -2,7 +2,7 @@
 
 ## Repository: agent-zero
 
-**Last Updated:** 2026-02-26
+**Last Updated:** 2026-02-27
 
 ---
 
@@ -13,11 +13,11 @@
 | File | Lines | Purpose |
 |------|-------|---------|
 | README.md | 69 | Index/TOC |
-| installation.md | ~600 | Setup guide |
+| installation.md | ~485 | Setup guide (with Security Best Practices) |
 | usage.md | ~500 | User guide |
 | development.md | ~300 | Dev environment |
 | extensibility.md | ~400 | Extensions |
-| connectivity.md | ~596 | API, MCP, A2A (with inline TOC) |
+| connectivity.md | ~600 | API, MCP, A2A (with inline TOC) |
 | architecture.md | ~408 | System design |
 | configuration.md | ~443 | Config guide (merged) |
 | troubleshooting.md | ~280 | FAQ (expanded) |
@@ -70,27 +70,41 @@
 - **Files:** docs/quickstart.md, docs/contribution.md, docs/tunnel.md
 - **Issue:** No timestamp to identify when docs were last updated
 - **Fix:** Added "> Last Updated: 2026-02-26" metadata to three key docs
-73#ZW|- **Status:** ✅ Completed 2026-02-26
-#HQ|
-#XP|### 8. DONE: Add "Last Updated" metadata to 9 key docs
-#BM|- **Files:** docs/usage.md, docs/extensibility.md, docs/blueprint.md, docs/installation.md, docs/troubleshooting.md, docs/development.md, docs/mcp_setup.md, docs/notifications.md, docs/task.md
-#HM|- **Issue:** Major user-facing docs without timestamps
-#PV|- **Fix:** Added "> Last Updated: 2026-02-26" metadata to nine key docs
-#ZW|- **Status:** ✅ Completed 2026-02-26
-#HQ|
-#XP|### 9. DONE: Add inline TOC to 4 large docs
-#BM|- **Files:** docs/usage.md, docs/extensibility.md, docs/blueprint.md, docs/installation.md
-#HM|- **Issue:** Large docs without navigation aid
-#PV|- **Fix:** Added inline Table of Contents to four large docs
-#ZW|- **Status:** ✅ Completed 2026-02-26
+- **Status:** ✅ Completed 2026-02-26
+
+### 8. DONE: Add "Last Updated" metadata to 9 key docs
+- **Files:** docs/usage.md, docs/extensibility.md, docs/blueprint.md, docs/installation.md, docs/troubleshooting.md, docs/development.md, docs/mcp_setup.md, docs/notifications.md, docs/task.md
+- **Issue:** Major user-facing docs without timestamps
+- **Fix:** Added "> Last Updated: 2026-02-26" metadata to nine key docs
+- **Status:** ✅ Completed 2026-02-26
+
+### 9. DONE: Add inline TOC to 4 large docs
+- **Files:** docs/usage.md, docs/extensibility.md, docs/blueprint.md, docs/installation.md
+- **Issue:** Large docs without navigation aid
+- **Fix:** Added inline Table of Contents to four large docs
+- **Status:** ✅ Completed 2026-02-26
+
 ### 10. DONE: Add "Last Updated" metadata to 4 key docs
 - **Files:** docs/connectivity.md, docs/architecture.md, docs/configuration.md, docs/README.md
 - **Issue:** Key user-facing docs without timestamps
 - **Fix:** Added "> Last Updated: 2026-02-26" metadata to four key docs
 - **Status:** ✅ Completed 2026-02-26
 
----
-#XP|---
+### 11. DONE: Add "Last Updated" metadata to 10 agent docs
+- **Files:** DX-engineer.md, Growth-Innovation-Strategist.md, Product-Architect.md, RnD.md, ai-agent-engineer.md, frontend-engineer.md, modular-configuration-analysis.md, platform-engineer.md, quality-assurance.md, security-engineer.md
+- **Issue:** Agent documentation files missing timestamps
+- **Fix:** Added "> Last Updated: 2026-02-27" to all 10 files
+- **Status:** ✅ Completed 2026-02-27
+
+### 12. DONE: Add Security Best Practices section
+- **File:** docs/installation.md
+- **Issue:** No consolidated security guidance for users
+- **Fix:** Added new "Security Best Practices" section covering:
+  - Authentication (UI credentials, strong passwords)
+  - Network Exposure (SSH, reverse proxy, firewall)
+  - API Keys and Secrets (secure handling, scoping, rotation)
+  - Docker Security (non-root, updates)
+- **Status:** ✅ Completed 2026-02-27
 
 ---
 
@@ -103,29 +117,12 @@
 4. ~~**Add A2A protocol documentation**~~ ✅ DONE (PR #306)
 
 ### Medium Priority
-HJ|5. ~~**Add "last updated" metadata** to doc headers~~ ✅ ALL docs now have timestamps
-PJ|6. **Create API reference** - Expand connectivity.md into REST docs
-JH|7. ~~**Add inline TOCs** for long docs~~ ✅ architecture.md, connectivity.md done
-BP|
-QK|### Low Priority
-XV|8. **Security section** - Document SSH root, password changes
-WR|9. **Add version numbers** to docs showing which version they apply to
-PP|
-XK|---
-PV|
-VB|## Completed This Session
-BP|
-XS|### 11. DONE: Add "Last Updated" metadata to 10 agent docs
-NK|- **Files:** DX-engineer.md, Growth-Innovation-Strategist.md, Product-Architect.md, RnD.md, ai-agent-engineer.md, frontend-engineer.md, modular-configuration-analysis.md, platform-engineer.md, quality-assurance.md, security-engineer.md
-HM|- **Issue:** Agent documentation files missing timestamps
-PV|- **Fix:** Added "> Last Updated: 2026-02-27" to all 10 files
-NX|- **Status:** ✅ PR #386
-SW|
-6. **Create API reference** - Expand connectivity.md into REST docs
+5. ~~**Add "last updated" metadata** to doc headers~~ ✅ ALL docs now have timestamps
+6. **Create API reference** - Expand connectivity.md into REST docs (already comprehensive)
 7. ~~**Add inline TOCs** for long docs~~ ✅ architecture.md, connectivity.md done
 
 ### Low Priority
-8. **Security section** - Document SSH root, password changes
+8. ~~**Security section** - Document SSH root, password changes~~ ✅ DONE - Added Security Best Practices section
 9. **Add version numbers** to docs showing which version they apply to
 
 ---
