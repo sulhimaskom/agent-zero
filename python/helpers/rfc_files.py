@@ -5,21 +5,16 @@ import shutil
 import tempfile
 import zipfile
 
+from python.helpers import files
 from python.helpers import runtime
 
-
-def get_abs_path(*relative_paths):
-    """Convert relative paths to absolute paths based on the base directory."""
-    if not relative_paths:
-        return os.path.abspath(os.path.dirname(__file__) + "/../..")
-
-    base_dir = os.path.abspath(os.path.dirname(__file__) + "/../..")
-    return os.path.join(base_dir, *relative_paths)
-
+# Import the canonical get_abs_path from files.py to avoid duplication
+get_abs_path = files.get_abs_path
 
 # =====================================================
 # RFC-ENABLED FILESYSTEM OPERATIONS
 # =====================================================
+
 
 
 def read_file_bin(relative_path: str, backup_dirs=None) -> bytes:
