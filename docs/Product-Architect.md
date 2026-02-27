@@ -63,6 +63,12 @@ As of 2026-02-25, agent profiles in `/agents/` have this structure:
 #KV|- Focus on small, incremental improvements rather than large refactors
 #BQ|
 ## Completed Improvements
+- **2026-02-27**: Added module docstrings to `api.py` and `call_llm.py` - improves code readability for key helper modules.
+- **2026-02-27**: Fixed memory leak in `keyboard-shortcuts.js` - Added `cleanupKeyboardShortcuts()` function to properly remove keydown event listener. Balances addEventListener (1) with removeEventListener (1), addressing Issue #317. PR #384.
+- **2026-02-27**: Added module docstrings to `errors.py`, `rfc_exchange.py`, and `tokens.py` - improves code readability. Fixed duplicate heading in `docs/installation.md`.
+- **2026-02-26**: Added ESLint and Prettier to webui/. JavaScript linting and code formatting tooling for the frontend (Issue #319). PR #343.
+- **2026-02-25**: Fixed `.github/prompt/README.md` - Updated file references from non-existent placeholder files to actual file names (e.g., `01-architect.md` → `01-code-review.md`). PR #311.
+- **2026-02-25**: Closed stale PR #302 - AGENTS.md updates already merged, resolved conflict by closing outdated PR.
 - **2026-02-27**: Fixed memory leak in `keyboard-shortcuts.js` - Added `cleanupKeyboardShortcuts()` function to properly remove keydown event listener. Balances addEventListener (1) with removeEventListener (1), addressing Issue #317. PR #384.
 - **2026-02-27**: Added module docstrings to `errors.py`, `rfc_exchange.py`, and `tokens.py` - improves code readability. Fixed duplicate heading in `docs/installation.md`.
 - **2026-02-26**: Added ESLint and Prettier to webui/. JavaScript linting and code formatting tooling for the frontend (Issue #319). PR #343.

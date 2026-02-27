@@ -1,3 +1,10 @@
+"""API handler base classes and utilities for Agent Zero.
+
+Provides the ApiHandler abstract base class that all API endpoints
+inherit from, along with type definitions and common functionality
+for request/response handling.
+"""
+
 import json
 import threading
 from abc import abstractmethod

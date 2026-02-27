@@ -1,3 +1,9 @@
+"""LLM calling utilities for Agent Zero.
+
+Provides helper functions for calling language models with examples,
+streaming support, and callback handling using LangChain.
+"""
+
 from collections.abc import Callable
 from typing import TypedDict
 
