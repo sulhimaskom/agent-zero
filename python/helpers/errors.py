@@ -1,3 +1,10 @@
+"""Error handling utilities for Agent Zero.
+
+Provides functions for handling, formatting, and reporting errors
+across the framework.
+"""
+
+
 import asyncio
 import re
 import traceback
