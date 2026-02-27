@@ -31,7 +31,7 @@
                     </div>
                     <button @click="$store.projects.openCreateModal()" type="button"
                         class="button projects-create-btn-top">
-                        <span class="icon material-symbols-outlined">add</span> Create project
+                        <span class="icon material-symbols-outlined" aria-hidden="true">add</span> Create project
                     </button>
                 </div>
 
@@ -48,12 +48,24 @@
   <div class="projects-project-card-actions flex gap-5">
     <template x-if="$store.chats.selectedContext && project.name === $store.chats.selectedContext?.project?.name">
       <button type="button" class="button cancel w-9em" title="Deactivate" aria-label="Deactivate" @click="$store.projects.deactivateProject()">
+        <span class="icon material-symbols-outlined" aria-hidden="true">close</span> Deactivate
+      <button type="button" class="button cancel w-9em" title="Deactivate" aria-label="Deactivate" @click="$store.projects.deactivateProject()">
         <span class="icon material-symbols-outlined">close</span> Deactivate
       </button>
     </template>
-    <template x-if="$store.chats.selectedContext && project.name !== $store.chats.selectedContext?.project?.name">
+      <button type="button" class="button confirm w-9em" title="Activate" aria-label="Activate" @click="$store.projects.activateProject(project.name)">
+        <span class="icon material-symbols-outlined" aria-hidden="true">play_arrow</span> Activate
       <button type="button" class="button confirm w-9em" title="Activate" aria-label="Activate" @click="$store.projects.activateProject(project.name)">
         <span class="icon material-symbols-outlined">play_arrow</span> Activate
+=======
+      <button type="button" class="button cancel w-9em" title="Deactivate" @click="$store.projects.deactivateProject()">
+      <span class="icon material-symbols-outlined" aria-hidden="true">close</span> Deactivate
+      </button>
+    </template>
+    <template x-if="$store.chats.selectedContext && project.name !== $store.chats.selectedContext?.project?.name">
+      <button type="button" class="button confirm w-9em" title="Activate" @click="$store.projects.activateProject(project.name)">
+      <span class="icon material-symbols-outlined" aria-hidden="true">play_arrow</span> Activate
+>>>>>>> bdb7ee2d (fix(ui-ux): add aria-hidden to decorative icons for screen reader accessibility)
       </button>
     </template>
     <button type="button" class="button icon-button" title="Edit" aria-label="Edit Project" @click="$store.projects.openEditModal(project.name)">
@@ -73,7 +85,7 @@
                         <div class="projects-project-card-title">There are no projects yet</div>
                         <div class="projects-no-projects-actions">
                             <button @click="$store.projects.openCreateModal()" type="button"
-                                class="button"><span class="icon material-symbols-outlined">add</span>Create project</button>
+                                class="button"><span class="icon material-symbols-outlined" aria-hidden="true">add</span>Create project</button>
                         </div>
                     </div>
                 </template>
