@@ -129,6 +129,10 @@ export function initKeyboardShortcuts() {
   document.addEventListener('keydown', handleKeyDown);
 }
 
+export function cleanupKeyboardShortcuts() {
+  document.removeEventListener('keydown', handleKeyDown);
+}
+
 export function getRegisteredShortcuts() {
   return Object.entries(shortcuts).reduce((acc, [key, value]) => {
     acc[key] = value.description;
