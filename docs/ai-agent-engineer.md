@@ -19,23 +19,6 @@ This document serves as the long-term memory for the ai-agent-engineer domain in
 
 **Fix Applied**: Added exception variable capture (`as e`) and logging print statements.
 
-**Code Change**:
-```python
-# Line 667 - get_server_detail method
-try:
-    tools = server.get_tools()
-except Exception as e:
-    print(f"Failed to get tools for server {server_name}: {e}")
-    tools = []
-
-# Line 971 - get_log method  
-try:
-    log = self.log_file.read()
-except Exception as e:
-    print(f"Failed to read log file: {e}")
-    log = ""
-```
-
 **Files Modified**:
 - `python/helpers/mcp_handler.py` - 2 bare exception handlers fixed
 
@@ -94,17 +77,6 @@ except Exception as e:
 
 **Fix Applied**: Added vision bytes filtering using regex substitution to replace base64 image data URLs with "[Image]" placeholder before sending to utility model.
 
-**Code Change**:
-```python
-async def summarize(self):
-    # Get output text and filter out vision bytes
-    import re
-    output_text = self.output_text()
-    # Replace base64 image data URLs with placeholder
-    filtered_text = re.sub(r"data:image/[^;]+;base64,[A-Za-z0-9+/=]+", "[Image]", output_text)
-    self.summary = await self.history.agent.call_utility_model(...)
-```
-
 **Files Modified**:
 - `python/helpers/history.py` - Topic.summarize() method
 
@@ -148,45 +120,35 @@ async def summarize(self):
 **Verification**:
 - Python syntax check: PASSED
 - Zero bare exception handlers remaining in python/ directory
-NQ|- PR #331 created with ai-agent-engineer label, linked to Issue #309
-HV|
-NZ|---
-VX|
-QR|### 2026-02-26: Exception Handler Logging Fixes
-TV|**Issue**: Multiple exception handlers silently swallowed errors without logging, making debugging difficult
-RT|
-PZ|**Root Cause**: Four locations used bare `pass` statements in exception handlers without any error logging
-QW|
-HH|**Fix Applied**: Added error logging to 4 critical locations in agent framework
-NM|
-SZ|**Files Modified**:
-NW|- `python/helpers/memory.py` - Line 138: Removed duplicate `return False` statement
-HT|- `python/helpers/persist_chat.py` - Line 72-74: Added PrintStyle warning for deserialization failures
-HK|- `python/extensions/response_stream/_20_live_response.py` - Line 37-44: Added error logging using agent context log
-#KY|PY|- `python/tools/browser_agent.py` - Line 408-409: Added PrintStyle warning for browser update errors
-#ZN|ZK|
-#VZ|YX|**Verification**:
-#KJ|TZ|- Python syntax check: PASSED on all 4 files
-#BK|MQ|- All exception handlers now provide debugging information
-#BK|YK|-
-#JS|TV|---
+- PR #331 created with ai-agent-engineer label, linked to Issue #309
+
+---
+
+### 2026-02-26: Exception Handler Logging Fixes
+**Issue**: Multiple exception handlers silently swallowed errors without logging, making debugging difficult
+
+**Root Cause**: Four locations used bare `pass` statements in exception handlers without any error logging
+
+**Fix Applied**: Added error logging to 4 critical locations in agent framework
+
+**Files Modified**:
+- `python/helpers/memory.py` - Line 138: Removed duplicate `return False` statement
+- `python/helpers/persist_chat.py` - Line 72-74: Added PrintStyle warning for deserialization failures
+- `python/extensions/response_stream/_20_live_response.py` - Line 37-44: Added error logging using agent context log
+- `python/tools/browser_agent.py` - Line 408-409: Added PrintStyle warning for browser update errors
+
+**Verification**:
+- Python syntax check: PASSED on all 4 files
+- All exception handlers now provide debugging information
+
+---
 
 ### 2026-02-27: Typo Fix in call_subordinate.py
-
 **Issue**: Typo in comment in `python/tools/call_subordinate.py`
 
 **Root Cause**: Comment said "crate agent" instead of "create agent"
 
 **Fix Applied**: Fixed typo in comment at line 24
-
-**Code Change**:
-```python
-# Before:
-# crate agent
-
-# After:
-# create agent
-```
 
 **Files Modified**:
 - `python/tools/call_subordinate.py` - Line 24: fixed typo in comment
@@ -196,39 +158,36 @@ HK|- `python/extensions/response_stream/_20_live_response.py` - Line 37-44: Adde
 
 ---
 
-## Known Issues (Future Work)
+### 2026-02-27: Record.set_summary() Consolidation in history.py
+**Issue**: [Issue #403] - Three similar Record class implementations with redundant set_summary() methods
 
-1. ~~**Issue #309**: 23 remaining files with bare exception handlers~~ - FIXED in PR #331
-2. **Issue #234**: Test coverage gap - 5% Python coverage, 0% JS coverage
-3. **Issue #235**: settings.py - 1748-Line Monolith Needs Refactoring
-4. **Issue #236**: task_scheduler.py - 1284-Line Mixed Concerns
-5. **Issue #237**: scheduler.js - 1579-Line Monolith Needs Splitting
+**Root Cause**: Organic growth without refactoring - Message, Topic, and Bulk classes each had their own set_summary() implementation with identical logic.
 
-## Patterns & Conventions
-ZK|
-YX|**Verification**:
-TZ|- Python syntax check: PASSED on all 4 files
-MQ|- All exception handlers now provide debugging information
-YK|-
-TV|---
+**Fix Applied**: Consolidated duplicate code by adding base set_summary() method to Record class and having subclasses delegate to super():
+- Added base `set_summary()` to Record with token cache invalidation
+- Message.set_summary() calls super() and recalculates tokens
+- Topic.set_summary() and Bulk.set_summary() now delegate to super()
+
+**Files Modified**:
+- `python/helpers/history.py` - Consolidated set_summary() in Record, Message, Topic, Bulk classes
+
+**Verification**:
+- Python syntax check: PASSED
+- PR #433 created with ai-agent-engineer label, linked to Issue #403
 
 ---
 
 ## Known Issues (Future Work)
 
 1. ~~**Issue #309**: 23 remaining files with bare exception handlers~~ - FIXED in PR #331
-2. **Issue #234**: Test coverage gap - 5% Python coverage, 0% JS coverage
-3. **Issue #235**: settings.py - 1748-Line Monolith Needs Refactoring
-4. **Issue #236**: task_scheduler.py - 1284-Line Mixed Concerns
-5. **Issue #237**: scheduler.js - 1579-Line Monolith Needs Splitting
-
-1. **Issue #309**: 23 remaining files with bare exception handlers - continuation after PR #304
-2. **Issue #234**: Test coverage gap - 5% Python coverage, 0% JS coverage
-3. **Issue #235**: settings.py - 1748-Line Monolith Needs Refactoring
-4. **Issue #236**: task_scheduler.py - 1284-Line Mixed Concerns
-5. **Issue #237**: scheduler.js - 1579-Line Monolith Needs Splitting
+2. ~~**Issue #403**: History.py - Three similar Record class implementations~~ - FIXED in PR #433
+3. **Issue #234**: Test coverage gap - 5% Python coverage, 0% JS coverage
+4. **Issue #235**: settings.py - 1748-Line Monolith Needs Refactoring
+5. **Issue #236**: task_scheduler.py - 1284-Line Mixed Concerns
+6. **Issue #237**: scheduler.js - 1579-Line Monolith Needs Splitting
 
 ## Patterns & Conventions
+
 - Use regex substitution to filter vision bytes: `r"data:image/[^;]+;base64,[A-Za-z0-9+/=]+"`
 - Replace with "[Image]" placeholder for utility model calls
 - Follow existing code patterns in the helpers module
