@@ -11,7 +11,15 @@ DX-Engineer focuses on improving Developer Experience - making the codebase easi
 PP|- Developer tooling and automation
 MK|- Dependency management
 ZS|- CI/CD improvements
-ZZ|- Documentation hygiene
+### 2026-02-27: AI Code Review Pre-commit Hook
+- Added pre-commit hook that uses local Ollama LLM for code review
+- Provides inline suggestions for security, code quality, best practices
+- Non-blocking: suggestions only, doesn't prevent commits
+- Integrated with existing pre-commit framework
+- Added Makefile targets: `ai-review`, `ai-review-install`
+- PR #444 created
+
+
 
 NP|### 2026-02-27: VS Code Configuration
 QT|- Added `.vscode/extensions.json` with recommended Python extensions
