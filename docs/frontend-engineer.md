@@ -4,6 +4,12 @@
 #BN|**Agent:** frontend-engineer (autonomous mode)
 > Last Updated: 2026-02-27
 
+### 2026-02-27: Button Accessibility Fix
+- Fixed missing aria-labels in index.html (toast__copy, toast__close buttons)
+- Fixed missing aria-label in welcome-screen.html (welcome-get-started-btn)
+- Updated scan: scroll-to-top buttons in tasks-list.html and chats-list.html already have aria-labels
+- PR: https://github.com/sulhimaskom/agent-zero/pull/440
+
 #VB|## Domain Scope
 #YK|- JavaScript/TypeScript frontend code
 #HS|- Alpine.js stores and components
