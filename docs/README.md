@@ -9,6 +9,7 @@ To begin with Agent Zero, follow the links below for detailed guides on various 
 - **[Installation](installation.md):** Set up (or [update](installation.md#how-to-update-agent-zero)) Agent Zero on your system.
 - **[Usage Guide](usage.md):** Explore GUI features and usage scenarios.
 - **[Development](development.md):** Set up a development environment for Agent Zero.
+- **[Testing Guide](testing.md):** Learn how to write and run tests for Agent Zero.
 - **[Extensibility](extensibility.md):** Learn how to create custom extensions for Agent Zero.
 - **[Connectivity](connectivity.md):** Learn how to connect to Agent Zero from other applications.
 - **[Architecture Overview](architecture.md):** Understand the internal workings of the framework.
@@ -71,3 +72,9 @@ To begin with Agent Zero, follow the links below for detailed guides on various 
 - [Troubleshooting and FAQ](troubleshooting.md)
   - [Frequently Asked Questions](troubleshooting.md#frequently-asked-questions)
   - [Troubleshooting](troubleshooting.md#troubleshooting)
+- [Testing Guide](testing.md)
+  - [Running Tests](testing.md#running-tests)
+  - [Test Structure](testing.md#test-structure)
+  - [Mock Usage](testing.md#mock-usage)
+  - [Async Testing](testing.md#async-testing)
+  - [Best Practices](testing.md#best-practices)
