@@ -17,7 +17,15 @@
                         <button class="notification-action" @click="$store.notificationStore?.clearAll()"
                             :disabled="!$store.notificationStore || $store.notificationStore.getDisplayNotifications().length === 0"
                             title="Clear All" aria-label="Clear All">
+                            <span class="material-symbols-outlined" aria-hidden="true">delete</span> Clear All
+                            :disabled="!$store.notificationStore || $store.notificationStore.getDisplayNotifications().length === 0"
+<<<<<<< HEAD
+                            title="Clear All" aria-label="Clear All">
                             <span class="material-symbols-outlined">delete</span> Clear All
+=======
+                            title="Clear All">
+                            <span class="material-symbols-outlined" aria-hidden="true">delete</span> Clear All
+>>>>>>> bdb7ee2d (fix(ui-ux): add aria-hidden to decorative icons for screen reader accessibility)
                         </button>
                     </div>
                 </div>
@@ -71,7 +79,7 @@
                 <div class="notification-empty"
                     x-show="!$store.notificationStore || $store.notificationStore.getDisplayNotifications().length === 0">
                     <div class="notification-empty-icon">
-                        <span class="material-symbols-outlined">notifications</span>
+                        <span class="material-symbols-outlined" aria-hidden="true">notifications</span>
                     </div>
                     <p>No notifications to display</p>
                 </div>

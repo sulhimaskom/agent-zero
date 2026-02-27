@@ -128,7 +128,36 @@ Fixed keyboard accessibility issues in the scheduler task table (`webui/index.ht
 - WCAG 2.1 Guidelines
 - MDN Accessibility Documentation
 - WAI-ARIA Practices
-**Last Updated:** 2026-02-27
+QQ|**Last Updated:** 2026-02-27
+#QZ|
+#MR|### Image Viewer Focus States (2026-02-27)
+#WS|**Status:** ✅ COMPLETED
+#QX|
+#QW|Fixed keyboard accessibility issue in image viewer zoom controls (`webui/components/modals/image-viewer/image-viewer.html`):
+#QS|
+#WS|1. **Zoom Buttons** - Added `:focus-visible` CSS styling:
+#MV|   - Added visible focus outline using `var(--color-highlight, #64b5f6)`
+#QJ|   - Added `outline-offset: 2px` for better visibility
+#TS|   - Added background change on focus for additional visual feedback
+#HQ|
+#ZW|**Impact:** Keyboard users can now see which zoom button is focused when navigating with Tab key.
+#QW|
+#YH|### Decorative Icon Accessibility (2026-02-27)
+#WS|**Status:** ✅ COMPLETED
+#QX|
+#QW|Fixed missing `aria-hidden="true"` on decorative material-symbols-outlined icons:
+#QS|
+#WS|1. **notification-modal.html** - Added aria-hidden to 2 icons:
+#MV|   - Line 20: delete icon in "Clear All" button
+#QJ|   - Line 74: notifications icon in empty state
+#TS|
+#ZW|2. **project-list.html** - Added aria-hidden to 4 icons:
+#MV|   - Line 34: add icon in "Create project" button (header)
+#QJ|   - Line 51: close icon in "Deactivate" button
+#TS|   - Line 56: play_arrow icon in "Activate" button
+#TW|   - Line 76: add icon in "Create project" button (empty state)
+#HQ|
+#ZW|**Impact:** Screen readers will now skip decorative icons and only announce the button text, improving the user experience for visually impaired users.
 
 ### Image Viewer Focus States (2026-02-27)
 **Status:** ✅ COMPLETED
