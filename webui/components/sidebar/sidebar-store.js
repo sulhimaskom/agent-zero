@@ -1,4 +1,4 @@
-import { createStore } from "/js/AlpineStore.js";
+import { createStore } from '/js/AlpineStore.js';
 
 // This store manages the visibility and state of the main sidebar panel.
 const model = {
@@ -8,7 +8,7 @@ const model = {
   // Centralized collapse state for all sidebar sections (persisted in localStorage)
   sectionStates: {
     tasks: false,       // default: collapsed
-    preferences: false  // default: collapsed
+    preferences: false,  // default: collapsed
   },
 
   // Initialize the store by setting up a resize listener
@@ -20,7 +20,7 @@ const model = {
     this.loadSectionStates();
     this.handleResize();
     this.resizeHandler = () => this.handleResize();
-    window.addEventListener("resize", this.resizeHandler);
+    window.addEventListener('resize', this.resizeHandler);
   },
 
   // Load section collapse states from localStorage
@@ -59,7 +59,7 @@ const model = {
   // Cleanup method for lifecycle management
   destroy() {
     if (this.resizeHandler) {
-      window.removeEventListener("resize", this.resizeHandler);
+      window.removeEventListener('resize', this.resizeHandler);
       this.resizeHandler = null;
     }
     this._initialized = false;
@@ -88,4 +88,4 @@ const model = {
   },
 };
 
-export const store = createStore("sidebar", model);
+export const store = createStore('sidebar', model);

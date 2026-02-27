@@ -1,10 +1,10 @@
-import { createStore } from "/js/AlpineStore.js";
-import { store as chatsStore } from "/components/sidebar/chats/chats-store.js";
+import { createStore } from '/js/AlpineStore.js';
+import { store as chatsStore } from '/components/sidebar/chats/chats-store.js';
 
 // Tasks sidebar store: tasks list and selected task id
 const model = {
   tasks: [],
-  selected: "",
+  selected: '',
   isLoading: true,
 
   init() {
@@ -20,17 +20,17 @@ const model = {
 
       // After updating tasks, ensure selection is still valid
       if (this.selected && !this.contains(this.selected)) {
-        this.setSelected("");
+        this.setSelected('');
       }
       this.isLoading = false;
     } catch (e) {
-      console.error("tasks-store.applyTasks failed", e);
+      console.error('tasks-store.applyTasks failed', e);
       // Show toast only if this is the first load (tasks were expected)
       if (this.tasks.length === 0 && this.isLoading) {
         window.toastFrontendWarning(
-          "Could not load tasks. Will retry on next poll.",
-          "Tasks",
-          5
+          'Could not load tasks. Will retry on next poll.',
+          'Tasks',
+          5,
         );
       }
       this.tasks = [];
@@ -40,8 +40,8 @@ const model = {
 
   // Update selected task and persist for tab restore
   setSelected(taskId) {
-    this.selected = taskId || "";
-    try { localStorage.setItem("lastSelectedTask", this.selected); } catch {}
+    this.selected = taskId || '';
+    try { localStorage.setItem('lastSelectedTask', this.selected); } catch {}
   },
 
   // Returns true if a task with the given id exists in the current list
@@ -51,7 +51,7 @@ const model = {
 
   // Convenience: id of the first task in the current list (or empty string)
   firstId() {
-    return (Array.isArray(this.tasks) && this.tasks[0]?.id) || "";
+    return (Array.isArray(this.tasks) && this.tasks[0]?.id) || '';
   },
 
   // Action methods for task management
@@ -77,6 +77,6 @@ const model = {
   },
 };
 
-export const store = createStore("tasks", model);
+export const store = createStore('tasks', model);
 
 

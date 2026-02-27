@@ -21,13 +21,13 @@ export function createStore(name, initialState) {
       const store = globalThis.Alpine?.store(name);
       if (store) return store[prop];
       return target[prop];
-    }
+    },
   });
 
   if (globalThis.Alpine) {
     globalThis.Alpine.store(name, initialState);
   } else {
-    document.addEventListener("alpine:init", () => Alpine.store(name, initialState));
+    document.addEventListener('alpine:init', () => Alpine.store(name, initialState));
   }
 
   // Store the proxy

@@ -1,13 +1,13 @@
-import { createStore } from "/js/AlpineStore.js";
+import { createStore } from '/js/AlpineStore.js';
 
 const model = {
-  versionNo: "",
-  commitTime: "",
+  versionNo: '',
+  commitTime: '',
 
   get versionLabel() {
     return this.versionNo && this.commitTime
       ? `Version ${this.versionNo} ${this.commitTime}`
-      : "";
+      : '';
   },
 
   init() {
@@ -29,7 +29,7 @@ const model = {
       }
       return true;
     } catch (err) {
-      console.warn("Failed to copy version:", err);
+      console.warn('Failed to copy version:', err);
       if (window.toastFrontendError) {
         window.toastFrontendError('Failed to copy version info', 'Copy Error');
       }
@@ -38,5 +38,5 @@ const model = {
   },
 };
 
-export const store = createStore("sidebarBottom", model);
+export const store = createStore('sidebarBottom', model);
 

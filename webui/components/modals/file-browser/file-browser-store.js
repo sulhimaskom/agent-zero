@@ -1,20 +1,20 @@
-import { createStore } from "/js/AlpineStore.js";
-import { fetchApi } from "/js/api.js";
+import { createStore } from '/js/AlpineStore.js';
+import { fetchApi } from '/js/api.js';
 
 // Model migrated from legacy file_browser.js (lift-and-shift)
 const model = {
   // Reactive state
   isLoading: false,
   browser: {
-    title: "File Browser",
-    currentPath: "",
+    title: 'File Browser',
+    currentPath: '',
     entries: [],
-    parentPath: "",
-    sortBy: "name",
-    sortDirection: "asc",
+    parentPath: '',
+    sortBy: 'name',
+    sortDirection: 'asc',
   },
   history: [], // navigation stack
-  initialPath: "", // Store path for open() call
+  initialPath: '', // Store path for open() call
   closePromise: null,
   error: null,
 
@@ -24,7 +24,7 @@ const model = {
   },
 
   // --- Public API (called from button/link) --------------------------------
-  async open(path = "") {
+  async open(path = '') {
     if (this.isLoading) return; // Prevent double-open
     this.isLoading = true;
     this.error = null;
@@ -33,7 +33,7 @@ const model = {
     try {
       // Open modal FIRST (immediate UI feedback)
       this.closePromise = window.openModal(
-        "modals/file-browser/file-browser.html"
+        'modals/file-browser/file-browser.html',
       );
 
       // // Setup cleanup on modal close
@@ -44,7 +44,7 @@ const model = {
       // }
 
       // Use stored initial path or default
-      path = path || this.initialPath || this.browser.currentPath || "$WORK_DIR";
+      path = path || this.initialPath || this.browser.currentPath || '$WORK_DIR';
       this.browser.currentPath = path;
 
       // Fetch files
@@ -55,8 +55,8 @@ const model = {
       this.destroy();
 
     } catch (error) {
-      console.error("File browser error:", error);
-      this.error = error?.message || "Failed to load files";
+      console.error('File browser error:', error);
+      this.error = error?.message || 'Failed to load files';
       this.isLoading = false;
     }
   },
@@ -70,32 +70,32 @@ const model = {
     // Reset state when modal closes
     this.isLoading = false;
     this.history = [];
-    this.initialPath = "";
+    this.initialPath = '';
     this.browser.entries = [];
   },
 
   // --- Helpers -------------------------------------------------------------
   isArchive(filename) {
-    const archiveExts = ["zip", "tar", "gz", "rar", "7z"];
-    const ext = filename.split(".").pop().toLowerCase();
+    const archiveExts = ['zip', 'tar', 'gz', 'rar', '7z'];
+    const ext = filename.split('.').pop().toLowerCase();
     return archiveExts.includes(ext);
   },
 
   formatFileSize(size) {
-    if (size === 0) return "0 Bytes";
+    if (size === 0) return '0 Bytes';
     const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
     const i = Math.floor(Math.log(size) / Math.log(k));
-    return parseFloat((size / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+    return `${parseFloat((size / Math.pow(k, i)).toFixed(2))  } ${  sizes[i]}`;
   },
 
   formatDate(dateString) {
     const options = {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
     };
     return new Date(dateString).toLocaleDateString(undefined, options);
   },
@@ -104,10 +104,10 @@ const model = {
   toggleSort(column) {
     if (this.browser.sortBy === column) {
       this.browser.sortDirection =
-        this.browser.sortDirection === "asc" ? "desc" : "asc";
+        this.browser.sortDirection === 'asc' ? 'desc' : 'asc';
     } else {
       this.browser.sortBy = column;
-      this.browser.sortDirection = "asc";
+      this.browser.sortDirection = 'asc';
     }
   },
 
@@ -115,26 +115,26 @@ const model = {
     return [...entries].sort((a, b) => {
       // Folders first
       if (a.is_dir !== b.is_dir) return a.is_dir ? -1 : 1;
-      const dir = this.browser.sortDirection === "asc" ? 1 : -1;
+      const dir = this.browser.sortDirection === 'asc' ? 1 : -1;
       switch (this.browser.sortBy) {
-        case "name":
-          return dir * a.name.localeCompare(b.name);
-        case "size":
-          return dir * (a.size - b.size);
-        case "date":
-          return dir * (new Date(a.modified) - new Date(b.modified));
-        default:
-          return 0;
+      case 'name':
+        return dir * a.name.localeCompare(b.name);
+      case 'size':
+        return dir * (a.size - b.size);
+      case 'date':
+        return dir * (new Date(a.modified) - new Date(b.modified));
+      default:
+        return 0;
       }
     });
   },
 
   // --- Navigation ----------------------------------------------------------
-  async fetchFiles(path = "") {
+  async fetchFiles(path = '') {
     this.isLoading = true;
     try {
       const response = await fetchApi(
-        `/get_work_dir_files?path=${encodeURIComponent(path)}`
+        `/get_work_dir_files?path=${encodeURIComponent(path)}`,
       );
       if (response.ok) {
         const data = await response.json();
@@ -142,13 +142,13 @@ const model = {
         this.browser.currentPath = data.data.current_path;
         this.browser.parentPath = data.data.parent_path;
       } else {
-        console.error("Error fetching files:", await response.text());
+        console.error('Error fetching files:', await response.text());
         this.browser.entries = [];
       }
     } catch (e) {
       window.toastFrontendError(
-        "Error fetching files: " + e.message,
-        "File Browser Error"
+        `Error fetching files: ${  e.message}`,
+        'File Browser Error',
       );
       this.browser.entries = [];
     } finally {
@@ -157,7 +157,7 @@ const model = {
   },
 
   async navigateToFolder(path) {
-    if(!path.startsWith("/")) path = "/" + path;
+    if(!path.startsWith('/')) path = `/${  path}`;
     if (this.browser.currentPath !== path)
       this.history.push(this.browser.currentPath);
     await this.fetchFiles(path);
@@ -174,9 +174,9 @@ const model = {
   async deleteFile(file) {
     if (!confirm(`Are you sure you want to delete ${file.name}?`)) return;
     try {
-      const resp = await fetchApi("/delete_work_dir_file", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const resp = await fetchApi('/delete_work_dir_file', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           path: file.path,
           currentPath: this.browser.currentPath,
@@ -184,16 +184,16 @@ const model = {
       });
       if (resp.ok) {
         this.browser.entries = this.browser.entries.filter(
-          (e) => e.path !== file.path
+          (e) => e.path !== file.path,
         );
-        alert("File deleted successfully.");
+        alert('File deleted successfully.');
       } else {
         alert(`Error deleting file: ${await resp.text()}`);
       }
     } catch (e) {
       window.toastFrontendError(
-        "Error deleting file: " + e.message,
-        "File Delete Error"
+        `Error deleting file: ${  e.message}`,
+        'File Delete Error',
       );
     }
   },
@@ -207,20 +207,20 @@ const model = {
       const files = event.target.files;
       if (!files.length) return;
       const formData = new FormData();
-      formData.append("path", this.browser.currentPath);
-      for (let f of files) {
-        const ext = f.name.split(".").pop().toLowerCase();
+      formData.append('path', this.browser.currentPath);
+      for (const f of files) {
+        const ext = f.name.split('.').pop().toLowerCase();
         if (
-          !["zip", "tar", "gz", "rar", "7z"].includes(ext) &&
+          !['zip', 'tar', 'gz', 'rar', '7z'].includes(ext) &&
           f.size > 100 * 1024 * 1024
         ) {
           alert(`File ${f.name} exceeds 100MB limit.`);
           continue;
         }
-        formData.append("files[]", f);
+        formData.append('files[]', f);
       }
-      const resp = await fetchApi("/upload_work_dir_files", {
-        method: "POST",
+      const resp = await fetchApi('/upload_work_dir_files', {
+        method: 'POST',
         body: formData,
       });
       if (resp.ok) {
@@ -231,7 +231,7 @@ const model = {
         if (data.failed && data.failed.length) {
           const msg = data.failed
             .map((f) => `${f.name}: ${f.error}`)
-            .join("\n");
+            .join('\n');
           alert(`Some files failed to upload:\n${msg}`);
         }
       } else {
@@ -239,16 +239,16 @@ const model = {
       }
     } catch (e) {
       window.toastFrontendError(
-        "Error uploading files: " + e.message,
-        "File Upload Error"
+        `Error uploading files: ${  e.message}`,
+        'File Upload Error',
       );
     } finally {
-      event.target.value = ""; // reset input so same file can be reselected
+      event.target.value = ''; // reset input so same file can be reselected
     }
   },
 
   downloadFile(file) {
-    const link = document.createElement("a");
+    const link = document.createElement('a');
     link.href = `/download_work_dir_file?path=${encodeURIComponent(file.path)}`;
     link.download = file.name;
     document.body.appendChild(link);
@@ -257,13 +257,13 @@ const model = {
   },
 };
 
-export const store = createStore("fileBrowser", model);
+export const store = createStore('fileBrowser', model);
 
 window.openFileLink = async function (path) {
   try {
-    const resp = await window.sendJsonData("/file_info", { path });
+    const resp = await window.sendJsonData('/file_info', { path });
     if (!resp.exists) {
-      window.toastFrontendError("File does not exist.", "File Error");
+      window.toastFrontendError('File does not exist.', 'File Error');
       return;
     }
     if (resp.is_dir) {
@@ -274,8 +274,8 @@ window.openFileLink = async function (path) {
     }
   } catch (e) {
     window.toastFrontendError(
-      "Error opening file: " + e.message,
-      "File Open Error"
+      `Error opening file: ${  e.message}`,
+      'File Open Error',
     );
   }
 };

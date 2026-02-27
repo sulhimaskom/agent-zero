@@ -1,30 +1,30 @@
-import { createStore } from "/js/AlpineStore.js";
-import { scrollModal } from "/js/modals.js";
-import sleep from "/js/sleep.js";
-import * as API from "/js/api.js";
-import { TIMING } from "/js/constants.js";
+import { createStore } from '/js/AlpineStore.js';
+import { scrollModal } from '/js/modals.js';
+import sleep from '/js/sleep.js';
+import * as API from '/js/api.js';
+import { TIMING } from '/js/constants.js';
 
 const model = {
   editor: null,
   servers: [],
   loading: true,
   statusCheck: false,
-  serverLog: "",
+  serverLog: '',
 
   async initialize() {
     // Initialize the JSON Viewer after the modal is rendered
-    const container = document.getElementById("mcp-servers-config-json");
+    const container = document.getElementById('mcp-servers-config-json');
     if (container) {
-      const editor = ace.edit("mcp-servers-config-json");
+      const editor = ace.edit('mcp-servers-config-json');
 
-      const dark = localStorage.getItem("darkMode");
-      if (dark != "false") {
-        editor.setTheme("ace/theme/github_dark");
+      const dark = localStorage.getItem('darkMode');
+      if (dark != 'false') {
+        editor.setTheme('ace/theme/github_dark');
       } else {
-        editor.setTheme("ace/theme/tomorrow");
+        editor.setTheme('ace/theme/tomorrow');
       }
 
-      editor.session.setMode("ace/mode/json");
+      editor.session.setMode('ace/mode/json');
       const json = this.getSettingsFieldConfigJson().value;
       editor.setValue(json);
       editor.clearSelection();
@@ -50,8 +50,8 @@ const model = {
       // move cursor to start
       this.editor.navigateFileStart();
     } catch (error) {
-      console.error("Failed to format JSON:", error);
-      alert("Invalid JSON: " + error.message);
+      console.error('Failed to format JSON:', error);
+      alert(`Invalid JSON: ${  error.message}`);
     }
   },
 
@@ -61,8 +61,8 @@ const model = {
 
   getSettingsFieldConfigJson() {
     return settingsModalProxy.settings.sections
-      .filter((x) => x.id == "mcp_client")[0]
-      .fields.filter((x) => x.id == "mcp_servers")[0];
+      .filter((x) => x.id == 'mcp_client')[0]
+      .fields.filter((x) => x.id == 'mcp_servers')[0];
   },
 
   onClose() {
@@ -86,7 +86,7 @@ const model = {
   },
 
   async _statusCheck() {
-    const resp = await API.callJsonApi("mcp_servers_status", null);
+    const resp = await API.callJsonApi('mcp_servers_status', null);
     if (resp.success) {
       this.servers = resp.status;
       this.servers.sort((a, b) => a.name.localeCompare(b.name));
@@ -101,8 +101,8 @@ const model = {
     if (this.loading) return;
     this.loading = true;
     try {
-      scrollModal("mcp-servers-status");
-      const resp = await API.callJsonApi("mcp_servers_apply", {
+      scrollModal('mcp-servers-status');
+      const resp = await API.callJsonApi('mcp_servers_apply', {
         mcp_servers: this.getEditorValue(),
       });
       if (resp.success) {
@@ -111,35 +111,35 @@ const model = {
       }
       this.loading = false;
       await sleep(100); // wait for ui and scroll
-      scrollModal("mcp-servers-status");
+      scrollModal('mcp-servers-status');
     } catch (error) {
-      console.error("Failed to apply MCP servers:", error);
+      console.error('Failed to apply MCP servers:', error);
     }
     this.loading = false;
   },
 
   async getServerLog(serverName) {
-    this.serverLog = "";
-    const resp = await API.callJsonApi("mcp_server_get_log", {
+    this.serverLog = '';
+    const resp = await API.callJsonApi('mcp_server_get_log', {
       server_name: serverName,
     });
     if (resp.success) {
       this.serverLog = resp.log;
-      openModal("settings/mcp/client/mcp-servers-log.html");
+      openModal('settings/mcp/client/mcp-servers-log.html');
     }
   },
 
   async onToolCountClick(serverName) {
-    const resp = await API.callJsonApi("mcp_server_get_detail", {
+    const resp = await API.callJsonApi('mcp_server_get_detail', {
       server_name: serverName,
     });
     if (resp.success) {
       this.serverDetail = resp.detail;
-      openModal("settings/mcp/client/mcp-server-tools.html");
+      openModal('settings/mcp/client/mcp-server-tools.html');
     }
   },
 };
 
-const store = createStore("mcpServersStore", model);
+const store = createStore('mcpServersStore', model);
 
 export { store };

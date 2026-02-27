@@ -1,9 +1,9 @@
-import { createStore } from "/js/AlpineStore.js";
-import { TIMING } from "/js/constants.js";
+import { createStore } from '/js/AlpineStore.js';
+import { TIMING } from '/js/constants.js';
 
 const model = {
   isTyping: false,
-  typingText: "Agent is thinking",
+  typingText: 'Agent is thinking',
   dotCount: 0,
   intervalId: null,
 
@@ -45,11 +45,11 @@ const model = {
   },
 
   getDisplayText() {
-    const dots = ".".repeat(this.dotCount);
+    const dots = '.'.repeat(this.dotCount);
     return `${this.typingText}${dots}`;
   },
 };
 
-const store = createStore("typingIndicator", model);
+const store = createStore('typingIndicator', model);
 
 export { store };

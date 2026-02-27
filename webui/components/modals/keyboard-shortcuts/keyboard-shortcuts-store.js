@@ -1,41 +1,41 @@
-import { getRegisteredShortcuts } from "/js/keyboard-shortcuts.js";
+import { getRegisteredShortcuts } from '/js/keyboard-shortcuts.js';
 
 export const store = {
-    isOpen: false,
-    shortcuts: [],
+  isOpen: false,
+  shortcuts: [],
 
-    init() {
-        this.loadShortcuts();
-    },
+  init() {
+    this.loadShortcuts();
+  },
 
-    loadShortcuts() {
-        const registered = getRegisteredShortcuts();
-        this.shortcuts = Object.entries(registered).map(([key, description]) => ({
-            key,
-            description
-        }));
-    },
+  loadShortcuts() {
+    const registered = getRegisteredShortcuts();
+    this.shortcuts = Object.entries(registered).map(([key, description]) => ({
+      key,
+      description,
+    }));
+  },
 
-    open() {
-        this.loadShortcuts();
-        openModal("modals/keyboard-shortcuts/keyboard-shortcuts.html", {
-            title: "Keyboard Shortcuts",
-            width: "500px",
-            height: "auto",
-        });
-        this.isOpen = true;
-    },
+  open() {
+    this.loadShortcuts();
+    openModal('modals/keyboard-shortcuts/keyboard-shortcuts.html', {
+      title: 'Keyboard Shortcuts',
+      width: '500px',
+      height: 'auto',
+    });
+    this.isOpen = true;
+  },
 
-    close() {
-        closeModal();
-        this.isOpen = false;
-    },
+  close() {
+    closeModal();
+    this.isOpen = false;
+  },
 };
 
 if (globalThis.Alpine) {
-    globalThis.Alpine.store("keyboardShortcuts", store);
+  globalThis.Alpine.store('keyboardShortcuts', store);
 } else {
-    document.addEventListener("alpine:init", () => {
-        globalThis.Alpine.store("keyboardShortcuts", store);
-    });
+  document.addEventListener('alpine:init', () => {
+    globalThis.Alpine.store('keyboardShortcuts', store);
+  });
 }

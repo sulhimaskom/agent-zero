@@ -51,11 +51,11 @@ function isStaticFileMode() {
  */
 export async function callJsonApi(endpoint, data) {
   const response = await fetchApi(endpoint, {
-    method: "POST",
+    method: 'POST',
     headers: {
-      "Content-Type": "application/json",
+      'Content-Type': 'application/json',
     },
-    credentials: "same-origin",
+    credentials: 'same-origin',
     body: JSON.stringify(data),
   });
 
@@ -87,7 +87,7 @@ export async function fetchApi(url, request) {
     finalRequest.headers = finalRequest.headers || {};
 
     // add the CSRF token to the headers
-    finalRequest.headers["X-CSRF-Token"] = token;
+    finalRequest.headers['X-CSRF-Token'] = token;
 
     // perform the fetch with the updated request
     const response = await fetch(url, finalRequest);
@@ -97,7 +97,7 @@ export async function fetchApi(url, request) {
       // retry the request with new token
       csrfToken = null;
       return await _wrap(false);
-    } else if (response.redirected && response.url.endsWith("/login")) {
+    } else if (response.redirected && response.url.endsWith('/login')) {
       // redirect to login
       window.location.href = response.url;
       return;
@@ -117,7 +117,7 @@ export async function fetchApi(url, request) {
 // csrf token stored locally
 let csrfToken = null;
 let csrfTokenFailed = false;
-let csrfTokenErrorLogged = false;
+const csrfTokenErrorLogged = false;
 
 /**
  * Get the CSRF token for API requests
@@ -129,24 +129,24 @@ async function getCsrfToken() {
 
   // Prevent repeated failed requests that spam the console
   if (csrfTokenFailed) {
-    throw new Error("CSRF token unavailable - backend not running");
+    throw new Error('CSRF token unavailable - backend not running');
   }
 
   // Check if we're in static file mode to avoid unnecessary network errors
   if (isStaticFileMode()) {
     csrfTokenFailed = true;
     Logger.once('static_mode_skip', () => {
-      Logger.debug("Static file mode detected - skipping CSRF token fetch");
+      Logger.debug('Static file mode detected - skipping CSRF token fetch');
     });
-    throw new Error("Static file mode - no backend available");
+    throw new Error('Static file mode - no backend available');
   }
 
   try {
     const response = await fetch(API.CSRF_TOKEN_ENDPOINT, {
-      credentials: "same-origin",
+      credentials: 'same-origin',
     });
 
-    if (response.redirected && response.url.endsWith("/login")) {
+    if (response.redirected && response.url.endsWith('/login')) {
       // redirect to login
       window.location.href = response.url;
       return;
@@ -157,7 +157,7 @@ async function getCsrfToken() {
       csrfTokenFailed = true;
       // Log as debug instead of warn to keep console clean in static file mode
       Logger.once('csrf_error', () => {
-        Logger.debug("Backend API not available - CSRF token endpoint returned", response.status);
+        Logger.debug('Backend API not available - CSRF token endpoint returned', response.status);
       });
       throw new Error(`CSRF token endpoint returned ${response.status}`);
     }
@@ -169,9 +169,9 @@ async function getCsrfToken() {
     } catch (parseError) {
       csrfTokenFailed = true;
       Logger.once('csrf_json_error', () => {
-        Logger.warn("Backend API not available - CSRF endpoint returned non-JSON response");
+        Logger.warn('Backend API not available - CSRF endpoint returned non-JSON response');
       });
-      throw new Error("Invalid JSON response from CSRF endpoint");
+      throw new Error('Invalid JSON response from CSRF endpoint');
     }
 
     if (json.ok) {
@@ -180,7 +180,7 @@ async function getCsrfToken() {
       return csrfToken;
     } else {
       if (json.error) alert(json.error);
-      throw new Error(json.error || "Failed to get CSRF token");
+      throw new Error(json.error || 'Failed to get CSRF token');
     }
   } catch (error) {
     csrfTokenFailed = true;
@@ -188,7 +188,7 @@ async function getCsrfToken() {
     // Only log the first error to prevent console spam
     // Log as debug instead of warn to keep console clean in static file mode
     Logger.once('backend_connection_error', () => {
-      Logger.debug("Backend connection not available - API calls will not work:", error.message);
+      Logger.debug('Backend connection not available - API calls will not work:', error.message);
     });
     throw error;
   }

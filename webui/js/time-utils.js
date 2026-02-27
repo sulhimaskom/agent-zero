@@ -14,12 +14,12 @@ export function toLocalTime(utcIsoString, options = {}) {
   const date = new Date(utcIsoString);
   const defaultOptions = {
     dateStyle: 'medium',
-    timeStyle: 'medium'
+    timeStyle: 'medium',
   };
 
   return new Intl.DateTimeFormat(
     undefined, // Use browser's locale
-    { ...defaultOptions, ...options }
+    { ...defaultOptions, ...options },
   ).format(date);
 }
 
@@ -56,7 +56,7 @@ export function formatDateTime(utcIsoString, format = 'full') {
     full: { dateStyle: 'medium', timeStyle: 'medium' },
     date: { dateStyle: 'medium' },
     time: { timeStyle: 'medium' },
-    short: { dateStyle: 'short', timeStyle: 'short' }
+    short: { dateStyle: 'short', timeStyle: 'short' },
   };
 
   return toLocalTime(utcIsoString, formatOptions[format] || formatOptions.full);

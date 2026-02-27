@@ -1,13 +1,13 @@
-import { createStore } from "/js/AlpineStore.js";
-import { sendJsonData } from "/js/api.js";
-import { API_ENDPOINTS } from "/js/constants.js";
+import { createStore } from '/js/AlpineStore.js';
+import { sendJsonData } from '/js/api.js';
+import { API_ENDPOINTS } from '/js/constants.js';
 
 const model = {
   // State
   isOpen: false,
   currentStep: 0,
   totalSteps: 5,
-  
+
   // Wizard data
   selectedProvider: null,
   apiKey: '',
@@ -16,19 +16,19 @@ const model = {
   isValidating: false,
   validationError: null,
   isComplete: false,
-  
+
   // Provider data (loaded from backend)
   providers: [],
   chatModels: [],
   utilModels: [],
-  
+
   // Step definitions
   steps: [
     { id: 'welcome', title: 'Welcome', description: 'Get started with Agent Zero' },
     { id: 'provider', title: 'Provider', description: 'Choose your AI provider' },
     { id: 'apikey', title: 'API Key', description: 'Enter your API key' },
     { id: 'model', title: 'Models', description: 'Select your models' },
-    { id: 'review', title: 'Review', description: 'Review your configuration' }
+    { id: 'review', title: 'Review', description: 'Review your configuration' },
   ],
 
   // Initialize the wizard
@@ -46,7 +46,7 @@ const model = {
             this.providers = providerField.options.map(opt => ({
               id: opt.value,
               name: opt.label,
-              description: this.getProviderDescription(opt.value)
+              description: this.getProviderDescription(opt.value),
             }));
           }
         }
@@ -54,9 +54,9 @@ const model = {
     } catch (e) {
       console.error('Failed to load providers:', e);
       window.toastFrontendWarning(
-        "Could not load providers from settings. Using defaults.",
-        "Provider Load",
-        5
+        'Could not load providers from settings. Using defaults.',
+        'Provider Load',
+        5,
       );
       // Fallback to default providers
       this.providers = this.getDefaultProviders();
@@ -72,7 +72,7 @@ const model = {
       { id: 'deepseek', name: 'DeepSeek', description: 'DeepSeek Chat, DeepSeek Coder' },
       { id: 'openrouter', name: 'OpenRouter', description: 'Access to 100+ models' },
       { id: 'ollama', name: 'Ollama', description: 'Local AI models' },
-      { id: 'lm_studio', name: 'LM Studio', description: 'Local AI models' }
+      { id: 'lm_studio', name: 'LM Studio', description: 'Local AI models' },
     ];
   },
 
@@ -88,7 +88,7 @@ const model = {
       'lm_studio': 'Desktop app for running local AI models',
       'azure': 'Microsoft Azure OpenAI Service',
       'groq': 'Fast inference with Groq chips',
-      'mistral': 'Mistral AI models'
+      'mistral': 'Mistral AI models',
     };
     return descriptions[providerId] || 'AI model provider';
   },
@@ -143,7 +143,7 @@ const model = {
         this.validationError = 'Please select at least a chat model';
         return;
       }
-      
+
       this.currentStep++;
       this.validationError = null;
     }
@@ -173,73 +173,73 @@ const model = {
         'chat': [
           { id: 'gpt-4-turbo', name: 'GPT-4 Turbo', description: 'Latest GPT-4 with vision' },
           { id: 'gpt-4', name: 'GPT-4', description: 'Most capable model' },
-          { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', description: 'Fast and affordable' }
+          { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', description: 'Fast and affordable' },
         ],
         'util': [
-          { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', description: 'Fast and affordable' }
-        ]
+          { id: 'gpt-3.5-turbo', name: 'GPT-3.5 Turbo', description: 'Fast and affordable' },
+        ],
       },
       'anthropic': {
         'chat': [
           { id: 'claude-3-5-sonnet-20241022', name: 'Claude 3.5 Sonnet', description: 'Latest Claude' },
           { id: 'claude-3-opus-20240229', name: 'Claude 3 Opus', description: 'Most capable' },
-          { id: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku', description: 'Fast and affordable' }
+          { id: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku', description: 'Fast and affordable' },
         ],
         'util': [
-          { id: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku', description: 'Fast and affordable' }
-        ]
+          { id: 'claude-3-haiku-20240307', name: 'Claude 3 Haiku', description: 'Fast and affordable' },
+        ],
       },
       'google': {
         'chat': [
           { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro', description: 'Long context, multimodal' },
           { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash', description: 'Fast and efficient' },
-          { id: 'gemini-pro', name: 'Gemini Pro', description: 'Balanced performance' }
+          { id: 'gemini-pro', name: 'Gemini Pro', description: 'Balanced performance' },
         ],
         'util': [
-          { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash', description: 'Fast and efficient' }
-        ]
+          { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash', description: 'Fast and efficient' },
+        ],
       },
       'deepseek': {
         'chat': [
           { id: 'deepseek-chat', name: 'DeepSeek Chat', description: 'Open source alternative' },
-          { id: 'deepseek-coder', name: 'DeepSeek Coder', description: 'Specialized for code' }
+          { id: 'deepseek-coder', name: 'DeepSeek Coder', description: 'Specialized for code' },
         ],
         'util': [
-          { id: 'deepseek-chat', name: 'DeepSeek Chat', description: 'Open source alternative' }
-        ]
+          { id: 'deepseek-chat', name: 'DeepSeek Chat', description: 'Open source alternative' },
+        ],
       },
       'openrouter': {
         'chat': [
           { id: 'anthropic/claude-3.5-sonnet', name: 'Claude 3.5 Sonnet', description: 'Via OpenRouter' },
           { id: 'openai/gpt-4-turbo', name: 'GPT-4 Turbo', description: 'Via OpenRouter' },
-          { id: 'google/gemini-pro-1.5', name: 'Gemini Pro 1.5', description: 'Via OpenRouter' }
+          { id: 'google/gemini-pro-1.5', name: 'Gemini Pro 1.5', description: 'Via OpenRouter' },
         ],
         'util': [
-          { id: 'openai/gpt-3.5-turbo', name: 'GPT-3.5 Turbo', description: 'Via OpenRouter' }
-        ]
+          { id: 'openai/gpt-3.5-turbo', name: 'GPT-3.5 Turbo', description: 'Via OpenRouter' },
+        ],
       },
       'ollama': {
         'chat': [
           { id: 'llama3', name: 'Llama 3', description: 'Meta\'s latest model' },
           { id: 'mistral', name: 'Mistral', description: 'Mistral AI model' },
-          { id: 'codellama', name: 'CodeLlama', description: 'For code generation' }
+          { id: 'codellama', name: 'CodeLlama', description: 'For code generation' },
         ],
         'util': [
-          { id: 'llama3', name: 'Llama 3', description: 'Meta\'s latest model' }
-        ]
+          { id: 'llama3', name: 'Llama 3', description: 'Meta\'s latest model' },
+        ],
       },
       'lm_studio': {
         'chat': [
           { id: 'llama3', name: 'Llama 3', description: 'Meta\'s latest model' },
           { id: 'mistral', name: 'Mistral', description: 'Mistral AI model' },
-          { id: 'phi3', name: 'Phi-3', description: 'Microsoft\'s small model' }
+          { id: 'phi3', name: 'Phi-3', description: 'Microsoft\'s small model' },
         ],
         'util': [
-          { id: 'llama3', name: 'Llama 3', description: 'Meta\'s latest model' }
-        ]
-      }
+          { id: 'llama3', name: 'Llama 3', description: 'Meta\'s latest model' },
+        ],
+      },
     };
-    
+
     return models[providerId]?.[type] || [];
   },
 
@@ -259,24 +259,24 @@ const model = {
         chat_model_provider: this.selectedProvider,
         chat_model_name: this.selectedChatModel?.id || 'gpt-3.5-turbo',
         util_model_provider: this.selectedProvider,
-        util_model_name: this.selectedUtilModel?.id || 'gpt-3.5-turbo'
+        util_model_name: this.selectedUtilModel?.id || 'gpt-3.5-turbo',
       };
 
       // Build the env var name for the API key
       const apiKeyEnvVar = `${this.selectedProvider.toUpperCase()}_API_KEY`;
-      
+
       // Save secrets and test connection
       const response = await sendJsonData('/api/secrets_set', {
-        secrets: { [apiKeyEnvVar]: this.apiKey }
+        secrets: { [apiKeyEnvVar]: this.apiKey },
       });
 
       // Test the connection
       const testResult = await sendJsonData(API_ENDPOINTS.TEST_CONNECTION, {
-        provider: this.selectedProvider
+        provider: this.selectedProvider,
       });
 
       this.isValidating = false;
-      
+
       if (testResult && testResult.success) {
         return true;
       } else {
@@ -309,20 +309,20 @@ const model = {
         util_model_provider: this.selectedProvider,
         util_model_name: this.selectedUtilModel?.id || this.selectedChatModel.id,
         browser_model_provider: this.selectedProvider,
-        browser_model_name: this.selectedChatModel.id
+        browser_model_name: this.selectedChatModel.id,
       };
 
       await sendJsonData(API_ENDPOINTS.SETTINGS_SAVE, settings);
-      
+
       this.isComplete = true;
       this.isValidating = false;
-      
+
       // Close wizard and reload
       setTimeout(() => {
         this.close();
         window.location.reload();
       }, 1500);
-      
+
     } catch (e) {
       this.isValidating = false;
       this.validationError = e.message || 'Failed to save configuration';
@@ -337,12 +337,12 @@ const model = {
   // Check if step is complete
   isStepComplete(step) {
     switch (step) {
-      case 0: return true; // Welcome always complete
-      case 1: return !!this.selectedProvider;
-      case 2: return !!this.apiKey && !this.validationError;
-      case 3: return !!this.selectedChatModel;
-      case 4: return this.selectedProvider && this.selectedChatModel;
-      default: return false;
+    case 0: return true; // Welcome always complete
+    case 1: return !!this.selectedProvider;
+    case 2: return !!this.apiKey && !this.validationError;
+    case 3: return !!this.selectedChatModel;
+    case 4: return this.selectedProvider && this.selectedChatModel;
+    default: return false;
     }
   },
 
@@ -350,13 +350,13 @@ const model = {
   skip() {
     this.close();
     // Open settings modal
-    const settingsButton = document.getElementById("settings");
+    const settingsButton = document.getElementById('settings');
     if (settingsButton) {
       settingsButton.click();
     }
-  }
+  },
 };
 
 // Create and export the store
-const store = createStore("setupWizardStore", model);
+const store = createStore('setupWizardStore', model);
 export { store };
