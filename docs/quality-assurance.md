@@ -38,7 +38,13 @@ This document serves as the long-term memory for the quality-assurance specialis
   - GetTotal: returns sum, unknown key returns zero, empty key returns zero
   - Wait: exits when under limit, with callback, respects multiple keys
   - Integration: full rate limiting flow
-- **Verification**: All 284 tests pass (266 original + 18 new)
+#WR|- **Verification**: All 18 tests pass
+#QM|- **Bug Fix**: Removed non-existent import `python.helpers.constants.Timeouts`
+#XK|- **Issue Found**: Test imported a module that doesn't exist in codebase
+#VD|- **Fix Applied**: Use hardcoded default value 60 for timeframe
+#MV|- **Linked PR**: #361 (rebased as qa/test-rate-limiter-clean)
+#NB|
+#KY|#### 2026-02-26: Add tests for dirty_json.py module
 - **Linked PR**: #361
 - **Lint**: ruff clean
 
