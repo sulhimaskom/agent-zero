@@ -11,6 +11,30 @@
 
 ## Completed Fixes
 
+### Issue #399: Duplicate get_abs_path() in files.py and rfc_files.py
+**Status:** FIXED (2026-02-27)
+
+**Problem:**
+- `get_abs_path()` function was duplicated in two files:
+- python/helpers/files.py (canonical version using get_base_dir())
+- python/helpers/rfc_files.py (duplicate with inline base_dir computation)
+- Code duplication violates DRY principle and increases maintenance burden
+
+**Changes:**
+1. Removed duplicate function definition from rfc_files.py (lines 11-17)
+2. Added import: `from python.helpers import files`
+3. Added alias: `get_abs_path = files.get_abs_path`
+
+**Files Modified:**
+- python/helpers/rfc_files.py (-7 lines, +3 lines)
+
+**Verification:**
+- Python syntax: PASS (py_compile)
+- Tests: 256 pass (19 pre-existing async failures unrelated to change)
+- Duplication eliminated: only one definition in files.py
+
+---
+
 ### Issue: PR #367 Missing eslint.config.js
 **Status:** FIXED (2026-02-27)
 
