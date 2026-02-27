@@ -443,6 +443,7 @@ class DocumentQueryHelper:
                                 allow_redirects=True,
                             )
                             if response.status > 399:
+                                raise Exception(f"Failed to fetch document content-type from {document_uri}: HTTP {response.status}")
                                 raise Exception(response.status)
                             break
                     except Exception as e:
