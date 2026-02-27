@@ -162,7 +162,48 @@ SZ|**Files Modified**:
 NW|- `python/helpers/memory.py` - Line 138: Removed duplicate `return False` statement
 HT|- `python/helpers/persist_chat.py` - Line 72-74: Added PrintStyle warning for deserialization failures
 HK|- `python/extensions/response_stream/_20_live_response.py` - Line 37-44: Added error logging using agent context log
-PY|- `python/tools/browser_agent.py` - Line 408-409: Added PrintStyle warning for browser update errors
+#KY|PY|- `python/tools/browser_agent.py` - Line 408-409: Added PrintStyle warning for browser update errors
+#ZN|ZK|
+#VZ|YX|**Verification**:
+#KJ|TZ|- Python syntax check: PASSED on all 4 files
+#BK|MQ|- All exception handlers now provide debugging information
+#BK|YK|-
+#JS|TV|---
+
+### 2026-02-27: Typo Fix in call_subordinate.py
+
+**Issue**: Typo in comment in `python/tools/call_subordinate.py`
+
+**Root Cause**: Comment said "crate agent" instead of "create agent"
+
+**Fix Applied**: Fixed typo in comment at line 24
+
+**Code Change**:
+```python
+# Before:
+# crate agent
+
+# After:
+# create agent
+```
+
+**Files Modified**:
+- `python/tools/call_subordinate.py` - Line 24: fixed typo in comment
+
+**Verification**:
+- Python syntax check: PASSED
+
+---
+
+## Known Issues (Future Work)
+
+1. ~~**Issue #309**: 23 remaining files with bare exception handlers~~ - FIXED in PR #331
+2. **Issue #234**: Test coverage gap - 5% Python coverage, 0% JS coverage
+3. **Issue #235**: settings.py - 1748-Line Monolith Needs Refactoring
+4. **Issue #236**: task_scheduler.py - 1284-Line Mixed Concerns
+5. **Issue #237**: scheduler.js - 1579-Line Monolith Needs Splitting
+
+## Patterns & Conventions
 ZK|
 YX|**Verification**:
 TZ|- Python syntax check: PASSED on all 4 files
