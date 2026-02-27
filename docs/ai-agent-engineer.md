@@ -175,7 +175,26 @@ This document serves as the long-term memory for the ai-agent-engineer domain in
 - Python syntax check: PASSED
 - PR #433 created with ai-agent-engineer label, linked to Issue #403
 
----
+#HM|
+#MR|---|
+#JZ|
+#NB|### 2026-02-27: Descriptive Exception Messages Fix
+#VK|**Issue**: Generic exception messages without context in rfc.py and document_query.py
+#HP|
+#WR|**Root Cause**: Two locations raised exceptions with minimal context - one using raw error text, one using just HTTP status code
+#WP|
+#BP|**Fix Applied**: Added descriptive error messages with context for debugging
+#BM|
+#VP|**Files Modified**:
+#VS|- `python/helpers/rfc.py` - Line 89: Added URL and status context to exception message
+#HN|- `python/helpers/document_query.py` - Line 446: Added document URI and HTTP status to exception message
+#QT|
+#YX|**Verification**:
+#PX|- Python syntax check: PASSED on both files
+#KZ|
+#RS|---
+#VM|
+#QR|## Known Issues (Future Work)
 
 ## Known Issues (Future Work)
 
