@@ -1,3 +1,8 @@
+"""Health check API endpoint.
+
+Provides system diagnostics and health status information.
+"""
+
 from python.helpers import errors, git
 from python.helpers.api import ApiHandler, Request, Response
 from python.helpers.health_check import Diagnostics, get_health_checker

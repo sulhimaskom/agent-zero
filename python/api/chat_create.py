@@ -1,3 +1,8 @@
+"""Chat creation API endpoint.
+
+Creates new chat contexts, optionally copying data from an existing context.
+"""
+
 from agent import AgentContext
 from python.helpers import guids, projects
 from python.helpers.api import ApiHandler, Input, Output, Request
