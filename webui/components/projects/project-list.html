@@ -47,12 +47,12 @@
   </div>
   <div class="projects-project-card-actions flex gap-5">
     <template x-if="$store.chats.selectedContext && project.name === $store.chats.selectedContext?.project?.name">
-      <button type="button" class="button cancel w-9em" title="Deactivate" @click="$store.projects.deactivateProject()">
+      <button type="button" class="button cancel w-9em" title="Deactivate" aria-label="Deactivate" @click="$store.projects.deactivateProject()">
         <span class="icon material-symbols-outlined">close</span> Deactivate
       </button>
     </template>
     <template x-if="$store.chats.selectedContext && project.name !== $store.chats.selectedContext?.project?.name">
-      <button type="button" class="button confirm w-9em" title="Activate" @click="$store.projects.activateProject(project.name)">
+      <button type="button" class="button confirm w-9em" title="Activate" aria-label="Activate" @click="$store.projects.activateProject(project.name)">
         <span class="icon material-symbols-outlined">play_arrow</span> Activate
       </button>
     </template>

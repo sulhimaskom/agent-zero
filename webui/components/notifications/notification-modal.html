@@ -16,7 +16,7 @@
                     <div class="notification-header-actions">
                         <button class="notification-action" @click="$store.notificationStore?.clearAll()"
                             :disabled="!$store.notificationStore || $store.notificationStore.getDisplayNotifications().length === 0"
-                            title="Clear All">
+                            title="Clear All" aria-label="Clear All">
                             <span class="material-symbols-outlined">delete</span> Clear All
                         </button>
                     </div>

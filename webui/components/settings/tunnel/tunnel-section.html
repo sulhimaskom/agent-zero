@@ -65,7 +65,6 @@
                                         <span x-text="copyState === 'success' ? 'Copied!' : copyState === 'error' ? 'Failed' : 'Copy'"></span>
                                     </button>
                                     <button class="refresh-link-button" @click="$store.tunnelStore.refreshLink()" aria-label="Generate new tunnel URL" title="Generate new URL">
-                                        title="Generate new URL">
                                         <span class="icon material-symbols-outlined">refresh</span> Refresh
                                     </button>
                                 </div>
@@ -83,14 +82,14 @@
                                 This URL will persist until you stop the tunnel or restart the Docker container.
                             </div>
                             <div class="stop-tunnel-container">
-                                <button class="btn btn-danger" @click="$store.tunnelStore.stopTunnel()">
+                                <button class="btn btn-danger" aria-label="Stop Tunnel" @click="$store.tunnelStore.stopTunnel()">
                                     <span class="icon material-symbols-outlined">stop_circle</span> Stop Tunnel
                                 </button>
                             </div>
                         </div>
                         <!-- Generate tunnel button when no link exists -->
                         <div class="tunnel-actions" x-show="!$store.tunnelStore.linkGenerated">
-                            <button class="btn btn-ok" @click="$store.tunnelStore.generateLink()">
+                            <button class="btn btn-ok" aria-label="Create Tunnel" @click="$store.tunnelStore.generateLink()">
                                 <span class="icon material-symbols-outlined">play_circle</span> Create Tunnel
                             </button>
                         </div>

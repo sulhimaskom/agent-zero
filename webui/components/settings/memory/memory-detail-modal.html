@@ -40,11 +40,11 @@
                                 </button>
                                 <div style="width:2em"></div>
                                 <button class="btn btn-action-header edit" @click="$store.memoryDashboardStore.enableEditMode()"
-                                        title="Edit Memory">
+                                        title="Edit Memory" aria-label="Edit Memory">
                                     <span class="material-symbols-outlined">edit_document</span>
                                 </button>
                                 <button class="btn btn-action-header delete danger" @click="$store.memoryDashboardStore.deleteMemory($store.memoryDashboardStore.detailMemory)"
-                                        title="Delete Memory">
+                                        title="Delete Memory" aria-label="Delete Memory">
                                     <span class="material-symbols-outlined">delete</span>
                                 </button>
                             </div>
@@ -53,11 +53,11 @@
                         <template x-if="$store.memoryDashboardStore.editMode">
                             <div style="display: flex; gap: 0.5rem;">
                                 <button class="btn btn-action-header cancel" @click="$store.memoryDashboardStore.cancelEditMode()"
-                                        title="Cancel Edit">
+                                        title="Cancel Edit" aria-label="Cancel Edit">
                                     <span class="material-symbols-outlined">close</span>
                                 </button>
                                 <button class="btn btn-action-header confirm" @click="$store.memoryDashboardStore.confirmEditMode()"
-                                        title="Confirm Changes">
+                                        title="Confirm Changes" aria-label="Confirm Changes">
                                     <span class="material-symbols-outlined">check</span>
                                 </button>
 
