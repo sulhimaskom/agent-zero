@@ -128,3 +128,16 @@ Fixed keyboard accessibility issues in the scheduler task table (`webui/index.ht
 - WCAG 2.1 Guidelines
 - MDN Accessibility Documentation
 - WAI-ARIA Practices
+**Last Updated:** 2026-02-27
+
+### Image Viewer Focus States (2026-02-27)
+**Status:** ✅ COMPLETED
+
+Fixed keyboard accessibility issue in image viewer zoom controls (`webui/components/modals/image-viewer/image-viewer.html`):
+
+1. **Zoom Buttons** - Added `:focus-visible` CSS styling:
+   - Added visible focus outline using `var(--color-highlight, #64b5f6)`
+   - Added `outline-offset: 2px` for better visibility
+   - Added background change on focus for additional visual feedback
+
+**Impact:** Keyboard users can now see which zoom button is focused when navigating with Tab key.
