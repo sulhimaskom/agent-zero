@@ -1,4 +1,5 @@
 # Security Engineer Agent Documentation
+**Last Updated:** 2026-02-27
 
 ## Overview
 Security-engineer agent is responsible for identifying and fixing security vulnerabilities in the Agent Zero codebase.

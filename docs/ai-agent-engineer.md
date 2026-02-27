@@ -1,4 +1,5 @@
 # AI Agent Engineer - Long-term Memory
+**Last Updated:** 2026-02-27
 
 ## Overview
 This document serves as the long-term memory for the ai-agent-engineer domain in the Agent Zero project.

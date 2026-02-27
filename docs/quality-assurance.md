@@ -1,4 +1,5 @@
 # Quality Assurance Documentation
+**Last Updated:** 2026-02-27
 
 ## Overview
 This document serves as the long-term memory for the quality-assurance specialist agent.
