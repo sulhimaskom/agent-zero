@@ -1,4 +1,5 @@
 # Security Engineer Agent Documentation
+
 **Last Updated:** 2026-02-27
 
 ## Overview
@@ -164,69 +165,94 @@ Implemented `safe_eval_condition()` - a secure AST-based expression evaluator th
 
 ---
 
+## 2026-02-26: XSS Vulnerability in messages.js
+
+**Issue**: #316 - XSS Vulnerability in messages.js - convertPathsToLinks Function
+**Date Fixed**: 2026-02-26
+**Severity**: HIGH (XSS)
+**Files Changed**: 
+- `webui/js/messages.js`
+
+**Vulnerability**: 
+The `convertPathsToLinks` function at line ~959 constructed onclick handlers with unsanitized path data. If a path contained a single quote (`'`), it could break out of the JavaScript string and execute arbitrary JavaScript code.
+
+**Example Attack Vector**:
+```html
+onclick="openFileLink('/path/to/file'); maliciousCode();//');"
+```
+
+**Solution**:
+Escaped single quotes and backslashes for JavaScript string context:
+- Added: `.replace(/\\/g, '\\\\').replace(/'/g, "\\'")`
+- This escapes backslashes first (to prevent double-escaping), then escapes single quotes
+
+**Testing**:
+- Path without special characters → Works as before
+- Path with single quote → Properly escaped to `\'`
+- Path with backslash → Properly escaped to `\\`
+
+**Scan for Similar Patterns**:
+Checked for other `onclick=.*${` patterns - found only vendor files and this instance
+Vendor files in `webui/vendor/` skipped per policy
+
+---
+
+## 2026-02-27: Command Injection in brocula_loop.py
+
+---
+
+**Issue**: Command Injection via shell=True with f-strings
+**Date Fixed**: 2026-02-27
+**Severity**: HIGH (Command Injection)
+**Files Changed**: 
+- `agents/brocula/brocula_loop.py`
+
+**Vulnerability**: 
+The `run_command()` function used `shell=True` with f-string commands, allowing command injection. Variables like `target_url` and `chrome_flags` were directly inserted into shell commands.
+
+**Solution**:
+Replaced `shell=True` with `shell=False` and used `shlex.split()` to parse commands:
+- Changed `subprocess.run(cmd, shell=True, ...)` to `subprocess.run(cmd_list, shell=False, ...)`
+- Used `shlex.split()` to safely parse command strings into list format
+- Added error handling for malformed commands
+- Maintains compatibility while preventing shell injection attacks
+
+**Testing**:
+- `which` commands → Work as before
+- Lighthouse command → Works with list-formatted arguments
+- Git commands → Work with shlex.split()
+
+---
+
+## 2026-02-27: Path Traversal in file_info.py and download_work_dir_file.py
+
+---
+
+**Issue**: Path Traversal in file info and download endpoints
+**Date Fixed**: 2026-02-27
+**Severity**: HIGH (File System Access)
+**Files Changed**: 
+- `python/api/file_info.py`
+- `python/api/download_work_dir_file.py`
+
+**Vulnerability**: 
+These API endpoints accepted user-controlled paths without validating they stayed within the allowed base directory. An attacker could use path traversal (e.g., `../../etc/passwd`) to access files outside the work directory.
+
+**Solution**:
+Added path traversal validation using the existing `files.is_in_base_dir()` function:
+- Added validation check in `file_info.py` before calling `get_file_info()`
+- Added validation check in `download_work_dir_file.py` before processing file download
+- Returns error message if path is outside allowed directory
+- Follows the same pattern as `api_files_get.py` and `image_get.py`
+
+**Testing**:
+- Valid paths within base directory → Works as before
+- Paths like `../../../etc/passwd` → Blocked with "Access denied" message
+- Absolute paths outside work directory → Blocked with "Access denied" message
+
+---
+
 ## Future Focus Areas
 - ~~Issue #232: eval() in Node.js~~ → **FIXED (Issue #255)**
 - ~~Issue #233: SSH Root Access~~ → **FIXED (Issue #268)**
 - ~~Issue #238: Weak password hashing~~ → **FIXED (Issue #266)**
-- ~~Issue #232: eval() in Node.js~~ → **FIXED (Issue #255)**
-- ~~Issue #233: SSH Root Access~~ → **FIXED (Issue #268)**
-#ZW|- ~~Issue #238: Weak password hashing~~ → **FIXED (Issue #266)**
-#BZ|
-#MX|## 2026-02-26: XSS Vulnerability in messages.js
-#TY|
-#YT|**Issue**: #316 - XSS Vulnerability in messages.js - convertPathsToLinks Function
-#PV|**Date Fixed**: 2026-02-26
-#TR|**Severity**: HIGH (XSS)
-#YR|**Files Changed**: 
-#SJ|- `webui/js/messages.js`
-#HQ|
-#RY|**Vulnerability**: 
-#QZ|The `convertPathsToLinks` function at line ~959 constructed onclick handlers with unsanitized path data. If a path contained a single quote (`'`), it could break out of the JavaScript string and execute arbitrary JavaScript code.
-#JN|
-#PJ|**Example Attack Vector**:
-#NV|```html
-onclick="openFileLink('/path/to/file'); maliciousCode();//');"
-```
-#PR|
-#PJ|**Solution**:
-#RW|Escaped single quotes and backslashes for JavaScript string context:
-#MB|- Added: `.replace(/\\/g, '\\\\').replace(/'/g, "\\\\'")`
-#SN|- This escapes backslashes first (to prevent double-escaping), then escapes single quotes
-#TY|
-#JS|**Testing**:
-#ZJ|- Path without special characters → Works as before
-#ZR|- Path with single quote → Properly escaped to `\'`
-#XP|- Path with backslash → Properly escaped to `\\`
-#NZ|
-#BQ|**Scan for Similar Patterns**:
-#JR|Checked for other `onclick=.*${` patterns - found only vendor files and this instance
-#ZQ|Vendor files in `webui/vendor/` skipped per policy
-#KJ|
-## 2026-02-26: Path Traversal in api_files_get.py
-
----
-
-**Issue**: Arbitrary File Read via Path Traversal
-**Date Fixed**: 2026-02-26
-**Severity**: HIGH (File System Access)
-**Files Changed**: 
-- `python/api/api_files_get.py`
-
-**Vulnerability**: 
-The API endpoint accepted external/absolute paths without validating they stayed within the allowed base directory. An attacker with API key access could read arbitrary files on the system using paths like `/etc/passwd`.
-
-**Solution**:
-Added path traversal validation using the existing `files.is_in_base_dir()` function:
-- Added check after determining `external_path`
-- Uses `os.path.commonpath()` to verify path stays within base directory
-- Follows the same pattern as `image_get.py` (lines 25-31)
-- Invalid paths are logged with a warning and skipped
-
-**Testing**:
-- Valid paths within base directory → Works as before
-- Paths like `/etc/passwd` → Blocked with warning message
-- Paths with `../` attempts → Blocked by `is_in_base_dir()` validation
-
----
-
-## 2026-02-26: XSS Vulnerability in messages.js

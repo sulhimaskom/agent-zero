@@ -8,6 +8,23 @@ from python.helpers.api import ApiHandler, Input, Output, Request
 class FileInfoApi(ApiHandler):
     async def process(self, input: Input, request: Request) -> Output:
         path = input.get("path", "")
+        
+        # Security: Validate path to prevent path traversal
+        abs_path = files.get_abs_path(path)
+        if not files.is_in_base_dir(abs_path):
+            return {"error": "Access denied: path outside allowed directory", "input_path": path}
+        
+        info = await runtime.call_development_function(get_file_info, path)
+        return info
+from typing import TypedDict
+
+from python.helpers import files, runtime
+from python.helpers.api import ApiHandler, Input, Output, Request
+
+
+class FileInfoApi(ApiHandler):
+    async def process(self, input: Input, request: Request) -> Output:
+        path = input.get("path", "")
         info = await runtime.call_development_function(get_file_info, path)
         return info
 
