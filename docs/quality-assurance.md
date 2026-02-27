@@ -143,10 +143,19 @@ This document serves as the long-term memory for the quality-assurance specialis
 - tests/test_tool_coordinator.py
 - tests/test_login.py
 - tests/test_dirty_json.py (NEW - 35 tests)
-- tests/test_guids.py (NEW - 9 tests)
+- tests/test_defer.py (NEW - 15 tests)
 - tests/chunk_parser_test.py
 - tests/email_parser_test.py
 - tests/rate_limiter_manual.py
 
 ### Workflow Pattern
 The repository uses a unique AI-powered CI (OpenCode agents) rather than traditional lint/test gates. This is intentional but creates gaps in automated quality enforcement.
+
+#### 2026-02-27: Add tests for defer.py module
+- **File Created**: `tests/test_defer.py`
+- **Test Coverage**: 15 tests covering:
+  - run_in_background: basic execution, multiple concurrent tasks
+  - EventLoopThread: singleton behavior, different thread names, daemon threads
+  - DeferredTask: basic execution, arguments, is_ready, is_alive, kill, sync result, timeout, multiple tasks, exception handling
+- **Verification**: All 15 tests pass, 288 total tests
+- **Lint**: ruff clean
