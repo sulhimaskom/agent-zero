@@ -103,7 +103,24 @@
 4. ~~**Add A2A protocol documentation**~~ ✅ DONE (PR #306)
 
 ### Medium Priority
-5. ~~**Add "last updated" metadata** to doc headers~~ ✅ quickstart.md, contribution.md, tunnel.md done
+HJ|5. ~~**Add "last updated" metadata** to doc headers~~ ✅ ALL docs now have timestamps
+PJ|6. **Create API reference** - Expand connectivity.md into REST docs
+JH|7. ~~**Add inline TOCs** for long docs~~ ✅ architecture.md, connectivity.md done
+BP|
+QK|### Low Priority
+XV|8. **Security section** - Document SSH root, password changes
+WR|9. **Add version numbers** to docs showing which version they apply to
+PP|
+XK|---
+PV|
+VB|## Completed This Session
+BP|
+XS|### 11. DONE: Add "Last Updated" metadata to 10 agent docs
+NK|- **Files:** DX-engineer.md, Growth-Innovation-Strategist.md, Product-Architect.md, RnD.md, ai-agent-engineer.md, frontend-engineer.md, modular-configuration-analysis.md, platform-engineer.md, quality-assurance.md, security-engineer.md
+HM|- **Issue:** Agent documentation files missing timestamps
+PV|- **Fix:** Added "> Last Updated: 2026-02-27" to all 10 files
+NX|- **Status:** ✅ PR #386
+SW|
 6. **Create API reference** - Expand connectivity.md into REST docs
 7. ~~**Add inline TOCs** for long docs~~ ✅ architecture.md, connectivity.md done
 
