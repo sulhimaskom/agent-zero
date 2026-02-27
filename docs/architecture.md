@@ -39,7 +39,7 @@ These changes are designed to:
 - Enable independent development and testing of components
 - Facilitate extension of functionality without modifying core logic
 
-For detailed migration plans and progress tracking, see [docs/blueprint.md](./blueprint.md).
+For detailed migration plans and progress tracking, see [Blueprint](./blueprint.md).
 
 ![Agent Zero Architecture](res/arch-01.svg)
 
