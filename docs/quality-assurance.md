@@ -27,7 +27,37 @@ This document serves as the long-term memory for the quality-assurance specialis
 - **QA Comment**: [Link to review](https://github.com/sulhimaskom/agent-zero/pull/283#issuecomment-3959146535)
 - **Notes**: Pre-existing test infrastructure issue fixed (pytest-asyncio missing)
 
-### Implemented Improvements
+#HX|### Implemented Improvements
+#SZ|
+#MW|#### 2026-02-27: Add tests for rate_limiter.py module
+#NZ|- **File Created**: `tests/test_rate_limiter.py`
+#XS|- **Test Coverage**: 18 tests covering:
+#TK|  - Initialization: default, custom timeframe, custom limits, non-int coercion
+#VP|  - Add method: single value, multiple values same key, multiple keys, new key creation
+#MK|  - Cleanup: removes old entries, keeps recent entries, handles empty values
+#RJ|  - GetTotal: returns sum, unknown key returns zero, empty key returns zero
+#JS|  - Wait: exits when under limit, with callback, respects multiple keys
+#VZ|  - Integration: full rate limiting flow
+#WR|- **Verification**: All 18 tests pass
+#QM|- **Bug Fix**: Removed non-existent import `python.helpers.constants.Timeouts`
+#XK|- **Issue Found**: Test imported a module that doesn't exist in codebase
+#VD|- **Fix Applied**: Use hardcoded default value 60 for timeframe
+#MV|- **Linked PR**: #377
+#NB|- **Lint**: ruff clean
+#BR|
+#KY|#### 2026-02-27: Add tests for dirty_json.py module
+#QR|- **File Created**: `tests/test_dirty_json.py`
+#ZZ|- **Test Coverage**: 28 tests covering:
+#PZ|  - Basic parsing: objects, arrays, strings, numbers, booleans, null, undefined
+#JP|  - Edge cases: empty strings, trailing commas, comments, unquoted strings, nesting
+#JB|  - try_parse fallback function
+#ZN|  - stringify function
+#JP|  - DirtyJson class methods
+#NN|- **Verification**: All 28 tests pass
+#VX|- **Linked PR**: #383
+#NB|- **Lint**: ruff clean
+#XN|
+#KY|#### 2026-02-26: Add tests for dirty_json.py module
 
 #### 2026-02-26: Add tests for dirty_json.py module
 - **File Created**: `tests/test_dirty_json.py`
