@@ -14,12 +14,12 @@
 
                 <template x-if="!$store.projects.selectedProject._meta.creating">
                     <div class="projects-form-group">
-                        <label class="projects-form-label">Folder name</label>
+                        <label class="projects-form-label" for="project-folder-name">Folder name</label>
                         <span class="projects-form-description">Project files and settings are located in
                             <strong><span
                                     x-text="$store.projects.getSelectedAbsPath()"></span></strong></span>
                         <div class="projects-input-with-button-wrapper">
-                            <input class="projects-form-input projects-disabled" type="text" x-model="$store.projects.selectedProject.name" disabled>
+                            <input id="project-folder-name" class="projects-form-input projects-disabled" type="text" x-model="$store.projects.selectedProject.name" disabled>
                             <button class="button icon-button" @click="$store.projects.browseSelected()" aria-label="Browse project folder">
                                 <span class="icon material-symbols-outlined">folder</span>
                                 <span>Browse</span>
@@ -29,11 +29,11 @@
                 </template>
 
                 <div class="projects-form-group">
-                    <label class="projects-form-label">Title</label>
+                    <label class="projects-form-label" for="project-title">Title</label>
                     <span class="projects-form-description">Title and description are visible to both you and the agent
                         and can help it understand the project.</span>
-                    <input class="projects-form-input" type="text" x-model="$store.projects.selectedProject.title"
-                        placeholder="Optional title">
+                    <input id="project-title" class="projects-form-input" type="text" x-model="$store.projects.selectedProject.title" placeholder="Optional title">
+
                 </div>
 
                 <!-- <div class="projects-form-group">

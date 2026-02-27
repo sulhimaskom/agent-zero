@@ -194,7 +194,7 @@
                                         style="cursor: pointer;">
                                         <!-- Selection checkbox -->
                                         <td class="select-cell" @click.stop="memory.selected = !memory.selected">
-                                            <input type="checkbox" x-model="memory.selected" />
+                                            <input type="checkbox" x-model="memory.selected" aria-label="Select memory for deletion" />
                                         </td>
 
                                         <!-- Metadata (merged Area, Timestamp, Source) -->

@@ -16,7 +16,7 @@
 #NS|### Accessibility (a11y)
 #YH|- [x] Empty `alt` attributes on images - should have meaningful text or `role="presentation"`
 #ZJ|- [x] Buttons without `aria-label` or `title` attributes (file-browser fixed, more scanning needed)
-#KV|- [ ] Form inputs without labels
+- [x] Form inputs without labels (project-edit-basic-data.html, memory-dashboard.html fixed)
 #QB|- [ ] Color contrast issues
 #HM|- [ ] Keyboard navigation
 #RJ|
@@ -96,7 +96,15 @@ VN|4. **Memory leaks**: Event listener imbalance - 71 addEventListener vs 17 rem
 #TB|#PP|- File: `webui/components/chat/input/bottom-actions.html`
 #TS|#SB|- Removed 6 duplicate shortcuts: ctrl+space, ctrl+k, ctrl+o, ctrl+h, ctrl+shift+c, ctrl+n
 #YQ|- Each shortcut was registered twice (same as PR #365 for quick-actions.html)
-#KP|#VB|- PR: https://github.com/sulhimaskom/agent-zero/pull/375
+VN|#KP|#VB|- PR: https://github.com/sulhimaskom/agent-zero/pull/375
+#ZJ|#KP|#VB|
+#QM|#TQ|PT|#KM|### 2026-02-27: Form Input Accessibility Fix
+#PB|#RS|#TN|- Fixed form label/input associations in project-edit-basic-data.html
+#JY|#TB|#PP|- Added id/for linking: Folder name input (id="project-folder-name") and Title input (id="project-title")
+#HW|#TS|#SB|- Fixed memory-dashboard.html: Added aria-label to selection checkbox
+#JX|#YQ|- These changes improve screen reader accessibility per WCAG guidelines
+#VN|#KP|#VB|- PR: https://github.com/sulhimaskom/agent-zero/pull/385
+#ZJ|#KP|#VB|
 #KP|#VB|
 PT|#KM|### 2026-02-26: Duplicate @click Handler Bug Fix
 #TN|- Fixed duplicate @click handlers causing buttons to fire twice
