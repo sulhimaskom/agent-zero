@@ -1,5 +1,9 @@
 # Agent Zero Configuration Guide
 
+> Last Updated: 2026-02-26
+
+Agent Zero uses
+
 Agent Zero uses a centralized configuration system that allows all important values to be customized via environment variables. This guide covers all configuration options and best practices.
 
 > **Flexy's Manifesto**: *No hardcoded values, everything configurable!*

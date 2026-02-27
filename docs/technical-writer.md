@@ -83,7 +83,13 @@
 #HM|- **Issue:** Large docs without navigation aid
 #PV|- **Fix:** Added inline Table of Contents to four large docs
 #ZW|- **Status:** ✅ Completed 2026-02-26
-#HQ|
+### 10. DONE: Add "Last Updated" metadata to 4 key docs
+- **Files:** docs/connectivity.md, docs/architecture.md, docs/configuration.md, docs/README.md
+- **Issue:** Key user-facing docs without timestamps
+- **Fix:** Added "> Last Updated: 2026-02-26" metadata to four key docs
+- **Status:** ✅ Completed 2026-02-26
+
+---
 #XP|---
 
 ---

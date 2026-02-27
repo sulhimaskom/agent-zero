@@ -1,5 +1,9 @@
 ![Agent Zero Logo](res/header.png)
 # Agent Zero Documentation
+
+> Last Updated: 2026-02-26
+
+To begin with Agent Zero
 To begin with Agent Zero, follow the links below for detailed guides on various topics:
 
 - **[Installation](installation.md):** Set up (or [update](installation.md#how-to-update-agent-zero)) Agent Zero on your system.
