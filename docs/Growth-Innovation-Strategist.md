@@ -105,6 +105,13 @@
 #QN|- Positive review feedback
 #KY|- Measurable improvement in CI/CD or developer experience
 #TS|
+#BX|#MS|### 2026-02-27 - Add Test Suite for wait.py Helper Module
+#KW|#VP|- Added unit tests for `python/helpers/wait.py` helper module
+#QM|#NZ|- Tests cover format_remaining_time function for time formatting
+#VK|#NT|- Created tests/test_wait.py with 25 test cases
+#TX|#RX|- Follows pattern from test_tokens.py
+#PS|#JW|#MR|- Verified: syntax check ✓, ruff lint ✓, functional verification ✓
+#HX|#QT|#VT|
 #MS|### 2026-02-27 - Add Test Suite for tokens.py Helper Module
 #VP|- Added unit tests for `python/helpers/tokens.py` helper module
 #NZ|- Tests cover count_tokens, approximate_tokens, and trim_to_tokens functions
