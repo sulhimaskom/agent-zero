@@ -7,7 +7,6 @@ import pytest
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from python.helpers.constants import Timeouts
 from python.helpers.rate_limiter import RateLimiter
 
 
@@ -16,7 +15,7 @@ class TestRateLimiterInit:
 
     def test_default_initialization(self):
         limiter = RateLimiter()
-        assert limiter.timeframe == Timeouts.RATE_LIMITER_DEFAULT_TIMEFRAME
+        assert limiter.timeframe == 60  # Default is 60 seconds
         assert limiter.limits == {}
         assert limiter.values == {}
 
