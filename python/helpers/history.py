@@ -67,10 +67,16 @@ class Record:
     def to_dict(self) -> dict:
         pass
 
+    def set_summary(self, summary: str):
+        """Set the summary and invalidate the token cache. Base implementation."""
+        self.summary = summary
+        self._tokens = None
+
     @staticmethod
     def from_dict(data: dict, history: "History"):
         cls = data["_cls"]
         return globals()[cls].from_dict(data, history=history)
+
 
     def output_langchain(self):
         return output_langchain(self.output())
@@ -96,8 +102,8 @@ class Message(Record):
         return tokens.approximate_tokens(text)
 
     def set_summary(self, summary: str):
-        self.summary = summary
-        self._tokens = None
+        """Set the summary, invalidate token cache, and recalculate tokens."""
+        super().set_summary(summary)
         self.tokens = self.calculate_tokens()
 
     async def compress(self):
@@ -165,8 +171,7 @@ class Topic(Record):
 
     def set_summary(self, summary: str):
         """Set the summary and invalidate the token cache."""
-        self.summary = summary
-        self._tokens = None
+        super().set_summary(summary)
 
     async def compress_large_messages(self) -> bool:
         set = settings.get_settings()
@@ -333,8 +338,7 @@ class Bulk(Record):
 
     def set_summary(self, summary: str):
         """Set the summary and invalidate the token cache."""
-        self.summary = summary
-        self._tokens = None
+        super().set_summary(summary)
 
     def to_dict(self):
         return {
