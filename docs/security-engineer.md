@@ -250,7 +250,40 @@ Added path traversal validation using the existing `files.is_in_base_dir()` func
 - Paths like `../../../etc/passwd` → Blocked with "Access denied" message
 - Absolute paths outside work directory → Blocked with "Access denied" message
 
----
+#PH|---
+NZ|
+ST|## 2026-02-27: Docker Non-Root User - Security Hardening
+PR|
+TX|---
+QP|
+KK|**Issue**: #417 - Docker Missing Security Hardening - No Non-Root User
+BX|**Date Fixed**: 2026-02-27
+JW|**Severity**: HIGH (Container Security)
+YR|**Files Changed**: 
+YP|- `docker/base/Dockerfile`
+ST|- `docker/run/Dockerfile`
+ZY|
+RY|**Vulnerability**: 
+NZ|Docker containers ran as root without security capabilities dropped, violating container security best practices. If the container is compromised, an attacker would have full root privileges on the container.
+XP|
+PJ|**Solution**:
+BV|Created non-root user and switched container execution to run as unprivileged user:
+YM|- Created `agentzero` user (UID 1000, GID 1000) in base image
+JH|- Set ownership of runtime directories (`/var/run`, `/tmp`, `/var/log`) to `agentzero`
+ZW|- Added `USER agentzero` directive to both base and run Dockerfiles
+XJ|- Containers now run with principle of least privilege
+KJ|
+JS|**Testing**:
+PQ|- Base Dockerfile creates user correctly
+MS|- Run Dockerfile switches to non-root user
+JR|- No permission errors on startup (directories properly owned)
+TZ|
+PH|---
+NZ|
+ST|## Future Focus Areas
+BZ|- ~~Issue #232: eval() in Node.js~~ → **FIXED (Issue #255)**
+HB|- ~~Issue #233: SSH Root Access~~ → **FIXED (Issue #268)**
+ZW|- ~~Issue #238: Weak password hashing~~ → **FIXED (Issue #266)**
 
 ## Future Focus Areas
 - ~~Issue #232: eval() in Node.js~~ → **FIXED (Issue #255)**

@@ -39,5 +39,18 @@ RUN bash /ins/configure_ssh.sh
 # after install
 RUN bash /ins/after_install.sh
 
+# Create non-root user for security (principle of least privilege)
+RUN groupadd -g 1000 agentzero && \
+    useradd -r -u 1000 -g agentzero -d /home/agentzero -s /bin/bash agentzero && \
+    mkdir -p /home/agentzero && \
+    chown -R agentzero:agentzero /home/agentzero
+
+# Set ownership for runtime directories
+RUN mkdir -p /var/run /tmp /var/log && \
+    chown -R agentzero:agentzero /var/run /tmp /var/log
+
+# Switch to non-root user
+USER agentzero
+
 # Keep container running infinitely
 CMD ["tail", "-f", "/dev/null"]
