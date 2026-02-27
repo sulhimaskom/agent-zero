@@ -96,34 +96,6 @@
                     }
                 },
 
-                setupKeyboardHandler() {
-                    // Show hint when user presses Ctrl or Cmd (indicates they're looking for shortcuts)
-                    document.addEventListener('keydown', (e) => {
-                        // Only show if not dismissed and not in input field
-                        if (this.hasBeenDismissed || this.isInputField(e.target)) {
-                            return;
-                        }
-
-                        // Show hint on modifier key press (Ctrl/Cmd)
-                        if ((e.ctrlKey || e.metaKey) && !e.shiftKey && !e.altKey) {
-                            // Don't show if they're already pressing ?
-                            if (e.key !== '?') {
-                                this.showHint();
-                            }
-                        }
-
-                        // Dismiss if user presses ? (they've discovered it!)
-                        if (e.key === '?' && !this.isInputField(e.target)) {
-                            this.dismissPermanently();
-                        }
-                    });
-
-                    // Dismiss on any click
-                    document.addEventListener('click', () => {
-                        this.hideHint();
-                    });
-                },
-
                 isInputField(element) {
                     if (!element) return false;
                     const tagName = element.tagName.toLowerCase();

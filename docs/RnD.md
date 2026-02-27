@@ -1,5 +1,32 @@
 ## 2026-02-27
 
+### PR #390 Fix: Duplicate setupKeyboardHandler() Still Present - FIXED ✅
+
+**Problem**: PR #390 claimed to remove duplicate `setupKeyboardHandler()` function in keyboard-shortcut-hint.html, but the duplicate was still present in the codebase (lines 99-125).
+
+**Root Cause**: The PR added a new properly implemented version but failed to remove the duplicate definition with anonymous event handlers.
+
+**Solution Applied**:
+- Removed duplicate setupKeyboardHandler() function (27 lines)
+- Now the component has proper handler references (_keydownHandler, _clickHandler)
+- $cleanup() method properly removes both event listeners
+
+**Event Listener Balance**:
+- Before: 5 addEventListener vs 2 removeEventListener (3 leaked handlers)
+- After: 3 addEventListener vs 2 removeEventListener (proper cleanup)
+
+**Files Changed**:
+- `webui/components/keyboard-shortcut-hint/keyboard-shortcut-hint.html` (removed 27 lines)
+
+**Verification**:
+- JavaScript syntax validated: `node --check` passes
+- No regressions: Full test suite passes (362 passed, 7 pre-existing failures in test_tokens.py)
+
+---
+
+
+## 2026-02-27
+
 **Last Updated:** 2026-02-27
 
 ### Issue #420: Call LLM Core Module Has Zero Tests - FIXED ✅
