@@ -1,11 +1,10 @@
-import pytest
-import sys
 import os
+import sys
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from python.helpers.dirty_json import try_parse, parse, stringify, DirtyJson
+from python.helpers.dirty_json import DirtyJson, parse, stringify, try_parse
 
 
 class TestBasicParsing:

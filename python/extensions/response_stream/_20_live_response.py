@@ -1,5 +1,4 @@
 from agent import LoopData
-from agent import LoopData
 from python.helpers import errors
 from python.helpers.extension import Extension
 
