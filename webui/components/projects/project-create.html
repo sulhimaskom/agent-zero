@@ -19,7 +19,11 @@
                         <div class="buttons-right">
                             <button type="button" class="button cancel"
                                 @click="$store.projects.cancelCreate()">Cancel</button>
+                            <button type="button" class="button confirm" @click="$store.projects.confirmCreate()" aria-label="Create project and continue">Create and
                             <button type="button" class="button confirm" aria-label="Create project and continue" @click="$store.projects.confirmCreate()">Create and
+=======
+                            <button type="button" class="button confirm" @click="$store.projects.confirmCreate()" aria-label="Create project and continue">Create and
+>>>>>>> 2528669f (fix: improve accessibility - add aria-label to buttons)
                                 continue</button>
                         </div>
                 </div>
