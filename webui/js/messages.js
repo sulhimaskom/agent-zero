@@ -1512,7 +1512,7 @@ function drawKvpsIncremental(container, kvps, latex) {
         th = row.insertCell(0);
         th.classList.add("kvps-key");
       }
-      const convertedKey = convertIcons(String(key), "");
+      const convertedKey = convertIcons(escapeHTML(String(key)), "");
       if (convertedKey !== String(key)) {
         th.innerHTML = convertedKey;
       } else {
@@ -1948,7 +1948,7 @@ export function convertIcons(html, classes = "") {
     /icon:\/\/([a-zA-Z0-9_]+)(\[(?:\\.|[^\]])*\])?/g,
     (match, iconName, tooltipBlock) => {
       if (!tooltipBlock) {
-        return `<span class="icon material-symbols-outlined ${classes}">${iconName}</span>`;
+        return `<span class="icon material-symbols-outlined ${escapeHTML(classes)}">${escapeHTML(iconName)}</span>`;
       }
 
       const tooltipRaw = tooltipBlock
@@ -1959,7 +1959,7 @@ export function convertIcons(html, classes = "") {
 
       const tooltip = escapeHTML(tooltipRaw);
 
-      return `<span class="icon material-symbols-outlined ${classes}" title="${tooltip}" data-bs-placement="top" data-bs-trigger="hover">${iconName}</span>`;
+      return `<span class="icon material-symbols-outlined ${escapeHTML(classes)}" title="${tooltip}" data-bs-placement="top" data-bs-trigger="hover">${escapeHTML(iconName)}</span>`;
     },
   );
 }
