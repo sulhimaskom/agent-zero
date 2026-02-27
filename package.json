@@ -1,0 +1,20 @@
+{
+  "name": "agent-zero",
+  "version": "0.9.7",
+  "description": "Agent Zero - Multi-agent AI framework with Python backend and JavaScript frontend",
+  "private": true,
+  "workspaces": [
+    ".",
+    "webui"
+  ],
+  "scripts": {
+    "lint": "eslint webui/",
+    "lint:fix": "eslint webui/ --fix"
+  },
+  "keywords": ["agent-zero", "ai", "framework"],
+  "license": "MIT",
+  "devDependencies": {
+    "eslint": "^9.0.0",
+    "globals": "^15.0.0"
+  }
+}
