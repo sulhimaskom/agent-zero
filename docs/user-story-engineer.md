@@ -2,6 +2,34 @@
 
 ## Repository: agent-zero
 
+**Last Updated:** 2026-02-27T12:00:00Z
+
+---
+
+## Scan Results Summary
+
+### Exploration Findings (2026-02-27)
+
+#### 1. JavaScript Dead Code - settings.js
+- Removed commented-out dead code in `webui/js/settings.js` (lines 309-323)
+- Removed two commented-out blocks:
+  - `initSettingsModal()` function
+  - `document.addEventListener('alpine:init', ...)` block
+- ✅ COMPLETED (PR #???)
+
+#### 2. JavaScript console.log Debugging Remnants
+- Investigated Issue #400 about console.log in 78 non-vendor files
+- Found only 2 non-vendor files with relevant console.log:
+  - `webui/components/chat/speech/speech-store.js` - 9 occurrences (status messages, not pure debugging)
+  - `webui/js/settings.js` - 1 commented console.log (included in dead code removal above)
+- Most matches are in vendor files (ace-min, katex, transformers) - NOT modifying vendor files
+- Partial completion
+
+---
+
+
+## Repository: agent-zero
+
 **Last Updated:** 2026-02-26T13:30:00Z
 
 ---
