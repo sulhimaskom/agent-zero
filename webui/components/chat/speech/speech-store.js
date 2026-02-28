@@ -5,7 +5,6 @@ import { store as microphoneSettingStore } from "/components/settings/speech/mic
 import * as shortcuts from "/js/shortcuts.js";
 import { Logger } from "/js/logger.js";
 
-
 const Status = {
   INACTIVE: "inactive",
   ACTIVATING: "activating",
@@ -100,8 +99,7 @@ const model = {
       Logger.debug(
         "[Speech Store] Already initialized, skipping duplicate init()"
       );
-        "[Speech Store] Already initialized, skipping duplicate init()"
-      );
+
       return;
     }
 
