@@ -6,6 +6,17 @@ const DIALOG_TYPES = {
   info: { icon: 'info', color: 'var(--color-primary, #3b82f6)' }
 };
 
+// Escape HTML to prevent XSS
+function escapeHTML(str) {
+  if (typeof str !== 'string') str = String(str);
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 export function showConfirmDialog(options) {
   const {
     title = 'Confirm',
@@ -28,12 +39,12 @@ export function showConfirmDialog(options) {
     dialog.innerHTML = `
       <div class="confirm-dialog-header">
         <span class="confirm-dialog-icon material-symbols-outlined" style="color: ${typeConfig.color}">${typeConfig.icon}</span>
-        <span class="confirm-dialog-title">${title}</span>
+        <span class="confirm-dialog-title">${escapeHTML(title)}</span>
       </div>
-      <div class="confirm-dialog-body">${message}</div>
+      <div class="confirm-dialog-body">${escapeHTML(message)}</div>
       <div class="confirm-dialog-footer">
-        <button class="button cancel confirm-dialog-cancel">${cancelText}</button>
-        <button class="button confirm confirm-dialog-confirm">${confirmText}</button>
+        <button class="button cancel confirm-dialog-cancel">${escapeHTML(cancelText)}</button>
+        <button class="button confirm confirm-dialog-confirm">${escapeHTML(confirmText)}</button>
       </div>
     `;
 
