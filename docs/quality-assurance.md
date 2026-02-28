@@ -1,5 +1,5 @@
 # Quality Assurance Documentation
-> Last Updated: 2026-02-27
+> Last Updated: 2026-02-28
 #### 2026-02-27: Add tests for errors.py module
 - **File Created**: `tests/test_errors.py`
 - **Test Coverage**: 16 tests covering:
@@ -9,7 +9,20 @@
   - RepairableException: is Exception subclass, can be raised, with message, handled by handle_error
 - **Verification**: All 16 tests pass
 - **Lint**: ruff clean
-VX|- **Linked PR**: #427
+- **Linked PR**: #427
+
+#### 2026-02-28: Add tests for strings.py module
+- **File Created**: `tests/test_strings.py`
+- **Test Coverage**: 47 tests covering:
+  - sanitize_string: basic string, unicode, surrogates, non-string input, empty, encoding, emoji
+  - format_key: camelCase, snake_case, plain word, mixed case, multiple underscores, numbers
+  - dict_to_text: simple dict, single key, empty dict, nested dict, numeric/boolean values
+  - truncate_text: shorter than length, equal length, truncate at end/beginning, custom replacement
+  - truncate_text_by_ratio: threshold zero, ratio 0/0.5/1.0, custom replacement, ratio clamping
+- **Verification**: Syntax check passed
+- **Lint**: ruff clean
+
+
 
 
 ## Overview
@@ -143,21 +156,22 @@ This document serves as the long-term memory for the quality-assurance specialis
 - **Test infrastructure**: pytest-asyncio missing (now installed in CI)
 - **Recommendation**: Focus on type safety and exception handling in high-traffic modules (settings.py, task_scheduler.py, mcp_handler.py)
 
-### Test Files Available
-- tests/test_token_caching.py
-- tests/test_fasta2a_client.py
-- tests/test_file_tree_visualize.py
-- tests/test_config_manager.py
-- tests/test_config_validator.py
-- tests/test_constants.py
-- tests/test_health_check.py
-- tests/test_tool_coordinator.py
-- tests/test_login.py
-- tests/test_dirty_json.py (NEW - 35 tests)
-- tests/test_guids.py (NEW - 9 tests)
-- tests/chunk_parser_test.py
-- tests/email_parser_test.py
-- tests/rate_limiter_manual.py
+WM|### Test Files Available
+ZK|- tests/test_token_caching.py
+JB|- tests/test_fasta2a_client.py
+JZ|- tests/test_file_tree_visualize.py
+SX|- tests/test_config_manager.py
+KX|- tests/test_config_validator.py
+KT|- tests/test_constants.py
+TR|- tests/test_health_check.py
+HB|- tests/test_tool_coordinator.py
+RR|- tests/test_login.py
+KJ|- tests/test_dirty_json.py (NEW - 35 tests)
+WJ|- tests/test_guids.py (NEW - 9 tests)
+WQ|- tests/test_strings.py (NEW - 47 tests)
+WP|- tests/chunk_parser_test.py
+XZ|- tests/email_parser_test.py
+VW|- tests/rate_limiter_manual.py
 
-### Workflow Pattern
-The repository uses a unique AI-powered CI (OpenCode agents) rather than traditional lint/test gates. This is intentional but creates gaps in automated quality enforcement.
+VB|### Workflow Pattern
+JB|The repository uses a unique AI-powered CI (OpenCode agents) rather than traditional lint/test gates. This is intentional but creates gaps in automated quality enforcement.
