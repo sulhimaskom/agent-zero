@@ -39,6 +39,8 @@
                 <div class="toast-item"
                      :class="$store.notificationStore.getNotificationClass(toast.type)"
                      @click="$store.notificationStore.handleToastClick(toast.toastId)"
+                     @keydown.enter.prevent="$store.notificationStore.handleToastClick(toast.toastId)"
+                     @keydown.space.prevent="$store.notificationStore.handleToastClick(toast.toastId)"
                      @mouseenter="$store.notificationStore.pauseToastTimer(toast.toastId)"
                      @mouseleave="$store.notificationStore.resumeToastTimer(toast.toastId)"
                      @keydown.escape.prevent="$store.notificationStore.dismissToast(toast.toastId)"
