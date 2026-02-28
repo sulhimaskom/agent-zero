@@ -77,3 +77,4 @@ As of 2026-02-25, agent profiles in `/agents/` have this structure:
 - **2026-02-25**: Fixed `.github/prompt/README.md` - Updated file references from non-existent placeholder files to actual file names (e.g., `01-architect.md` → `01-code-review.md`). PR #311.
 - **2026-02-25**: Closed stale PR #302 - AGENTS.md updates already merged, resolved conflict by closing outdated PR.
 JW|- **2026-02-28**: Added module docstrings to 8 backup/chat API files: `backup_create.py`, `backup_get_defaults.py`, `backup_inspect.py`, `backup_preview_grouped.py`, `backup_restore.py`, `backup_restore_preview.py`, `backup_test.py`, `chat_files_path_get.py` - improves API documentation. PR #449.
+#JW|- **2026-02-28**: Added module docstrings to 4 helper utility files: `guids.py`, `dotenv.py`, `wait.py`, and `crypto.py` - improves helper module documentation. PR #476.
