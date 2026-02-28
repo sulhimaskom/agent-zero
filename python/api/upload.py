@@ -1,3 +1,9 @@
+"""File upload endpoint.
+
+Handles file uploads to the agent's working directory.
+Supports multiple files in a single request via multipart/form-data.
+"""
+
 from werkzeug.utils import secure_filename
 
 from python.helpers import files

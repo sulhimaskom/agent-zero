@@ -1,3 +1,9 @@
+"""Tunnel management endpoint.
+
+Creates and manages remote access tunnels for Agent Zero.
+Supports multiple providers (serveo, localtunnel, ngrok) for external access.
+"""
+
 from python.helpers import runtime
 from python.helpers.api import ApiHandler, Request, Response
 from python.helpers.constants import Timeouts

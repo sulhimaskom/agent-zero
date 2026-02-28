@@ -1,3 +1,9 @@
+"""MCP server status endpoint.
+
+Returns the connection status of all configured MCP servers.
+Shows which servers are connected, disconnected, or have errors.
+"""
+
 from typing import Any
 
 from python.helpers.api import ApiHandler, Request, Response

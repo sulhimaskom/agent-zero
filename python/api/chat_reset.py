@@ -1,3 +1,9 @@
+"""Chat reset endpoint.
+
+Clears the current conversation history and resets the agent context
+while preserving project associations. Used to start fresh conversations.
+"""
+
 from python.helpers import persist_chat
 from python.helpers.api import ApiHandler, Input, Output, Request
 

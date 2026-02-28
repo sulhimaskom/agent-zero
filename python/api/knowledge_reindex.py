@@ -1,3 +1,9 @@
+"""Knowledge base reindex endpoint.
+
+Triggers a rebuild of the knowledge vector index.
+Used after adding new documents to the knowledge base.
+"""
+
 from python.helpers import memory
 from python.helpers.api import ApiHandler, Request, Response
 

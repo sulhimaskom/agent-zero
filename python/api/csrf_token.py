@@ -1,3 +1,9 @@
+"""CSRF token retrieval endpoint.
+
+Returns a CSRF token for secure form submissions.
+Required for state-changing operations to prevent cross-site requests.
+"""
+
 import fnmatch
 import secrets
 from urllib.parse import urlparse

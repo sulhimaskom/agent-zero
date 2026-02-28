@@ -1,3 +1,9 @@
+"""Chat polling endpoint.
+
+Long-polling endpoint for retrieving agent responses and notifications.
+Clients can poll for new messages, agent output, and notification updates.
+"""
+
 from agent import AgentContext, AgentContextType
 from python.helpers.api import ApiHandler, Request, Response
 from python.helpers.dotenv import get_dotenv_value

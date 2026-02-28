@@ -1,3 +1,9 @@
+"""Agent pause/resume endpoint.
+
+Controls the agent's processing state - pauses or resumes
+message processing for a specific context.
+"""
+
 from python.helpers.api import ApiHandler, Request, Response
 
 
