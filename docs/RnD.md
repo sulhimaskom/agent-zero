@@ -1,4 +1,33 @@
 ## 2026-02-28
+>
+> Last Updated: 2026-02-28
+
+### Issue #467: JavaScript Memory Leaks in messages.js - FIXED ✅
+
+**Problem**: messages.js had event listeners added without cleanup in two functions:
+- `drawMessageUser()`: attachment click handlers added but never removed on re-render
+- `drawKvpsIncremental()`: image click handlers added but never removed on content update
+
+**Root Cause**: When messages were re-rendered, `innerHTML = ''` cleared the DOM elements but the event listeners remained in memory, causing memory leaks.
+
+**Solution Applied**:
+- Added `_eventHandlers` storage object to track event listener references
+- In `drawMessageUser()`: cleanup attachment handlers before clearing innerHTML
+- In `drawKvpsIncremental()`: cleanup image handlers before clearing innerHTML
+- Store handler references when adding listeners for proper cleanup
+
+**Files Changed**:
+- `webui/js/messages.js` (+33 lines, -3 lines)
+
+**Verification**:
+- JavaScript syntax validated: passes
+- Python tests: 475 passed, 7 pre-existing failures (unrelated to changes)
+
+**PR Created**: #485
+
+---
+
+## 2026-02-28
 
 > Last Updated: 2026-02-28
 
