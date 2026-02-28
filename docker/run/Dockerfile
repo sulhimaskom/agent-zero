@@ -32,5 +32,8 @@ EXPOSE 22 80 9000-9009
 
 RUN chmod +x /exe/initialize.sh /exe/run_A0.sh /exe/run_searxng.sh /exe/run_tunnel_api.sh
 
+# Switch to non-root user for security
+USER agentzero
+
 # initialize runtime and switch to supervisord
 CMD ["/exe/initialize.sh", "$BRANCH"]

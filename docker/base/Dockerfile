@@ -36,5 +36,9 @@ RUN bash /ins/configure_ssh.sh
 # after install
 RUN bash /ins/after_install.sh
 
+# Create non-root user for security (runs as non-root in production)
+RUN groupadd -r agentzero && useradd -r -g agentzero -d /home/agentzero -s /bin/bash agentzero
+RUN mkdir -p /home/agentzero && chown -R agentzero:agentzero /home/agentzero
+
 # Keep container running infinitely
 CMD ["tail", "-f", "/dev/null"]
