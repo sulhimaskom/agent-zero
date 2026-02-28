@@ -3,19 +3,17 @@
 Tests the dotenv helper functions for loading and saving environment variables.
 """
 
-import os
-import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import MagicMock, patch
 
 from python.helpers.dotenv import (
-    load_dotenv,
-    get_dotenv_file_path,
-    get_dotenv_value,
-    save_dotenv_value,
     KEY_AUTH_LOGIN,
     KEY_AUTH_PASSWORD,
     KEY_RFC_PASSWORD,
     KEY_ROOT_PASSWORD,
+    get_dotenv_file_path,
+    get_dotenv_value,
+    load_dotenv,
+    save_dotenv_value,
 )
 
 
@@ -94,15 +92,15 @@ class TestSaveDotenvValue:
     def test_save_new_key(self, mock_open, mock_load_dotenv, mock_get_path):
         """Test saving a new key to .env file"""
         mock_get_path.return_value = "/test/.env"
-        
+
         # Mock file that doesn't exist initially
         mock_file = MagicMock()
         mock_file.readlines.return_value = []
         mock_open.return_value = mock_file
-        
+
         with patch("os.path.isfile", return_value=True):
             save_dotenv_value("NEW_KEY", "new_value")
-        
+
         # Should have called load_dotenv at the end
         mock_load_dotenv.assert_called_once()
 
@@ -112,49 +110,54 @@ class TestSaveDotenvValue:
     def test_update_existing_key(self, mock_open, mock_load_dotenv, mock_get_path):
         """Test updating an existing key in .env file"""
         mock_get_path.return_value = "/test/.env"
-        
+
         # Mock file with existing key
         mock_file = MagicMock()
         mock_file.readlines.return_value = ["EXISTING_KEY=old_value\n"]
         mock_open.return_value = mock_file
-        
+
         with patch("os.path.isfile", return_value=True):
             save_dotenv_value("EXISTING_KEY", "new_value")
-        
+
         # Should have called load_dotenv at the end
         mock_load_dotenv.assert_called_once()
 
     @patch("python.helpers.dotenv.get_dotenv_file_path")
     @patch("python.helpers.dotenv.load_dotenv")
     @patch("python.helpers.dotenv.open", create=True)
-    def test_create_file_if_not_exists(self, mock_open, mock_load_dotenv, mock_get_path):
+    def test_create_file_if_not_exists(
+        self, mock_open, mock_load_dotenv, mock_get_path
+    ):
         """Test creating .env file if it doesn't exist"""
         mock_get_path.return_value = "/test/.env"
-        
+
         mock_file = MagicMock()
         mock_open.return_value = mock_file
-        
+
         with patch("os.path.isfile", return_value=False):
+            save_dotenv_value("NEW_KEY", "value")
             with patch("os.path.isfile", return_value=False):
                 save_dotenv_value("NEW_KEY", "value")
-        
+
         # Should have called open with 'w' mode to create file
         mock_open.assert_any_call("/test/.env", "w")
 
     @patch("python.helpers.dotenv.get_dotenv_file_path")
     @patch("python.helpers.dotenv.load_dotenv")
     @patch("python.helpers.dotenv.open", create=True)
-    def test_none_value_becomes_empty_string(self, mock_open, mock_load_dotenv, mock_get_path):
+    def test_none_value_becomes_empty_string(
+        self, mock_open, mock_load_dotenv, mock_get_path
+    ):
         """Test that None value is converted to empty string"""
         mock_get_path.return_value = "/test/.env"
-        
+
         mock_file = MagicMock()
         mock_file.readlines.return_value = []
         mock_open.return_value = mock_file
-        
+
         with patch("os.path.isfile", return_value=True):
             save_dotenv_value("KEY", None)
-        
+
         # Should write empty string
         mock_load_dotenv.assert_called_once()
 
@@ -167,7 +170,7 @@ class TestLoadDotenv:
     def test_load_dotenv_calls_underlying_function(self, mock_get_path, mock_load):
         """Test that load_dotenv calls the underlying dotenv load function"""
         mock_get_path.return_value = "/test/.env"
-        
+
         load_dotenv()
-        
+
         mock_load.assert_called_once_with("/test/.env", override=True)
