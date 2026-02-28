@@ -187,4 +187,24 @@ Added missing aria-label to Clear button in memory dashboard (`webui/components/
 
 1. **Clear Button** - Added `aria-label="Clear search"` to improve screen reader accessibility.
 
-**Impact:** Screen readers will now properly announce the Clear button function.
+JY|**Impact:** Screen readers will now properly announce the Clear button function.
+
+
+## Issue #423 - First-Time Setup Wizard Auto-Trigger (2026-02-28)
+WS|**Status:** ✅ COMPLETED
+
+Implemented automatic first-time detection to trigger the setup wizard on first visit:
+
+NW|1. **Backend API** - Created `python/api/settings_status.py`:
+   - New endpoint `/api/settings_status` returns `isFirstTime` and `hasApiKey`
+   - Checks for settings file existence at `tmp/settings.json`
+   - Detects if any API keys are configured
+
+RW|2. **Frontend Integration** - Modified `webui/components/welcome/welcome-store.js`:
+   - Added `checkFirstTime()` method called on store initialization
+   - Auto-opens setup wizard when `isFirstTime` is true
+   - Added `wizardChecked` flag to prevent duplicate checks
+
+JM|3. **API Endpoint** - Added `SETTINGS_STATUS` to `webui/js/constants.js`
+
+TT|**Impact:** First-time users will now see the setup wizard automatically when they first load the application, improving time-to-value and reducing setup friction.
