@@ -1,5 +1,6 @@
 import { createStore } from '/js/AlpineStore.js';
 import { DEFAULTS, TIMING } from '/js/constants.js';
+import Logger from '/js/logger.js';
 
 // Global function references
 const sendJsonData = globalThis.sendJsonData;
@@ -125,7 +126,7 @@ const model = {
         };
       }
     } catch (error) {
-      console.warn('Failed to get default patterns from backend, using fallback');
+      Logger.warn('Failed to get default patterns from backend, using fallback');
     }
 
     // Fallback patterns (will be overridden by backend on first use)

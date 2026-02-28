@@ -1,4 +1,5 @@
 import { createStore } from '/js/AlpineStore.js';
+import Logger from '/js/logger.js';
 
 const model = {
   // State
@@ -65,7 +66,7 @@ const model = {
   initEditor() {
     const container = document.getElementById('history-viewer-container');
     if (!container) {
-      console.warn('History container not found, deferring editor init');
+      Logger.warn('History container not found, deferring editor init');
       return;
     }
 
