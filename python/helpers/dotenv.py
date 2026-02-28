@@ -1,3 +1,10 @@
+"""Environment variable management for Agent Zero.
+
+Handles loading and saving environment variables from .env files.
+Provides utilities for managing authentication credentials (login, password,
+RFC password, root password) and other configuration values.
+"""
+
 import os
 import re
 from typing import Any

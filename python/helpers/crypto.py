@@ -1,3 +1,9 @@
+"""Cryptographic utilities for Agent Zero.
+
+Provides RSA-based encryption and decryption functions, HMAC hashing,
+and data verification for secure credential and data handling.
+"""
+
 import hashlib
 import hmac
 

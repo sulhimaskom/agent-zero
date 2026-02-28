@@ -1,3 +1,10 @@
+"""Wait tool implementation for Agent Zero.
+
+Provides time management utilities for agent wait operations, including
+formatting remaining time in human-readable format and managed async waiting
+with intervention handling.
+"""
+
 import asyncio
 from datetime import UTC, datetime
 
