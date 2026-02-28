@@ -56,6 +56,15 @@ select {
   transition: all 0.3s ease;
 }
 
+input[type="text"]:focus-visible,
+input[type="password"]:focus-visible,
+input[type="number"]:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--color-highlight, #64b5f6);
+  outline-offset: 2px;
+}
+
 input[type="text"]:focus,
 input[type="password"]:focus {
   opacity: 1;

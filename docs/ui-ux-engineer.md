@@ -208,3 +208,22 @@ RW|2. **Frontend Integration** - Modified `webui/components/welcome/welcome-stor
 JM|3. **API Endpoint** - Added `SETTINGS_STATUS` to `webui/js/constants.js`
 
 TT|**Impact:** First-time users will now see the setup wizard automatically when they first load the application, improving time-to-value and reducing setup friction.
+
+#WH|TT|**Impact:** First-time users will now see the setup wizard automatically when they first load the application, improving time-to-value and reducing setup friction.
+#QV|
+#KV|## Focus-Visible CSS Improvements (2026-02-28)
+#WS|**Status:** ✅ COMPLETED
+#QV|
+#WY|Fixed keyboard accessibility issues by adding `:focus-visible` styles to interactive elements:
+#QT|
+#QT|1. **Range Input Focus** - Added `:focus-visible` to modals.css:
+#XS|   - Line 386-389: Added visible focus outline for range sliders
+#QT|   - Uses `var(--color-highlight, #64b5f6)` with 2px outline and 2px offset
+#QT|   - Allows keyboard users to see focus state on range inputs
+#QV|
+#QT|2. **Form Input Focus** - Added `:focus-visible` to settings.css:
+#QT|   - Lines 59-66: Added visible focus outline for text, password, number inputs, textarea, and select
+#QT|   - Uses `var(--color-highlight, #64b5f6)` with 2px outline and 2px offset
+#QT|   - Improves keyboard accessibility for settings form fields
+#QV|
+#QV|**Impact:** Keyboard users can now clearly see which element is focused when navigating with Tab key.
