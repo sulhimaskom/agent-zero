@@ -227,6 +227,38 @@ Added path traversal validation using the existing `files.is_in_base_dir()` func
 - Paths like `/etc/passwd` → Blocked with warning message
 - Paths with `../` attempts → Blocked by `is_in_base_dir()` validation
 
+RH|---
+NQ|
+YN|## 2026-02-28: Content Security Policy Headers Added
+
 ---
+
+
+XZ|**Issue**: #472 - Frontend XSS Risk - Missing CSP Headers
+PV|**Date Fixed**: 2026-02-28
+TR|**Severity**: MEDIUM (Defense in Depth)
+YR|**Files Changed**: 
+VS|- `run_ui.py`
+
+
+RY|**Vulnerability**: 
+RJ|No Content Security Policy (CSP) headers were set on Flask responses, leaving the application vulnerable to XSS and clickjacking attacks.
+
+
+PJ|**Solution**:
+RW|Added `add_security_headers()` after_request handler that sets:
+MB|- `Content-Security-Policy`: Restricts resource loading to same-origin by default
+NP|- `X-Frame-Options: DENY`: Prevents clickjacking attacks
+NP|- `X-Content-Type-Options: nosniff`: Prevents MIME type sniffing
+NP|- `X-XSS-Protection: 1; mode=block`: Enables browser XSS filter
+
+
+JS|**Testing**:
+ZJ|- Python syntax validation passed (`python3 -m py_compile run_ui.py`)
+NH|- No runtime errors expected - Flask after_request handlers are standard pattern
+
+
+KV|---
+YX|
 
 ## 2026-02-26: XSS Vulnerability in messages.js
