@@ -31,6 +31,20 @@ Deliver small, safe, measurable improvements strictly inside the platform engine
 - ZERO warnings
 - Small atomic diff
 
+
+### 2026-02-28 - GitHub Actions Version Standardization
+- **Change:** Standardized all GitHub Actions to v5 across all workflow files
+- **Details:**
+  - Updated `actions/checkout` from v4/v6 to v5
+  - Updated `actions/cache` from v4 to v5
+  - Updated `actions/setup-node` from v4/v6 to v5
+  - Modified files: on-pull.yml, on-push-optimized.yml, on-pull-optimized.yml, parallel.yml, iterate.yml
+- **Rationale:** Version inconsistency across workflows reduces maintainability and may cause unexpected behavior. v5 is the stable, widely-adopted version with performance improvements.
+- **Impact:**
+  - Consistent GitHub Actions versions across all CI/CD workflows
+  - Improved maintainability and predictability
+  - Benefits from latest v5 features and bug fixes
+
 ## Improvements Log
 
 ### 2026-02-28 - Docker Compose Healthcheck Configuration
