@@ -208,8 +208,12 @@ Small modules (< 100 lines) without tests:
 
 ## Quick Wins (Ready for Implementation)
 
-1. **Add tests for errors.py** - 73 lines, simple error classes
-2. **Add tests for wait.py** - 71 lines, async wait utility
+Pending candidates for test coverage (small modules without tests):
+- `update_check.py` (21 lines)
+- `searxng.py` (22 lines)
+- `duckduckgo_search.py` (24 lines)
+- `playwright.py` (38 lines)
+
 
 ---
 
@@ -219,31 +223,9 @@ Small modules (< 100 lines) without tests:
 2. ~~**Add test for rate_limiter.py**~~ ✅ COMPLETED (PR #443)
 3. ~~**Remove dead code in timed_input.py**~~ ✅ COMPLETED (PR #281)
 4. ~~**Fix config typo in model_providers.yaml**~~ ✅ COMPLETED (PR #358)
-204#XS|
-#WS|5. ~~**Add test for crypto.py**~~ ✅ COMPLETED (PR #432)
-#XY|
-#NH|
-#ZB|---
-#ZK|
-#HJ|## Branch Convention
-#NM|- **Main branch:** `custom` (not `main` or `development`)
-#HQ|- All PRs should target `custom`
-#ZP|
-#HQ|---
-#XJ|
-#PQ|## PR Template
 5. ~~**Add test for crypto.py**~~ ✅ COMPLETED (PR #432)
-218#NK|
-#MH|
-#YH|---
+6. ~~**Add test for images.py**~~ ✅ COMPLETED (PR #477)
 
----
-
-## Branch Convention
-- **Main branch:** `custom` (not `main` or `development`)
-- All PRs should target `custom`
-
----
 
 ## PR Template
 
