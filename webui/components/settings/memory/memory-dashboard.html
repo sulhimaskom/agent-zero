@@ -115,6 +115,15 @@
                                 <span class="material-symbols-outlined">chevron_left</span>
                             </button>
                             <div class="page-input-group">
+                                <label for="memory-page-input">Page</label>
+                                <input type="number" id="memory-page-input" class="page-input"
+                                    x-model.number="$store.memoryDashboardStore.currentPage"
+                                    @change="$store.memoryDashboardStore.goToPage($store.memoryDashboardStore.currentPage)"
+                                    @keyup.enter="$store.memoryDashboardStore.goToPage($store.memoryDashboardStore.currentPage)"
+                                    :min="1" :max="$store.memoryDashboardStore.totalPages" />
+                                <span class="page-total">of <strong
+                                        x-text="$store.memoryDashboardStore.totalPages"></strong></span>
+                            </div>
                                 <label>Page</label>
                                 <input type="number" class="page-input"
                                     x-model.number="$store.memoryDashboardStore.currentPage"
@@ -328,6 +337,12 @@
                                 <span class="material-symbols-outlined">chevron_left</span>
                             </button>
                             <div class="page-input-group">
+                                <label for="status-page-input">Page</label>
+                                <input type="number" id="status-page-input" class="page-input"
+                                    x-model.number="$store.memoryDashboardStore.currentPage"
+                                    @change="$store.memoryDashboardStore.goToPage($store.memoryDashboardStore.currentPage)"
+                                    @keyup.enter="$store.memoryDashboardStore.goToPage($store.memoryDashboardStore.currentPage)"
+                                    :min="1" :max="$store.memoryDashboardStore.totalPages" />
                                 <label>Page</label>
                                 <input type="number" class="page-input"
                                     x-model.number="$store.memoryDashboardStore.currentPage"

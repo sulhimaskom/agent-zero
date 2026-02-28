@@ -227,3 +227,38 @@ TT|**Impact:** First-time users will now see the setup wizard automatically when
 #QT|   - Improves keyboard accessibility for settings form fields
 #QV|
 #QV|**Impact:** Keyboard users can now clearly see which element is focused when navigating with Tab key.
+
+
+
+## Accessibility Improvements (2026-02-28)
+**Status:** ✅ COMPLETED
+
+Fixed several accessibility issues across the UI:
+
+### 1. Toast Keyboard Activation - notification-toast-stack.html
+- Added `@keydown.enter` and `@keydown.space` handlers to toast items
+- Users can now activate toast actions using keyboard (Enter/Space) in addition to click
+- Improves accessibility for keyboard-only users
+
+### 2. Keyboard Shortcuts Modal - keyboard-shortcuts.html
+- Added close button with `aria-label="Close keyboard shortcuts"`
+- Added `aria-hidden="true"` to decorative keyboard icon
+- Added `aria-hidden="true"` to decorative tips_and_updates icon
+- Modal is now fully accessible
+
+### 3. Scheduler Focus State - settings.css
+- Added `:focus-visible` selector to `.scheduler-status-selected` class
+- Ensures keyboard focus is visible when navigating through scheduler status badges
+- Uses `var(--color-highlight)` for consistency
+
+### 4. Project Edit Form Labels - project-edit-file-structure.html
+- Added `for` attributes to all labels
+- Added `id` attributes to all inputs
+- Fixed 6 label-input associations (file-structure-enabled, max-depth, max-lines, max-folders, max-files, ignored-files)
+- Added `aria-hidden="true"` to decorative account_tree icon
+
+### 5. Memory Dashboard Page Inputs - memory-dashboard.html
+- Added `for` and `id` attributes to page input labels
+- Fixed 2 page input associations (memory-page-input, status-page-input)
+
+**Impact:** These changes improve accessibility for screen reader users and keyboard-only navigation throughout the application.

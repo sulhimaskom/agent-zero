@@ -16,9 +16,10 @@
                 <!-- Header -->
                 <div class="keyboard-shortcuts-header">
                     <h3 id="keyboard-shortcuts-title" class="keyboard-shortcuts-title">
-                        <span class="material-symbols-outlined">keyboard</span>
+                        <span class="material-symbols-outlined" aria-hidden="true">keyboard</span>
                         Keyboard Shortcuts
                     </h3>
+                    <button class="modal-close" @click="$store.keyboardShortcuts.close()" aria-label="Close keyboard shortcuts">&times;</button>
                     <p class="keyboard-shortcuts-subtitle">Press <kbd>?</kbd> anytime to show this help</p>
                 </div>
 
@@ -42,7 +43,7 @@
                 <!-- Footer hint -->
                 <div class="keyboard-shortcuts-footer">
                     <p>
-                        <span class="material-symbols-outlined">tips_and_updates</span>
+                        <span class="material-symbols-outlined" aria-hidden="true">tips_and_updates</span>
                         Shortcuts work when you're not typing in a text field
                     </p>
                 </div>
