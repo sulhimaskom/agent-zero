@@ -69,6 +69,28 @@ webapp.config.update(
 # Enable gzip compression for static assets
 Compress(webapp)
 
+# Security: Add Content-Security-Policy header to prevent XSS attacks
+@webapp.after_request
+def add_security_headers(response):
+    # Content Security Policy - restrict script sources and other risky behaviors
+    # This helps mitigate XSS attacks by controlling where resources can be loaded from
+    response.headers['Content-Security-Policy'] = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval'; "
+        "style-src 'self' 'unsafe-inline'; "
+        "img-src 'self' data: blob:; "
+        "font-src 'self' data:; "
+        "connect-src 'self'; "
+        "frame-ancestors 'none';"
+    )
+    # Prevent clickjacking
+    response.headers['X-Frame-Options'] = 'DENY'
+    # Prevent MIME type sniffing
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    # Enable XSS filter in browsers
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+    return response
+
 lock = threading.Lock()
 
 # Set up basic authentication for UI and API but not MCP
