@@ -1,3 +1,14 @@
+"""Memory management dashboard API endpoint - comprehensive memory operations.
+
+Provides memory management operations including:
+- search: semantic search across memories
+- get_memory_subdirs: list available memory categories
+- get_current_memory_subdir: get current memory configuration
+- delete: remove specific memories by ID
+- update: modify memory content or metadata
+- bulk_delete: remove multiple memories at once
+"""
+
 from langchain_core.documents import Document
 
 from agent import AgentContext

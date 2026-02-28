@@ -1,3 +1,9 @@
+"""Chat load API endpoint - loads chat history from JSON files.
+
+Provides functionality to load previous chat sessions into memory
+by reading chat data from JSON files and restoring agent context.
+"""
+
 from python.helpers import persist_chat
 from python.helpers.api import ApiHandler, Input, Output, Request
 
