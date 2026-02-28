@@ -169,6 +169,31 @@ API_KEY_PLACEHOLDER = "************"
 SETTINGS_FILE = files.get_abs_path(Paths.SETTINGS_FILE)
 _settings: Settings | None = None
 
+def _run_background_task(coro, task_name: str = "background task"):
+    """
+    Run a coroutine in the background with error handling.
+
+    This is a safer alternative to direct defer.run_in_background() calls,
+    providing error handling and logging for fire-and-forget background tasks.
+
+    Args:
+        coro: The coroutine to run in the background
+        task_name: Name for logging purposes
+
+    Returns:
+        The created task
+    """
+    async def wrapped():
+        try:
+            await coro
+        except Exception as e:
+            PrintStyle(
+                background_color="red",
+                font_color="white",
+                padding=True,
+            ).print(f"Error in {task_name}: {e}")
+
+    return defer.run_in_background(wrapped())
 
 def convert_out(settings: Settings) -> SettingsOutput:
     default_settings = get_default_settings()
@@ -1556,7 +1581,7 @@ def _apply_settings(previous: Settings | None):
 
         # reload whisper model if necessary
         if not previous or _settings["stt_model_size"] != previous["stt_model_size"]:
-            _ = defer.run_in_background(whisper.preload(_settings["stt_model_size"]))
+            _run_background_task(whisper.preload(_settings["stt_model_size"]), "whisper preload")
 
         # force memory reload on embedding model change
         if not previous or (
@@ -1620,7 +1645,7 @@ def _apply_settings(previous: Settings | None):
                     temp=True,
                 )
 
-            _ = defer.run_in_background(update_mcp_settings(config.mcp_servers))
+            _run_background_task(update_mcp_settings(config.mcp_servers), "MCP settings update")
 
         # update token in mcp server
         # Technical Debt: Token is generated from dotenv which may not match the settings store.
@@ -1634,7 +1659,7 @@ def _apply_settings(previous: Settings | None):
 
                 DynamicMcpProxy.get_instance().reconfigure(token=token)
 
-            _ = defer.run_in_background(update_mcp_token(current_token))
+            _run_background_task(update_mcp_token(current_token), "MCP token update")
 
         # update token in a2a server
         if not previous or current_token != previous["mcp_server_token"]:
@@ -1644,7 +1669,7 @@ def _apply_settings(previous: Settings | None):
 
                 DynamicA2AProxy.get_instance().reconfigure(token=token)
 
-            _ = defer.run_in_background(update_a2a_token(current_token))
+            _run_background_task(update_a2a_token(current_token), "A2A token update")
 
 
 def _env_to_dict(data: str):
