@@ -12,6 +12,24 @@ This document serves as the long-term memory for the ai-agent-engineer domain in
 
 ## Implemented Fixes
 
+### 2026-02-28: Dead Code Removal in document_query.py
+**Issue**: Unreachable code after raise statement in document_query.py
+
+**Root Cause**: Line 447 had `raise Exception(response.status)` which was dead code - unreachable after the raise on line 446. Also passed raw HTTP status integer without context.
+
+**Fix Applied**: Removed the dead code line 447
+
+**Files Modified**:
+- `python/helpers/document_query.py` - Removed 1 line of dead code
+
+**Verification**:
+- Python syntax check: PASSED
+
+**PR**: [#487](https://github.com/sulhimaskom/agent-zero/pull/487) created with ai-agent-engineer label
+
+---
+#BY|
+
 ### 2026-02-28: Code Quality Improvements - Dead Code and Exception Logging
 **Issue**: Multiple code quality issues found during proactive scan:
 
