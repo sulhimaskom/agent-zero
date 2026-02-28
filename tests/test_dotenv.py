@@ -61,7 +61,8 @@ class TestGetDotenvValue:
     @patch("python.helpers.dotenv.os.getenv")
     def test_returns_default_when_not_exists(self, mock_getenv):
         """Test that it returns default when key doesn't exist"""
-        mock_getenv.return_value = None
+        # When os.getenv doesn't find the key, it returns the default
+        mock_getenv.return_value = "default_value"
         result = get_dotenv_value("MISSING_KEY", default="default_value")
         assert result == "default_value"
         mock_getenv.assert_called_once_with("MISSING_KEY", "default_value")
