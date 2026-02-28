@@ -33,14 +33,32 @@ Deliver small, safe, measurable improvements strictly inside the platform engine
 
 ## Improvements Log
 
-### 2026-02-28 - pytest-asyncio Version Alignment
-- **Change:** Updated pytest-asyncio version in `pyproject.toml` to match `requirements.dev.txt`
-- **Details:** Changed `pytest-asyncio>=0.21.0` to `pytest-asyncio>=1.2.0` in `[project.optional-dependencies] dev`
-- **Rationale:** Version mismatch between pyproject.toml and requirements.dev.txt. Using the more recent version (1.2.0) which is already documented in requirements.dev.txt.
+#JP|
+#XP|### 2026-02-28 - pytest in Dev Dependencies
+#SK|- **Change:** Moved pytest from main dependencies to dev in `pyproject.toml`
+#RQ|- **Details:**
+#HK|  - Removed `pytest>=7.0.0` from main `[dependencies]` (line 51)
+#XQ|  - Added `pytest>=8.0.0` to `[project.optional-dependencies] dev`
+#BZ|  - Added `pytest-mock>=3.15.1` to dev dependencies (aligned with requirements.dev.txt)
+#BZ|- **Rationale:** pytest is a development-only testing tool and should not be in production dependencies. This was identified during proactive platform-engineer scan of Python tooling configuration.
+#BX|- **Impact:**
+#HH|  - Proper dependency classification (dev vs production)
+#BQ|  - Developers can install with `pip install -e ".[dev]"` and get all testing tools
+
+### 2026-02-28 - pytest in Dev Dependencies
+- **Change:** Moved pytest from main dependencies to dev in `pyproject.toml`
+- **Details:**
+  - Removed `pytest>=7.0.0` from main `[dependencies]` (line 51)
+  - Added `pytest>=8.0.0` to `[project.optional-dependencies] dev`
+  - Added `pytest-mock>=3.15.1` to dev dependencies (aligned with requirements.dev.txt)
+- **Rationale:** pytest is a development-only testing tool and should not be in production dependencies. This was identified during proactive platform-engineer scan of Python tooling configuration.
 - **Impact:**
-  - Consistent pytest-asyncio version across all dependency files
-  - Developers can install with `pip install -e ".[dev]"` and get the correct version
-  - Aligned with testing documentation
+  - Proper dependency classification (dev vs production)
+  - Developers can install with `pip install -e ".[dev]"` and get all testing tools
+  - Aligned with requirements.dev.txt
+- **PR:** #454
+
+>>>>>>> 0d1d27f (docs: update platform-engineer.md with pytest fix)
 
 
 ### 2026-02-26 - Pytest CI Integration
