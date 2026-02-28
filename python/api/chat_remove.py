@@ -1,3 +1,9 @@
+"""Chat removal endpoint.
+
+Permanently deletes a chat context and all associated files.
+Stops any ongoing tasks before removal.
+"""
+
 from agent import AgentContext
 from python.helpers import persist_chat
 from python.helpers.api import ApiHandler, Input, Output, Request

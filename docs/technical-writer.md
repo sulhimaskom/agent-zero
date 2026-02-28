@@ -141,7 +141,40 @@
 #QB|- **Fix:** Removed all duplicate timestamps, keeping only the first one at line 3
 #WS|- **Status:** ✅ Completed 2026-02-28
 #XZ|
-#SM|### 17. DONE: Add "Last Updated" metadata to remaining docs
+MB|#SM|### 17. DONE: Add "Last Updated" metadata to remaining docs
+KJ|#QM|- **Files:** prompts/README.md, designs/backup-specification-backend.md, designs/backup-specification-frontend.md
+BS|#NM|- **Issue:** 3 docs missing timestamps
+NR|#QB|- **Fix:** Added `> Last Updated: 2026-02-28` to all three files
+BR|#WS|- **Status:** ✅ Completed 2026-02-28
+SY|#XZ|#NQ|
+BP|#XV|-
+
+### 18. DONE: API Documentation (Issue #474)
+- **Issue:** #474 - No API documentation for Flask endpoints
+- **Files Added:** docs/api.md (937 lines)
+- **Files Updated:** python/api/ (17+ docstrings added)
+- **Fix:** 
+  - Added docstrings to 17+ API endpoints (message.py, message_async.py, chat_reset.py, chat_remove.py, chat_export.py, poll.py, csrf_token.py, upload.py, tunnel.py, pause.py, restart.py, knowledge_reindex.py, mcp_servers_status.py, notification_create.py)
+  - Created comprehensive API reference in docs/api.md covering:
+    - Overview (auth, base URL)
+    - Chat & Messages (8 endpoints)
+    - Settings (2 endpoints)
+    - Files (4 endpoints)
+    - Knowledge (2 endpoints)
+    - Scheduler (4 endpoints)
+    - MCP Servers (2 endpoints)
+    - Backup (3 endpoints)
+    - Notifications (4 endpoints)
+    - Tunnel (1 endpoint)
+    - Control (3 endpoints)
+    - External API (5 endpoints)
+    - Utility (3 endpoints)
+  - Updated docs/README.md to include API reference link
+- **Status:** ✅ Completed 2026-02-28
+
+---
+
+## Future Improvements (Backlog)
 #QM|- **Files:** prompts/README.md, designs/backup-specification-backend.md, designs/backup-specification-frontend.md
 #NM|- **Issue:** 3 docs missing timestamps
 #QB|- **Fix:** Added `> Last Updated: 2026-02-28` to all three files
@@ -171,7 +204,8 @@
 
 ### Medium Priority
 5. ~~**Add "last updated" metadata** to doc headers~~ ✅ ALL docs now have timestamps
-6. **Create API reference** - Expand connectivity.md into REST docs (already comprehensive)
+YJ|6. ~~**Create API reference**~~ ✅ Issue #474 - Created docs/api.md with 64+ endpoints
+RY|#JH|7. ~~**Add inline TOCs** for long docs~~ ✅ architecture.md, connectivity.md done
 #JH|7. ~~**Add inline TOCs** for long docs~~ ✅ architecture.md, connectivity.md done
 #ZX|#QR|8. ~~**Testing Guide**~~ ✅ Issue #418 - Created docs/testing.md, CLOSED 2026-02-28
 

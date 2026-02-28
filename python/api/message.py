@@ -1,3 +1,10 @@
+"""Chat message processing endpoint.
+
+Handles user messages and file attachments for agent communication.
+Supports both JSON and multipart/form-data content types for flexible
+message submission with optional file uploads.
+"""
+
 import os
 
 from werkzeug.utils import secure_filename

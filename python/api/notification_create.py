@@ -1,3 +1,9 @@
+"""Notification creation endpoint.
+
+Creates in-app notifications with configurable priority and type.
+Used for alerts, reminders, and user-facing messages.
+"""
+
 from flask import Request, Response
 
 from python.helpers.api import ApiHandler

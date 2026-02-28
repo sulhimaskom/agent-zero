@@ -1,3 +1,9 @@
+"""Chat export endpoint.
+
+Exports a chat session to JSON format for backup or migration.
+Returns the complete conversation history as a downloadable JSON file.
+"""
+
 from python.helpers import persist_chat
 from python.helpers.api import ApiHandler, Input, Output, Request
 
