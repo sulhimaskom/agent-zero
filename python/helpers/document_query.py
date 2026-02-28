@@ -444,7 +444,6 @@ class DocumentQueryHelper:
                             )
                             if response.status > 399:
                                 raise Exception(f"Failed to fetch document content-type from {document_uri}: HTTP {response.status}")
-                                raise Exception(response.status)
                             break
                     except Exception as e:
                         await asyncio.sleep(Timeouts.RETRY_DELAY_SHORT)

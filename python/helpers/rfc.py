@@ -49,7 +49,7 @@ async def call_rfc(
 
 async def handle_rfc(rfc_call: RFCCall, password: str):
     if not crypto.verify_data(rfc_call["rfc_input"], rfc_call["hash"], password):
-        raise Exception("Invalid RFC hash")
+        raise ValueError("Invalid RFC hash")
 
     input: RFCInput = json.loads(rfc_call["rfc_input"])
     return await _call_function(

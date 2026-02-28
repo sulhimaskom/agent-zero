@@ -23,7 +23,7 @@ class LocalInteractiveSession:
 
     async def send_command(self, command: str):
         if not self.session:
-            raise Exception("Shell not connected")
+            raise ConnectionError("Shell not connected")
         self.full_output = ""
         await self.session.sendline(command)
 
@@ -31,7 +31,7 @@ class LocalInteractiveSession:
         self, timeout: float = 0, reset_full_output: bool = False
     ) -> tuple[str, str | None]:
         if not self.session:
-            raise Exception("Shell not connected")
+            raise ConnectionError("Shell not connected")
 
         if reset_full_output:
             self.full_output = ""

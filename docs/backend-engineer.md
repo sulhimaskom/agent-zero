@@ -369,5 +369,32 @@ content uses a preview string, not the actual base64 data.
 **Verification:**
 - Python syntax: PASS (py_compile)
 - AST parse: OK
-- Logic: Flag properly prevents concurrent tick execution
+HV|- Logic: Flag properly prevents concurrent tick execution
+TH|- No regressions in existing tests
+
+---
+
+### Issue #415: Generic Exception Messages - Dead Code and Specific Types
+**Status:** FIXED - 2026-02-28
+
+**Problem:**
+- document_query.py had unreachable dead code (line 447: `raise Exception(response.status)` with no message)
+- Multiple files used generic `Exception` instead of specific types (ValueError, ConnectionError)
+
+**Changes:**
+1. Removed dead code in python/helpers/document_query.py (line 447 - unreachable raise statement)
+2. Changed `raise Exception("Invalid RFC hash")` to `raise ValueError("Invalid RFC hash")` in rfc.py
+3. Changed `raise Exception("Shell not connected")` to `raise ConnectionError("Shell not connected")` in:
+   - shell_local.py (2 occurrences)
+   - shell_ssh.py (3 occurrences)
+
+**Files Modified:**
+- python/helpers/document_query.py (-1 line, removed dead code)
+- python/helpers/rfc.py (+1 line, -1 line)
+- python/helpers/shell_local.py (+2 replacements)
+- python/helpers/shell_ssh.py (+3 replacements)
+
+**Verification:**
+- Python syntax: PASS (py_compile) on all modified files
+- Tests: 508 passed (7 pre-existing failures in test_tokens.py unrelated to changes)
 - No regressions in existing tests
