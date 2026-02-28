@@ -369,10 +369,12 @@ class Network:
     ]
 
     # CORS allowed origins (development)
+    # SECURITY: These defaults are for development only!
+    # For production, set A0_DEV_CORS_ORIGINS to your actual domain
+    # or empty string to disable CORS (same-origin only)
     DEV_CORS_ORIGINS: Final[list[str]] = [
-        "*://localhost:*",
-        "*://127.0.0.1:*",
-        "*://0.0.0.0:*",
+        "http://localhost:50001",
+        "http://127.0.0.1:50001",
     ]
 
     # External API endpoints

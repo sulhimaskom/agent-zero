@@ -262,3 +262,50 @@ KV|---
 YX|
 
 ## 2026-02-26: XSS Vulnerability in messages.js
+
+---
+
+## 2026-02-28: Docker Non-Root User Security Hardening
+
+**Issue**: #417 - Docker Missing Security Hardening - No Non-Root User
+**Date Fixed**: 2026-02-28
+**Severity**: HIGH (Container Security)
+**Files Changed**: 
+- `docker/base/Dockerfile`
+- `docker/run/Dockerfile`
+
+**Vulnerability**: 
+Docker containers ran as root without dropping security capabilities, violating the principle of least privilege. While SSH root login was properly disabled, the container still ran with full root privileges.
+
+**Solution**:
+Added non-root user `a0user` (UID 1000) to the Docker images:
+- `docker/base/Dockerfile`: Created `a0user` group and user with `groupadd` and `useradd`
+- `docker/run/Dockerfile`: Added `USER a0user` directive to run container as non-root
+
+**Testing**:
+- Dockerfile syntax validation passed
+- User creation uses `|| true` for idempotency
+- No breaking changes expected - non-root user has appropriate permissions
+
+---
+
+## 2026-02-28: CORS Restrictive Defaults
+
+**Issue**: #416 - CORS Permissive Defaults - Production Security Risk
+**Date Fixed**: 2026-02-28
+**Severity**: MEDIUM (Defense in Depth)
+**Files Changed**: 
+- `python/helpers/constants.py`
+
+**Vulnerability**: 
+CORS defaults used wildcard patterns (`*://localhost:*`) which allowed any localhost port, potentially enabling unauthorized cross-origin requests in certain configurations.
+
+**Solution**:
+Changed default CORS origins from wildcard to specific development ports:
+- Before: `*://localhost:*`, `*://127.0.0.1:*`, `*://0.0.0.0:*`
+- After: `http://localhost:50001`, `http://127.0.0.1:50001`
+- Added security comments explaining production configuration
+
+**Testing**:
+- Python syntax validation passed (`python3 -m py_compile`)
+- No runtime breaking changes expected

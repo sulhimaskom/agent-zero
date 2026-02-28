@@ -410,6 +410,12 @@ class TestNetwork:
     def test_cors_origins(self):
         """Test CORS allowed origins"""
         expected_origins = [
+            "http://localhost:50001",
+            "http://127.0.0.1:50001",
+        ]
+        assert expected_origins == Network.DEV_CORS_ORIGINS
+        """Test CORS allowed origins"""
+        expected_origins = [
             "*://localhost:*",
             "*://127.0.0.1:*",
             "*://0.0.0.0:*",

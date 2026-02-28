@@ -18,6 +18,10 @@ ENV LANGUAGE=en_US:en
 ENV LC_ALL=${LOCALE}
 ENV TZ=${TZ}
 
+# Create non-root user for security (principle of least privilege)
+RUN groupadd --gid 1000 a0user || true && \
+    useradd --shell /bin/bash --uid 1000 --gid 1000 --create-home a0user || true
+
 # Copy contents of the project to /
 COPY ./fs/ /
 
