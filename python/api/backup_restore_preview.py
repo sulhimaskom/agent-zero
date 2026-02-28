@@ -1,3 +1,9 @@
+"""Handler for previewing backup restore.
+
+Uploads a backup archive and shows what would be restored
+without actually performing the restore operation.
+"""
+
 import json
 
 from werkzeug.datastructures import FileStorage

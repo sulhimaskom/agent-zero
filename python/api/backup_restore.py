@@ -1,3 +1,9 @@
+"""Handler for restoring backups.
+
+Uploads and restores a backup archive, replacing or merging
+with existing data based on the overwrite policy.
+"""
+
 import json
 
 from werkzeug.datastructures import FileStorage

@@ -1,3 +1,9 @@
+"""Handler for getting default backup patterns.
+
+Returns the default include/exclude patterns used for backups,
+providing a starting point for custom backup configurations.
+"""
+
 from python.helpers.api import ApiHandler, Request, Response
 from python.helpers.backup import BackupService
 
