@@ -122,7 +122,10 @@
   - Async testing best practices
   - Test coverage priorities
   - Best practices (assertions, naming, docstrings)
-- **Status:** ✅ Completed 2026-02-27
+#WS|- **Status:** ✅ Completed 2026-02-27
+#VS|- **Also:** Added to docs/README.md index (quick links + TOC)
+#HT|- **GitHub:** Issue #418 CLOSED 2026-02-28 (verified work, closed issue)
+#PV|127#HT|#BJ|
 - **Also:** Added to docs/README.md index (quick links + TOC)
 127#HT|#BJ|
 #YX|
@@ -170,7 +173,7 @@
 5. ~~**Add "last updated" metadata** to doc headers~~ ✅ ALL docs now have timestamps
 6. **Create API reference** - Expand connectivity.md into REST docs (already comprehensive)
 #JH|7. ~~**Add inline TOCs** for long docs~~ ✅ architecture.md, connectivity.md done
-#QR|8. ~~**Testing Guide**~~ ✅ Issue #418 - Created docs/testing.md
+#ZX|#QR|8. ~~**Testing Guide**~~ ✅ Issue #418 - Created docs/testing.md, CLOSED 2026-02-28
 
 ### Low Priority
 8. ~~**Security section** - Document SSH root, password changes~~ ✅ DONE - Added Security Best Practices section
