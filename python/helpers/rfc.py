@@ -86,4 +86,4 @@ async def _send_json_data(url: str, data):
             return result
         else:
             error = await response.text()
-            raise Exception(f"RFC request failed with status {response.status}: {error}")
+            raise RuntimeError(f"RFC request failed with status {response.status}: {error}")

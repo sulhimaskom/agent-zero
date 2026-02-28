@@ -105,4 +105,4 @@ class ApiHandler:
                 context = AgentContext(config=initialize_agent(), id=ctxid, set_current=True)
                 return context
             else:
-                raise Exception(f"Context {ctxid} not found")
+                raise KeyError(f"Context {ctxid} not found")

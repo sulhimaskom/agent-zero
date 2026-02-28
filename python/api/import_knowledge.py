@@ -9,11 +9,11 @@ from python.helpers.api import ApiHandler, Request, Response
 class ImportKnowledge(ApiHandler):
     async def process(self, input: dict, request: Request) -> dict | Response:
         if "files[]" not in request.files:
-            raise Exception("No files part")
+            raise ValueError("No files part")
 
         ctxid = request.form.get("ctxid", "")
         if not ctxid:
-            raise Exception("No context id provided")
+            raise ValueError("No context id provided")
 
         context = self.use_context(ctxid)
 
@@ -26,11 +26,11 @@ class ImportKnowledge(ApiHandler):
         try:
             os.makedirs(KNOWLEDGE_FOLDER, exist_ok=True)
         except (OSError, PermissionError) as e:
-            raise Exception(f"Failed to create knowledge folder {KNOWLEDGE_FOLDER}: {e}") from e
+            raise OSError(f"Failed to create knowledge folder {KNOWLEDGE_FOLDER}: {e}") from e
 
         # Verify the directory is accessible
         if not os.access(KNOWLEDGE_FOLDER, os.W_OK):
-            raise Exception(f"Knowledge folder {KNOWLEDGE_FOLDER} is not writable")
+            raise PermissionError(f"Knowledge folder {KNOWLEDGE_FOLDER} is not writable")
 
         saved_filenames = []
 

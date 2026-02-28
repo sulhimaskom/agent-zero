@@ -23,7 +23,7 @@ class DeleteWorkDirFile(ApiHandler):
             )
             return {"data": result}
         else:
-            raise Exception("File not found or could not be deleted")
+            raise OSError("File not found or could not be deleted")
 
 
 async def delete_file(file_path: str):

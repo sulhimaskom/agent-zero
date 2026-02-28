@@ -1720,7 +1720,7 @@ def _dict_to_env(data_dict):
 
 def set_root_password(password: str):
     if not runtime.is_dockerized():
-        raise Exception("root password can only be set in dockerized environments")
+        raise RuntimeError("root password can only be set in dockerized environments")
     subprocess.run(
         ["chpasswd"],
         input=f"root:{password}".encode(),
