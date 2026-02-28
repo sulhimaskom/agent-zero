@@ -9,7 +9,6 @@ import os
 
 from python.helpers import settings
 from python.helpers.api import ApiHandler, Request, Response
-from python.helpers.constants import Paths
 
 
 class GetSettingsStatus(ApiHandler):
@@ -17,7 +16,7 @@ class GetSettingsStatus(ApiHandler):
         # Check if settings file exists
         settings_file = settings.SETTINGS_FILE
         is_first_time = not os.path.exists(settings_file)
-        
+
         # Check if any API keys are configured
         has_api_key = False
         if not is_first_time:
@@ -25,7 +24,7 @@ class GetSettingsStatus(ApiHandler):
             # Check for any non-empty API keys
             api_keys = current_settings.get("api_keys", {})
             has_api_key = any(bool(v) for v in api_keys.values())
-        
+
         return {
             "isFirstTime": is_first_time,
             "hasApiKey": has_api_key
