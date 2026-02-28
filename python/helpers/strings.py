@@ -2,7 +2,6 @@ import re
 import sys
 import time
 
-from python.helpers import files
 from python.helpers.constants import UITiming
 
 
@@ -141,10 +140,21 @@ def truncate_text(text: str, length: int, at_end: bool = True, replacement: str 
     orig_length = len(text)
     if orig_length <= length:
         return text
+
+    # Handle edge case where length is less than or equal to replacement length
+    replacement_length = len(replacement)
+    if length <= replacement_length:
+        # For zero or very small lengths, return as much of replacement as possible
+        # but at least return something (not empty) if length was 0
+        if length == 0:
+            return replacement
+        return replacement[:length]
+        return replacement[:length]
+
     if at_end:
-        return text[:length] + replacement
+        return text[:length - replacement_length] + replacement
     else:
-        return replacement + text[-length:]
+        return replacement + text[-(length - replacement_length):]
 
 
 def truncate_text_by_ratio(
@@ -178,6 +188,9 @@ def truncate_text_by_ratio(
 
 
 def replace_file_includes(text: str, placeholder_pattern: str = r"§§include\(([^)]+)\)") -> str:
+    # Lazy import to avoid circular import
+    from python.helpers import files
+
     # Replace include aliases with file content
     if not text:
         return text

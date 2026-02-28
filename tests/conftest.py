@@ -229,5 +229,5 @@ print_style_mock.PrintStyle = print_style_class
 # python.helpers.constants is intentionally not mocked - it has no heavy
 # dependencies and is directly tested by test_constants.py
 
-sys.modules["python.helpers.strings"] = MagicMock()
-sys.modules["python.helpers.strings"].sanitize_string = MagicMock(return_value="")
+# python.helpers.strings is intentionally not mocked - it has no heavy
+# dependencies and is directly tested by test_strings.py
