@@ -1,6 +1,19 @@
 # Quality Assurance Documentation
 > Last Updated: 2026-02-28
 
+#### 2026-02-28: Test Infrastructure Improvements - Install Missing Dependencies
+- **Packages Installed**: tiktoken, Pillow
+- **Impact**: 
+  - Fixed test collection error in test_images.py (PIL/Pillow missing)
+  - Fixed test_tokens.py collection (tiktoken not mocked properly)
+  - Increased passing tests: 508 → 521 (+13 tests now runnable)
+- **Test Results**: 521 passed, 7 failed, 1 warning
+- **Note**: 7 pre-existing failures in test_tokens.py due to improper mocking in conftest.py (get_encoding not properly mocked)
+- **Lint**: python/ code is ruff clean (5 files auto-fixed)
+
+# Quality Assurance Documentation
+> Last Updated: 2026-02-28
+
 #### 2026-02-28: Add tests for config.py module
 - **File Created**: `tests/test_config.py`
 - **Test Coverage**: 23 tests covering:
