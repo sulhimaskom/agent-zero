@@ -2,7 +2,7 @@
 
 > **Purpose:** Step-by-step guide for deploying Agent Zero instances on VPS/dedicated servers  
 > **Author:** Auto-generated from deployment experience  
-> **Last Updated:** December 21 2025  
+#JJ|> Last Updated: 2025-12-21
 > **Compatibility:** Docker-capable Linux servers (AlmaLinux, CentOS, Rocky, Ubuntu, Debian)
 
 ---
