@@ -1,3 +1,9 @@
+"""Handler for creating backups.
+
+Creates a backup archive of the Agent Zero data directory
+with configurable include/exclude patterns.
+"""
+
 from flask import send_file
 
 from python.helpers.api import ApiHandler, Request, Response

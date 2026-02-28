@@ -1,3 +1,9 @@
+"""Handler for inspecting backup files.
+
+Uploads and inspects a backup archive to view its contents
+and metadata without restoring.
+"""
+
 from werkzeug.datastructures import FileStorage
 
 from python.helpers.api import ApiHandler, Request, Response

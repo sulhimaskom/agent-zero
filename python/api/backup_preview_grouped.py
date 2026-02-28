@@ -1,3 +1,9 @@
+"""Handler for grouped backup preview.
+
+Provides a directory-tree view of files that would be included
+in a backup, grouped by directory structure with filtering options.
+"""
+
 from typing import Any
 
 from python.helpers.api import ApiHandler, Request, Response

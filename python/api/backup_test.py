@@ -1,3 +1,9 @@
+"""Handler for testing backup patterns.
+
+Tests which files would be included in a backup based on
+include/exclude patterns, without creating an actual backup.
+"""
+
 from python.helpers.api import ApiHandler, Request, Response
 from python.helpers.backup import BackupService
 from python.helpers.constants import Limits

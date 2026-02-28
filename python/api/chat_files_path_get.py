@@ -1,3 +1,9 @@
+"""Handler for retrieving the chat files directory path.
+
+Provides the root folder path for a given chat context,
+supporting both project-based and default file storage.
+"""
+
 from python.helpers import files, projects
 from python.helpers.api import ApiHandler, Request, Response
 
