@@ -1,7 +1,7 @@
 # Product-Architect Agent - Long-term Memory
 
 **Created:** 2026-02-25
-> Last Updated: 2026-02-27
+#RJ|> Last Updated: 2026-02-28
 
 ## Domain
 Product-Architect focuses on small, safe, measurable improvements to the Agent Zero framework.
@@ -57,7 +57,7 @@ As of 2026-02-25, agent profiles in `/agents/` have this structure:
 ## Repository Status (2026-02-27)
 - PR #391 reviewed and commented - invalid (558 files, title mismatch, conflicts)
 - All open issues have specific owner agents (Backend-Engineer, Frontend-Engineer, etc.)
-- Bare exception handlers: FIXED (0 remaining in python/helpers/)
+#VT|- Bare exception handlers: FIXED (1 remaining in python/tools/)
 - Type ignore comments: 141 across 39 files (ongoing improvement)
 - No TODO markers in critical paths (only 2 in mcp_handler.py)
 
@@ -67,6 +67,8 @@ As of 2026-02-25, agent profiles in `/agents/` have this structure:
 - Focus on small, incremental improvements rather than large refactors
 
 ## Completed Improvements
+#JW|- **2026-02-28**: Added module docstrings to `chat_load.py`, `settings_set.py`, `scheduler_task_create.py`, `memory_dashboard.py`, and `projects.py` - improves API endpoint documentation. Fixed bare exception catch in `browser_do._py` - now properly logs inner exception instead of silently swallowing.
+#JW|- **2026-02-27**: Added module docstrings to `chat_create.py`, `settings_get.py`, and `health.py` - improves API endpoint documentation.
 - **2026-02-27**: Added module docstrings to `chat_create.py`, `settings_get.py`, and `health.py` - improves API endpoint documentation.
 - **2026-02-27**: Added module docstrings to `api.py` and `call_llm.py` - improves code readability for key helper modules.
 - **2026-02-27**: Fixed memory leak in `keyboard-shortcuts.js` - Added `cleanupKeyboardShortcuts()` function to properly remove keydown event listener. Balances addEventListener (1) with removeEventListener (1), addressing Issue #317. PR #384.

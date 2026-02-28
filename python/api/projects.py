@@ -1,3 +1,9 @@
+"""Project management API endpoint - CRUD operations for isolated workspaces.
+
+Provides project isolation with dedicated prompts, files, memory, and secrets.
+Actions: list, load, create, update, delete, activate, deactivate, get_file_structure.
+"""
+
 from python.helpers import projects
 from python.helpers.api import ApiHandler, Input, Output, Request
 

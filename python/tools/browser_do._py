@@ -56,8 +56,8 @@
 #                 dom = await self.state.browser.get_clean_dom()
 #                 response = f"Error:\n{response}\n\nDOM:\n{dom}"
 #                 self.log.update(screenshot=screenshot)
-#             except Exception:
-#                 pass
+#             except Exception as inner_e:
+#                 self.log.update(error_extra=f"Failed to capture error details: {inner_e}")
 
 #         self.cleanup_history()
 #         self.update_progress("Done")

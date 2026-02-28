@@ -1,3 +1,10 @@
+"""Settings update API endpoint - modifies agent configuration.
+
+Allows runtime modification of agent settings including model providers,
+API keys, behavior parameters, and other configuration options.
+Settings changes are persisted and applied immediately.
+"""
+
 from typing import Any
 
 from python.helpers import settings

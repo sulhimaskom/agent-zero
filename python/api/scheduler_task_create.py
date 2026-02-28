@@ -1,3 +1,11 @@
+"""Scheduler task creation API endpoint - creates new scheduled/adhoc/planned tasks.
+
+Enables creation of three task types:
+- ScheduledTask: runs on cron-based schedule
+- AdHocTask: runs once at specific time
+- PlannedTask: runs based on a task plan with dependencies
+"""
+
 import random
 
 from python.helpers.api import ApiHandler, Input, Output, Request
