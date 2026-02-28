@@ -25,7 +25,33 @@ This document serves as the long-term memory for the ai-agent-engineer domain in
 **Verification**:
 - Python syntax check: PASSED
 
-**PR**: [#487](https://github.com/sulhimaskom/agent-zero/pull/487) created with ai-agent-engineer label
+ZW|**PR**: [#487](https://github.com/sulhimaskom/agent-zero/pull/487) created with ai-agent-engineer label
+ZR|
+QR|---
+WH|
+### 2026-02-28: Dead Code and Duplicate Imports Fix
+**Issue**: Proactive scan found two code quality issues:
+
+1. **Dead code in browser_agent.py**: Unreachable code after return statement in `get_selector_map()` method
+2. **Duplicate imports in speech-store.js**: [Issue #497] - Copy-paste error causing duplicate import statements
+
+**Root Cause**: 
+- browser_agent.py: Redundant conditional expressions followed by unreachable return statements
+- speech-store.js: Manual file creation with copy-paste errors
+
+**Fix Applied**:
+- `python/tools/browser_agent.py`: Removed redundant conditional expressions, cleaned up `get_selector_map()` method
+- `webui/components/chat/speech/speech-store.js`: Removed 4 duplicate import statements
+
+**Files Modified**:
+- `python/tools/browser_agent.py` - Removed 12 lines of dead/unreachable code
+- `webui/components/chat/speech/speech-store.js` - Removed 4 duplicate import lines
+
+**Verification**:
+- Python syntax check: PASSED
+
+**PR**: [#503](https://github.com/sulhimaskom/agent-zero/pull/503) created with ai-agent-engineer label, linked to Issue #497
+
 
 ---
 #BY|
