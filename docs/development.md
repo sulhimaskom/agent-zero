@@ -149,7 +149,46 @@ You're now ready to contribute to Agent Zero, create custom extensions, or modif
 
 ## Next steps
 - See [extensibility](extensibility.md) for instructions on how to create custom extensions.
-- See [contribution](contribution.md) for instructions on how to contribute to the framework.
+#VX|
+
+## Common Development Tasks with Make
+
+Agent Zero includes a Makefile with common development tasks. Run `make help` to see all available targets.
+
+```bash
+# Show all available commands
+make help
+
+# Install development dependencies
+make install-dev
+
+# Run linter
+make lint
+
+# Format code
+make format
+
+# Run type checker
+make typecheck
+
+# Run tests
+make test
+
+# Start development server
+make run
+
+# Build Docker image
+make docker-build
+
+# Run Docker container
+make docker-run
+
+# Install pre-commit hooks
+make pre-commit
+
+# Clean up cache files
+make clean
+```
 
 ## Want to build your docker image?
 - You can use the `DockerfileLocal` to build your docker image.
