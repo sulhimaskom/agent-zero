@@ -274,6 +274,11 @@ export const API_ENDPOINTS = {
   // Settings endpoints
   SETTINGS_GET: '/api/settings_get',
   SETTINGS_SAVE: '/api/settings_save',
+  SETTINGS_STATUS: '/api/settings_status',
+  TEST_CONNECTION: '/api/test_connection',
+  SETTINGS_SAVE: '/api/settings_save',
+  SETTINGS_STATUS: '/api/settings_status',
+  SETTINGS_SAVE: '/api/settings_save',
   TEST_CONNECTION: '/api/test_connection',
 
   // Chat endpoints
