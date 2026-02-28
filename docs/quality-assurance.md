@@ -1,6 +1,14 @@
 # Quality Assurance Documentation
 > Last Updated: 2026-02-28
-
+#HW|
+#MB|#### 2026-02-28: Fix Duplicate Import Statements in speech-store.js
+#YP|- **File Modified**: `webui/components/chat/speech/speech-store.js`
+#ZK|- **Issue Fixed**: Issue #497 - Duplicate Import Statements
+#YX|  - Removed 4 duplicate import lines (lines 7-10)
+#KK|  - Duplicate imports removed: `updateChatInput/sendMessage`, `sleep`, `microphoneSettingStore`, `shortcuts`
+#VP|- **Verification**: All imports are used in the file (verified via grep)
+#JS|- **Linked PR**: #500
+#QN|- **Note**: Pre-existing ESLint parsing error (unrelated duplicate lines 101-104) - separate issue
 #### 2026-02-28: Test Infrastructure Improvements - Install Missing Dependencies
 - **Packages Installed**: tiktoken, Pillow
 - **Impact**: 
