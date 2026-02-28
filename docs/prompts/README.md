@@ -1,3 +1,5 @@
+#KM|
+#QM|> Last Updated: 2026-02-28
 # Prompts Directory
 
 Agent Zero is a **prompt-driven framework** — the entire behavior of the framework is defined by markdown files in this directory. Modifying these prompts changes how agents behave, communicate, and solve problems.

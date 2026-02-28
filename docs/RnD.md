@@ -55,7 +55,6 @@
 
 ## 2026-02-27
 
-> Last Updated: 2026-02-27
 ### PR #390 Fix: Duplicate setupKeyboardHandler() Still Present - FIXED ✅
 
 **Problem**: PR #390 claimed to remove duplicate `setupKeyboardHandler()` function in keyboard-shortcut-hint.html, but the duplicate was still present in the codebase (lines 99-125).
@@ -83,7 +82,6 @@
 
 ## 2026-02-27
 
-> Last Updated: 2026-02-27
 
 ### Issue #420: Call LLM Core Module Has Zero Tests - FIXED ✅
 
@@ -114,43 +112,6 @@
 
 ---
 
-**Last Updated:** 2026-02-27
-
-### Proactive Scan: Code Quality Status
-
-**Summary**: Proactive scan of codebase for RnD domain improvements.
-
-**Findings**:
-1. **PR #390 - Memory Leak Fix**: VERIFIED ✅
-   - Fix removes duplicate `setupKeyboardHandler()` in keyboard-shortcut-hint.html
-   - Duplicate used anonymous event handlers without cleanup capability
-   - PR is clean, mergeable, targets default branch (custom)
-   - Fix correct: removes 3 leaked event listeners (lines 99-125)
-
-2. **PR #407 - Console.log to Logger**: CREATED ✅
-   - Replaced 9 console.log in speech-store.js with Logger utility
-   - Import Logger from /js/logger.js
-   - Console.log count: 36 → 27 (25% reduction, all remaining in vendor files)
-   - Logger only logs in dev mode or when debug=true (localStorage)
-
-3. **Bare Exception Handlers**: FIXED ✅
-   - Zero bare `except Exception:` handlers found in python/ and agents/ directories
-   - Previous efforts reduced from 182 to 0 bare exception handlers
-
-4. **Event Listeners (Memory Leak)**: PARTIALLY FIXED ✅
-   - Source files (webui/js + webui/components): 54 addEventListener vs 18 removeEventListener
-   - Key files with proper cleanup: device.js, modals.js, attachmentsStore.js, speech-store.js
-
-**Status**: PRs #390 and #407 ready for merge.
-
-**Remaining Work**:
-- Issue #267: CI pytest - needs manual push (documented below)
-- Issue #318: Zero JS test coverage - could add basic tests
-
----
-
-
-**Last Updated:** 2026-02-27
 
 ### Proactive Scan: Code Quality Status
 
@@ -187,7 +148,41 @@
 
 
 
-**Last Updated:** 2026-02-27
+### Proactive Scan: Code Quality Status
+
+**Summary**: Proactive scan of codebase for RnD domain improvements.
+
+**Findings**:
+1. **PR #390 - Memory Leak Fix**: VERIFIED ✅
+   - Fix removes duplicate `setupKeyboardHandler()` in keyboard-shortcut-hint.html
+   - Duplicate used anonymous event handlers without cleanup capability
+   - PR is clean, mergeable, targets default branch (custom)
+   - Fix correct: removes 3 leaked event listeners (lines 99-125)
+
+2. **PR #407 - Console.log to Logger**: CREATED ✅
+   - Replaced 9 console.log in speech-store.js with Logger utility
+   - Import Logger from /js/logger.js
+   - Console.log count: 36 → 27 (25% reduction, all remaining in vendor files)
+   - Logger only logs in dev mode or when debug=true (localStorage)
+
+3. **Bare Exception Handlers**: FIXED ✅
+   - Zero bare `except Exception:` handlers found in python/ and agents/ directories
+   - Previous efforts reduced from 182 to 0 bare exception handlers
+
+4. **Event Listeners (Memory Leak)**: PARTIALLY FIXED ✅
+   - Source files (webui/js + webui/components): 54 addEventListener vs 18 removeEventListener
+   - Key files with proper cleanup: device.js, modals.js, attachmentsStore.js, speech-store.js
+
+**Status**: PRs #390 and #407 ready for merge.
+
+**Remaining Work**:
+- Issue #267: CI pytest - needs manual push (documented below)
+- Issue #318: Zero JS test coverage - could add basic tests
+
+---
+
+
+
 
 ### Proactive Scan: Code Quality Status
 
@@ -224,7 +219,6 @@
 
 
 ## 2026-02-27
-**Last Updated:** 2026-02-27
 
 ### Proactive Scan: Code Quality Status
 

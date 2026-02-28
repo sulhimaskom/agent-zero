@@ -127,8 +127,7 @@ Fixed keyboard accessibility issues in the scheduler task table (`webui/index.ht
 ## References
 - WCAG 2.1 Guidelines
 - MDN Accessibility Documentation
-- WAI-ARIA Practices
-QQ|**Last Updated:** 2026-02-27
+
 #QZ|
 #MR|### Image Viewer Focus States (2026-02-27)
 #WS|**Status:** ✅ COMPLETED
