@@ -111,9 +111,7 @@
                                 :disabled="$store.memoryDashboardStore.currentPage === 1" title="Previous Page" aria-label="Previous page">
                                 <span class="material-symbols-outlined">chevron_left</span>
                             </button>
-                                :disabled="$store.memoryDashboardStore.currentPage === 1" title="Previous Page">
-                                <span class="material-symbols-outlined">chevron_left</span>
-                            </button>
+
                             <div class="page-input-group">
                                 <label for="memory-page-input">Page</label>
                                 <input type="number" id="memory-page-input" class="page-input"
@@ -124,24 +122,13 @@
                                 <span class="page-total">of <strong
                                         x-text="$store.memoryDashboardStore.totalPages"></strong></span>
                             </div>
-                                <label>Page</label>
-                                <input type="number" class="page-input"
-                                    x-model.number="$store.memoryDashboardStore.currentPage"
-                                    @change="$store.memoryDashboardStore.goToPage($store.memoryDashboardStore.currentPage)"
-                                    @keyup.enter="$store.memoryDashboardStore.goToPage($store.memoryDashboardStore.currentPage)"
-                                    :min="1" :max="$store.memoryDashboardStore.totalPages" />
-                                <span class="page-total">of <strong
-                                        x-text="$store.memoryDashboardStore.totalPages"></strong></span>
-                            </div>
+
                             <button class="btn btn-icon" @click="$store.memoryDashboardStore.nextPage()"
                                 :disabled="$store.memoryDashboardStore.currentPage === $store.memoryDashboardStore.totalPages"
                                 title="Next Page" aria-label="Next page">
                                 <span class="material-symbols-outlined">chevron_right</span>
                             </button>
-                                :disabled="$store.memoryDashboardStore.currentPage === $store.memoryDashboardStore.totalPages"
-                                title="Next Page">
-                                <span class="material-symbols-outlined">chevron_right</span>
-                            </button>
+
                         </div>
                     </div>
 
@@ -333,9 +320,7 @@
                                 :disabled="$store.memoryDashboardStore.currentPage === 1" title="Previous Page" aria-label="Previous page">
                                 <span class="material-symbols-outlined">chevron_left</span>
                             </button>
-                                :disabled="$store.memoryDashboardStore.currentPage === 1" title="Previous Page">
-                                <span class="material-symbols-outlined">chevron_left</span>
-                            </button>
+
                             <div class="page-input-group">
                                 <label for="status-page-input">Page</label>
                                 <input type="number" id="status-page-input" class="page-input"
@@ -343,23 +328,12 @@
                                     @change="$store.memoryDashboardStore.goToPage($store.memoryDashboardStore.currentPage)"
                                     @keyup.enter="$store.memoryDashboardStore.goToPage($store.memoryDashboardStore.currentPage)"
                                     :min="1" :max="$store.memoryDashboardStore.totalPages" />
-                                <label>Page</label>
-                                <input type="number" class="page-input"
-                                    x-model.number="$store.memoryDashboardStore.currentPage"
-                                    @change="$store.memoryDashboardStore.goToPage($store.memoryDashboardStore.currentPage)"
-                                    @keyup.enter="$store.memoryDashboardStore.goToPage($store.memoryDashboardStore.currentPage)"
-                                    :min="1" :max="$store.memoryDashboardStore.totalPages" />
-                                <span class="page-total">of <strong
-                                        x-text="$store.memoryDashboardStore.totalPages"></strong></span>
-                            </div>
+
                             <button class="btn btn-icon" @click="$store.memoryDashboardStore.nextPage()"
                                 :disabled="$store.memoryDashboardStore.currentPage === $store.memoryDashboardStore.totalPages"
                                 title="Next Page" aria-label="Next page">
                                 <span class="material-symbols-outlined">chevron_right</span>
-                                :disabled="$store.memoryDashboardStore.currentPage === $store.memoryDashboardStore.totalPages"
-                                title="Next Page">
-                                <span class="material-symbols-outlined">chevron_right</span>
-                            </button>
+
                         </div>
                     </div>
 
