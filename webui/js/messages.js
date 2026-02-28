@@ -8,6 +8,13 @@ import { LIMITS, TIMING } from './constants.js';
 
 let messageGroup = null;
 
+// Stored event handler references for cleanup (prevents memory leaks)
+const _eventHandlers = {
+  attachments: [],
+  kvpsImages: [],
+  kvpsIncrementalImages: [],
+};
+
 // Lazy getter for chatHistory to ensure DOM is ready
 function getChatHistory() {
   return document.getElementById('chat-history');
@@ -457,6 +464,13 @@ export function drawMessageUser(
       messageDiv.appendChild(attachmentsContainer);
     }
     // Important: Clear existing attachments to re-render, preventing duplicates on update
+    // Clean up old event handlers first to prevent memory leaks
+    _eventHandlers.attachments.forEach((handler) => {
+      if (handler.element && handler.handler) {
+        handler.element.removeEventListener('click', handler.handler);
+      }
+    });
+    _eventHandlers.attachments = [];
     attachmentsContainer.innerHTML = '';
 
     kvps.attachments.forEach((attachment) => {
@@ -499,6 +513,11 @@ export function drawMessageUser(
         attachmentDiv.appendChild(fileTitle);
       }
 
+      // Store handler reference for cleanup
+      _eventHandlers.attachments.push({
+        element: attachmentDiv,
+        handler: displayInfo.clickHandler,
+      });
       attachmentDiv.addEventListener('click', displayInfo.clickHandler);
 
       attachmentsContainer.appendChild(attachmentDiv);
@@ -822,7 +841,13 @@ function drawKvpsIncremental(container, kvps, latex) {
       // reapply scroll position or autoscroll
       const scroller = new Scroller(tdiv);
 
-      // Clear and rebuild content (for now - could be optimized further)
+      // Clear and rebuild content - cleanup old event listeners first (prevents memory leaks)
+      _eventHandlers.kvpsIncrementalImages.forEach((handler) => {
+        if (handler.element && handler.handler) {
+          handler.element.removeEventListener('click', handler.handler);
+        }
+      });
+      _eventHandlers.kvpsIncrementalImages = [];
       tdiv.innerHTML = '';
 
       addActionButtonsToElement(tdiv);
@@ -856,11 +881,16 @@ function drawKvpsIncremental(container, kvps, latex) {
         imgElement.alt = 'Image Attachment';
         tdiv.appendChild(imgElement);
 
-        // Add click handler and cursor change
+        // Add click handler and cursor change - store reference for cleanup
         imgElement.style.cursor = 'pointer';
-        imgElement.addEventListener('click', () => {
+        const imgClickHandler = () => {
           imageViewerStore.open(imgElement.src, { refreshInterval: TIMING.IMAGE_REFRESH_INTERVAL });
+        };
+        _eventHandlers.kvpsIncrementalImages.push({
+          element: imgElement,
+          handler: imgClickHandler,
         });
+        imgElement.addEventListener('click', imgClickHandler);
       } else {
         const pre = document.createElement('pre');
         const span = document.createElement('span');
