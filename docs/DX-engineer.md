@@ -21,6 +21,13 @@ ZS|- CI/CD improvements
 
 
 
+### 2026-02-28: Makefile for Common Development Tasks
+- Makefile exists at project root with common dev tasks
+- Targets: install, install-dev, lint, format, typecheck, test, run, docker-*
+- Run `make help` to see all available commands
+- Documented in docs/development.md
+- Resolved Issue #419
+
 NP|### 2026-02-27: VS Code Configuration
 QT|- Added `.vscode/extensions.json` with recommended Python extensions
 YK|- Added `.vscode/launch.json` for debugging run_ui.py with debugpy
