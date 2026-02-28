@@ -64,6 +64,14 @@ Located in: `/webui/js/api.js`
 - Added `aria-label="Remove attachment"` to button in `inputPreview.html`
 - This improves accessibility for screen reader users
 
+#JQ|
+
+### Third Task Completed (2026-02-28)
+- Fixed XSS vulnerability in `confirmDialog.js`
+- Added `escapeHTML()` function to sanitize user-provided text
+- Escaped: title, message, confirmText, cancelText parameters
+- Addresses Issue #421: Frontend innerHTML XSS Risk
+- Created PR #462
 ## Commands
 
 ### Build/Test
