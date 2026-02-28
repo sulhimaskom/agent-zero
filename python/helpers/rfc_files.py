@@ -5,8 +5,7 @@ import shutil
 import tempfile
 import zipfile
 
-from python.helpers import files
-from python.helpers import runtime
+from python.helpers import files, runtime
 
 # Import the canonical get_abs_path from files.py to avoid duplication
 get_abs_path = files.get_abs_path

@@ -1,6 +1,15 @@
 # DX-Engineer Agent
 
 
+### 2026-02-28: CI Quality Gates (pytest, ruff, mypy)
+- Added quality-gates.yml workflow with pytest, ruff, mypy jobs
+- Fixed 5 ruff lint errors (unused imports, whitespace, unsorted imports)
+- Fixed broken tiktoken mock in conftest.py (was not mocking get_encoding())
+- All 528 tests now pass
+- PR #492 created
+- Note: Workflow file added as PR comment due to GitHub App permission restrictions
+
+
 > Last Updated: 2026-02-27
 
 ## Overview
