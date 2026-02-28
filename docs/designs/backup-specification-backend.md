@@ -1,3 +1,5 @@
+#KM|
+#QM|> Last Updated: 2026-02-28
 # Agent Zero Backup/Restore Backend Specification
 
 ## Overview

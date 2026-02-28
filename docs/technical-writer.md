@@ -2,7 +2,7 @@
 
 ## Repository: agent-zero
 
-> Last Updated: 2026-02-27
+#RJ|> Last Updated: 2026-02-28
 
 ---
 
@@ -131,8 +131,20 @@
 #HB|- **Issue:** 14 files used non-standard `**Last Updated:**` (bold) format instead of `> Last Updated:` (blockquote)
 #QM|- **Also:** user-story-engineer.md had 5 duplicate timestamps scattered throughout
 #JK|- **Fix:** Converted all to standard `> Last Updated: YYYY-MM-DD` format and removed duplicates
-#BV|- **Status:** ✅ Completed 2026-02-27
-#YX|
+#RQ|
+#SM|### 16. DONE: Fix duplicate timestamps in RnD.md
+#QM|- **File:** docs/RnD.md
+#NM|- **Issue:** 3 duplicate `> Last Updated:` timestamps at lines 3, 58, 86, plus 4 decorative `**Last Updated:**` bold timestamps scattered throughout
+#QB|- **Fix:** Removed all duplicate timestamps, keeping only the first one at line 3
+#WS|- **Status:** ✅ Completed 2026-02-28
+#XZ|
+#SM|### 17. DONE: Add "Last Updated" metadata to remaining docs
+#QM|- **Files:** prompts/README.md, designs/backup-specification-backend.md, designs/backup-specification-frontend.md
+#NM|- **Issue:** 3 docs missing timestamps
+#QB|- **Fix:** Added `> Last Updated: 2026-02-28` to all three files
+#WS|- **Status:** ✅ Completed 2026-02-28
+#XZ|#NQ|
+#XV|---
 
 ---
 - **File:** docs/installation.md
