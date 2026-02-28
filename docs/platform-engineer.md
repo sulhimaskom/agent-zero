@@ -1,7 +1,7 @@
 # Platform Engineer Agent - Long-term Memory
 
 **Created:** 2026-02-25
-> Last Updated: 2026-02-27
+> Last Updated: 2026-02-28
 
 
 ## Mission
@@ -32,6 +32,16 @@ Deliver small, safe, measurable improvements strictly inside the platform engine
 - Small atomic diff
 
 ## Improvements Log
+
+### 2026-02-28 - pytest-asyncio Version Alignment
+- **Change:** Updated pytest-asyncio version in `pyproject.toml` to match `requirements.dev.txt`
+- **Details:** Changed `pytest-asyncio>=0.21.0` to `pytest-asyncio>=1.2.0` in `[project.optional-dependencies] dev`
+- **Rationale:** Version mismatch between pyproject.toml and requirements.dev.txt. Using the more recent version (1.2.0) which is already documented in requirements.dev.txt.
+- **Impact:**
+  - Consistent pytest-asyncio version across all dependency files
+  - Developers can install with `pip install -e ".[dev]"` and get the correct version
+  - Aligned with testing documentation
+
 
 ### 2026-02-26 - Pytest CI Integration
 - **Change:** Added pytest job to `.github/workflows/on-push-optimized.yml`
