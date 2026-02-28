@@ -4,10 +4,7 @@ import { sleep } from "/js/sleep.js";
 import { store as microphoneSettingStore } from "/components/settings/speech/microphone-setting-store.js";
 import * as shortcuts from "/js/shortcuts.js";
 import { Logger } from "/js/logger.js";
-import { updateChatInput, sendMessage } from "/index.js";
-import { sleep } from "/js/sleep.js";
-import { store as microphoneSettingStore } from "/components/settings/speech/microphone-setting-store.js";
-import * as shortcuts from "/js/shortcuts.js";
+
 
 const Status = {
   INACTIVE: "inactive",
