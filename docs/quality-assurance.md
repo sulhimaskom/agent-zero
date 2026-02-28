@@ -1,5 +1,18 @@
 # Quality Assurance Documentation
 > Last Updated: 2026-02-28
+
+#### 2026-02-28: Add tests for config.py module
+- **File Created**: `tests/test_config.py`
+- **Test Coverage**: 23 tests covering:
+  - get_frontend_config: returns dict, network/host/url keys, features, limits, static ports, port types
+  - get_env_config_js: returns string, script tags, window.ENV_CONFIG, valid JS, JSON content
+  - inject_config_into_html: returns string, adds script, before </head>, no head tag handling, multiple heads, empty string, preserves content, window.ENV_CONFIG
+  - Integration: frontend config matches JS config, injected HTML contains full config
+- **Verification**: All 23 tests pass
+- **Lint**: ruff clean
+- **Linked Issue**: Issue #465 (Test Coverage Crisis)
+# Quality Assurance Documentation
+> Last Updated: 2026-02-28
 #### 2026-02-27: Add tests for errors.py module
 - **File Created**: `tests/test_errors.py`
 - **Test Coverage**: 16 tests covering:
