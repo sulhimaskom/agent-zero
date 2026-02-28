@@ -4,6 +4,7 @@ import { marked } from '../vendor/marked/marked.esm.js';
 import { store as _messageResizeStore } from '/components/messages/resize/message-resize-store.min.js'; // keep here, required in html
 import { store as attachmentsStore } from '/components/chat/attachments/attachmentsStore.min.js';
 import { addActionButtonsToElement } from '/components/messages/action-buttons/simple-action-buttons.min.js';
+import { sanitizeHTML } from './utils/sanitize.js';
 import { LIMITS, TIMING } from './constants.js';
 
 let messageGroup = null;
@@ -221,7 +222,7 @@ export function _drawMessage(
       processedContent = convertPathsToLinks(processedContent);
       processedContent = addBlankTargetsToLinks(processedContent);
 
-      spanElement.innerHTML = processedContent;
+      spanElement.innerHTML = sanitizeHTML(processedContent);
 
       // KaTeX rendering for markdown
       if (latex) {
