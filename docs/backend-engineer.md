@@ -345,5 +345,29 @@ content uses a preview string, not the actual base64 data.
 
 **Verification:**
 - All 9 tests pass
-- Syntax verified: python -m py_compile ✅
+#NR|- Syntax verified: python -m py_compile ✅
+#TH|- No regressions in existing tests
+
+---
+
+### Issue #458: Task Scheduler - Job Duplication Risk Below 1min Interval
+**Status:** FIXED (PR #475) - 2026-02-28
+
+**Problem:**
+- In job_loop.py, if scheduler_tick() takes longer than SLEEP_TIME (default 60s),
+- multiple ticks can overlap and execute the same tasks multiple times
+- This causes job duplication when SLEEP_TIME is lowered below 1 minute
+
+**Solution:**
+- Added tick_in_progress flag to track if a tick is already running
+- Skip next tick if previous one hasn't completed
+- Log warning when skipping to help operators diagnose the issue
+
+**Files Modified:**
+- python/helpers/job_loop.py (+14 lines, -1 line)
+
+**Verification:**
+- Python syntax: PASS (py_compile)
+- AST parse: OK
+- Logic: Flag properly prevents concurrent tick execution
 - No regressions in existing tests
