@@ -225,18 +225,6 @@ class State:
     async def get_selector_map(self):
         """Get the selector map for the current page state."""
         if self.use_agent:
-            (
-                await self.use_agent.browser_session.get_state_summary(
-                    cache_clickable_elements_hashes=True
-                )
-                if self.use_agent.browser_session
-                else None
-            )
-            return (
-                await self.use_agent.browser_session.get_selector_map()
-                if self.use_agent.browser_session
-                else None
-            )
             await self.use_agent.browser_session.get_state_summary(
                 cache_clickable_elements_hashes=True
             )
