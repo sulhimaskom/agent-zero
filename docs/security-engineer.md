@@ -309,3 +309,27 @@ Changed default CORS origins from wildcard to specific development ports:
 **Testing**:
 - Python syntax validation passed (`python3 -m py_compile`)
 - No runtime breaking changes expected
+-
+
+---
+
+## 2026-02-28: SSH Default User Changed to Non-Root
+
+**Issue**: #466 - SSH Root Login Enabled by Default in Docker (partial fix)
+**Date Fixed**: 2026-02-28
+**Severity**: MEDIUM (Defense in Depth)
+**Files Changed**: 
+- `python/helpers/settings.py`
+
+**Vulnerability**: 
+The default SSH user was set to "root" in settings.py, which contradicted the Docker security hardening that added non-root user `a0user`. While root login was disabled in SSH config, the configuration was inconsistent.
+
+**Solution**:
+Changed default SSH user from "root" to "a0user" in two locations:
+- Line 1743: Docker runtime configuration
+- Line 1757: Non-Docker runtime configuration
+- Users can still override via `CODE_EXEC_SSH_USER` environment variable
+
+**Testing**:
+- Python syntax validation passed (`python3 -m py_compile`)
+- No breaking changes - existing deployments can set `CODE_EXEC_SSH_USER=root` if needed
