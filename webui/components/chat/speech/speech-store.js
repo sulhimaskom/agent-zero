@@ -544,7 +544,7 @@ const model = {
       text = doc.body.textContent || "";
     } catch (e) {
       // Fallback: simple tag stripping if DOMParser fails
-      console.warn("[Speech Store] DOMParser failed, using fallback:", e);
+      Logger.warn("[Speech Store] DOMParser failed, using fallback:", e);
       text = text.replace(/<pre[^>]*>[\s\S]*?<\/pre>/gi, codePlaceholder);
       text = text.replace(/<code[^>]*>[\s\S]*?<\/code>/gi, codePlaceholder);
       text = text.replace(/<[^>]+>/g, ''); // strip remaining tags

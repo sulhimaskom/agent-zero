@@ -4,6 +4,7 @@ import * as API from '/js/api.js';
 import { openModal, closeModal } from '/js/modals.js';
 import { store as notificationStore } from '/components/notifications/notification-store.min.js';
 import { LIMITS, STORAGE_KEYS, DEFAULTS, TIMING } from '/js/constants.js';
+import Logger from '/js/logger.js';
 
 // Helper function for toasts
 function justToast(text, type = 'info', timeout = TIMING.TOAST_DISPLAY) {
@@ -244,7 +245,7 @@ const memoryDashboardStore = {
           this.message = null;
         } else {
           // For silent updates, just log the error but don't break the UI
-          console.warn('Memory dashboard polling failed:', response.error);
+          Logger.warn('Memory dashboard polling failed:', response.error);
         }
       }
     } catch (error) {
@@ -255,7 +256,7 @@ const memoryDashboardStore = {
         console.error('Memory search error:', error);
       } else {
         // For silent updates, just log the error but don't break the UI
-        console.warn('Memory dashboard polling error:', error);
+        Logger.warn('Memory dashboard polling error:', error);
       }
     } finally {
       if (!silent) {

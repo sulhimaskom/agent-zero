@@ -1,4 +1,5 @@
 import { createStore } from '/js/AlpineStore.js';
+import Logger from '/js/logger.js';
 
 const model = {
   versionNo: '',
@@ -29,7 +30,7 @@ const model = {
       }
       return true;
     } catch (err) {
-      console.warn('Failed to copy version:', err);
+      Logger.warn('Failed to copy version:', err);
       if (window.toastFrontendError) {
         window.toastFrontendError('Failed to copy version info', 'Copy Error');
       }

@@ -1,3 +1,23 @@
+# Frontend Engineer Agent - Knowledge Base
+
+**Created:** 2026-02-25
+**Agent:** frontend-engineer (autonomous mode)
+> Last Updated: 2026-02-28
+
+### 2026-02-28: Replace console.warn with Logger utility
+- Replaced `console.warn` with `Logger.warn` in 7 component files:
+  - `context-store.js` - Added Logger import, replaced console.warn
+  - `history-store.js` - Added Logger import, replaced console.warn
+  - `speech-store.js` - Replaced console.warn (Logger already imported)
+  - `memory-dashboard-store.js` - Added Logger import, replaced 2x console.warn
+  - `tunnel-store.js` - Replaced console.warn (Logger already imported)
+  - `backup-store.js` - Added Logger import, replaced console.warn
+  - `sidebar-bottom-store.js` - Added Logger import, replaced console.warn
+- This addresses issue #400: JavaScript console.log debugging remnants
+- All 7 edited files pass Node.js syntax check
+- PR: https://github.com/sulhimaskom/agent-zero/pull/506
+
+### 2026-02-27: Button Accessibility Fix
 #TY|# Frontend Engineer Agent - Knowledge Base
 #KM|
 #NZ|**Created:** 2026-02-25

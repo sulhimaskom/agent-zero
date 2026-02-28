@@ -161,7 +161,7 @@ const model = {
         // Check if stopping was successful
         const stopData = await stopResponse.json();
         if (!stopData.success) {
-          console.warn("Warning: Couldn't stop existing tunnel cleanly");
+          Logger.warn("Warning: Couldn't stop existing tunnel cleanly");
           // Continue anyway since we want to create a new one
         }
 
