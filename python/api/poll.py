@@ -2,6 +2,7 @@ from agent import AgentContext, AgentContextType
 from python.helpers.api import ApiHandler, Request, Response
 from python.helpers.dotenv import get_dotenv_value
 from python.helpers.localization import Localization
+from python.helpers.print_style import PrintStyle
 from python.helpers.task_scheduler import TaskScheduler
 
 
@@ -16,6 +17,14 @@ class Poll(ApiHandler):
         Localization.get().set_timezone(timezone)
 
         # context instance - get or create only if ctxid is provided
+        if ctxid:
+            try:
+                context = self.use_context(ctxid, create_if_not_exists=False)
+            except Exception as e:
+                PrintStyle.error(f"Failed to get context {ctxid}: {e}")
+                context = None
+        else:
+            context = None
         if ctxid:
             try:
                 context = self.use_context(ctxid, create_if_not_exists=False)

@@ -149,7 +149,6 @@ def truncate_text(text: str, length: int, at_end: bool = True, replacement: str 
         if length == 0:
             return replacement
         return replacement[:length]
-        return replacement[:length]
 
     if at_end:
         return text[:length - replacement_length] + replacement

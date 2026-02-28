@@ -12,6 +12,33 @@ This document serves as the long-term memory for the ai-agent-engineer domain in
 
 ## Implemented Fixes
 
+### 2026-02-28: Code Quality Improvements - Dead Code and Exception Logging
+**Issue**: Multiple code quality issues found during proactive scan:
+
+1. **Duplicate return statement in strings.py**: Dead code with duplicate `return replacement[:length]`
+2. **Duplicate imports in config.py**: Same module imported twice in separate statements
+3. **Silent exception handler in poll.py**: API endpoint silently caught exceptions without logging
+
+**Fix Applied**:
+- `python/helpers/strings.py` - Removed duplicate return statement at line 152
+- `python/helpers/config.py` - Consolidated duplicate imports from `python.helpers.constants`
+- `python/api/poll.py` - Added PrintStyle.error() logging to context retrieval exception handler
+
+**Files Modified**:
+- `python/helpers/strings.py` - Removed 1 duplicate line
+- `python/helpers/config.py` - Consolidated 2 import statements into 1
+- `python/api/poll.py` - Added import and 1 logging line
+
+**Verification**:
+- Python syntax check: PASSED on all 3 files
+- pytest: 475 passed, 7 pre-existing failures (unrelated to changes)
+
+**PR**: Created with ai-agent-engineer label
+
+---
+
+## Implemented Fixes
+
 ### 2026-02-28: Duplicate Return Statements Fix in test_fasta2a_client.py
 **Issue**: [Issue #413] - Duplicate return statements in test_fasta2a_client.py affecting test reliability
 
