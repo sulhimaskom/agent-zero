@@ -52,6 +52,7 @@ def print_test_commands():
 
 def print_troubleshooting():
     """Print troubleshooting information."""
+    pass
 
 
 def validate_token_format():
