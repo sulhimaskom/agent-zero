@@ -427,7 +427,7 @@ export function drawMessageUser(
     headingElement.classList.add('msg-heading');
     messageDiv.insertBefore(headingElement, messageDiv.firstChild);
   }
-  headingElement.innerHTML = `${heading} <span class='icon material-symbols-outlined'>person</span>`;
+  headingElement.innerHTML = `${escapeHTML(heading)} <span class='icon material-symbols-outlined'>person</span>`;
 
   // Handle content
   let textDiv = messageDiv.querySelector('.message-text');
