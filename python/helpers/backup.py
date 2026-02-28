@@ -357,7 +357,7 @@ class BackupService:
                     break
 
         except Exception as e:
-            raise Exception(f"Error processing patterns: {e!s}")
+            raise RuntimeError(f"Error processing patterns: {e!s}")
 
         return matched_files
 
@@ -380,7 +380,7 @@ class BackupService:
         matched_files = await self.test_patterns(metadata, max_files=Limits.BACKUP_MAX_FILES_FULL)
 
         if not matched_files:
-            raise Exception("No files matched the backup patterns")
+            raise ValueError("No files matched the backup patterns")
 
         # Create temporary zip file
         temp_dir = tempfile.mkdtemp()
@@ -447,7 +447,7 @@ class BackupService:
             # Cleanup on error
             if os.path.exists(zip_path):
                 os.remove(zip_path)
-            raise Exception(f"Error creating backup: {e!s}")
+            raise RuntimeError(f"Error creating backup: {e!s}")
 
     async def inspect_backup(self, backup_file) -> dict[str, Any]:
         """Inspect backup archive and return metadata."""
@@ -461,7 +461,7 @@ class BackupService:
             with zipfile.ZipFile(temp_file, "r") as zipf:
                 # Read metadata
                 if "metadata.json" not in zipf.namelist():
-                    raise Exception("Invalid backup file: missing metadata.json")
+                    raise ValueError("Invalid backup file: missing metadata.json")
 
                 metadata_content = zipf.read("metadata.json").decode("utf-8")
                 metadata = json.loads(metadata_content)
@@ -473,9 +473,9 @@ class BackupService:
                 return metadata
 
         except zipfile.BadZipFile:
-            raise Exception("Invalid backup file: not a valid zip archive")
+            raise ValueError("Invalid backup file: not a valid zip archive")
         except json.JSONDecodeError:
-            raise Exception("Invalid backup file: corrupted metadata")
+            raise ValueError("Invalid backup file: corrupted metadata")
         finally:
             # Cleanup
             if os.path.exists(temp_file):
@@ -627,11 +627,11 @@ class BackupService:
                 }
 
         except zipfile.BadZipFile:
-            raise Exception("Invalid backup file: not a valid zip archive")
+            raise ValueError("Invalid backup file: not a valid zip archive")
         except json.JSONDecodeError:
-            raise Exception("Invalid backup file: corrupted metadata")
+            raise ValueError("Invalid backup file: corrupted metadata")
         except Exception as e:
-            raise Exception(f"Error previewing restore: {e!s}")
+            raise RuntimeError(f"Error previewing restore: {e!s}")
         finally:
             # Cleanup
             if os.path.exists(temp_file):
@@ -823,11 +823,11 @@ class BackupService:
                 }
 
         except zipfile.BadZipFile:
-            raise Exception("Invalid backup file: not a valid zip archive")
+            raise ValueError("Invalid backup file: not a valid zip archive")
         except json.JSONDecodeError:
-            raise Exception("Invalid backup file: corrupted metadata")
+            raise ValueError("Invalid backup file: corrupted metadata")
         except Exception as e:
-            raise Exception(f"Error restoring backup: {e!s}")
+            raise RuntimeError(f"Error restoring backup: {e!s}")
         finally:
             # Cleanup
             if os.path.exists(temp_file):

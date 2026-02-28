@@ -34,5 +34,5 @@ def ensure_playwright_binary():
         subprocess.check_call(["playwright", "install", "chromium", "--only-shell"], env=env)
     bin = get_playwright_binary()
     if not bin:
-        raise Exception("Playwright binary not found after installation")
+        raise RuntimeError("Playwright binary not found after installation")
     return bin

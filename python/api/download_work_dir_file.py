@@ -91,7 +91,7 @@ class DownloadFile(ApiHandler):
         file = await runtime.call_development_function(file_info.get_file_info, file_path)
 
         if not file["exists"]:
-            raise Exception(f"File {file_path} not found")
+            raise FileNotFoundError(f"File {file_path} not found")
 
         if file["is_dir"]:
             zip_file = await runtime.call_development_function(files.zip_dir, file["abs_path"])
@@ -114,7 +114,7 @@ class DownloadFile(ApiHandler):
                     file["abs_path"],
                     download_name=os.path.basename(file["file_name"]),
                 )
-        raise Exception(f"File {file_path} not found")
+        raise FileNotFoundError(f"File {file_path} not found")
 
 
 async def fetch_file(path):
