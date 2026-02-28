@@ -38,7 +38,6 @@ def get_test_urls():
 
     except Exception as e:
         return None
-        return None
 
 
 def print_test_commands():
@@ -77,7 +76,6 @@ def validate_token_format():
 
     except Exception as e:
         return False
-        return False
 
 
 @pytest.mark.asyncio
@@ -94,7 +92,6 @@ async def test_server_connectivity():
             except httpx.ConnectError:
                 return False
             except Exception as e:
-                return False
                 return False
 
     except ImportError:
@@ -118,7 +115,6 @@ def main():
             return 1
 
     except Exception as e:
-        pass
         pass
 
     # Print test commands
