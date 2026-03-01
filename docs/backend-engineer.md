@@ -436,4 +436,29 @@ TH|- No regressions in existing tests
 #PM|**Note:** Some tests for parse_env_content() and parse_env_lines() were excluded because
 #YQ|conftest.py mocks dotenv.parser.parse_stream with empty return. These methods work correctly
 #TB|in production but cannot be unit tested without modifying conftest.py globally.
+---
+
+### Issue: Add Test Coverage for attachment_manager.py
+**Status:** COMPLETED - 2026-03-01
+
+**Problem:**
+- attachment_manager.py (101 lines) was missing test coverage
+- Module handles file validation, MIME type checking, and image previews
+- No existing tests for security-critical file validation functions
+
+**Changes:**
+1. Added tests/test_attachment_manager.py with 24 tests covering:
+   - is_allowed_file(): 9 tests (images, code, documents, disallowed, no extension)
+   - get_file_type(): 5 tests (image, code, document, unknown types)
+   - get_file_extension(): 5 tests (basic, uppercase, no extension, multiple dots)
+   - validate_mime_type(): 6 tests (image, text, application, disallowed, edge cases)
+
+**Files Modified:**
+- tests/test_attachment_manager.py (new file, 179 lines)
+
+**Verification:**
+- 24 tests: ALL PASS
+- Python syntax: PASS (py_compile)
+- No regressions: Existing tests unaffected (700 total tests pass)
+
 - No regressions in existing tests
