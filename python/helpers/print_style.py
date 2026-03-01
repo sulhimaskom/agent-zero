@@ -8,8 +8,9 @@ from datetime import datetime
 
 import webcolors
 
-from . import files
-from .constants import Colors
+from python.helpers import files
+from python.helpers.constants import Colors
+from python.helpers.runtime import is_dockerized
 
 
 class PrintStyle:
@@ -20,6 +21,7 @@ class PrintStyle:
     _structured_logging_enabled: bool = False
     _logger: logging.Logger | None = None
     _json_formatter: logging.Formatter | None = None
+    _auto_enabled: bool = False  # Track if auto-enabled for Docker
 
     # Mapping of PrintStyle methods to logging levels
     LOG_LEVELS = {
@@ -50,6 +52,11 @@ class PrintStyle:
         self.padding = padding
         self.padding_added = False  # Flag to track if padding was added
         self.log_only = log_only
+
+        # Auto-enable structured logging in Docker (production) mode
+        if not PrintStyle._auto_enabled and is_dockerized():
+            PrintStyle.enable_structured_logging(enabled=True, use_json=True)
+            PrintStyle._auto_enabled = True
 
         if PrintStyle.log_file_path is None:
             logs_dir = files.get_abs_path("logs")
