@@ -371,3 +371,35 @@ XJ|JS|**Testing**:
 WK|ZJ|- Verified no eval() usage in application code (webui/js, webui/components)
 TP|NH|- Python syntax validation passed
 WQ|- CSP string correctly formed without unsafe-eval
+ZH|WQ|- CSP string correctly formed without unsafe-eval
+
+---
+
+
+XZ|**Issue**: #517 - Command Injection Risk - shell=True in brocula_loop.py
+SB|PV|**Date Fixed**: 2026-03-01
+KM|TR|**Severity**: HIGH (Command Injection)
+VZ|YR|**Files Changed**: 
+RQ|VS|- `agents/brocula/brocula_loop.py`
+TK|
+
+RJ|
+
+SJ|RY|**Vulnerability**: 
+VR|RJ|The `run_command()` function used `subprocess.run(cmd, shell=True, ...)` which allows shell metacharacter injection. If an attacker could control the `cmd` parameter, they could execute arbitrary shell commands.
+PT|
+
+
+SM|PJ|**Solution**:
+WH|RW|Replaced `shell=True` with `shell=False` and use `shlex.split()`:
+SP|MB|- Uses `shlex.split(cmd)` to properly parse command string into list
+NP|- Runs with `shell=False` to prevent shell interpretation
+NP|- Maintains compatibility with existing command calls
+NP|- Defense-in-depth: even hardcoded commands now use safe execution
+NZ|
+
+VZ|
+
+XJ|JS|**Testing**:
+WK|ZJ|- Python syntax validation passed
+TP|NH|- No breaking changes to command execution logic
