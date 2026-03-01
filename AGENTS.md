@@ -3,7 +3,7 @@
 **Generated:** 2026-03-01
 **Branch:** custom
 **Commit:** d7c3076
-**Last RepoKeeper Run:** 2026-02-19 (Repository maintenance - synchronized with origin/main, statistics updated, branch merged, documentation sync)
+**Last RepoKeeper Run:** 2026-03-01 (Repository maintenance - synchronized with origin/main, statistics updated, branch merged, documentation sync)
 
 ## OVERVIEW
 Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpine.js). Prompt-driven behavior - everything controlled by `/prompts/` markdown files. Grows organically through memory, tools, extensions, and agent profiles.
@@ -101,7 +101,7 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 - `/python/helpers/history.py:236` - FIXME: vision bytes sent to utility LLM (inefficiency)
 - `/python/helpers/vector_db.py`, `/python/helpers/memory.py` - FAISS patch for Python 3.12 ARM (remove when fixed upstream)
 - `/python/helpers/job_loop.py:34` - TODO: lowering SLEEP_TIME below 1min causes job duplication
-- 141 `# type: ignore` comments across 39 files - mostly legitimate (external libraries)
+- 183 `# type: ignore` comments across 50 files - mostly legitimate (external libraries)
 - Zero bare `except Exception:` handlers (all fixed to capture as `e`)
 - 289 PrintStyle calls across 45 files - intentional framework logging (not bare prints)
 
@@ -109,7 +109,7 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 - pytest.ini exists and configured (asyncio mode, markers, test paths)
 - conftest.py exists with fixtures and mocks
 - All tests passing
-- 11 test files for 228 Python files (~5% coverage) - tests passing
+- 37 test files for ~100 Python files (~23% coverage) - tests passing
 - Tests not run in CI (GitHub workflows use OpenCode AI agent only)
 - Mixed naming: `test_*.py` and `*_test.py` both used
 - Coverage tool not configured
@@ -185,7 +185,7 @@ docker run -p 50001:80 agent0ai/agent-zero
 - **Large files**: `agent.py` (771 lines), `models.py` (905 lines), `settings.py` (1745 lines), `task_scheduler.py` (1284 lines), `mcp_handler.py` (1109 lines)
 - **Large frontend files**: `webui/js/scheduler.js` (1579 lines), `webui/js/messages.js` (1016 lines), `webui/components/chat/speech/speech-store.js` (965 lines)
 - **FAISS patch required** for Python 3.12 ARM - temporary workaround
-- **228 Python files** (~34,839 lines) - backend codebase
+- ~100 Python files - backend codebase
 - **587 JavaScript files** (~20,083 lines) - frontend codebase
 - **96 prompt files** - system prompts and agent behavior definitions
 - **No traditional testing** - CI uses AI code analysis instead of pytest runs
@@ -310,9 +310,9 @@ Linter Configs | 5 ✅ (ruff/mypy/pre-commit) | 3+ | P2 |
 ✅ **Security**: No secrets committed to repo
 ✅ **Clean Repo**: No temp files, OS files, or cache
 
-### RECENT CLEANUP (2026-02-19)
+### RECENT CLEANUP (2026-03-01)
 
 ✅ **Branch synchronized**: Merged origin/main into custom branch
-✅ **Updated AGENTS.md statistics**: 228 Python files, 587 JS files, 174 Markdown files, 183 type ignores, 0 bare exceptions, 711 tests
+✅ **Updated AGENTS.md statistics**: ~100 Python files, 587 JS files, 100 Markdown files, 183 type ignores, 0 bare exceptions, 37 test files (711 tests)
 ✅ **Verified repository cleanliness**: No .pyc, __pycache__, .DS_Store, Thumbs.db, or temp files found
 ✅ **No temporary files**: Repository clean of .pyc, __pycache__, .DS_Store, Thumbs.db, cache directories
