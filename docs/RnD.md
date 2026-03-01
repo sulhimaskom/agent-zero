@@ -1,5 +1,30 @@
 ## 2026-03-01
 
+### Issue: Type Safety - Remove index Type Ignores - PR #588 ✅
+
+**Problem**:
+- 3 `# type: ignore[index]` comments in a2a_chat.py and fasta2a_client.py
+- Dictionary `.get()` chained calls produced untyped results
+
+**Solution Applied**:
+- Added `cast` import from typing module
+- Replaced `# type: ignore[index]` with proper `cast(str | None, ...)` calls
+- This properly types the dict.get() chained calls without suppressing errors
+
+**Files Changed**:
+- `python/helpers/fasta2a_client.py` (+2 lines, -2 lines)
+- `python/tools/a2a_chat.py` (+3 lines, -3 lines)
+
+**Verification**:
+- Python syntax validated: ✅
+- Ruff linting: ✅ (all checks passed)
+- Type ignores reduced: 142 → 139 (2% reduction)
+
+**PR**: #588
+
+---
+## 2026-03-01
+
 ### Issue #558: Contribution Guide Too Brief - PR Template Added ✅
 
 **Problem**:
