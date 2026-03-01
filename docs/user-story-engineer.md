@@ -229,6 +229,27 @@ Pending candidates for test coverage (small modules without tests):
 4. ~~**Fix config typo in model_providers.yaml**~~ ✅ COMPLETED (PR #358)
 5. ~~**Add test for crypto.py**~~ ✅ COMPLETED (PR #432)
 6. ~~**Add test for images.py**~~ ✅ COMPLETED (PR #477)
+7. ~~**Add test for update_check.py, duckduckgo_search.py, playwright.py**~~ ✅ COMPLETED (PR #541)
+8. ~~**Remove dead code in timeout.js**~~ ✅ COMPLETED (PR #579)
+9. ~~**Add test for rfc_exchange.py**~~ ✅ COMPLETED (PR #590+)
+
+---
+
+## Pending Modules (no tests)
+
+Small modules without test coverage:
+- `shell_local.py` (51 lines)
+- `extension.py` (66 lines)
+- `job_loop.py` (70 lines)
+- `messages.py` (71 lines)
+- `tunnel_manager.py` (84 lines)
+
+1. ~~**Fix bare excepts in tunnel_manager.py**~~ ✅ COMPLETED
+2. ~~**Add test for rate_limiter.py**~~ ✅ COMPLETED (PR #443)
+3. ~~**Remove dead code in timed_input.py**~~ ✅ COMPLETED (PR #281)
+4. ~~**Fix config typo in model_providers.yaml**~~ ✅ COMPLETED (PR #358)
+5. ~~**Add test for crypto.py**~~ ✅ COMPLETED (PR #432)
+6. ~~**Add test for images.py**~~ ✅ COMPLETED (PR #477)
 HK|7. ~~**Add test for update_check.py, duckduckgo_search.py, playwright.py**~~ ✅ COMPLETED (PR #541)
 #TK|#NQ|8. ~~**Remove dead code in timeout.js**~~ ✅ COMPLETED (PR #579)
 #NQ|
