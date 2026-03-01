@@ -1,5 +1,31 @@
 ## 2026-03-01
 
+### Issue #515: Frontend Memory Leaks - Intervals Not Cleaned - FIXED ✅
+
+**Problem**:
+- welcome-store.js: setInterval() created in init() but cleanup() never called
+- input-store.js: setInterval() for placeholder rotation but stopPlaceholderRotation() never called
+
+**Root Cause**:
+- cleanup() and stopPlaceholderRotation() methods existed in stores but never invoked
+- No x-destroy attributes in HTML templates to trigger cleanup on component destruction
+
+**Solution Applied**:
+- welcome-screen.html: Added `x-destroy="$store.welcomeStore.cleanup()"` to trigger interval cleanup
+- chat-bar.html: Added `x-destroy="$store.chatInput.stopPlaceholderRotation()"` to clear interval on destroy
+
+**Files Changed**:
+- `webui/components/welcome/welcome-screen.html` (+1 line)
+- `webui/components/chat/input/chat-bar.html` (+1 line)
+
+**Verification**:
+- JavaScript syntax validated: welcome-store.js ✅
+- HTML syntax validated: welcome-screen.html ✅, chat-bar.html ✅
+
+---
+
+## 2026-03-01
+
 ### Issue #514 + #515: Frontend Bare Catch Block and Memory Leak - FIXED ✅
 
 **Problem**:

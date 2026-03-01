@@ -9,7 +9,7 @@
 <body>
     <div x-data x-show="$store.welcomeStore && $store.welcomeStore.isVisible">
         <template x-if="$store.welcomeStore">
-            <div x-data="$store.welcomeStore" class="welcome-container">
+            <div x-data="$store.welcomeStore" class="welcome-container" x-destroy="$store.welcomeStore.cleanup()">
                 <!-- Agent Zero Logo -->
                 <div class="welcome-logo-container">
                     <img src="./public/darkSymbol.svg" alt="Agent Zero Logo" class="welcome-logo" loading="eager" width="112" height="112" />

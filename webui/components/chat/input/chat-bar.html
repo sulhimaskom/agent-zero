@@ -7,7 +7,7 @@
 <body>
     <div id="input-section" x-data>
         <template x-if="$store.chatInput">
-            <div class="chat-bar-wrapper">
+            <div class="chat-bar-wrapper" x-destroy="$store.chatInput.stopPlaceholderRotation()">
                 <!-- Attachment Preview section -->
                 <div>
                     <x-component path="/chat/attachments/inputPreview.html" />
