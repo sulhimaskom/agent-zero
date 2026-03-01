@@ -1,5 +1,6 @@
 import asyncio
 import random
+import secrets
 import string
 
 import nest_asyncio
@@ -131,7 +132,7 @@ class AgentContext:
     @staticmethod
     def generate_id():
         def generate_short_id():
-            return "".join(random.choices(string.ascii_letters + string.digits, k=8))
+            return "".join(secrets.choice(string.ascii_letters + string.digits) for _ in range(8))
 
         while True:
             short_id = generate_short_id()
