@@ -16,7 +16,10 @@ from python.helpers.constants import Network, Timeouts
 def run_command(cmd, timeout=Timeouts.BROCULA_COMMAND_TIMEOUT):
     """Run a shell command and return output."""
     try:
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=timeout)
+        # Use shlex.split for safer command parsing - prevents injection
+        import shlex
+        cmd_list = shlex.split(cmd) if isinstance(cmd, str) else cmd
+        result = subprocess.run(cmd_list, shell=False, capture_output=True, text=True, timeout=timeout)
         return result.returncode, result.stdout, result.stderr
     except subprocess.TimeoutExpired:
         return -1, "", "Command timed out"
