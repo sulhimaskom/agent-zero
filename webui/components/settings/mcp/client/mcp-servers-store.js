@@ -1,4 +1,5 @@
 import { createStore } from '/js/AlpineStore.js';
+import { loadingMixin } from '/js/loading.js';
 import { scrollModal } from '/js/modals.js';
 import sleep from '/js/sleep.js';
 import * as API from '/js/api.js';
