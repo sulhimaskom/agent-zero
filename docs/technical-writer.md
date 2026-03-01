@@ -2,7 +2,7 @@
 
 ## Repository: agent-zero
 
-#RJ|> Last Updated: 2026-02-28
+#RJ|> Last Updated: 2026-03-01
 
 ---
 
@@ -124,11 +124,7 @@
   - Best practices (assertions, naming, docstrings)
 #WS|- **Status:** ✅ Completed 2026-02-27
 #VS|- **Also:** Added to docs/README.md index (quick links + TOC)
-#HT|- **GitHub:** Issue #418 CLOSED 2026-02-28 (verified work, closed issue)
-#PV|127#HT|#BJ|
-- **Also:** Added to docs/README.md index (quick links + TOC)
-127#HT|#BJ|
-#YX|
+#XZ|
 #SM|### 15. DONE: Standardize "Last Updated" metadata format
 #XZ|- **Files:** a2a_protocol.md, security-engineer.md, DX-engineer.md, Product-Architect.md, Growth-Innovation-Strategist.md, backend-engineer.md, modular-configuration-analysis.md, ai-agent-engineer.md, quality-assurance.md, platform-engineer.md, frontend-engineer.md, ui-ux-engineer.md, RnD.md, user-story-engineer.md
 #HB|- **Issue:** 14 files used non-standard `**Last Updated:**` (bold) format instead of `> Last Updated:` (blockquote)
@@ -179,30 +175,7 @@ BP|#XV|-
 - **Issue:** Duplicate "Basic Operations" entries in Table of Contents
 - **Fix:** Removed 6 duplicate TOC lines
 - **Status:** ✅ PR #526 created 2026-03-01
-#MM|---
-
----
-
-## Future Improvements (Backlog)
-#QM|- **Files:** prompts/README.md, designs/backup-specification-backend.md, designs/backup-specification-frontend.md
-#NM|- **Issue:** 3 docs missing timestamps
-#QB|- **Fix:** Added `> Last Updated: 2026-02-28` to all three files
-#WS|- **Status:** ✅ Completed 2026-02-28
-#XZ|#NQ|
-#XV|---
-
----
-- **File:** docs/installation.md
-- **Issue:** No consolidated security guidance for users
-- **Fix:** Added new "Security Best Practices" section covering:
-  - Authentication (UI credentials, strong passwords)
-  - Network Exposure (SSH, reverse proxy, firewall)
-  - API Keys and Secrets (secure handling, scoping, rotation)
-  - Docker Security (non-root, updates)
-- **Status:** ✅ Completed 2026-02-27
-
----
-
+#XZ|
 ## Future Improvements (Backlog)
 
 ### High Priority
@@ -214,13 +187,12 @@ BP|#XV|-
 ### Medium Priority
 5. ~~**Add "last updated" metadata** to doc headers~~ ✅ ALL docs now have timestamps
 YJ|6. ~~**Create API reference**~~ ✅ Issue #474 - Created docs/api.md with 64+ endpoints
-RY|#JH|7. ~~**Add inline TOCs** for long docs~~ ✅ architecture.md, connectivity.md done
-#JH|7. ~~**Add inline TOCs** for long docs~~ ✅ architecture.md, connectivity.md done
-#ZX|#QR|8. ~~**Testing Guide**~~ ✅ Issue #418 - Created docs/testing.md, CLOSED 2026-02-28
-
-### Low Priority
-8. ~~**Security section** - Document SSH root, password changes~~ ✅ DONE - Added Security Best Practices section
-9. **Add version numbers** to docs showing which version they apply to
+#XZ|7. ~~**Add inline TOCs** for long docs~~ ✅ architecture.md, connectivity.md, usage.md, extensibility.md, blueprint.md, installation.md
+#QM|8. ~~**Testing Guide**~~ ✅ Issue #418 - Created docs/testing.md, CLOSED 2026-02-28
+#XZ|
+#QM|### Low Priority
+#QM|9. ~~**Security section**~~ ✅ DONE - Added Security Best Practices section
+#QM|10. **Add version numbers** to docs showing which version they apply to
 
 ---
 
