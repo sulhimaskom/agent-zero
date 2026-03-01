@@ -2,7 +2,13 @@
 
 **Created:** 2026-02-25
 **Agent:** frontend-engineer (autonomous mode)
-> Last Updated: 2026-03-01
+#TB|> Last Updated: 2026-03-01
+
+### 2026-03-01: Fix Empty Catch Block and Memory Leak
+- Fixed empty catch block in `a2a-connection.html` (line 33): Added `console.warn('Failed to get token field:', e)` instead of silently swallowing errors
+- Fixed memory leak in `welcome-store.js`: Added `_intervalId` state and `destroy()` method to properly clean up `setInterval`
+- Related to issues #514 (Frontend Bare Catch Blocks) and #515 (Frontend Memory Leaks)
+- PR: https://github.com/sulhimaskom/agent-zero/pull/536
 
 ### 2026-03-01: Replace console.error with Logger utility
 - Replaced `console.error` with `Logger.error` in 26 files:
