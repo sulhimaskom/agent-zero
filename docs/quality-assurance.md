@@ -1,6 +1,24 @@
 # Quality Assurance Documentation
 # > Last Updated: 2026-03-01
 # 
+# ### 2026-03-01: Add Traditional Testing to CI Workflow
+# - **Files Created**: `.github/workflows/tests.yml` (NEW)
+# - **Files Modified**: `pyproject.toml` (added pytest-cov dependency)
+# - **Changes**:
+#   - Created dedicated pytest CI workflow with coverage enforcement
+#   - Added pytest-cov to dev dependencies for coverage reporting
+#   - Workflow triggers on push/PR to main/custom branches
+#   - Uses uv for fast dependency installation
+#   - Enforces 20% minimum coverage threshold (addresses issue #574)
+#   - Uploads coverage reports as artifacts
+# - **Linked Issue**: Issue #577 "[CI/CD] Add traditional testing to AI-powered CI workflow"
+# - **Impact**: Traditional pytest testing now runs in CI alongside AI-powered analysis
+# - **Verification**: YAML syntax validated, workflow ready for CI execution
+# 
+# 
+# ### 2026-03-01: Fix F841 Unused Exception Variables
+# > Last Updated: 2026-03-01
+# 
 # ### 2026-03-01: Fix F841 Unused Exception Variables
 # - **Files Modified**: 28 files
 # - **Changes**: Removed 33 unused `e` variables from exception handlers (F841)
