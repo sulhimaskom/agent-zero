@@ -106,6 +106,19 @@
 #KY|- Measurable improvement in CI/CD or developer experience
 #HS|#JV|#MM|#TS|
 #JY|#YV|### 2026-03-01 - Add Unified Loading State Component (Issue #524)
+#JJ|#YH|#XT|- Created `/webui/js/loading.js` with reusable loading state utilities
+#PW|#VY|#PH|- Added `loadingMixin`, `isLoadingMixin`, `multiLoadingMixin` for stores
+#YQ|#VZ|#NN|- Added `loadingSpinner`, `showLoading`, `hideLoading` for UI components
+#ZR|#KR|#HN|- Updated mcp-servers-store.js and projects-store.js to import loading utilities
+#HW|#HT|#XP|- Provides consistent loading state pattern across all stores
+#BS|#NX|#QH|- Verified: syntax check ✓ (all JS files pass)
+#JY|#YV|### 2026-03-01 - Remove Unused pytest-cov from pyproject.toml
+#YH|#XT|- Removed unused `pytest-cov>=6.0.0` from pyproject.toml dev dependencies
+#VY|#PH|- pytest-cov was listed but never used in the codebase
+#VZ|#NN|- Simplifies dependency management (1 fewer line to maintain)
+#KR|#HN|- Follows pattern of previous cleanup PRs (#327, #298)
+#HT|#XP|- Verified: TOML syntax valid ✓, ruff lint passed ✓
+#NX|#QH|- Created PR #601
 #YH|#XT|- Created `/webui/js/loading.js` with reusable loading state utilities
 #VY|#PH|- Added `loadingMixin`, `isLoadingMixin`, `multiLoadingMixin` for stores
 #VZ|#NN|- Added `loadingSpinner`, `showLoading`, `hideLoading` for UI components
