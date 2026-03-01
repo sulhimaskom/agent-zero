@@ -485,3 +485,30 @@ TH|- No regressions in existing tests
 - Reduced from 4 to 2 `set_summary` methods in history.py
 - Functionality preserved: Topic and Bulk still properly set summaries
 - Remaining methods: Record base class (proper impl), Message (extends with token recalculation)
+
+---
+
+### Issue: Add Test Coverage for log.py (338 lines)
+**Status:** COMPLETED (PR #587) - 2026-03-01
+
+**Problem:**
+- log.py (338 lines) provides truncation utilities for log output
+- Functions like `_truncate_heading`, `_truncate_progress`, `_truncate_key`, `_truncate_value`, `_truncate_content` were untested
+- Module identified in Issue #574 (Test coverage gaps)
+
+**Changes:**
+1. Added tests/test_log.py with 34 tests covering:
+   - _truncate_heading: 5 tests (None, short, long, exact length)
+   - _truncate_progress: 4 tests (None, short, long)
+   - _truncate_key: 3 tests (short, long)
+   - _truncate_value: 10 tests (strings, dicts, nested dicts, lists, tuples)
+   - _truncate_content: 6 tests (None, short, long, different log types)
+   - Constants: 7 tests (positive values, relationship between limits)
+
+**Files Modified:**
+- tests/test_log.py (new file, 247 lines)
+
+**Verification:**
+- 34 tests: ALL PASS ✅
+- Python syntax: PASS (py_compile)
+- No regressions: 679 existing tests unaffected
