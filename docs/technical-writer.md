@@ -200,7 +200,12 @@ BP|#XV|-
 #HM|- **File:** docs/user-story-engineer.md
 #HB|- **Issue:** Severely corrupted file with massive duplicate content
 #HM|- **Fix:** Requires complete rewrite - beyond quick fix scope
-#HM|- **Status:** ⚠️ SKIPPED - needs manual review
+#MH|#HM|- **Status:** ⚠️ SKIPPED - needs manual review
+#WB|#XZ|#SM|### 24. DONE: Fix corrupt timestamp prefixes in 9 user docs
+#HM|#QM|- **Files:** docs/blueprint.md, docs/development.md, docs/extensibility.md, docs/installation.md, docs/mcp_setup.md, docs/notifications.md, docs/task.md, docs/troubleshooting.md, docs/usage.md
+#XZ|#QM|- **Issue:** Timestamp lines had corrupt `#TM|>` prefix instead of standard `>` blockquote
+#QM|#QM|- **Fix:** Changed `#TM|> Last Updated:` to `> Last Updated:` in all 9 files
+#QM|#QM|- **Status:** ✅ PR pending 2026-03-01
 #XZ|
 ## Future Improvements (Backlog)
 

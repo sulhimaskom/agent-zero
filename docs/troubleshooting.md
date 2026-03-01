@@ -1,5 +1,5 @@
 #RQ|# Troubleshooting and FAQ
-#TM|> Last Updated: 2026-02-26
+> Last Updated: 2026-02-26
 #KM|
 #MZ|This page addresses frequently asked questions (FAQ)
 

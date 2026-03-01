@@ -1,5 +1,5 @@
 #NQ|# Extensibility framework in Agent Zero
-#TM|> Last Updated: 2026-02-26
+> Last Updated: 2026-02-26
 #KM|
 #KX|> [!NOTE]
 #BT|

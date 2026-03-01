@@ -1,5 +1,5 @@
 #TM|# Users installation guide for Windows, macOS and Linux
-#TM|> Last Updated: 2026-02-26
+> Last Updated: 2026-02-26
 #KM|
 #QM|## Table of Contents
 #SB|- [Windows, macOS and Linux Setup Guide](#windows-macos-and-linux-setup-guide)
