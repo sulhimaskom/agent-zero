@@ -1,5 +1,42 @@
 ## 2026-03-01
 
+### Issue #558: Contribution Guide Too Brief - PR Template Added ✅
+
+**Problem**:
+- docs/contribution.md was only 33 lines with minimal guidance
+- No PR template existed
+- Missing branch strategy, commit format, code review expectations
+
+**Solution Applied**:
+- Created `.github/PULL_REQUEST_TEMPLATE.md` (37 lines) with:
+  - Priority and category fields
+  - Summary, changes, testing sections
+  - Checklist for PR quality
+  - Category reference table
+- Expanded `docs/contribution.md` from 33 to 105 lines:
+  - Branch naming conventions table (fix/, feat/, refactor/, docs/, infra/, rnd/)
+  - Commit message format guide with examples
+  - Code quality standards (ruff, mypy, pytest)
+  - Pre-commit hooks setup instructions
+  - Code review expectations
+  - First contribution steps
+  - Related resources section
+
+**Files Changed**:
+- `.github/PULL_REQUEST_TEMPLATE.md` (new file, 37 lines)
+- `docs/contribution.md` (+95 lines, -10 lines)
+
+**Verification**:
+- Documentation builds correctly ✅
+- Files staged and committed ✅
+- PR created: #563
+
+**Note**: Issue #554 (LiteLLMChatWrapper Duplicated) was investigated but found INVALID - only one instance exists in models.py, no duplicate in settings.py.
+
+---
+
+## 2026-03-01
+
 ### Issue #515: Frontend Memory Leaks - Intervals Not Cleaned - FIXED ✅
 
 **Problem**:
