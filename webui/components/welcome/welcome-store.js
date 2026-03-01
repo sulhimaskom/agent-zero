@@ -12,6 +12,7 @@ const model = {
   // State
   isVisible: true,
   wizardChecked: false,
+  _intervalId: null,
 
   init() {
     // Initialize visibility based on current context
@@ -21,9 +22,17 @@ const model = {
     this.checkFirstTime();
 
     // Watch for context changes with faster polling for immediate response
-    setInterval(() => {
+    this._intervalId = setInterval(() => {
       this.updateVisibility();
     }, TIMING.WELCOME_ANIMATION_DELAY); // Use timing constant for responsive updates
+  },
+
+  destroy() {
+    // Clean up interval to prevent memory leaks
+    if (this._intervalId) {
+      clearInterval(this._intervalId);
+      this._intervalId = null;
+    }
   },
 
   // Check if first-time user and open setup wizard

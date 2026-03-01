@@ -30,7 +30,9 @@
                 try {
                     const allFields = settingsModalProxy.settings.sections.flatMap(s => s.fields);
                     tokenField = allFields.find(f => f.id === 'a2a_token') || allFields.find(f => f.id === 'mcp_server_token');
-                } catch (e) { }
+                } catch (e) { 
+                    console.warn('Failed to get token field:', e);
+                }
                 const token = tokenField ? tokenField.value : '';
                 const connectionUrl = `${url}/a2a/t-${token}`;
 
