@@ -72,5 +72,5 @@ ci:
   autoupdate_branch: ''
   autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
   autoupdate_schedule: weekly
-  skip: [mypy, ai-code-review]  # Skip mypy and AI review in CI, run separately
+  skip: [ai-code-review]  # Skip AI review in CI (requires Ollama), Ruff handles linting
   submodules: false
