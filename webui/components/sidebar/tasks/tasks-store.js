@@ -42,9 +42,14 @@ const model = {
   // Update selected task and persist for tab restore
   setSelected(taskId) {
     this.selected = taskId || '';
+    try { localStorage.setItem('lastSelectedTask', this.selected); } catch (e) { Logger.error('Failed to persist task selection', e); }
+
     try { localStorage.setItem('lastSelectedTask', this.selected); } catch (e) {
       // Silent fail in private browsing mode or when storage is unavailable
     }
+=======
+    try { localStorage.setItem('lastSelectedTask', this.selected); } catch (e) { Logger.error('Failed to persist task selection', e); }
+>>>>>>> d30e671 (fix(frontend): replace bare catch blocks with proper error logging)
   },
 
   // Returns true if a task with the given id exists in the current list
