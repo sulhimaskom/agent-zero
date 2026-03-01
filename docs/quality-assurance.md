@@ -1,4 +1,21 @@
 # Quality Assurance Documentation
+#VN|> Last Updated: 2026-03-01
+
+#### 2026-03-01: Fix test_searxng.py Async Mocking
+- **File Modified**: `tests/test_searxng.py`
+- **Issue**: 4 tests failing due to incorrect async mocking
+- **Root Cause**: 
+  - `mock_response` was created as `AsyncMock()` but not set up as async context manager
+  - `mock_post`/`capture_post` defined as `async def` (returns coroutine, not context manager)
+- **Fix Applied**:
+  - Changed `mock_response` to `MagicMock()` with proper `__aenter__`/`__aexit__` setup
+  - Changed `async def mock_post` to regular `def` (aiohttp's session.post is NOT async)
+  - Fixed nested with statements (SIM117)
+  - Fixed import ordering (I001)
+- **Test Results**: 636 passed (was 632 passed + 4 failed)
+- **Lint**: ruff clean
+
+# Quality Assurance Documentation
 > Last Updated: 2026-02-28
 
 #### 2026-02-28: Test Infrastructure Improvements - Install Missing Dependencies
