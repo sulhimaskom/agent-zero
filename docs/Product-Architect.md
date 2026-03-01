@@ -1,7 +1,8 @@
 # Product-Architect Agent - Long-term Memory
 
 **Created:** 2026-02-25
-#NQ|#RJ|> Last Updated: 2026-03-01
+#NZ|**Created:** 2026-02-25
+#TM|#NQ|#RJ|> Last Updated: 2026-03-01
 
 ## Domain
 Product-Architect focuses on small, safe, measurable improvements to the Agent Zero framework.
@@ -82,4 +83,5 @@ JW|- **2026-02-28**: Added module docstrings to 8 backup/chat API files: `backup
 
 #JW|- **2026-02-28**: Added module docstrings to 4 helper utility files: `guids.py`, `dotenv.py`, `wait.py`, and `crypto.py` - improves helper module documentation. PR #476.
 #JW|- **2026-03-01**: Added module docstrings to 8 file/knowledge API endpoints: `ctx_window_get.py`, `history_get.py`, `file_info.py`, `get_work_dir_files.py`, `delete_work_dir_file.py`, `import_knowledge.py`, `knowledge_path_get.py`, and `upload_work_dir_files.py` - improves API endpoint documentation for core file operations and knowledge management.
+#JW|- **2026-03-01**: Fixed 2 bare exception handlers in Python helpers - Changed `except Exception:` to `except Exception as e:` in `extract_tools.py` (line 28) and `print_style.py` (line 188). Added debug logging for secret masking failure in print_style.py. Addresses Issue #595.
 
