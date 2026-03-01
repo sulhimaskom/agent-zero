@@ -5,7 +5,6 @@ import logging
 import os
 import sys
 from datetime import datetime
-from typing import Optional
 
 import webcolors
 
@@ -16,12 +15,12 @@ from .constants import Colors
 class PrintStyle:
     last_endline = True
     log_file_path = None
-    
+
     # Structured logging configuration
     _structured_logging_enabled: bool = False
-    _logger: Optional[logging.Logger] = None
-    _json_formatter: Optional[logging.Formatter] = None
-    
+    _logger: logging.Logger | None = None
+    _json_formatter: logging.Formatter | None = None
+
     # Mapping of PrintStyle methods to logging levels
     LOG_LEVELS = {
         "debug": logging.DEBUG,
@@ -154,7 +153,7 @@ class PrintStyle:
     def enable_structured_logging(enabled: bool = True, use_json: bool = False):
         """
         Enable or disable structured logging.
-        
+
         Args:
             enabled: Whether to enable structured logging
             use_json: Whether to use JSON format (for log aggregators like Datadog, Splunk, ELK)
