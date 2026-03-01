@@ -1,3 +1,9 @@
+"""Scheduler task deletion API endpoint - removes tasks from the scheduler.
+
+Deletes a scheduled task by its UUID. Handles cleanup of associated
+chat contexts if the task has one attached.
+"""
+
 from agent import AgentContext
 from python.helpers import persist_chat
 from python.helpers.api import ApiHandler, Input, Output, Request

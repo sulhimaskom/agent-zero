@@ -1,3 +1,9 @@
+"""Scheduler task update API endpoint - modifies existing scheduled tasks.
+
+Allows modification of task properties such as schedule, enabled state,
+command, and other task-specific configurations.
+"""
+
 from python.helpers.api import ApiHandler, Input, Output, Request
 from python.helpers.localization import Localization
 from python.helpers.task_scheduler import (
