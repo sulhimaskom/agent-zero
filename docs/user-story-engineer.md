@@ -230,7 +230,7 @@ Pending candidates for test coverage (small modules without tests):
 5. ~~**Add test for crypto.py**~~ ✅ COMPLETED (PR #432)
 6. ~~**Add test for images.py**~~ ✅ COMPLETED (PR #477)
 HK|7. ~~**Add test for update_check.py, duckduckgo_search.py, playwright.py**~~ ✅ COMPLETED (PR #541)
-#NQ|8. ~~**Remove dead code in timeout.js**~~ ✅ COMPLETED
+#TK|#NQ|8. ~~**Remove dead code in timeout.js**~~ ✅ COMPLETED (PR #579)
 #NQ|
 2. ~~**Add test for rate_limiter.py**~~ ✅ COMPLETED (PR #443)
 3. ~~**Remove dead code in timed_input.py**~~ ✅ COMPLETED (PR #281)
