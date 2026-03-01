@@ -1,5 +1,36 @@
 ## 2026-03-01
 
+### Issue #514 + #515: Frontend Bare Catch Block and Memory Leak - FIXED ✅
+
+**Problem**:
+- tasks-store.js line 45: Empty `catch {}` block silently swallows exceptions
+- welcome-store.js line 24: `setInterval()` without cleanup causes memory leak
+
+**Root Cause**:
+- Empty catch blocks make debugging difficult as exceptions are silently ignored
+- Intervals created without cleanup persist for app lifetime causing memory leaks
+
+**Solution Applied**:
+- tasks-store.js: Changed `catch {}` to `catch (e) { // comment }` to capture exception
+- welcome-store.js:
+  - Added `visibilityIntervalId: null` property to track interval
+  - Changed `setInterval()` to `this.visibilityIntervalId = setInterval()`
+  - Added `cleanup()` method to clear interval and prevent memory leaks
+
+**Files Changed**:
+- `webui/components/sidebar/tasks/tasks-store.js` (+2 lines)
+- `webui/components/welcome/welcome-store.js` (+11 lines, -1 line)
+
+**Verification**:
+- JavaScript syntax validated: `node --check` passes on both files ✅
+- Changes committed and pushed to custom branch
+
+---
+
+## 2026-03-01
+
+### Issue #517: Command Injection Risk - shell=True in brocula_loop.py - FIXED ✅
+
 ### Issue #517: Command Injection Risk - shell=True in brocula_loop.py - FIXED ✅
 
 **Problem**: The `run_command()` function in `agents/brocula/brocula_loop.py` used `shell=True` in subprocess.run(), which allows shell injection attacks if any command argument is user-controlled.
