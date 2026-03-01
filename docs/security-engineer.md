@@ -1,3 +1,86 @@
+## 2026-03-01: XSS Sanitization Consistency in messages.js
+
+---
+
+
+**Issue**: #513 - CRITICAL: XSS Vulnerability in messages.js - innerHTML Usage
+
+**Date Fixed**: 2026-03-01
+
+**Severity**: MEDIUM (Defense in Depth - existing code was safe but inconsistent)
+
+**Files Changed**: 
+- `webui/js/messages.js`
+
+
+**Vulnerability**: 
+The code used inconsistent XSS sanitization approaches:
+- Line 166: Used `convertIcons(escapeHTML(heading))` - basic HTML escaping
+- Line 225: Used `sanitizeHTML(processedContent)` - DOMPurify (best practice)
+- Line 259: Used `convertHTML(content)` - basic HTML escaping
+
+While the existing code was SAFE (escapeHTML properly escapes dangerous characters), the inconsistency made security auditing difficult and could mask future vulnerabilities.
+
+
+**Solution**:
+Standardized on using `sanitizeHTML()` for heading rendering at line 166:
+- Changed from: `headingH4.innerHTML = convertIcons(escapeHTML(heading));`
+- Changed to: `headingH4.innerHTML = sanitizeHTML(convertIcons(heading));`
+
+This ensures consistent use of DOMPurify (when available) which provides better protection against edge-case XSS vectors.
+
+
+**Analysis of All innerHTML Usages**:
+| Location | Code | Sanitization | Status |
+|----------|------|---------------|--------|
+| Line 166 | `headingH4.innerHTML = ...` | `sanitizeHTML()` | ✅ Fixed |
+| Line 225 | `spanElement.innerHTML = ...` | `sanitizeHTML()` | ✅ Already safe |
+| Line 259 | `spanElement.innerHTML = ...` | `convertHTML()` (uses escapeHTML) | ✅ Safe - wraps user content in escapeHTML |
+| Line 438 | `headingElement.innerHTML = ...` | `escapeHTML()` | ✅ Safe - static template |
+| Line 453 | `spanElement.innerHTML = ...` | `escapeHTML()` | ✅ Safe |
+| Lines 772, 898 | `span.innerHTML = ...` | `convertHTML()` | ✅ Safe |
+
+
+**Testing**:
+- JavaScript syntax validated via `node --check`
+- Existing functionality preserved (sanitizeHTML preserves safe HTML tags like `<span>` used by convertIcons)
+
+
+---
+
+
+## 2026-03-01: Insecure random Module for ID Generation
+
+---
+
+
+**Issue**: Cryptographically Insecure ID Generation Using `random` Module
+
+**Date Fixed**: 2026-03-01
+
+**Severity**: MEDIUM (Cryptographic Security)
+
+**Files Changed**: 
+- `python/helpers/guids.py`
+- `agent.py`
+
+**Vulnerability**: 
+The Python `random` module was used to generate session IDs, GUIDs, and other identifiers. The `random` module is NOT cryptographically secure and can be predicted by attackers. This could allow attackers to guess session IDs or GUIDs.
+
+**Solution**:
+Replaced `random.choices()` with `secrets.choice()` in:
+- `python/helpers/guids.py`: `generate_id()` function
+- `agent.py`: `generate_short_id()` function
+
+The `secrets` module provides cryptographically secure random values suitable for security-sensitive operations.
+
+**Testing**:
+- Python syntax validation passed
+- Functionality verified - generates 8-character alphanumeric IDs
+- IDs are unique and cryptographically secure
+
+---
+
 ## 2026-03-01: Insecure random Module for ID Generation
 
 ---
