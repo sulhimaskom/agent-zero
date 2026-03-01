@@ -2,6 +2,7 @@ import asyncio
 import re
 import time
 
+
 import paramiko
 
 from python.helpers.constants import Limits, Shell, Timeouts
@@ -29,8 +30,11 @@ class SSHInteractiveSession:
         self.port = port
         self.username = username
         self.password = password
-        self.client = paramiko.SSHClient()
-        self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        # Load system host keys for verification
+        self.client.load_system_host_keys()
+        # SECURITY: Use RejectPolicy to prevent MITM attacks
+        # AutoAddPolicy trusts unknown host keys - vulnerable to MITM
+        self.client.set_missing_host_key_policy(paramiko.RejectPolicy())
         self.shell = None
         self.full_output = b""
         self.last_command = b""

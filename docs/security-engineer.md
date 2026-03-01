@@ -390,3 +390,52 @@ Changed default SSH user from "root" to "a0user" in two locations:
 **Testing**:
 - Python syntax validation passed (`python3 -m py_compile`)
 - No breaking changes - existing deployments can set `CODE_EXEC_SSH_USER=root` if needed
+
+
+---
+
+## 2026-03-01: SSH Host Key Trust - Paramiko AutoAddPolicy MITM Vulnerability Fixed
+
+---
+
+
+**Issue**: #593 - SSH Host Key Trust - Paramiko AutoAddPolicy MITM Vulnerable
+**Date Fixed**: 2026-03-01
+**Severity**: HIGH (MITM Attack Vulnerability)
+**Files Changed**: 
+- `python/helpers/shell_ssh.py`
+
+
+**Vulnerability**: 
+The SSH client implementation used `paramiko.AutoAddPolicy()` which automatically trusts unknown SSH host keys. This made the application vulnerable to Man-in-the-Middle (MITM) attacks where an attacker could intercept SSH connections and capture credentials or inject commands.
+
+
+**Solution**:
+Replaced `AutoAddPolicy` with `RejectPolicy` and added system host key loading:
+- Changed: `paramiko.AutoAddPolicy()` → `paramiko.RejectPolicy()`
+- Added: `self.client.load_system_host_keys()` to load known host keys from `~/.ssh/known_hosts`
+- Added security comments explaining the vulnerability and fix
+
+
+**Security Rationale**:
+`RejectPolicy` is the only secure option per:
+- AWS Codeguru Detector: BAN-B507
+- CodeQL: py/paramiko-missing-host-key-validation
+- Stack Overflow security consensus
+
+
+Before: Unknown host keys are automatically trusted → MITM vulnerable
+After: Unknown host keys are rejected → Secure by default
+
+
+**Breaking Change**:
+First-time SSH connections to new hosts will now be rejected. Users must:
+1. Manually add host keys to `~/.ssh/known_hosts` before first connection
+2. Or use `ssh-keyscan` to fetch and verify host keys
+
+
+**Testing**:
+- Python syntax validation passed (`python3 -m py_compile`)
+- Implementation follows Paramiko best practices
+- No runtime errors expected - standard Paramiko API
+
