@@ -1,4 +1,14 @@
-#QM|### 2026-03-01: Comprehensive Frontend Scan Results
+### 2026-03-01: Issue #520 - Consistent Store Patterns
+- Migrated `keyboard-shortcuts-store.js` to use `createStore()` from AlpineStore.js
+- Previously used direct `Alpine.store()` registration - now consistent with all other stores
+- Files changed:
+  - `webui/components/modals/keyboard-shortcuts/keyboard-shortcuts-store.js` - Added createStore import, migrated to model pattern
+  - `webui/components/modals/keyboard-shortcuts/keyboard-shortcuts-store.min.js` - Regenerated with terser
+- All stores now use consistent `createStore()` pattern
+- JavaScript syntax validated with `node --check`
+- PR: https://github.com/sulhimaskom/agent-zero/pull/581
+
+
 #HT|- Performed full codebase scan for:
 #BM|  - XSS vulnerabilities (innerHTML usage)
 #QV|  - Memory leaks (setInterval, addEventListener)
