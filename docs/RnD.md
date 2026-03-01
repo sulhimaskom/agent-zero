@@ -1,3 +1,25 @@
+## 2026-03-01
+
+### Issue #517: Command Injection Risk - shell=True in brocula_loop.py - FIXED ✅
+
+**Problem**: The `run_command()` function in `agents/brocula/brocula_loop.py` used `shell=True` in subprocess.run(), which allows shell injection attacks if any command argument is user-controlled.
+
+**Root Cause**: Using `shell=True` passes the command through the system shell, which interprets special characters and allows command injection.
+
+**Solution Applied**:
+- Added `import shlex`
+- Modified `run_command()` to use `shell=False` with `shlex.split()` to safely convert string commands to argument lists
+- This prevents shell injection attacks while maintaining backward compatibility
+
+**Files Changed**:
+- `agents/brocula/brocula_loop.py` (+4 lines, -1 line)
+
+**Verification**:
+- Python syntax validated: ✅
+- Module import test: ✅
+
+---
+
 ## 2026-02-28
 
 > Last Updated: 2026-02-28
