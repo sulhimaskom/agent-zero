@@ -217,10 +217,10 @@ class State:
                     if self.use_agent.browser_session
                     else None
                 )
-            except Exception:
+            except Exception as e:
                 # Browser session might be closed or invalid
+                PrintStyle().warning(f"Browser session error: {e}")
                 return None
-        return None
 
     async def get_selector_map(self):
         """Get the selector map for the current page state."""
@@ -420,7 +420,8 @@ class BrowserAgent(Tool):
     def _mask(self, text: str) -> str:
         try:
             return get_secrets_manager(self.agent.context).mask_values(text or "")
-        except Exception:
+        except Exception as e:
+            PrintStyle().warning(f"Failed to mask secrets: {e}")
             return text or ""
 
     # def __del__(self):

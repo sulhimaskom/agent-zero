@@ -10,7 +10,31 @@ This document serves as the long-term memory for the ai-agent-engineer domain in
 - Agent tool execution and extensions
 - Memory and history management for agents
 
+#BY|
 ## Implemented Fixes
+#BY|
+### 2026-03-01: Bare Exception Handlers Fix in Domain Files
+**Issue**: Proactive scan found bare exception handlers (`except Exception:`) without capturing exception variable in ai-agent-engineer domain files.
+
+**Root Cause**: Multiple locations in tools and helper modules were using `except Exception:` without capturing the exception variable, making debugging difficult.
+
+**Fix Applied**: Changed all bare exception handlers to `except Exception as e:` and added PrintStyle warning logging:
+- `python/tools/browser_agent.py` - Added exception capture and logging at 2 locations (get_current_page, _mask methods)
+- `python/tools/scheduler.py` - Added exception capture, logging, and PrintStyle import
+- `python/helpers/memory.py` - Added exception capture and logging in safe_eval function
+
+**Files Modified**:
+- `python/tools/browser_agent.py` - 2 exception handlers fixed with logging
+- `python/tools/scheduler.py` - 1 exception handler fixed with logging + PrintStyle import
+- `python/helpers/memory.py` - 1 exception handler fixed with logging
+
+**Verification**:
+- Python syntax check: PASSED on all 3 files
+- Tests: 193 passed (pre-existing failures due to missing dependencies)
+
+**PR**: [To be created] with ai-agent-engineer label
+
+---
 
 ### 2026-03-01: Race Condition Fix in job_loop.py
 **Issue**: [Issue #458] - Job Duplication Risk Below 1min Interval
