@@ -1,5 +1,7 @@
 import atexit
 import html
+import json
+import logging
 import os
 import sys
 from datetime import datetime
@@ -13,6 +15,22 @@ from .constants import Colors
 class PrintStyle:
     last_endline = True
     log_file_path = None
+
+    # Structured logging configuration
+    _structured_logging_enabled: bool = False
+    _logger: logging.Logger | None = None
+    _json_formatter: logging.Formatter | None = None
+
+    # Mapping of PrintStyle methods to logging levels
+    LOG_LEVELS = {
+        "debug": logging.DEBUG,
+        "standard": logging.INFO,
+        "info": logging.INFO,
+        "hint": logging.INFO,
+        "success": logging.INFO,
+        "warning": logging.WARNING,
+        "error": logging.ERROR,
+    }
 
     def __init__(
         self,
@@ -111,6 +129,52 @@ class PrintStyle:
             with open(PrintStyle.log_file_path, "a") as f:
                 f.write("</pre></body></html>")
 
+    @staticmethod
+    def _get_logger() -> logging.Logger:
+        """Get or create the structured logging logger."""
+        if PrintStyle._logger is None:
+            PrintStyle._logger = logging.getLogger("agent_zero")
+            PrintStyle._logger.setLevel(logging.DEBUG)
+            # Add handler if not already present
+            if not PrintStyle._logger.handlers:
+                handler = logging.StreamHandler()
+                handler.setLevel(logging.DEBUG)
+                PrintStyle._logger.addHandler(handler)
+        return PrintStyle._logger
+
+    @staticmethod
+    def _get_json_formatter() -> logging.Formatter:
+        """Get or create the JSON formatter for structured logging."""
+        if PrintStyle._json_formatter is None:
+            PrintStyle._json_formatter = JsonFormatter()
+        return PrintStyle._json_formatter
+
+    @staticmethod
+    def enable_structured_logging(enabled: bool = True, use_json: bool = False):
+        """
+        Enable or disable structured logging.
+
+        Args:
+            enabled: Whether to enable structured logging
+            use_json: Whether to use JSON format (for log aggregators like Datadog, Splunk, ELK)
+        """
+        PrintStyle._structured_logging_enabled = enabled
+        if enabled:
+            logger = PrintStyle._get_logger()
+            if use_json:
+                for handler in logger.handlers:
+                    handler.setFormatter(PrintStyle._get_json_formatter())
+
+    @staticmethod
+    def _log_structured(method_name: str, text: str):
+        """Log to Python logging if structured logging is enabled."""
+        if not PrintStyle._structured_logging_enabled:
+            return
+
+        logger = PrintStyle._get_logger()
+        level = PrintStyle.LOG_LEVELS.get(method_name, logging.INFO)
+        logger.log(level, text)
+
     def get(self, *args, sep=" ", **kwargs):
         text = sep.join(map(str, args))
 
@@ -156,30 +220,69 @@ class PrintStyle:
     @staticmethod
     def standard(text: str):
         PrintStyle().print(text)
+        PrintStyle._log_structured("standard", text)
 
     @staticmethod
     def hint(text: str):
-        PrintStyle(font_color=Colors.HINT, padding=True).print("Hint: " + text)
+        msg = "Hint: " + text
+        PrintStyle(font_color=Colors.HINT, padding=True).print(msg)
+        PrintStyle._log_structured("hint", msg)
 
     @staticmethod
     def info(text: str):
-        PrintStyle(font_color=Colors.INFO, padding=True).print("Info: " + text)
+        msg = "Info: " + text
+        PrintStyle(font_color=Colors.INFO, padding=True).print(msg)
+        PrintStyle._log_structured("info", msg)
 
     @staticmethod
     def success(text: str):
-        PrintStyle(font_color=Colors.SUCCESS, padding=True).print("Success: " + text)
+        msg = "Success: " + text
+        PrintStyle(font_color=Colors.SUCCESS, padding=True).print(msg)
+        PrintStyle._log_structured("success", msg)
 
     @staticmethod
     def warning(text: str):
-        PrintStyle(font_color=Colors.WARNING, padding=True).print("Warning: " + text)
+        msg = "Warning: " + text
+        PrintStyle(font_color=Colors.WARNING, padding=True).print(msg)
+        PrintStyle._log_structured("warning", msg)
 
     @staticmethod
     def debug(text: str):
-        PrintStyle(font_color=Colors.DEBUG, padding=True).print("Debug: " + text)
+        msg = "Debug: " + text
+        PrintStyle(font_color=Colors.DEBUG, padding=True).print(msg)
+        PrintStyle._log_structured("debug", msg)
 
     @staticmethod
     def error(text: str):
-        PrintStyle(font_color="red", padding=True).print("Error: " + text)
+        msg = "Error: " + text
+        PrintStyle(font_color="red", padding=True).print(msg)
+        PrintStyle._log_structured("error", msg)
+
+
+class JsonFormatter(logging.Formatter):
+    """JSON formatter for structured logging to support log aggregators."""
+
+    def format(self, record: logging.LogRecord) -> str:
+        """Format log record as JSON for production log aggregation."""
+        log_data = {
+            "timestamp": datetime.fromtimestamp(record.created).isoformat(),
+            "level": record.levelname,
+            "logger": record.name,
+            "message": record.getMessage(),
+            "module": record.module,
+            "function": record.funcName,
+            "line": record.lineno,
+        }
+
+        # Add exception info if present
+        if record.exc_info:
+            log_data["exception"] = self.formatException(record.exc_info)
+
+        # Add extra fields
+        if hasattr(record, "extra"):
+            log_data.update(record.extra)
+
+        return json.dumps(log_data)
 
 
 # Ensure HTML file is closed properly when the program exits
