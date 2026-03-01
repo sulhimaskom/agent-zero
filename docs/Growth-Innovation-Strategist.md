@@ -104,7 +104,14 @@
 #SQ|- Zero linting warnings
 #QN|- Positive review feedback
 #KY|- Measurable improvement in CI/CD or developer experience
-#JV|#MM|#TS|
+#HS|#JV|#MM|#TS|
+#JY|#YV|### 2026-03-01 - Add Unified Loading State Component (Issue #524)
+#YH|#XT|- Created `/webui/js/loading.js` with reusable loading state utilities
+#VY|#PH|- Added `loadingMixin`, `isLoadingMixin`, `multiLoadingMixin` for stores
+#VZ|#NN|- Added `loadingSpinner`, `showLoading`, `hideLoading` for UI components
+#KR|#HN|- Updated mcp-servers-store.js and projects-store.js to import loading utilities
+#HT|#XP|- Provides consistent loading state pattern across all stores
+#NX|#QH|- Verified: syntax check ✓ (all JS files pass)
 #YV|### 2026-03-01 - Add Test Suite for timed_input.py Helper Module
 #XT|- Added unit tests for `python/helpers/timed_input.py` helper module
 #PH|- Tests cover timeout_input function with various inputs

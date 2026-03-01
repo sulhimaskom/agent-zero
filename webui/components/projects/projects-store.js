@@ -1,4 +1,5 @@
 import { createStore } from '/js/AlpineStore.js';
+import { loadingMixin } from '/js/loading.js';
 import * as api from '/js/api.js';
 import * as modals from '/js/modals.js';
 import * as notifications from '/components/notifications/notification-store.min.js';
