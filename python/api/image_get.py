@@ -1,13 +1,16 @@
 import base64
-import os
-from python.helpers.api import ApiHandler, Request, Response, send_file
-from python.helpers import files, runtime
 import io
+import os
 from mimetypes import guess_type
+
+from flask import Request, Response, send_file
+
+from python.helpers import files, runtime
+from python.helpers.api import ApiHandler
+from python.helpers.constants import MimeTypes, Timeouts
 
 
 class ImageGet(ApiHandler):
-
     @classmethod
     def get_methods(cls) -> list[str]:
         return ["GET"]
@@ -15,37 +18,40 @@ class ImageGet(ApiHandler):
     async def process(self, input: dict, request: Request) -> dict | Response:
         # input data
         path = input.get("path", request.args.get("path", ""))
-        metadata = (
-            input.get("metadata", request.args.get("metadata", "false")).lower()
-            == "true"
-        )
 
         if not path:
             raise ValueError("No path provided")
 
-        # no real need to check, we have the extension filter in place
         # check if path is within base directory
-        # if runtime.is_development():
-        #     in_base = files.is_in_base_dir(files.fix_dev_path(path))
-        # else:
-        #     in_base = files.is_in_base_dir(path)
-        # if not in_base and not files.is_in_dir(path, "/root"):
-        #     raise ValueError("Path is outside of allowed directory")
+        if runtime.is_development():
+            in_base = files.is_in_base_dir(files.fix_dev_path(path))
+        else:
+            in_base = files.is_in_base_dir(path)
+        if not in_base:
+            raise ValueError("Path is outside of allowed directory")
 
         # get file extension and info
         file_ext = os.path.splitext(path)[1].lower()
         filename = os.path.basename(path)
 
         # list of allowed image extensions
-        image_extensions = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp", ".svg", ".ico", ".svgz"]
+        image_extensions = [
+            ".jpg",
+            ".jpeg",
+            ".png",
+            ".gif",
+            ".bmp",
+            ".webp",
+            ".svg",
+        ]
 
         # # If metadata is requested, return file information
         # if metadata:
         #     return _get_file_metadata(path, filename, file_ext, image_extensions)
-       
-        if file_ext in image_extensions:
 
-            # in development environment, try to serve the image from local file system if exists, otherwise from docker
+        if file_ext in image_extensions:
+            # in development environment, try to serve the image from local file system
+            # if exists, otherwise from docker
             if runtime.is_development():
                 if files.exists(path):
                     response = send_file(path)
@@ -56,7 +62,7 @@ class ImageGet(ApiHandler):
                     file_content = base64.b64decode(b64_content)
                     mime_type, _ = guess_type(filename)
                     if not mime_type:
-                        mime_type = "application/octet-stream"
+                        mime_type = MimeTypes.DEFAULT_BINARY
                     response = send_file(
                         io.BytesIO(file_content),
                         mimetype=mime_type,
@@ -66,13 +72,10 @@ class ImageGet(ApiHandler):
                 else:
                     response = _send_fallback_icon("image")
             else:
-                if files.exists(path):
-                    response = send_file(path)
-                else:
-                    response = _send_fallback_icon("image")
+                response = send_file(path) if files.exists(path) else _send_fallback_icon("image")
 
             # Add cache headers for better device sync performance
-            response.headers["Cache-Control"] = "public, max-age=3600"
+            response.headers["Cache-Control"] = f"public, max-age={Timeouts.HTTP_CACHE_MAX_AGE}"
             response.headers["X-File-Type"] = "image"
             response.headers["X-File-Name"] = filename
             return response
@@ -82,8 +85,7 @@ class ImageGet(ApiHandler):
 
 
 def _send_file_type_icon(file_ext, filename=None):
-    """Return appropriate icon for file type"""
-
+    """Return appropriate icon for file type."""
     # Map file extensions to icon names
     icon_mapping = {
         # Archive files
@@ -130,7 +132,8 @@ def _send_file_type_icon(file_ext, filename=None):
     # Add headers for device sync
     if hasattr(response, "headers"):
         response.headers["Cache-Control"] = (
-            "public, max-age=86400"  # Cache icons for 24 hours
+            # Cache icons for 24 hours from constants
+            f"public, max-age={Timeouts.HTTP_CACHE_MAX_AGE}"
         )
         response.headers["X-File-Type"] = "icon"
         response.headers["X-Icon-Type"] = icon_name
@@ -141,8 +144,7 @@ def _send_file_type_icon(file_ext, filename=None):
 
 
 def _send_fallback_icon(icon_name):
-    """Return fallback icon from public directory"""
-
+    """Return fallback icon from public directory."""
     # Path to public icons
     icon_path = files.get_abs_path(f"webui/public/{icon_name}.svg")
 

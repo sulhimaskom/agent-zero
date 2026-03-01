@@ -1,26 +1,31 @@
-from abc import ABC, abstractmethod
-from fnmatch import fnmatch
-import json
-from ntpath import isabs
-import os
-import sys
-import re
+"""File I/O utilities and plugin system for Agent Zero.
+
+Provides file operations including read/write, compression,
+path resolution, and a plugin system for variable substitution.
+"""
+
 import base64
+import glob
+import json
+import mimetypes
+import os
+import re
 import shutil
 import tempfile
-from typing import Any, Literal
 import zipfile
-import importlib
-import importlib.util
-import inspect
-import glob
-import mimetypes
-from simpleeval import simple_eval
+from abc import ABC, abstractmethod
+from fnmatch import fnmatch
+from typing import Any
+
+from python.helpers.constants import Limits
+from python.helpers.strings import sanitize_string
 
 
 class VariablesPlugin(ABC):
     @abstractmethod
-    def get_variables(self, file: str, backup_dirs: list[str] | None = None, **kwargs) -> dict[str, Any]:  # type: ignore
+    def get_variables(
+        self, file: str, backup_dirs: list[str] | None = None, **kwargs
+    ) -> dict[str, Any]:  # type: ignore
         pass
 
 
@@ -36,13 +41,12 @@ def load_plugin_variables(
     try:
         # Create filename and directories list
         plugin_filename = basename(file, ".md") + ".py"
-        directories = [dirname(file)] + backup_dirs
+        directories = [dirname(file), *backup_dirs]
         plugin_file = find_file_in_dirs(plugin_filename, directories)
     except FileNotFoundError:
         plugin_file = None
 
     if plugin_file and exists(plugin_file):
-
         from python.helpers import extract_tools
 
         classes = extract_tools.load_classes_from_file(
@@ -78,11 +82,11 @@ def load_plugin_variables(
     return {}
 
 
-from python.helpers.strings import sanitize_string
-
-
 def parse_file(
-    _filename: str, _directories: list[str] | None = None, _encoding="utf-8", **kwargs
+    _filename: str,
+    _directories: list[str] | None = None,
+    _encoding="utf-8",
+    **kwargs,
 ):
     if _directories is None:
         _directories = []
@@ -91,7 +95,7 @@ def parse_file(
     absolute_path = find_file_in_dirs(_filename, _directories)
 
     # Read the file content
-    with open(absolute_path, "r", encoding=_encoding) as f:
+    with open(absolute_path, encoding=_encoding) as f:
         # content = remove_code_fences(f.read())
         content = f.read()
 
@@ -117,7 +121,10 @@ def parse_file(
 
 
 def read_prompt_file(
-    _file: str, _directories: list[str] | None = None, _encoding="utf-8", **kwargs
+    _file: str,
+    _directories: list[str] | None = None,
+    _encoding="utf-8",
+    **kwargs,
 ):
     if _directories is None:
         _directories = []
@@ -126,21 +133,18 @@ def read_prompt_file(
     if os.path.dirname(_file):
         folder_path = os.path.dirname(_file)
         _file = os.path.basename(_file)
-        _directories = [folder_path] + _directories
+        _directories = [folder_path, *_directories]
 
     # Find the file in the directories
     absolute_path = find_file_in_dirs(_file, _directories)
 
     # Read the file content
-    with open(absolute_path, "r", encoding=_encoding) as f:
+    with open(absolute_path, encoding=_encoding) as f:
         # content = remove_code_fences(f.read())
         content = f.read()
 
     variables = load_plugin_variables(_file, _directories, **kwargs) or {}  # type: ignore
     variables.update(kwargs)
-
-    # evaluate conditions
-    content = evaluate_text_conditions(content, **variables)
 
     # Replace placeholders with values from kwargs
     content = replace_placeholders_text(content, **variables)
@@ -156,59 +160,12 @@ def read_prompt_file(
     return content
 
 
-def evaluate_text_conditions(_content: str, **kwargs):
-    # search for {{if ...}} ... {{endif}} blocks and evaluate conditions with nesting support
-    if_pattern = re.compile(r"{{\s*if\s+(.*?)}}", flags=re.DOTALL)
-    token_pattern = re.compile(r"{{\s*(if\b.*?|endif)\s*}}", flags=re.DOTALL)
-
-    def _process(text: str) -> str:
-        m_if = if_pattern.search(text)
-        if not m_if:
-            return text
-
-        depth = 1
-        pos = m_if.end()
-        while True:
-            m = token_pattern.search(text, pos)
-            if not m:
-                # Unterminated if-block, do not modify text
-                return text
-            token = m.group(1)
-            depth += 1 if token.startswith("if ") else -1
-            if depth == 0:
-                break
-            pos = m.end()
-
-        before = text[: m_if.start()]
-        condition = m_if.group(1).strip()
-        inner = text[m_if.end() : m.start()]
-        after = text[m.end() :]
-
-        try:
-            result = simple_eval(condition, names=kwargs)
-        except Exception:
-            # On evaluation error, do not modify this block
-            return text
-
-        if result:
-            # Keep inner content (processed recursively), remove if/endif markers
-            kept = before + _process(inner)
-        else:
-            # Skip entire block, including inner content and markers
-            kept = before
-
-        # Continue processing the remaining text after this block
-        return kept + _process(after)
-
-    return _process(_content)
-
-
 def read_file(relative_path: str, encoding="utf-8"):
     # Try to get the absolute path for the file from the original directory or backup directories
     absolute_path = get_abs_path(relative_path)
 
     # Read the file content
-    with open(absolute_path, "r", encoding=encoding) as f:
+    with open(absolute_path, encoding=encoding) as f:
         return f.read()
 
 
@@ -230,42 +187,6 @@ def read_file_base64(relative_path):
         return base64.b64encode(f.read()).decode("utf-8")
 
 
-def is_probably_binary_bytes(data: bytes, threshold: float = 0.3) -> bool:
-    """
-    Binary detection.
-
-    - Fast path: NUL bytes => binary
-    - Otherwise: treat high ratio of suspicious ASCII control bytes as binary.
-      (We intentionally do NOT treat bytes >= 0x80 as binary to avoid false
-      positives for UTF-8 text.)
-    """
-    if not data:
-        return False
-    if b"\x00" in data:
-        return True
-
-    # Count suspicious control bytes
-    allowed = {8, 9, 10, 12, 13}  # \b \t \n \f \r
-    suspicious = sum(
-        1
-        for b in data
-        if ((b < 32 and b not in allowed) or b == 127)
-    )
-    return (suspicious / len(data)) > threshold
-
-
-def is_probably_binary_file(
-    file_path: str, sample_size: int = 10 * 1024, threshold: float = 0.3
-) -> bool:
-    """Binary detection by reading only the first ~sample_size bytes of a file."""
-    try:
-        with open(file_path, "rb") as f:
-            sample = f.read(sample_size)
-    except (FileNotFoundError, PermissionError, OSError):
-        raise OSError(f"Unable to read file for binary detection: {file_path}")
-    return is_probably_binary_bytes(sample, threshold=threshold)
-
-
 def replace_placeholders_text(_content: str, **kwargs):
     # Replace placeholders with values from kwargs
     for key, value in kwargs.items():
@@ -279,9 +200,8 @@ def replace_placeholders_json(_content: str, **kwargs):
     # Replace placeholders with values from kwargs
     for key, value in kwargs.items():
         placeholder = "{{" + key + "}}"
-        if placeholder in _content:
-            strval = json.dumps(value)
-            _content = _content.replace(placeholder, strval)
+        strval = json.dumps(value)
+        _content = _content.replace(placeholder, strval)
     return _content
 
 
@@ -295,14 +215,13 @@ def replace_placeholders_dict(_content: dict, **kwargs):
                         replacement = kwargs[placeholder]
                         if value == f"{{{{{placeholder}}}}}":
                             return replacement
-                        elif isinstance(replacement, (dict, list)):
+                        elif isinstance(replacement, dict | list):
                             value = value.replace(
-                                f"{{{{{placeholder}}}}}", json.dumps(replacement)
+                                f"{{{{{placeholder}}}}}",
+                                json.dumps(replacement),
                             )
                         else:
-                            value = value.replace(
-                                f"{{{{{placeholder}}}}}", str(replacement)
-                            )
+                            value = value.replace(f"{{{{{placeholder}}}}}", str(replacement))
             return value
         elif isinstance(value, dict):
             return {k: replace_value(v) for k, v in value.items()}
@@ -347,12 +266,10 @@ def find_file_in_dirs(_filename: str, _directories: list[str]):
             return full_path
 
     # If the file is not found, raise FileNotFoundError
-    raise FileNotFoundError(
-        f"File '{_filename}' not found in any of the provided directories."
-    )
+    raise FileNotFoundError(f"File '{_filename}' not found in any of the provided directories.")
 
 
-def get_unique_filenames_in_dirs(dir_paths: list[str], pattern: str = "*", type: Literal["file", "dir", "any"] = "file"):
+def get_unique_filenames_in_dirs(dir_paths: list[str], pattern: str = "*"):
     # returns absolute paths for unique filenames, priority by order in dir_paths
     seen = set()
     result = []
@@ -360,22 +277,12 @@ def get_unique_filenames_in_dirs(dir_paths: list[str], pattern: str = "*", type:
         full_dir = get_abs_path(dir_path)
         for file_path in glob.glob(os.path.join(full_dir, pattern)):
             fname = os.path.basename(file_path)
-            if fname not in seen and (type == "any" or (type == "file" and os.path.isfile(file_path)) or (type == "dir" and os.path.isdir(file_path))):
+            if fname not in seen and os.path.isfile(file_path):
                 seen.add(fname)
                 result.append(get_abs_path(file_path))
     # sort by filename (basename), not the full path
     result.sort(key=lambda path: os.path.basename(path))
     return result
-
-
-def find_existing_paths_by_pattern(pattern: str):
-    if not pattern:
-        return []
-
-    search_pattern = get_abs_path(pattern)
-    matches = glob.glob(search_pattern, recursive=True)
-    matches.sort()
-    return matches
 
 
 def remove_code_fences(text):
@@ -445,9 +352,12 @@ def delete_dir(relative_path: str):
 
                 # try again after changing permissions
                 shutil.rmtree(abs_path, ignore_errors=True)
-            except OSError:
-                # suppress permission errors - we're ensuring no errors propagate
-                pass
+            except Exception as e:
+                # suppress all errors - we're ensuring no errors propagate
+                # log warning for debugging purposes
+                import warnings
+
+                warnings.warn(f"Failed to remove directory {abs_path}: {e}", stacklevel=2)
 
 
 def move_dir(old_path: str, new_path: str):
@@ -456,14 +366,14 @@ def move_dir(old_path: str, new_path: str):
     abs_new = get_abs_path(new_path)
     if not os.path.isdir(abs_old):
         return  # nothing to rename
-    
-    # ensure parent directory exists
-    os.makedirs(os.path.dirname(abs_new), exist_ok=True)
-    
     try:
         os.rename(abs_old, abs_new)
-    except Exception:
-        pass  # suppress all errors, keep behavior consistent
+    except Exception as e:
+        # suppress all errors, keep behavior consistent
+        # log warning for debugging purposes
+        import warnings
+
+        warnings.warn(f"Failed to move directory from {abs_old} to {abs_new}: {e}", stacklevel=2)
 
 
 # move dir safely, remove with number if needed
@@ -506,40 +416,26 @@ def make_dirs(relative_path: str):
 
 
 def get_abs_path(*relative_paths):
-    "Convert relative paths to absolute paths based on the base directory."
+    """Convert relative paths to absolute paths based on the base directory."""
     return os.path.join(get_base_dir(), *relative_paths)
-
-def get_abs_path_dockerized(*relative_paths):
-    "Ensures the abs path is dockerized (i.e. /a0/... path)"
-    abs = get_abs_path(*relative_paths)
-    from python.helpers import runtime
-    if runtime.is_dockerized():
-        return abs
-    return normalize_a0_path(abs)
-
-def get_abs_path_development(*relative_paths):
-    "Ensures the abs path is relevant for dev environment"
-    abs = get_abs_path(*relative_paths)
-    return fix_dev_path(abs)
 
 
 def deabsolute_path(path: str):
-    "Convert absolute paths to relative paths based on the base directory."
+    """Convert absolute paths to relative paths based on the base directory."""
     return os.path.relpath(path, get_base_dir())
 
 
 def fix_dev_path(path: str):
-    "On dev environment, convert /a0/... paths to local absolute paths"
+    """On dev environment, convert /a0/... paths to local absolute paths."""
     from python.helpers.runtime import is_development
 
-    if is_development():
-        if path.startswith("/a0/"):
-            path = path.replace("/a0/", "")
+    if is_development() and path.startswith("/a0/"):
+        path = path.replace("/a0/", "")
     return get_abs_path(path)
 
 
 def normalize_a0_path(path: str):
-    "Convert absolute paths into /a0/... paths"
+    """Convert absolute paths into /a0/... paths."""
     if is_in_base_dir(path):
         deabs = deabsolute_path(path)
         return "/a0/" + deabs
@@ -568,14 +464,12 @@ def dirname(path: str):
 
 
 def is_in_base_dir(path: str):
-    return is_in_dir(path,get_base_dir())
-
-
-def is_in_dir(path:str,dir:str):
-    # check if the given path is within the directory
+    # check if the given path is within the base directory
+    base_dir = get_base_dir()
+    # normalize paths to handle relative paths and symlinks
     abs_path = os.path.abspath(path)
-    abs_dir = os.path.abspath(dir)
-    return os.path.commonpath([abs_path, abs_dir]) == abs_dir
+    # check if the absolute path starts with the base directory
+    return os.path.commonpath([abs_path, base_dir]) == base_dir
 
 
 def get_subdirectories(
@@ -616,16 +510,7 @@ def move_file(relative_path: str, new_path: str):
     abs_path = get_abs_path(relative_path)
     new_abs_path = get_abs_path(new_path)
     os.makedirs(os.path.dirname(new_abs_path), exist_ok=True)
-    try:
-        os.rename(abs_path, new_abs_path)
-    except OSError:
-        # fallback to copy and delete
-        import shutil
-        shutil.copy2(abs_path, new_abs_path)
-        try:
-            os.unlink(abs_path)
-        except OSError:
-            pass
+    os.rename(abs_path, new_abs_path)
 
 
 def safe_file_name(filename: str) -> str:
@@ -634,9 +519,8 @@ def safe_file_name(filename: str) -> str:
 
 
 def read_text_files_in_dir(
-    dir_path: str, max_size: int = 1024 * 1024, pattern: str = "*"
+    dir_path: str, max_size: int = Limits.FILE_READ_MAX_SIZE
 ) -> dict[str, str]:
-
     abs_path = get_abs_path(dir_path)
     if not os.path.exists(abs_path):
         return {}
@@ -645,9 +529,7 @@ def read_text_files_in_dir(
         try:
             if not os.path.isfile(file_path):
                 continue
-            if not fnmatch(os.path.basename(file_path), pattern):
-                continue
-            if max_size > 0 and os.path.getsize(file_path) > max_size:
+            if os.path.getsize(file_path) > max_size:
                 continue
             mime, _ = mimetypes.guess_type(file_path)
             if mime is not None and not mime.startswith("text"):
@@ -655,20 +537,20 @@ def read_text_files_in_dir(
             # Check if file is binary by reading a small chunk
             content = read_file(file_path)
             result[os.path.basename(file_path)] = content
-        except Exception:
+        except Exception as e:
             continue
     return result
+
 
 def list_files_in_dir_recursively(relative_path: str) -> list[str]:
     abs_path = get_abs_path(relative_path)
     if not os.path.exists(abs_path):
         return []
     result = []
-    for root, dirs, files in os.walk(abs_path):
+    for root, _dirs, files in os.walk(abs_path):
         for file in files:
             file_path = os.path.join(root, file)
             # Return relative path from the base directory
             rel_path = os.path.relpath(file_path, abs_path)
             result.append(rel_path)
     return result
-    

@@ -1,6 +1,6 @@
-from python.helpers.tool import Tool, Response
-from python.helpers.print_style import PrintStyle
 from python.helpers.fasta2a_client import connect_to_agent, is_client_available
+from python.helpers.print_style import PrintStyle
+from python.helpers.tool import Response, Tool
 
 
 class A2AChatTool(Tool):
@@ -8,11 +8,14 @@ class A2AChatTool(Tool):
 
     async def execute(self, **kwargs):
         if not is_client_available():
-            return Response(message="FastA2A client not available on this instance.", break_loop=False)
+            return Response(
+                message="FastA2A client not available on this instance.",
+                break_loop=False,
+            )
 
         agent_url: str | None = kwargs.get("agent_url")  # required
         user_message: str | None = kwargs.get("message")  # required
-        attachments = kwargs.get("attachments", None)  # optional list[str]
+        attachments = kwargs.get("attachments")  # optional list[str]
         reset = bool(kwargs.get("reset", False))
         if not agent_url or not isinstance(agent_url, str):
             return Response(message="agent_url argument missing", break_loop=False)
@@ -29,10 +32,17 @@ class A2AChatTool(Tool):
         context_id = None if reset else sessions.get(agent_url)
         try:
             async with await connect_to_agent(agent_url) as conn:
-                task_resp = await conn.send_message(user_message, attachments=attachments, context_id=context_id)
+                task_resp = await conn.send_message(
+                    user_message,
+                    attachments=attachments,
+                    context_id=context_id,
+                )
                 task_id = task_resp.get("result", {}).get("id")  # type: ignore[index]
                 if not task_id:
-                    return Response(message="Remote agent failed to create task.", break_loop=False)
+                    return Response(
+                        message="Remote agent failed to create task.",
+                        break_loop=False,
+                    )
                 final = await conn.wait_for_completion(task_id)
                 new_context_id = final["result"].get("context_id")  # type: ignore[index]
                 if isinstance(new_context_id, str):

@@ -1,9 +1,9 @@
 from python.helpers.extension import Extension
+from python.helpers.print_style import PrintStyle
 from python.helpers.secrets import get_secrets_manager
 
 
 class MaskHistoryContent(Extension):
-
     async def execute(self, **kwargs):
         # Get content data from kwargs
         content_data = kwargs.get("content_data")
@@ -17,7 +17,7 @@ class MaskHistoryContent(Extension):
             content_data["content"] = self._mask_content(content_data["content"], secrets_mgr)
         except Exception as e:
             # If masking fails, proceed without masking
-            pass
+            PrintStyle.error(f"Failed to mask history content: {e}")
 
     def _mask_content(self, content, secrets_mgr):
         """Recursively mask secrets in message content."""

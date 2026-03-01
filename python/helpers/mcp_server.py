@@ -1,31 +1,27 @@
 import os
-import asyncio
-from typing import Annotated, Literal, Union
+import threading
+from typing import Annotated, Literal
 from urllib.parse import urlparse
+
+from fastmcp import FastMCP
+from fastmcp.server.http import create_sse_app
 from openai import BaseModel
 from pydantic import Field
-import fastmcp
-from fastmcp import FastMCP
-import contextvars
-
-from agent import AgentContext, AgentContextType, UserMessage
-from python.helpers.persist_chat import remove_chat
-from initialize import initialize_agent
-from python.helpers.print_style import PrintStyle
-from python.helpers import settings, projects
+from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware import Middleware
 from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.exceptions import HTTPException as StarletteHTTPException
-from starlette.types import ASGIApp, Receive, Scope, Send
-from fastmcp.server.http import create_sse_app, create_base_app, build_resource_metadata_url # type: ignore
-from starlette.routing import Mount  # type: ignore
 from starlette.requests import Request
-import threading
+from starlette.types import ASGIApp, Receive, Scope, Send
+
+from agent import AgentContext, AgentContextType, UserMessage
+from initialize import initialize_agent
+from python.helpers import settings
+from python.helpers.constants import HttpStatus
+from python.helpers.persist_chat import remove_chat
+from python.helpers.print_style import PrintStyle
 
 _PRINTER = PrintStyle(italic=True, font_color="green", padding=False)
 
-# Context variable to store project name from URL (per-request)
-_mcp_project_name: contextvars.ContextVar[str | None] = contextvars.ContextVar('mcp_project_name', default=None)
 
 mcp_server: FastMCP = FastMCP(
     name="Agent Zero integrated MCP Server",
@@ -39,22 +35,14 @@ mcp_server: FastMCP = FastMCP(
 
 
 class ToolResponse(BaseModel):
-    status: Literal["success"] = Field(
-        description="The status of the response", default="success"
-    )
-    response: str = Field(
-        description="The response from the remote Agent Zero Instance"
-    )
+    status: Literal["success"] = Field(description="The status of the response", default="success")
+    response: str = Field(description="The response from the remote Agent Zero Instance")
     chat_id: str = Field(description="The id of the chat this message belongs to.")
 
 
 class ToolError(BaseModel):
-    status: Literal["error"] = Field(
-        description="The status of the response", default="error"
-    )
-    error: str = Field(
-        description="The error message from the remote Agent Zero Instance"
-    )
+    status: Literal["error"] = Field(description="The status of the response", default="error")
+    error: str = Field(description="The error message from the remote Agent Zero Instance")
     chat_id: str = Field(description="The id of the chat this message belongs to.")
 
 
@@ -128,14 +116,12 @@ async def send_message(
         | None
     ) = None,
 ) -> Annotated[
-    Union[ToolResponse, ToolError],
+    ToolResponse | ToolError,
     Field(
-        description="The response from the remote Agent Zero Instance", title="response"
+        description="The response from the remote Agent Zero Instance",
+        title="response",
     ),
 ]:
-    # Get project name from context variable (set in proxy __call__)
-    project_name = _mcp_project_name.get()
-
     context: AgentContext | None = None
     if chat_id:
         context = AgentContext.get(chat_id)
@@ -146,29 +132,14 @@ async def send_message(
             # whether we should save the chat or delete it afterwards
             # If we continue a conversation, it must be persistent
             persistent_chat = True
-
-            # Validation: if project is in URL but context has different project
-            if project_name:
-                existing_project = context.get_data(projects.CONTEXT_DATA_KEY_PROJECT)
-                if existing_project and existing_project != project_name:
-                    return ToolError(
-                        error=f"Chat belongs to project '{existing_project}' but URL specifies '{project_name}'",
-                        chat_id=chat_id
-                    )
     else:
         config = initialize_agent()
         context = AgentContext(config=config, type=AgentContextType.BACKGROUND)
 
-        # Activate project if specified in URL
-        if project_name:
-            try:
-                projects.activate_project(context.id, project_name)
-            except Exception as e:
-                return ToolError(error=f"Failed to activate project: {str(e)}", chat_id="")
-
     if not message:
         return ToolError(
-            error="Message is required", chat_id=context.id if persistent_chat else ""
+            error="Message is required",
+            chat_id=context.id if persistent_chat else "",
         )
 
     try:
@@ -177,9 +148,7 @@ async def send_message(
             context.reset()
             AgentContext.remove(context.id)
             remove_chat(context.id)
-        return ToolResponse(
-            response=response, chat_id=context.id if persistent_chat else ""
-        )
+        return ToolResponse(response=response, chat_id=context.id if persistent_chat else "")
     except Exception as e:
         return ToolError(error=str(e), chat_id=context.id if persistent_chat else "")
 
@@ -223,11 +192,12 @@ async def finish_chat(
             description="ID of the chat to be finished. This value is returned in response to sending previous message.",
             title="chat_id",
         ),
-    ]
+    ],
 ) -> Annotated[
-    Union[ToolResponse, ToolError],
+    ToolResponse | ToolError,
     Field(
-        description="The response from the remote Agent Zero Instance", title="response"
+        description="The response from the remote Agent Zero Instance",
+        title="response",
     ),
 ]:
     if not chat_id:
@@ -243,9 +213,7 @@ async def finish_chat(
         return ToolResponse(response="Chat finished", chat_id=chat_id)
 
 
-async def _run_chat(
-    context: AgentContext, message: str, attachments: list[str] | None = None
-):
+async def _run_chat(context: AgentContext, message: str, attachments: list[str] | None = None):
     try:
         _PRINTER.print("MCP Chat message received")
 
@@ -258,12 +226,18 @@ async def _run_chat(
                 else:
                     try:
                         url = urlparse(attachment)
-                        if url.scheme in ["http", "https", "ftp", "ftps", "sftp"]:
+                        if url.scheme in [
+                            "http",
+                            "https",
+                            "ftp",
+                            "ftps",
+                            "sftp",
+                        ]:
                             attachment_filenames.append(attachment)
                         else:
                             _PRINTER.print(f"Skipping attachment: [{attachment}]")
-                    except Exception:
-                        _PRINTER.print(f"Skipping attachment: [{attachment}]")
+                    except Exception as e:
+                        _PRINTER.print(f"Skipping attachment: [{attachment}] - {e}")
 
         _PRINTER.print("User message:")
         _PRINTER.print(f"> {message}")
@@ -274,7 +248,9 @@ async def _run_chat(
 
         task = context.communicate(
             UserMessage(
-                message=message, system_message=[], attachments=attachment_filenames
+                message=message,
+                system_message=[],
+                attachments=attachment_filenames,
             )
         )
         result = await task.result()
@@ -322,46 +298,60 @@ class DynamicMcpProxy:
         message_path = f"/t-{self.token}/messages/"
 
         # Update settings in the MCP server instance if provided
-        # Keep FastMCP settings synchronized so downstream helpers that read these
-        # values (including deprecated accessors) resolve the runtime paths.
-        fastmcp.settings.message_path = message_path
-        fastmcp.settings.sse_path = sse_path
-        fastmcp.settings.streamable_http_path = http_path
+        mcp_server.settings.message_path = message_path
+        mcp_server.settings.sse_path = sse_path
 
         # Create new MCP apps with updated settings
         with self._lock:
-            middleware = [Middleware(BaseHTTPMiddleware, dispatch=mcp_middleware)]
-
             self.sse_app = create_sse_app(
                 server=mcp_server,
-                message_path=message_path,
-                sse_path=sse_path,
-                auth=mcp_server.auth,
-                debug=fastmcp.settings.debug,
-                middleware=list(middleware),
+                message_path=mcp_server.settings.message_path,
+                sse_path=mcp_server.settings.sse_path,
+                auth_server_provider=mcp_server._auth_server_provider,
+                auth_settings=mcp_server.settings.auth,
+                debug=mcp_server.settings.debug,
+                routes=mcp_server._additional_http_routes,
+                middleware=[Middleware(BaseHTTPMiddleware, dispatch=mcp_middleware)],
             )
 
+            # For HTTP, we need to create a custom app since the lifespan manager
+            # doesn't work properly in our Flask/Werkzeug environment
             self.http_app = self._create_custom_http_app(
                 http_path,
-                middleware=list(middleware),
+                mcp_server._auth_server_provider,
+                mcp_server.settings.auth,
+                mcp_server.settings.debug,
+                mcp_server._additional_http_routes,
             )
 
     def _create_custom_http_app(
         self,
-        streamable_http_path: str,
-        *,
-        middleware: list[Middleware],
-    ) -> ASGIApp:
-        """Create a Streamable HTTP app with manual session manager lifecycle."""
-
-        from mcp.server.streamable_http_manager import StreamableHTTPSessionManager  # type: ignore
-        from mcp.server.auth.middleware.bearer_auth import RequireAuthMiddleware  # type: ignore
+        streamable_http_path,
+        auth_server_provider,
+        auth_settings,
+        debug,
+        routes,
+    ):
+        """Create a custom HTTP app that manages the session manager manually."""
         import anyio
+        from fastmcp.server.http import (
+            create_base_app,
+            setup_auth_middleware_and_routes,
+        )
+        from mcp.server.auth.middleware.bearer_auth import (
+            RequireAuthMiddleware,
+        )
+        from mcp.server.streamable_http_manager import (
+            StreamableHTTPSessionManager,
+        )
+        from starlette.routing import Mount
 
         server_routes = []
         server_middleware = []
 
         self.http_session_task_group = None
+
+        # Create session manager
         self.http_session_manager = StreamableHTTPSessionManager(
             app=mcp_server._mcp_server,
             event_store=None,
@@ -369,7 +359,10 @@ class DynamicMcpProxy:
             stateless=False,
         )
 
+        # Custom ASGI handler that ensures task group is initialized
+
         async def handle_streamable_http(scope, receive, send):
+            # Lazy initialization of task group
             if self.http_session_task_group is None:
                 self.http_session_task_group = anyio.create_task_group()
                 await self.http_session_task_group.__aenter__()
@@ -379,25 +372,20 @@ class DynamicMcpProxy:
             if self.http_session_manager:
                 await self.http_session_manager.handle_request(scope, receive, send)
 
-        auth_provider = mcp_server.auth
+        # Get auth middleware and routes
+        auth_middleware, auth_routes, required_scopes = setup_auth_middleware_and_routes(
+            auth_server_provider, auth_settings
+        )
 
-        if auth_provider:
-            server_routes.extend(auth_provider.get_routes(mcp_path=streamable_http_path))
-            server_middleware.extend(auth_provider.get_middleware())
+        server_routes.extend(auth_routes)
+        server_middleware.extend(auth_middleware)
 
-            resource_url = auth_provider._get_resource_url(streamable_http_path)
-            resource_metadata_url = (
-                build_resource_metadata_url(resource_url) if resource_url else None
-            )
-
+        # Add StreamableHTTP routes with or without auth
+        if auth_server_provider:
             server_routes.append(
                 Mount(
                     streamable_http_path,
-                    app=RequireAuthMiddleware(
-                        handle_streamable_http,
-                        auth_provider.required_scopes,
-                        resource_metadata_url,
-                    ),
+                    app=RequireAuthMiddleware(handle_streamable_http, required_scopes),
                 )
             )
         else:
@@ -408,20 +396,22 @@ class DynamicMcpProxy:
                 )
             )
 
-        additional_routes = mcp_server._get_additional_http_routes()
-        if additional_routes:
-            server_routes.extend(additional_routes)
+        # Add custom routes with lowest precedence
+        if routes:
+            server_routes.extend(routes)
 
-        server_middleware.extend(middleware)
+        # Add middleware
+        server_middleware.append(Middleware(BaseHTTPMiddleware, dispatch=mcp_middleware))
 
+        # Create and return the app
         return create_base_app(
             routes=server_routes,
             middleware=server_middleware,
-            debug=fastmcp.settings.debug,
+            debug=debug,
         )
 
     async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
-        """Forward the ASGI calls to the appropriate app based on the URL path"""
+        """Forward the ASGI calls to the appropriate app based on the URL path."""
         with self._lock:
             sse_app = self.sse_app
             http_app = self.http_app
@@ -432,58 +422,24 @@ class DynamicMcpProxy:
         # Route based on path
         path = scope.get("path", "")
 
-        # Check for token in path (with or without project segment)
-        # Patterns: /t-{token}/sse, /t-{token}/p-{project}/sse, etc.
-        has_token = f"/t-{self.token}/" in path or f"t-{self.token}/" in path
-
-        # Extract project from path BEFORE cleaning and set in context variable
-        project_name = None
-        if "/p-" in path:
-            try:
-                parts = path.split("/p-")
-                if len(parts) > 1:
-                    project_part = parts[1].split("/")[0]
-                    if project_part:
-                        project_name = project_part
-                        _PRINTER.print(f"[MCP] Proxy extracted project from URL: {project_name}")
-            except Exception as e:
-                _PRINTER.print(f"[MCP] Failed to extract project in proxy: {e}")
-
-        # Store project in context variable (will be available in send_message)
-        _mcp_project_name.set(project_name)
-
-        # Strip project segment from path if present (e.g., /p-project_name/)
-        # This is needed because the underlying MCP apps were configured without project paths
-        cleaned_path = path
-        if "/p-" in path:
-            # Remove /p-{project}/ segment: /t-TOKEN/p-PROJECT/sse -> /t-TOKEN/sse
-            import re
-            cleaned_path = re.sub(r'/p-[^/]+/', '/', path)
-
-        # Update scope with cleaned path for the underlying app
-        modified_scope = dict(scope)
-        modified_scope['path'] = cleaned_path
-
-        if has_token and ("/sse" in path or "/messages" in path):
-            # Route to SSE app with cleaned path
-            await sse_app(modified_scope, receive, send)
-        elif has_token and "/http" in path:
-            # Route to HTTP app with cleaned path
-            await http_app(modified_scope, receive, send)
+        if f"/t-{self.token}/sse" in path or f"t-{self.token}/messages" in path:
+            # Route to SSE app
+            await sse_app(scope, receive, send)
+        elif f"/t-{self.token}/http" in path:
+            # Route to HTTP app
+            await http_app(scope, receive, send)
         else:
-            raise StarletteHTTPException(
-                status_code=403, detail="MCP forbidden"
-            )
+            raise StarletteHTTPException(status_code=HttpStatus.FORBIDDEN, detail="MCP forbidden")
 
 
 async def mcp_middleware(request: Request, call_next):
-    """Middleware to check if MCP server is enabled."""
+
     # check if MCP server is enabled
     cfg = settings.get_settings()
     if not cfg["mcp_server_enabled"]:
         PrintStyle.error("[MCP] Access denied: MCP server is disabled in settings.")
         raise StarletteHTTPException(
-            status_code=403, detail="MCP server is disabled in settings."
+            status_code=HttpStatus.FORBIDDEN, detail="MCP server is disabled in settings."
         )
 
     return await call_next(request)

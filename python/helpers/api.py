@@ -1,23 +1,29 @@
-from abc import abstractmethod
+"""API handler base classes and utilities for Agent Zero.
+
+Provides the ApiHandler abstract base class that all API endpoints
+inherit from, along with type definitions and common functionality
+for request/response handling.
+"""
+
 import json
 import threading
-from typing import Union, TypedDict, Dict, Any
-from attr import dataclass
-from flask import Request, Response, jsonify, Flask, session, request, send_file
+from abc import abstractmethod
+from typing import Any, TypedDict, Union
+
+from flask import Flask, Request, Response
+
 from agent import AgentContext
 from initialize import initialize_agent
-from python.helpers.print_style import PrintStyle
+from python.helpers.constants import HttpStatus, MimeTypes
 from python.helpers.errors import format_error
-from werkzeug.serving import make_server
-
-ThreadLockType = Union[threading.Lock, threading.RLock]
+from python.helpers.print_style import PrintStyle
 
 Input = dict
-Output = Union[Dict[str, Any], Response, TypedDict]  # type: ignore
+Output = Union[dict[str, Any], Response, TypedDict]  # type: ignore
 
 
 class ApiHandler:
-    def __init__(self, app: Flask, thread_lock: ThreadLockType):
+    def __init__(self, app: Flask, thread_lock: threading.Lock):
         self.app = app
         self.thread_lock = thread_lock
 
@@ -56,12 +62,11 @@ class ApiHandler:
                     # If empty or not valid JSON, use empty dict
                 except Exception as e:
                     # Just log the error and continue with empty input
-                    PrintStyle().print(f"Error parsing JSON: {str(e)}")
+                    PrintStyle().print(f"Error parsing JSON: {e!s}")
                     input_data = {}
             else:
                 # input_data = {"data": request.get_data(as_text=True)}
                 input_data = {}
-
 
             # process via handler
             output = await self.process(input_data, request)
@@ -72,14 +77,16 @@ class ApiHandler:
             else:
                 response_json = json.dumps(output)
                 return Response(
-                    response=response_json, status=200, mimetype="application/json"
+                    response=response_json,
+                    status=HttpStatus.OK,
+                    mimetype=MimeTypes.APPLICATION_JSON,
                 )
 
             # return exceptions with 500
         except Exception as e:
             error = format_error(e)
             PrintStyle.error(f"API error: {error}")
-            return Response(response=error, status=500, mimetype="text/plain")
+            return Response(response=error, status=HttpStatus.ERROR, mimetype=MimeTypes.TEXT_PLAIN)
 
     # get context to run agent zero in
     def use_context(self, ctxid: str, create_if_not_exists: bool = True):
@@ -98,5 +105,4 @@ class ApiHandler:
                 context = AgentContext(config=initialize_agent(), id=ctxid, set_current=True)
                 return context
             else:
-                raise Exception(f"Context {ctxid} not found")
-            
+                raise KeyError(f"Context {ctxid} not found")

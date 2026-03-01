@@ -1,13 +1,15 @@
 import glob
-import os
 import hashlib
-from typing import Any, Dict, Literal, TypedDict
+import os
+from typing import Any, Literal, TypedDict
+
 from langchain_community.document_loaders import (
     CSVLoader,
     PyPDFLoader,
     TextLoader,
     UnstructuredHTMLLoader,
 )
+
 from python.helpers.log import LogItem
 from python.helpers.print_style import PrintStyle
 
@@ -33,27 +35,28 @@ def calculate_checksum(file_path: str) -> str:
 def load_knowledge(
     log_item: LogItem | None,
     knowledge_dir: str,
-    index: Dict[str, KnowledgeImport],
-    metadata: dict[str, Any] = {},
+    index: dict[str, KnowledgeImport],
+    metadata: dict[str, Any] | None = None,
     filename_pattern: str = "**/*",
     recursive: bool = True,
-) -> Dict[str, KnowledgeImport]:
+) -> dict[str, KnowledgeImport]:
     """
     Load knowledge files from a directory with change detection and metadata enhancement.
 
     This function now includes enhanced error handling and compatibility with the
     intelligent memory consolidation system.
     """
-
     # Mapping file extensions to corresponding loader classes
     # Note: Using TextLoader for JSON and MD to avoid parsing issues with consolidation
+    if metadata is None:
+        metadata = {}
     file_types_loaders = {
         "txt": TextLoader,
         "pdf": PyPDFLoader,
         "csv": CSVLoader,
         "html": UnstructuredHTMLLoader,
         "json": TextLoader,  # Use TextLoader for better consolidation compatibility
-        "md": TextLoader,    # Use TextLoader for better consolidation compatibility
+        "md": TextLoader,  # Use TextLoader for better consolidation compatibility
     }
 
     cnt_files = 0
@@ -98,9 +101,13 @@ def load_knowledge(
     # Fetch all files in the directory with specified extensions
     try:
         kn_files = glob.glob(os.path.join(knowledge_dir, filename_pattern), recursive=recursive)
-        kn_files = [f for f in kn_files if os.path.isfile(f) and not os.path.basename(f).startswith('.')]
+        kn_files = [
+            f for f in kn_files if os.path.isfile(f) and not os.path.basename(f).startswith(".")
+        ]
     except Exception as e:
-        PrintStyle(font_color="red").print(f"Error scanning knowledge directory {knowledge_dir}: {e}")
+        PrintStyle(font_color="red").print(
+            f"Error scanning knowledge directory {knowledge_dir}: {e}"
+        )
         if log_item:
             log_item.stream(progress=f"\nError scanning directory: {e}")
         return index
@@ -117,7 +124,7 @@ def load_knowledge(
     for file_path in kn_files:
         try:
             # Get file extension safely
-            file_parts = os.path.basename(file_path).split('.')
+            file_parts = os.path.basename(file_path).split(".")
             if len(file_parts) < 2:
                 continue  # Skip files without extensions
 
@@ -132,13 +139,16 @@ def load_knowledge(
             file_key = file_path
 
             # Load existing data from the index or create a new entry
-            file_data: KnowledgeImport = index.get(file_key, {
-                "file": file_key,
-                "checksum": "",
-                "ids": [],
-                "state": "changed",
-                "documents": []
-            })
+            file_data: KnowledgeImport = index.get(
+                file_key,
+                {
+                    "file": file_key,
+                    "checksum": "",
+                    "ids": [],
+                    "state": "changed",
+                    "documents": [],
+                },
+            )
 
             # Check if file has changed
             if file_data.get("checksum") == checksum:
@@ -154,11 +164,7 @@ def load_knowledge(
                 try:
                     loader = loader_cls(
                         file_path,
-                        **(
-                            text_loader_kwargs
-                            if ext in ["txt", "csv", "html", "md"]
-                            else {}
-                        ),
+                        **(text_loader_kwargs if ext in ["txt", "csv", "html", "md"] else {}),
                     )
                     documents = loader.load_and_split()
 
@@ -183,7 +189,9 @@ def load_knowledge(
                 except Exception as e:
                     PrintStyle(font_color="red").print(f"Error loading {file_path}: {e}")
                     if log_item:
-                        log_item.stream(progress=f"\nError loading {os.path.basename(file_path)}: {e}")
+                        log_item.stream(
+                            progress=f"\nError loading {os.path.basename(file_path)}: {e}"
+                        )
                     continue
 
             # Update the index
@@ -203,8 +211,6 @@ def load_knowledge(
     if cnt_files > 0 or cnt_docs > 0:
         PrintStyle.standard(f"Processed {cnt_docs} documents from {cnt_files} files.")
         if log_item:
-            log_item.stream(
-                progress=f"\nProcessed {cnt_docs} documents from {cnt_files} files."
-            )
+            log_item.stream(progress=f"\nProcessed {cnt_docs} documents from {cnt_files} files.")
 
     return index

@@ -1,6 +1,18 @@
-from python.helpers.api import ApiHandler
+"""Notification creation endpoint.
+
+Creates in-app notifications with configurable priority and type.
+Used for alerts, reminders, and user-facing messages.
+"""
+
 from flask import Request, Response
-from python.helpers.notification import NotificationManager, NotificationPriority, NotificationType
+
+from python.helpers.api import ApiHandler
+from python.helpers.constants import Limits
+from python.helpers.notification import (
+    NotificationManager,
+    NotificationPriority,
+    NotificationType,
+)
 
 
 class NotificationCreate(ApiHandler):
@@ -15,7 +27,9 @@ class NotificationCreate(ApiHandler):
         message = input.get("message", "")
         title = input.get("title", "")
         detail = input.get("detail", "")
-        display_time = input.get("display_time", 3)  # Default to 3 seconds
+        display_time = input.get(
+            "display_time", Limits.NOTIFICATION_DISPLAY_TIME
+        )  # Default from constants
         group = input.get("group", "")  # Group parameter for notification grouping
 
         # Validate required fields
@@ -26,9 +40,11 @@ class NotificationCreate(ApiHandler):
         try:
             display_time = int(display_time)
             if display_time <= 0:
-                display_time = 3  # Reset to default if invalid
+                display_time = Limits.NOTIFICATION_DISPLAY_TIME  # Reset to default if invalid
         except (ValueError, TypeError):
-            display_time = 3  # Reset to default if not convertible to int
+            display_time = (
+                Limits.NOTIFICATION_DISPLAY_TIME
+            )  # Reset to default if not convertible to int
 
         # Validate notification type
         try:
@@ -61,5 +77,5 @@ class NotificationCreate(ApiHandler):
         except Exception as e:
             return {
                 "success": False,
-                "error": f"Failed to create notification: {str(e)}",
+                "error": f"Failed to create notification: {e!s}",
             }

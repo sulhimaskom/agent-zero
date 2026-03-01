@@ -1,11 +1,12 @@
-import { createStore } from "/js/AlpineStore.js";
-import { store as chatsStore } from "/components/sidebar/chats/chats-store.js";
-import { store as schedulerStore } from "/components/modals/scheduler/scheduler-store.js";
+import { createStore } from '/js/AlpineStore.js';
+import { store as chatsStore } from '/components/sidebar/chats/chats-store.js';
+import Logger from '/js/logger.js';
 
 // Tasks sidebar store: tasks list and selected task id
 const model = {
   tasks: [],
-  selected: "",
+  selected: '',
+  isLoading: true,
 
   init() {
     // No-op: data is driven by poll() in index.js; this store provides a stable target
@@ -20,18 +21,35 @@ const model = {
 
       // After updating tasks, ensure selection is still valid
       if (this.selected && !this.contains(this.selected)) {
-        this.setSelected("");
+        this.setSelected('');
       }
+      this.isLoading = false;
     } catch (e) {
-      console.error("tasks-store.applyTasks failed", e);
+      Logger.error('tasks-store.applyTasks failed', e);
+      // Show toast only if this is the first load (tasks were expected)
+      if (this.tasks.length === 0 && this.isLoading) {
+        window.toastFrontendWarning(
+          'Could not load tasks. Will retry on next poll.',
+          'Tasks',
+          5,
+        );
+      }
       this.tasks = [];
+      this.isLoading = false;
     }
   },
 
   // Update selected task and persist for tab restore
   setSelected(taskId) {
-    this.selected = taskId || "";
-    try { localStorage.setItem("lastSelectedTask", this.selected); } catch {}
+    this.selected = taskId || '';
+    try { localStorage.setItem('lastSelectedTask', this.selected); } catch (e) { Logger.error('Failed to persist task selection', e); }
+
+    try { localStorage.setItem('lastSelectedTask', this.selected); } catch (e) {
+      // Silent fail in private browsing mode or when storage is unavailable
+    }
+=======
+    try { localStorage.setItem('lastSelectedTask', this.selected); } catch (e) { Logger.error('Failed to persist task selection', e); }
+>>>>>>> d30e671 (fix(frontend): replace bare catch blocks with proper error logging)
   },
 
   // Returns true if a task with the given id exists in the current list
@@ -41,7 +59,7 @@ const model = {
 
   // Convenience: id of the first task in the current list (or empty string)
   firstId() {
-    return (Array.isArray(this.tasks) && this.tasks[0]?.id) || "";
+    return (Array.isArray(this.tasks) && this.tasks[0]?.id) || '';
   },
 
   // Action methods for task management
@@ -51,9 +69,8 @@ const model = {
   },
 
   openDetail(taskId) {
-    // Open lightweight task detail popup directly
-    if (schedulerStore?.showTaskDetail) {
-      schedulerStore.showTaskDetail(taskId);
+    if (globalThis.openTaskDetail) {
+      globalThis.openTaskDetail(taskId);
     }
   },
 
@@ -62,12 +79,12 @@ const model = {
   },
 
   deleteTask(taskId) {
-    if (schedulerStore?.deleteTaskFromSidebar) {
-      schedulerStore.deleteTaskFromSidebar(taskId);
+    if (globalThis.deleteTaskGlobal) {
+      globalThis.deleteTaskGlobal(taskId);
     }
   },
 };
 
-export const store = createStore("tasks", model);
+export const store = createStore('tasks', model);
 
 

@@ -1,54 +1,180 @@
 <html>
 <head>
     <script type="module">
-        import { store as speechStore } from "/components/chat/speech/speech-store.js";
-        import { store as attachmentsStore } from "/components/chat/attachments/attachmentsStore.js";
-        import { store as fullScreenStore } from "/components/modals/full-screen-input/full-screen-store.js";
-        import { store as messageQueueStore } from "/components/chat/message-queue/message-queue-store.js";
-        import { store as chatInputStore } from "/components/chat/input/input-store.js";
+        import { store as speechStore } from "/components/chat/speech/speech-store.min.js";
+        import { store as attachmentsStore } from "/components/chat/attachments/attachmentsStore.min.js";
+        import { store as fullScreenStore } from "/components/modals/full-screen-input/full-screen-store.min.js";
     </script>
 </head>
 <body>
     <div class="input-row">
         <!-- Attachment icon with tooltip -->
-        <div class="attachment-wrapper">
-            <label for="file-input" class="attachment-icon" title="Add attachments to the message" data-bs-placement="top" data-bs-trigger="hover">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+        <div class="attachment-wrapper" x-data="{ showTooltip: false }">
+            <label for="file-input"
+                   class="attachment-icon"
+                   tabindex="0"
+                   role="button"
+                   aria-label="Add file attachments"
+                   @mouseover="showTooltip = true"
+                   @mouseleave="showTooltip = false"
+                   @focus="showTooltip = true"
+                   @blur="showTooltip = false"
+                   @keydown.enter.prevent="$event.target.click()"
+                   @keydown.space.prevent="$event.target.click()">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                     <path d="M16.5 6v11.5c0 2.21-1.79 4-4 4s-4-1.79-4-4V5c0-1.38 1.12-2.5 2.5-2.5s2.5 1.12 2.5 2.5v10.5c0 .55-.45 1-1 1s-1-.45-1-1V6H10v9.5c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5V5c0-2.21-1.79-4-4-4S7 2.79 7 5v12.5c0 3.04 2.46 5.5 5.5 5.5s5.5-2.46 5.5-5.5V6h-1.5z" />
                 </svg>
             </label>
-            <input type="file" id="file-input" accept="*" multiple style="display: none" @change="$store.chatAttachments.handleFileUpload($event)">
+            <input type="file" id="file-input" accept="*" multiple class="hidden" @change="$store.chatAttachments.handleFileUpload($event)">
+
+            <div x-show="showTooltip" x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0 translate-y-1" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-1" class="tooltip">Add attachments to the message</div>
         </div>
 
         <!-- Container for textarea and expand button -->
-        <div id="chat-input-container" style="position: relative;">
-            <textarea id="chat-input" :placeholder="$store.chatInput.inputPlaceholder" rows="1"
+        <div id="chat-input-container" class="relative" x-data="{ showExpandTooltip: false }">
+            <textarea id="chat-input"
+                      :placeholder="$store.chatInput.placeholderText"
+                      :class="{ 'placeholder-typing': $store.chatInput.placeholderTyping }"
+                      rows="1"
                       @keydown.enter="if (!$event.shiftKey && !$event.isComposing && $event.keyCode !== 229) { $event.preventDefault(); $store.chatInput.sendMessage(); }"
-                      @input="$store.chatInput.adjustTextareaHeight()"
-                      x-model="$store.chatInput.message"></textarea>
-            <button id="expand-button" @click="$store.fullScreenInputModal.openModal()" aria-label="Expand input">
+                      @input="$store.chatInput.adjustTextareaHeight(); $store.chatInput.updateCharacterCount(); $el.classList.add('typing'); clearTimeout($el._typingTimeout); $el._typingTimeout = setTimeout(() => $el.classList.remove('typing'), 500)"
+                      @focus="$store.chatInput.stopPlaceholderRotation()"
+                      @blur="$store.chatInput.startPlaceholderRotation()"></textarea>
+            <!-- Character Counter -->
+            <div class="character-counter"
+                 :class="$store.chatInput.getCharacterStatus()"
+                 x-show="$store.chatInput.characterCount > 0"
+                 x-transition:enter="counter-enter"
+                 x-transition:enter-start="counter-enter-start"
+                 x-transition:enter-end="counter-enter-end"
+                 x-transition:leave="counter-leave"
+                 x-transition:leave-start="counter-leave-start"
+                 x-transition:leave-end="counter-leave-end">
+                <span class="counter-current" x-text="$store.chatInput.characterCount"></span>
+                <span class="counter-separator">/</span>
+                <span class="counter-max" x-text="$store.chatInput.maxCharacterLimit"></span>
+            </div>
+            <button id="expand-button"
+                    @click="$store.fullScreenInputModal.openModal()"
+                    aria-label="Expand input for easier editing (Ctrl+Shift+F)"
+                    @mouseover="showExpandTooltip = true"
+                    @mouseleave="showExpandTooltip = false"
+                    @focus="showExpandTooltip = true"
+                    @blur="showExpandTooltip = false">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
                 </svg>
             </button>
+            <!-- Expand Button Tooltip -->
+            <div x-show="showExpandTooltip"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 translate-y-1"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 translate-y-1"
+                 class="tooltip expand-tooltip">
+                 Expand for easier editing <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd>
+            </div>
         </div>
 
-        <div id="chat-buttons-wrapper">
-            <!-- Send button -->
-            <button class="chat-button" id="send-button" aria-label="Send message"
-                    @click="$store.chatInput.sendMessage()"
-                    :class="$store.chatInput.sendButtonClass"
-                    :title="$store.chatInput.sendButtonTitle">
-                    <span class="material-symbols-outlined" x-text="$store.chatInput.sendButtonIcon"></span>
-            </button>
+        <div id="chat-buttons-wrapper" x-data="{ showSendTooltip: false }"
+             x-init="
+                const sendBtn = document.getElementById('send-button');
+                sendBtn.addEventListener('click', function(e) {
+                    // Trigger ripple effect
+                    this.classList.remove('ripple');
+                    void this.offsetWidth; // Force reflow
+                    this.classList.add('ripple');
 
-            <!-- Microphone button -->
-            <button class="chat-button mic-inactive" id="microphone-button" aria-label="Start/Stop recording"
-                    @click="$store.speech.handleMicrophoneClick()" x-effect="$store.speech.updateMicrophoneButtonUI()">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 18" fill="currentColor">
-                    <path d="m8,12c1.66,0,3-1.34,3-3V3c0-1.66-1.34-3-3-3s-3,1.34-3,3v6c0,1.66,1.34,3,3,3Zm-1,1.9c-2.7-.4-4.8-2.6-5-5.4H0c.2,3.8,3.1,6.9,7,7.5v2h2v-2c3.9-.6,6.8-3.7,7-7.5h-2c-.2,2.8-2.3,5-5,5.4h-2Z" />
+                    // Remove ripple class after animation
+                    setTimeout(() => {
+                        this.classList.remove('ripple');
+                    }, 600);
+                });
+
+                // Watch for sending state changes
+                const observer = new MutationObserver((mutations) => {
+                    mutations.forEach((mutation) => {
+                        if (mutation.type === 'attributes' && mutation.attributeName === 'disabled') {
+                            const isDisabled = sendBtn.disabled;
+                            if (isDisabled) {
+                                sendBtn.classList.add('sending');
+                                sendBtn.classList.remove('success');
+                            } else {
+                                sendBtn.classList.remove('sending');
+                                // Show success animation briefly
+                                if (sendBtn.dataset.sent === 'true') {
+                                    sendBtn.classList.add('success');
+                                    setTimeout(() => {
+                                        sendBtn.classList.remove('success');
+                                        sendBtn.dataset.sent = 'false';
+                                    }, 600);
+                                }
+                            }
+                        }
+                    });
+                });
+                observer.observe(sendBtn, { attributes: true });
+             "
+             @sent-message.window="document.getElementById('send-button').dataset.sent = 'true'">
+            <!-- Send button -->
+            <button class="chat-button" id="send-button"
+                    :aria-label="$store.chatInput.isSending ? 'Sending message...' : 'Send message'"
+                    :disabled="$store.chatInput.isSending"
+                    @click="$store.chatInput.sendMessage()"
+                    @mouseover="showSendTooltip = true"
+                    @mouseleave="showSendTooltip = false"
+                    @focus="showSendTooltip = true"
+                    @blur="showSendTooltip = false"
+                    data-sent="false">
+                <!-- Send Icon -->
+                <svg x-show="!$store.chatInput.isSending" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                    <path d="M25 20 L75 50 L25 80" fill="none" stroke="currentColor" stroke-width="15"></path>
+                </svg>
+                <!-- Loading Spinner -->
+                <svg x-show="$store.chatInput.isSending" class="spinner" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-opacity="0.25" stroke-width="4"></circle>
+                    <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" stroke-width="4" stroke-linecap="round"></path>
                 </svg>
             </button>
+            <!-- Send Button Tooltip -->
+            <div x-show="showSendTooltip && !$store.chatInput.isSending"
+                 x-transition:enter="transition ease-out duration-200"
+                 x-transition:enter-start="opacity-0 translate-y-1"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-150"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 translate-y-1"
+                 class="tooltip send-tooltip">
+                Press <kbd>Enter</kbd> to send
+            </div>
+
+            <!-- Microphone button with tooltip -->
+            <div class="mic-button-wrapper" x-data="{ showMicTooltip: false }">
+                <button class="chat-button mic-inactive" id="microphone-button"
+                        :aria-label="$store.speech.micStatus === 'inactive' ? 'Start voice recording' : 'Stop voice recording'"
+                        @click="$store.speech.handleMicrophoneClick()" x-effect="$store.speech.updateMicrophoneButtonUI()"
+                        @mouseover="showMicTooltip = true"
+                        @mouseleave="showMicTooltip = false"
+                        @focus="showMicTooltip = true"
+                        @blur="showMicTooltip = false">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 18" fill="currentColor">
+                        <path d="m8,12c1.66,0,3-1.34,3-3V3c0-1.66-1.34-3-3-3s-3,1.34-3,3v6c0,1.66,1.34,3,3,3Zm-1,1.9c-2.7-.4-4.8-2.6-5-5.4H0c.2,3.8,3.1,6.9,7,7.5v2h2v-2c3.9-.6,6.8-3.7,7-7.5h-2c-.2,2.8-2.3,5-5,5.4h-2Z" />
+                    </svg>
+                </button>
+                <!-- Microphone Button Tooltip -->
+                <div x-show="showMicTooltip"
+                     x-transition:enter="transition ease-out duration-200"
+                     x-transition:enter-start="opacity-0 translate-y-1"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     x-transition:leave="transition ease-in duration-150"
+                     x-transition:leave-start="opacity-100 translate-y-0"
+                     x-transition:leave-end="opacity-0 translate-y-1"
+                     class="tooltip mic-tooltip"
+                     x-text="$store.speech.micStatus === 'inactive' ? 'Start voice recording' : 'Stop voice recording'">
+                </div>
+            </div>
         </div>
     </div>
 
@@ -59,12 +185,16 @@
     <style>
     /* Layout rows */
     .input-row { display: flex; align-items: center; gap: var(--spacing-xs); width: 100%; white-space: nowrap; }
-    
+
     /* Attachments icon + tooltip */
     .attachment-wrapper { position: relative; flex-shrink: 0; }
-    .attachment-icon { cursor: pointer; color: var(--color-text); opacity: 0.7; transition: opacity 0.2s ease; display: flex; align-items: center; }
+    .attachment-icon { cursor: pointer; color: var(--color-text); opacity: 0.7; transition: all 0.2s ease; display: flex; align-items: center; border-radius: 4px; outline: none; }
     .attachment-icon:hover { opacity: 1; }
+    .attachment-icon:focus-visible { opacity: 1; outline: 2px solid var(--color-highlight); outline-offset: 2px; }
     .attachment-icon:active { opacity: 0.5; }
+    .tooltip { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); padding: 8px 12px; background-color: var(--color-secondary); color: var(--color-text); border-radius: 6px; font-size: 12px; white-space: nowrap; z-index: 1002; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); margin-bottom: 8px; pointer-events: none; }
+    .tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); border: 6px solid transparent; border-top-color: var(--color-secondary); }
+
 /* Text input */
     #chat-input-container {
     position: relative;
@@ -92,34 +222,342 @@
     background-clip: border-box;
     border: 6px solid transparent;
     outline: 1px solid var(--color-border);
-    transition: all 0.3s ease;
-    -webkit-transition: all 0.3s ease;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    -webkit-transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, box-shadow;
     }
     #chat-input::-webkit-scrollbar { width: 6px; height: 6px; }
     #chat-input::-webkit-scrollbar-track { background: transparent; margin: 4px 0; border-radius: 6px; }
     #chat-input::-webkit-scrollbar-thumb { background-color: rgba(155,155,155,0.5); border-radius: 6px; -webkit-transition: background-color 0.2s ease; transition: background-color 0.2s ease; }
     #chat-input::-webkit-scrollbar-thumb:hover { background-color: rgba(155,155,155,0.7); }
-    #chat-input:focus { outline: 0.05rem solid rgba(155,155,155,0.5); font-size: 0.955rem; padding-top: 0.45rem; background-color: var(--color-input-focus); }
-    #chat-input::placeholder { color: var(--color-text-muted); opacity: 0.7; }
+    #chat-input:focus {
+      outline: none;
+      font-size: 0.955rem;
+      padding-top: 0.45rem;
+      background-color: var(--color-input-focus);
+      border-color: var(--color-highlight);
+      box-shadow: 0 0 0 3px rgba(66, 72, 241, 0.15),
+                  0 0 20px rgba(66, 72, 241, 0.1),
+                  inset 0 1px 2px rgba(255, 255, 255, 0.05);
+      transform: scale(1.005);
+      animation: input-breathe 3s ease-in-out infinite;
+    }
+
+    /* Breathing glow animation for focused input - adds delightful micro-interaction */
+    @keyframes input-breathe {
+      0%, 100% {
+        box-shadow: 0 0 0 3px rgba(66, 72, 241, 0.15),
+                    0 0 20px rgba(66, 72, 241, 0.1),
+                    inset 0 1px 2px rgba(255, 255, 255, 0.05);
+      }
+      50% {
+        box-shadow: 0 0 0 4px rgba(66, 72, 241, 0.25),
+                    0 0 30px rgba(66, 72, 241, 0.2),
+                    inset 0 1px 2px rgba(255, 255, 255, 0.05);
+      }
+    }
+    #chat-input::placeholder {
+      color: var(--color-text-muted);
+      opacity: 0.7;
+      transition: opacity 0.3s ease;
+    }
+    #chat-input:focus::placeholder {
+      opacity: 0.5;
+    }
+    #chat-input.placeholder-typing::placeholder {
+      opacity: 0.4;
+    }
+
+    /* Typing state - enhanced glow when user is actively typing */
+    #chat-input.typing {
+      animation: input-typing-glow 1.5s ease-in-out infinite;
+    }
+
+    @keyframes input-typing-glow {
+      0%, 100% {
+        box-shadow: 0 0 0 3px rgba(66, 72, 241, 0.2),
+                    0 0 25px rgba(66, 72, 241, 0.15),
+                    inset 0 1px 2px rgba(255, 255, 255, 0.05);
+      }
+      50% {
+        box-shadow: 0 0 0 5px rgba(66, 72, 241, 0.3),
+                    0 0 35px rgba(66, 72, 241, 0.25),
+                    inset 0 1px 2px rgba(255, 255, 255, 0.05);
+      }
+    }
 
     #expand-button { position: absolute; top: 12px; right: 10px; background: transparent; border: none; cursor: pointer; font-size: 1.2rem; color: var(--color-text); opacity: 0.4; transition: opacity 0.2s; }
     #expand-button:hover { opacity: 0.7; }
     #expand-button:active { opacity: 1; }
+    #expand-button:focus-visible { opacity: 1; outline: 2px solid var(--color-highlight); outline-offset: 2px; }
     #expand-button svg { width: 1.3rem; height: 1.3rem; }
+
+    /* Character Counter Styles */
+    .character-counter {
+        position: absolute;
+        bottom: 8px;
+        right: 44px;
+        font-size: 0.7rem;
+        font-family: var(--font-family-code);
+        padding: 2px 8px;
+        border-radius: 12px;
+        background: rgba(128, 128, 128, 0.15);
+        color: var(--color-text);
+        opacity: 0.7;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        gap: 2px;
+        z-index: 10;
+    }
+
+    .character-counter:hover {
+        opacity: 1;
+        background: rgba(128, 128, 128, 0.25);
+    }
+
+    /* Normal state - below warning threshold */
+    .character-counter.normal {
+        color: var(--color-text);
+    }
+
+    /* Warning state - approaching limit */
+    .character-counter.warning {
+        background: rgba(255, 193, 7, 0.15);
+        color: #ffc107;
+        animation: counter-pulse-warning 2s ease-in-out infinite;
+    }
+
+    @keyframes counter-pulse-warning {
+        0%, 100% {
+            box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.3);
+        }
+        50% {
+            box-shadow: 0 0 0 4px rgba(255, 193, 7, 0);
+        }
+    }
+
+    /* Critical state - at or exceeding limit */
+    .character-counter.critical {
+        background: rgba(244, 67, 54, 0.15);
+        color: #f44336;
+        animation: counter-pulse-critical 1s ease-in-out infinite;
+    }
+
+    @keyframes counter-pulse-critical {
+        0%, 100% {
+            box-shadow: 0 0 0 0 rgba(244, 67, 54, 0.4);
+        }
+        50% {
+            box-shadow: 0 0 0 4px rgba(244, 67, 54, 0);
+        }
+    }
+
+    .counter-current {
+        font-weight: 600;
+    }
+
+    .counter-separator {
+        opacity: 0.5;
+    }
+
+    .counter-max {
+        opacity: 0.6;
+        font-size: 0.65rem;
+    }
+
+    /* Character Counter Transitions */
+    .counter-enter { transition: all 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+    .counter-enter-start { opacity: 0; transform: translateY(5px) scale(0.9); }
+    .counter-enter-end { opacity: 0.7; transform: translateY(0) scale(1); }
+
+    .counter-leave { transition: all 0.15s ease; }
+    .counter-leave-start { opacity: 0.7; transform: translateY(0) scale(1); }
+    .counter-leave-end { opacity: 0; transform: translateY(5px) scale(0.9); }
+
+    /* Accessibility: Respect reduced motion preferences */
+    @media (prefers-reduced-motion: reduce) {
+        .character-counter,
+        .character-counter.warning,
+        .character-counter.critical {
+            animation: none;
+            transition: opacity 0.2s ease;
+        }
+    }
+
+    /* Expand button tooltip */
+    .expand-tooltip { position: absolute; top: -40px; right: 0; transform: none; left: auto; margin-bottom: 0; white-space: nowrap; }
+    .expand-tooltip::after { top: 100%; left: auto; right: 10px; transform: none; border-top-color: var(--color-secondary); border-left-color: transparent; }
+    .expand-tooltip kbd {
+        background-color: var(--color-panel);
+        border: 1px solid var(--color-border);
+        border-radius: 4px;
+        padding: 2px 6px;
+        font-family: var(--font-family-code);
+        font-size: 10px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Send button tooltip */
+    .send-tooltip { position: absolute; top: -40px; right: 0; transform: none; left: auto; margin-bottom: 0; }
+    .send-tooltip::after { top: 100%; left: auto; right: 10px; transform: none; border-top-color: var(--color-secondary); border-left-color: transparent; }
+    .send-tooltip kbd {
+        background-color: var(--color-panel);
+        border: 1px solid var(--color-border);
+        border-radius: 4px;
+        padding: 2px 6px;
+        font-family: var(--font-family-code);
+        font-size: 10px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Microphone button tooltip */
+    .mic-button-wrapper {
+        position: relative;
+        display: inline-flex;
+    }
+    .mic-tooltip {
+        position: absolute;
+        top: -40px;
+        right: 0;
+        transform: none;
+        left: auto;
+        margin-bottom: 0;
+        white-space: nowrap;
+    }
+    .mic-tooltip::after {
+        top: 100%;
+        left: auto;
+        right: 10px;
+        transform: none;
+        border-top-color: var(--color-secondary);
+        border-left-color: transparent;
+    }
 
     /* Chat buttons (Send/Mic) */
     #chat-buttons-wrapper { gap: var(--spacing-xs); padding-left: var(--spacing-xs); line-height: 0.5rem; display: -webkit-flex; display: flex; }
-    .chat-button { border: none; border-radius: 50%; color: var(--color-background); cursor: pointer; font-size: var(--font-size-normal); height: 2.525rem; width: 2.525rem; margin: 0 0.18rem 0 0 var(--spacing-xs); display: -webkit-flex; display: flex; align-items: center; justify-content: center; flex-shrink: 0; flex-grow: 0; min-width: 2.525rem; -webkit-transition: all var(--transition-speed), transform 0.1s ease-in-out; transition: all var(--transition-speed), transform 0.1s ease-in-out; }
-    #send-button { background-color: #4248f1; }
-    #send-button.send-queue { background-color: #e67e22; }
-    #send-button:hover { -webkit-transform: scale(1.05); transform: scale(1.05); transform-origin: center; background-color: #353bc5; }
-    #send-button.send-queue:hover { background-color: #d35400; }
-    #send-button:active { -webkit-transform: scale(1); transform: scale(1); transform-origin: center; background-color: #2b309c; }
-    .chat-button svg { width: 1.5rem; height: 1.5rem; }
-    #send-button .material-symbols-outlined { font-size: 1.5rem; }
-    
+    .chat-button { border: none; border-radius: 50%; color: var(--color-background); cursor: pointer; font-size: var(--font-size-normal); height: 2.525rem; width: 2.525rem; margin: 0 0.18rem 0 0 var(--spacing-xs); display: -webkit-flex; display: flex; align-items: center; justify-content: center; flex-shrink: 0; flex-grow: 0; min-width: 2.525rem; -webkit-transition: all var(--transition-speed), transform 0.1s ease-in-out; transition: all var(--transition-speed), transform 0.1s ease-in-out; position: relative; overflow: hidden; }
+
+    /* Send Button with Ripple Effect */
+    #send-button {
+      background-color: #4248f1;
+      position: relative;
+      overflow: hidden;
+    }
+    #send-button:hover {
+      -webkit-transform: scale(1.05);
+      transform: scale(1.05);
+      transform-origin: center;
+      background-color: #353bc5;
+      box-shadow: 0 4px 15px rgba(66, 72, 241, 0.4);
+    }
+    #send-button:active {
+      -webkit-transform: scale(0.95);
+      transform: scale(0.95);
+      transform-origin: center;
+      background-color: #2b309c;
+    }
+    #send-button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none;
+    }
+
+    /* Ripple Effect */
+    #send-button::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.6s ease-out, height 0.6s ease-out, opacity 0.6s ease-out;
+      pointer-events: none;
+    }
+    #send-button.ripple::after {
+      width: 200%;
+      height: 200%;
+      opacity: 0;
+    }
+
+    /* Enhanced Sending State */
+    #send-button.sending {
+      background-color: #2b309c;
+      animation: send-pulse 1.5s ease-in-out infinite;
+    }
+    @keyframes send-pulse {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(66, 72, 241, 0.4);
+      }
+      50% {
+        box-shadow: 0 0 0 8px rgba(66, 72, 241, 0);
+      }
+    }
+
+    /* Success Animation */
+    #send-button.success {
+      background-color: #4CAF50;
+      animation: success-bounce 0.5s ease;
+    }
+    @keyframes success-bounce {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+
+    /* Spinner Animation */
+    #send-button .spinner {
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Icon transitions */
+    #send-button svg {
+      width: 1.5rem;
+      height: 1.5rem;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+    #send-button:hover svg {
+      transform: translateX(2px);
+    }
+    #send-button.sending svg {
+      transform: scale(0.9);
+    }
     /* Microphone button */
     .chat-button.mic-inactive svg { /* Add specific styles if needed */ }
+    /* Accessibility: Respect reduced motion preferences */
+    @media (prefers-reduced-motion: reduce) {
+      #chat-input {
+        transition: none;
+        -webkit-transition: none;
+      }
+      #chat-input:focus,
+      #chat-input.typing {
+        transform: none;
+        box-shadow: 0 0 0 2px var(--color-highlight);
+        animation: none;
+      }
+      #send-button::after {
+        transition: none;
+      }
+      #send-button.sending {
+        animation: none;
+      }
+      #send-button.success {
+        animation: none;
+      }
+      #send-button:hover svg {
+        transform: none;
+      }
+    }
+
     /* Responsive tweaks */
     @media (max-width: 640px) {
       #chat-input { min-height: 5.3rem; align-content: start; }

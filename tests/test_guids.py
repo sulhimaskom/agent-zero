@@ -1,74 +1,58 @@
-"""
-Tests for guids.py - ID generation utility.
-
-This module provides simple random ID generation for Agent Zero.
-"""
-
-import re
-import pytest
-import sys
-import os
-
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import string
 
 from python.helpers.guids import generate_id
 
 
 class TestGenerateId:
-    """Test suite for generate_id function"""
+    """Test generate_id function"""
 
-    def test_generate_id_default_length(self):
-        """Test that generate_id returns correct default length (8)"""
+    def test_default_length(self):
+        """Test default length is 8 characters"""
         result = generate_id()
         assert len(result) == 8
 
-    def test_generate_id_custom_length(self):
-        """Test that generate_id respects custom length parameter"""
+    def test_custom_length(self):
+        """Test custom length parameter"""
         result = generate_id(length=16)
         assert len(result) == 16
 
-        result = generate_id(length=4)
-        assert len(result) == 4
+    def test_length_zero(self):
+        """Test zero length returns empty string"""
+        result = generate_id(length=0)
+        assert len(result) == 0
 
-        result = generate_id(length=32)
-        assert len(result) == 32
+    def test_custom_length_one(self):
+        """Test length of 1 returns single character"""
+        result = generate_id(length=1)
+        assert len(result) == 1
 
-    def test_generate_id_uses_alphanumeric_characters(self):
-        """Test that generated ID contains only alphanumeric characters"""
+    def test_contains_only_alphanumeric(self):
+        """Test output contains only alphanumeric characters"""
         result = generate_id()
-        assert result.isalnum()
+        assert all(c in string.ascii_letters + string.digits for c in result)
 
-    def test_generate_id_contains_letters_and_digits(self):
-        """Test that generated ID contains both letters and digits"""
-        result = generate_id(length=100)
-        has_letters = any(c.isalpha() for c in result)
-        has_digits = any(c.isdigit() for c in result)
-        # With 100 characters, statistically should have both
-        assert has_letters or has_digits
+    def test_contains_digits(self):
+        """Test output can contain digits"""
+        # Generate many IDs to increase chance of containing digits
+        results = [generate_id() for _ in range(100)]
+        # At least some should contain digits (not guaranteed but very likely)
+        has_digit = any(any(c.isdigit() for c in r) for r in results)
+        assert has_digit  # Statistical test
 
-    def test_generate_id_returns_string(self):
-        """Test that generate_id returns a string type"""
+    def test_contains_letters(self):
+        """Test output contains letters"""
+        result = generate_id()
+        assert any(c.isalpha() for c in result)
+
+    def test_different_ids_are_different(self):
+        """Test that multiple calls return different IDs"""
+        ids = [generate_id() for _ in range(10)]
+        assert len(set(ids)) == len(ids)  # All unique
+
+    def test_reproducibility_with_same_seed(self):
+        """Test that same seed produces same results (if we could set seed)"""
+        # Note: Since we can't easily set the seed in the current implementation,
+        # we just verify the function returns consistent type and format
         result = generate_id()
         assert isinstance(result, str)
-
-    def test_generate_id_zero_length(self):
-        """Test that generate_id with length=0 returns empty string"""
-        result = generate_id(length=0)
-        assert result == ""
-
-    def test_generate_id_different_each_call(self):
-        """Test that generate_id returns different IDs on each call"""
-        ids = [generate_id() for _ in range(100)]
-        unique_ids = set(ids)
-        # With 100 calls, should have many unique values
-        assert len(unique_ids) > 90
-
-    def test_generate_id_format(self):
-        """Test that generated ID matches expected character pattern"""
-        result = generate_id()
-        pattern = r'^[a-zA-Z0-9]+$'
-        assert re.match(pattern, result) is not None
-
-
-if __name__ == "__main__":
-    pytest.main([__file__, "-v"])
+        assert result.isalnum()

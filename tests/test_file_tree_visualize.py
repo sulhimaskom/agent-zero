@@ -2,13 +2,13 @@ from __future__ import annotations
 
 import argparse
 import os
-from collections.abc import Iterable
+import sys
+import time
+from collections.abc import Callable, Iterable
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from pathlib import Path
-import sys
-import time
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any
 
 try:
     import pytest  # type: ignore
@@ -16,14 +16,16 @@ except ImportError:  # pragma: no cover
     pytest = None
 
 if pytest is not None:
-    pytestmark = pytest.mark.skip(reason="Visualization utility; excluded from automated test runs.")
+    pytestmark = pytest.mark.skip(
+        reason="Visualization utility; excluded from automated test runs."
+    )
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
-from python.helpers.file_tree import (
+from python.helpers.file_tree import (  # noqa: E402
     OUTPUT_MODE_FLAT,
     OUTPUT_MODE_NESTED,
     OUTPUT_MODE_STRING,
@@ -34,8 +36,7 @@ from python.helpers.file_tree import (
     SORT_DESC,
     file_tree,
 )
-from python.helpers.files import create_dir, delete_dir, get_abs_path, write_file
-
+from python.helpers.files import create_dir, delete_dir, get_abs_path, write_file  # noqa: E402
 
 BASE_TEMP_ROOT = "tmp/tests/file_tree/visualize"
 
@@ -43,23 +44,23 @@ BASE_TEMP_ROOT = "tmp/tests/file_tree/visualize"
 @dataclass(slots=True)
 class Config:
     label: str
-    params: Dict[str, Any]
+    params: dict[str, Any]
 
 
-SetupHook = Optional[Callable[[str], None]]
+SetupHook = Callable[[str], None] | None
 
 
 @dataclass(slots=True)
 class Scenario:
     name: str
     description: str
-    structure: Dict[str, Any]
-    configs: List[Config] = field(default_factory=list)
-    ignore_content: Optional[str] = None
+    structure: dict[str, Any]
+    configs: list[Config] = field(default_factory=list)
+    ignore_content: str | None = None
     setup: SetupHook = None
 
 
-def materialize_structure(base_rel: str, structure: Dict[str, Any]) -> None:
+def materialize_structure(base_rel: str, structure: dict[str, Any]) -> None:
     for entry, value in structure.items():
         rel = os.path.join(base_rel, entry)
         if isinstance(value, dict):
@@ -74,32 +75,24 @@ def ensure_ignore_file(base_rel: str, content: str) -> None:
 
 
 def print_header(title: str, char: str = "=") -> None:
-    print(char * 80)
-    print(title)
-    print(char * 80)
+    pass
 
 
-def print_flat(items: List[Dict[str, Any]]) -> None:
-    print("level  type     name                   text")
-    print("-" * 80)
+def print_flat(items: list[dict[str, Any]]) -> None:
     for item in items:
-        level = item["level"]
-        item_type = item["type"]
-        name = item["name"]
-        text = item["text"]
-        print(f"{level:<5}  {item_type:<7}  {name:<20}  {text}")
+        item["level"]
+        item["type"]
+        item["name"]
+        item["text"]
 
 
-def print_nested(items: List[Dict[str, Any]], root_label: str) -> None:
-    print(root_label)
+def print_nested(items: list[dict[str, Any]], root_label: str) -> None:
 
-    def recurse(nodes: List[Dict[str, Any]], prefix: str) -> None:
+    def recurse(nodes: list[dict[str, Any]], prefix: str) -> None:
         total = len(nodes)
         for index, node in enumerate(nodes):
             is_last = index == total - 1
-            connector = "└── " if is_last else "├── "
-            label = node["name"] + ("/" if node["type"] == "folder" else "")
-            print(f"{prefix}{connector}{label}  [{node['type']}]")
+            node["name"] + ("/" if node["type"] == "folder" else "")
             children = node.get("items") or []
             if children:
                 child_prefix = prefix + ("    " if is_last else "│   ")
@@ -125,20 +118,19 @@ def _set_entry_times(relative_path: str, timestamp: float) -> None:
     time.sleep(0.01)
 
 
-def _apply_timestamps(base_rel: str, paths: List[str], base_ts: Optional[float] = None) -> None:
+def _apply_timestamps(base_rel: str, paths: list[str], base_ts: float | None = None) -> None:
     if base_ts is None:
         base_ts = time.time()
     for offset, rel in enumerate(paths, start=1):
         _set_entry_times(os.path.join(base_rel, rel), base_ts + offset)
 
 
-def list_scenarios(scenarios: List[Scenario]) -> None:
-    print("Available scenarios:")
-    for scenario in scenarios:
-        print(f"  - {scenario.name}: {scenario.description}")
+def list_scenarios(scenarios: list[Scenario]) -> None:
+    for _scenario in scenarios:
+        pass
 
 
-def run_scenarios(selected: List[Scenario]) -> None:
+def run_scenarios(selected: list[Scenario]) -> None:
     create_dir(BASE_TEMP_ROOT)
     for scenario in selected:
         print_header(f"Scenario: {scenario.name} — {scenario.description}")
@@ -164,33 +156,21 @@ def run_scenarios(selected: List[Scenario]) -> None:
                     **config.params,
                 }
                 output_mode = params.setdefault("output_mode", OUTPUT_MODE_STRING)
-                print("Parameters:")
-                print(f"  output_mode   : {output_mode}")
-                print(f"  folders_first : {params['folders_first']}")
-                sort_key, sort_dir = params["sort"]
-                print(f"  sort          : key={sort_key}, direction={sort_dir}")
-                print(f"  max_depth     : {params['max_depth']}")
-                print(f"  max_lines     : {params['max_lines']}")
-                print(f"  max_folders   : {params['max_folders']}")
-                print(f"  max_files     : {params['max_files']}")
-                print(f"  ignore        : {params.get('ignore')}")
-                print()
+                _sort_key, _sort_dir = params["sort"]
                 result = file_tree(**params)
 
                 if output_mode == OUTPUT_MODE_STRING:
-                    print(result)
+                    pass
                 elif output_mode == OUTPUT_MODE_FLAT:
                     print_flat(result)  # type: ignore[arg-type]
                 elif output_mode == OUTPUT_MODE_NESTED:
                     print_nested(result, f"{scenario.name}/")
                 else:
-                    print(f"(Unhandled output mode {output_mode!r})")
-
-        print()
+                    pass
 
 
-def build_scenarios() -> List[Scenario]:
-    scenarios: List[Scenario] = []
+def build_scenarios() -> list[Scenario]:
+    scenarios: list[Scenario] = []
 
     scenarios.append(
         Scenario(

@@ -1,0 +1,55 @@
+import { createStore } from '/js/AlpineStore.js';
+import { TIMING } from '/js/constants.js';
+
+const model = {
+  isTyping: false,
+  typingText: 'Agent is thinking',
+  dotCount: 0,
+  intervalId: null,
+
+  init() {
+    this.startDotAnimation();
+  },
+
+  startDotAnimation() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+    }
+
+
+    this.intervalId = setInterval(() => {
+      if (this.isTyping) {
+        this.dotCount = (this.dotCount + 1) % 4;
+      }
+    }, TIMING.TYPING_INDICATOR_INTERVAL);
+  },
+
+  stopDotAnimation() {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.intervalId = null;
+    }
+    this.dotCount = 0;
+  },
+
+  show() {
+    this.isTyping = true;
+    if (!this.intervalId) {
+      this.startDotAnimation();
+    }
+  },
+
+  hide() {
+    this.isTyping = false;
+    this.dotCount = 0;
+  },
+
+  getDisplayText() {
+    const dots = '.'.repeat(this.dotCount);
+    return `${this.typingText}${dots}`;
+  },
+};
+
+const store = createStore('typingIndicator', model);
+
+export { store };

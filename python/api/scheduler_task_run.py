@@ -1,17 +1,20 @@
+"""Scheduler task on-demand execution API endpoint - runs tasks immediately.
+
+Manually triggers execution of a scheduled task by its UUID.
+Useful for testing or forcing immediate task execution.
+"""
+
 from python.helpers.api import ApiHandler, Input, Output, Request
-from python.helpers.task_scheduler import TaskScheduler, TaskState
-from python.helpers.print_style import PrintStyle
 from python.helpers.localization import Localization
+from python.helpers.print_style import PrintStyle
+from python.helpers.task_scheduler import TaskScheduler, TaskState
 
 
 class SchedulerTaskRun(ApiHandler):
-
     _printer: PrintStyle = PrintStyle(italic=True, font_color="green", padding=False)
 
     async def process(self, input: Input, request: Request) -> Output:
-        """
-        Manually run a task from the scheduler by ID
-        """
+        """Manually run a task from the scheduler by ID."""
         # Get timezone from input (do not set if not provided, we then rely on poll() to set it)
         if timezone := input.get("timezone", None):
             Localization.get().set_timezone(timezone)
@@ -37,10 +40,12 @@ class SchedulerTaskRun(ApiHandler):
         if task.state == TaskState.RUNNING:
             # Return task details along with error for better frontend handling
             serialized_task = scheduler.serialize_task(task_id)
-            self._printer.error(f"SchedulerTaskRun: Task '{task_id}' is in state '{task.state}' and cannot be run")
+            self._printer.error(
+                f"SchedulerTaskRun: Task '{task_id}' is in state '{task.state}' and cannot be run"
+            )
             return {
                 "error": f"Task '{task_id}' is in state '{task.state}' and cannot be run",
-                "task": serialized_task
+                "task": serialized_task,
             }
 
         # Run the task, which now includes atomic state checks and updates
@@ -53,13 +58,16 @@ class SchedulerTaskRun(ApiHandler):
                 return {
                     "success": True,
                     "message": f"Task '{task_id}' started successfully",
-                    "task": serialized_task
+                    "task": serialized_task,
                 }
             else:
-                return {"success": True, "message": f"Task '{task_id}' started successfully"}
+                return {
+                    "success": True,
+                    "message": f"Task '{task_id}' started successfully",
+                }
         except ValueError as e:
-            self._printer.error(f"SchedulerTaskRun: Task '{task_id}' failed to start: {str(e)}")
+            self._printer.error(f"SchedulerTaskRun: Task '{task_id}' failed to start: {e!s}")
             return {"error": str(e)}
         except Exception as e:
-            self._printer.error(f"SchedulerTaskRun: Task '{task_id}' failed to start: {str(e)}")
-            return {"error": f"Failed to run task '{task_id}': {str(e)}"}
+            self._printer.error(f"SchedulerTaskRun: Task '{task_id}' failed to start: {e!s}")
+            return {"error": f"Failed to run task '{task_id}': {e!s}"}

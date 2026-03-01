@@ -1,18 +1,15 @@
 import asyncio
+
+from agent import LoopData
+from python.helpers import dirty_json, errors, log, settings
 from python.helpers.extension import Extension
 from python.helpers.memory import Memory
-from agent import LoopData
-from python.tools.memory_load import DEFAULT_THRESHOLD as DEFAULT_MEMORY_THRESHOLD
-from python.helpers import dirty_json, errors, settings, log 
-
 
 DATA_NAME_TASK = "_recall_memories_task"
 DATA_NAME_ITER = "_recall_memories_iter"
-SEARCH_TIMEOUT = 30
 
 
 class RecallMemories(Extension):
-
     # INTERVAL = 3
     # HISTORY = 10000
     # MEMORIES_MAX_SEARCH = 12
@@ -21,7 +18,9 @@ class RecallMemories(Extension):
     # SOLUTIONS_MAX_RESULT = 3
     # THRESHOLD = DEFAULT_MEMORY_THRESHOLD
 
-    async def execute(self, loop_data: LoopData = LoopData(), **kwargs):
+    async def execute(self, loop_data: LoopData | None = None, **kwargs):
+        if loop_data is None:
+            loop_data = LoopData()
 
         set = settings.get_settings()
 
@@ -31,7 +30,6 @@ class RecallMemories(Extension):
 
         # every X iterations (or the first one) recall memories
         if loop_data.iteration % set["memory_recall_interval"] == 0:
-
             # show util message right away
             log_item = self.agent.context.log.log(
                 type="util",
@@ -39,10 +37,7 @@ class RecallMemories(Extension):
             )
 
             task = asyncio.create_task(
-                asyncio.wait_for(
-                    self.search_memories(loop_data=loop_data, log_item=log_item, **kwargs),
-                    timeout=SEARCH_TIMEOUT,
-                )
+                self.search_memories(loop_data=loop_data, log_item=log_item, **kwargs)
             )
         else:
             task = None
@@ -60,24 +55,25 @@ class RecallMemories(Extension):
         if "solutions" in extras:
             del extras["solutions"]
 
-
         set = settings.get_settings()
         # try:
 
         # get system message and chat history for util llm
         system = self.agent.read_prompt("memory.memories_query.sys.md")
 
-        # # log query streamed by LLM
-        # async def log_callback(content):
-        #     log_item.stream(query=content)
+        # log query streamed by LLM
+        async def log_callback(content):
+            log_item.stream(query=content)
 
         # call util llm to summarize conversation
         user_instruction = (
             loop_data.user_message.output_text() if loop_data.user_message else "None"
         )
-        history = self.agent.history.output_text()[-set["memory_recall_history_len"]:]
+        history = self.agent.history.output_text()[-set["memory_recall_history_len"] :]
         message = self.agent.read_prompt(
-            "memory.memories_query.msg.md", history=history, message=user_instruction
+            "memory.memories_query.msg.md",
+            history=history,
+            message=user_instruction,
         )
 
         # if query preparation by AI is enabled
@@ -87,14 +83,15 @@ class RecallMemories(Extension):
                 query = await self.agent.call_utility_model(
                     system=system,
                     message=message,
-                    # callback=log_callback,
+                    callback=log_callback,
                 )
                 query = query.strip()
-                log_item.update(query=query) # no need for streaming here
             except Exception as e:
                 err = errors.format_error(e)
                 self.agent.context.log.log(
-                    type="warning", heading="Recall memories extension error:", content=err
+                    type="error",
+                    heading="Recall memories extension error:",
+                    content=err,
                 )
                 query = ""
 
@@ -104,7 +101,7 @@ class RecallMemories(Extension):
                     heading="Failed to generate memory query",
                 )
                 return
-        
+
         # otherwise use the message and history as query
         else:
             query = user_instruction + "\n\n" + history
@@ -124,7 +121,9 @@ class RecallMemories(Extension):
             query=query,
             limit=set["memory_recall_memories_max_search"],
             threshold=set["memory_recall_similarity_threshold"],
-            filter=f"area == '{Memory.Area.MAIN.value}' or area == '{Memory.Area.FRAGMENTS.value}'",  # exclude solutions
+            filter=(
+                f"area == '{Memory.Area.MAIN.value}' or area == '{Memory.Area.FRAGMENTS.value}'"
+            ),  # exclude solutions
         )
 
         # search for solutions
@@ -185,10 +184,11 @@ class RecallMemories(Extension):
             except Exception as e:
                 err = errors.format_error(e)
                 self.agent.context.log.log(
-                    type="warning", heading="Failed to filter relevant memories", content=err
+                    type="error",
+                    heading="Failed to filter relevant memories",
+                    content=err,
                 )
                 filter_inds = []
-
 
         # limit the number of memories and solutions
         memories = memories[: set["memory_recall_memories_max_result"]]

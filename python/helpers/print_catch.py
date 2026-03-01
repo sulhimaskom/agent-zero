@@ -1,13 +1,13 @@
 import asyncio
 import io
 import sys
-from typing import Callable, Any, Awaitable, Tuple
+from collections.abc import Awaitable, Callable
+from typing import Any
+
 
 def capture_prints_async(
-    func: Callable[..., Awaitable[Any]],
-    *args,
-    **kwargs
-) -> Tuple[Awaitable[Any], Callable[[], str]]:
+    func: Callable[..., Awaitable[Any]], *args, **kwargs
+) -> tuple[Awaitable[Any], Callable[[], str]]:
     # Create a StringIO object to capture the output
     captured_output = io.StringIO()
     original_stdout = sys.stdout
@@ -17,7 +17,6 @@ def capture_prints_async(
         return captured_output.getvalue()
 
     async def wrapped_func() -> Any:
-        nonlocal captured_output, original_stdout
         try:
             # Redirect sys.stdout to the StringIO object
             sys.stdout = captured_output

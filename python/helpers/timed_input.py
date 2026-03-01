@@ -1,9 +1,16 @@
-import sys
-from inputimeout import inputimeout, TimeoutOccurred
+"""Timeout input helper for interactive terminal sessions.
 
-def timeout_input(prompt, timeout=10):
+Provides a cross-platform way to get user input with a timeout,
+falling back gracefully when input times out.
+"""
+
+from inputimeout import TimeoutOccurred, inputimeout
+
+from python.helpers.constants import Timeouts
+
+
+def timeout_input(prompt, timeout=Timeouts.INPUT_DEFAULT_TIMEOUT):
     try:
-        if sys.platform != "win32": import readline
         user_input = inputimeout(prompt=prompt, timeout=timeout)
         return user_input
     except TimeoutOccurred:

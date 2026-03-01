@@ -1,6 +1,14 @@
+"""Handler for grouped backup preview.
+
+Provides a directory-tree view of files that would be included
+in a backup, grouped by directory structure with filtering options.
+"""
+
+from typing import Any
+
 from python.helpers.api import ApiHandler, Request, Response
 from python.helpers.backup import BackupService
-from typing import Dict, Any
+from python.helpers.constants import Limits
 
 
 class BackupPreviewGrouped(ApiHandler):
@@ -17,17 +25,20 @@ class BackupPreviewGrouped(ApiHandler):
             # Get input parameters
             include_patterns = input.get("include_patterns", [])
             exclude_patterns = input.get("exclude_patterns", [])
-            include_hidden = input.get("include_hidden", True)
+            include_hidden = input.get("include_hidden", False)
             max_depth = input.get("max_depth", 3)
             search_filter = input.get("search_filter", "")
 
             # Support legacy string patterns format for backward compatibility
             patterns_string = input.get("patterns", "")
             if patterns_string and not include_patterns:
-                lines = [line.strip() for line in patterns_string.split('\n')
-                         if line.strip() and not line.strip().startswith('#')]
+                lines = [
+                    line.strip()
+                    for line in patterns_string.split("\n")
+                    if line.strip() and not line.strip().startswith("#")
+                ]
                 for line in lines:
-                    if line.startswith('!'):
+                    if line.startswith("!"):
                         exclude_patterns.append(line[1:])
                     else:
                         include_patterns.append(line)
@@ -36,20 +47,26 @@ class BackupPreviewGrouped(ApiHandler):
                 return {
                     "success": True,
                     "groups": [],
-                    "stats": {"total_groups": 0, "total_files": 0, "total_size": 0},
+                    "stats": {
+                        "total_groups": 0,
+                        "total_files": 0,
+                        "total_size": 0,
+                    },
                     "total_files": 0,
-                    "total_size": 0
+                    "total_size": 0,
                 }
 
             # Create metadata object for testing
             metadata = {
                 "include_patterns": include_patterns,
                 "exclude_patterns": exclude_patterns,
-                "include_hidden": include_hidden
+                "include_hidden": include_hidden,
             }
 
             backup_service = BackupService()
-            all_files = await backup_service.test_patterns(metadata, max_files=10000)
+            all_files = await backup_service.test_patterns(
+                metadata, max_files=Limits.BACKUP_MAX_FILES_PARTIAL
+            )
 
             # Apply search filter if provided
             if search_filter.strip():
@@ -57,7 +74,7 @@ class BackupPreviewGrouped(ApiHandler):
                 all_files = [f for f in all_files if search_lower in f["path"].lower()]
 
             # Group files by directory structure
-            groups: Dict[str, Dict[str, Any]] = {}
+            groups: dict[str, dict[str, Any]] = {}
             total_size = 0
 
             for file_info in all_files:
@@ -65,14 +82,14 @@ class BackupPreviewGrouped(ApiHandler):
                 total_size += file_info["size"]
 
                 # Split path and limit depth
-                path_parts = path.strip('/').split('/')
+                path_parts = path.strip("/").split("/")
 
                 # Limit to max_depth for grouping
                 if len(path_parts) > max_depth:
-                    group_path = '/' + '/'.join(path_parts[:max_depth])
+                    group_path = "/" + "/".join(path_parts[:max_depth])
                     is_truncated = True
                 else:
-                    group_path = '/' + '/'.join(path_parts[:-1]) if len(path_parts) > 1 else '/'
+                    group_path = "/" + "/".join(path_parts[:-1]) if len(path_parts) > 1 else "/"
                     is_truncated = False
 
                 if group_path not in groups:
@@ -82,13 +99,15 @@ class BackupPreviewGrouped(ApiHandler):
                         "file_count": 0,
                         "total_size": 0,
                         "is_truncated": False,
-                        "subdirectories": set()
+                        "subdirectories": set(),
                     }
 
                 groups[group_path]["files"].append(file_info)
                 groups[group_path]["file_count"] += 1
                 groups[group_path]["total_size"] += file_info["size"]
-                groups[group_path]["is_truncated"] = groups[group_path]["is_truncated"] or is_truncated
+                groups[group_path]["is_truncated"] = (
+                    groups[group_path]["is_truncated"] or is_truncated
+                )
 
                 # Track subdirectories for truncated groups
                 if is_truncated and len(path_parts) > max_depth:
@@ -97,8 +116,8 @@ class BackupPreviewGrouped(ApiHandler):
 
             # Convert groups to sorted list and add display info
             sorted_groups = []
-            for group_path, group_info in sorted(groups.items()):
-                group_info["subdirectories"] = sorted(list(group_info["subdirectories"]))
+            for _group_path, group_info in sorted(groups.items()):
+                group_info["subdirectories"] = sorted(group_info["subdirectories"])
 
                 # Limit displayed files for UI performance
                 if len(group_info["files"]) > 50:
@@ -118,14 +137,11 @@ class BackupPreviewGrouped(ApiHandler):
                     "total_files": len(all_files),
                     "total_size": total_size,
                     "search_applied": bool(search_filter.strip()),
-                    "max_depth": max_depth
+                    "max_depth": max_depth,
                 },
                 "total_files": len(all_files),
-                "total_size": total_size
+                "total_size": total_size,
             }
 
         except Exception as e:
-            return {
-                "success": False,
-                "error": str(e)
-            }
+            return {"success": False, "error": str(e)}

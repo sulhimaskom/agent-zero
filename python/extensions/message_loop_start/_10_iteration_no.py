@@ -1,10 +1,13 @@
-from python.helpers.extension import Extension
 from agent import Agent, LoopData
+from python.helpers.extension import Extension
 
 DATA_NAME_ITER_NO = "iteration_no"
 
+
 class IterationNo(Extension):
-    async def execute(self, loop_data: LoopData = LoopData(), **kwargs):
+    async def execute(self, loop_data: LoopData | None = None, **kwargs):
+        if loop_data is None:
+            loop_data = LoopData()
         # total iteration number
         no = self.agent.get_data(DATA_NAME_ITER_NO) or 0
         self.agent.set_data(DATA_NAME_ITER_NO, no + 1)

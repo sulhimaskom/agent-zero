@@ -1,8 +1,16 @@
+"""Cryptographic utilities for Agent Zero.
+
+Provides RSA-based encryption and decryption functions, HMAC hashing,
+and data verification for secure credential and data handling.
+"""
+
 import hashlib
 import hmac
-from cryptography.hazmat.primitives.asymmetric import rsa, padding
-from cryptography.hazmat.primitives import serialization, hashes
-import os
+
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.asymmetric import padding, rsa
+
+from python.helpers.constants import Limits
 
 
 def hash_data(data: str, password: str):
@@ -15,8 +23,8 @@ def verify_data(data: str, hash: str, password: str):
 
 def _generate_private_key():
     return rsa.generate_private_key(
-        public_exponent=65537,
-        key_size=2048,
+        public_exponent=Limits.RSA_PUBLIC_EXPONENT,
+        key_size=Limits.RSA_KEY_SIZE,
     )
 
 
@@ -29,7 +37,8 @@ def _generate_public_key(private_key: rsa.RSAPrivateKey):
         )
         .hex()
     )
-    
+
+
 def _decode_public_key(public_key: str) -> rsa.RSAPublicKey:
     # Decode hex string back to bytes
     pem_bytes = bytes.fromhex(public_key)
@@ -39,8 +48,10 @@ def _decode_public_key(public_key: str) -> rsa.RSAPublicKey:
         raise TypeError("The provided key is not an RSAPublicKey")
     return key
 
+
 def encrypt_data(data: str, public_key_pem: str):
     return _encrypt_data(data.encode("utf-8"), _decode_public_key(public_key_pem))
+
 
 def _encrypt_data(data: bytes, public_key: rsa.RSAPublicKey):
     b = public_key.encrypt(
@@ -53,6 +64,7 @@ def _encrypt_data(data: bytes, public_key: rsa.RSAPublicKey):
     )
     return b.hex()
 
+
 def decrypt_data(data: str, private_key: rsa.RSAPrivateKey):
     b = private_key.decrypt(
         bytes.fromhex(data),
@@ -63,4 +75,3 @@ def decrypt_data(data: str, private_key: rsa.RSAPrivateKey):
         ),
     )
     return b.decode("utf-8")
-

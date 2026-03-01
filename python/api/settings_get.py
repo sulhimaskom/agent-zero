@@ -1,12 +1,16 @@
-from python.helpers.api import ApiHandler, Request, Response
+"""Settings retrieval API endpoint.
+
+Returns the current agent configuration settings.
+"""
 
 from python.helpers import settings
+from python.helpers.api import ApiHandler, Request, Response
+
 
 class GetSettings(ApiHandler):
     async def process(self, input: dict, request: Request) -> dict | Response:
-        backend = settings.get_settings()
-        out = settings.convert_out(backend)
-        return dict(out)
+        set = settings.convert_out(settings.get_settings())
+        return {"settings": set}
 
     @classmethod
     def get_methods(cls) -> list[str]:

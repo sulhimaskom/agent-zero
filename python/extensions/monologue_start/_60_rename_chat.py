@@ -1,12 +1,15 @@
-from python.helpers import persist_chat, tokens
-from python.helpers.extension import Extension
-from agent import LoopData
 import asyncio
+
+from agent import LoopData
+from python.helpers import persist_chat, tokens
+from python.helpers.constants import Limits
+from python.helpers.extension import Extension
 
 
 class RenameChat(Extension):
-
-    async def execute(self, loop_data: LoopData = LoopData(), **kwargs):
+    async def execute(self, loop_data: LoopData | None = None, **kwargs):
+        if loop_data is None:
+            loop_data = LoopData()
         asyncio.create_task(self.change_name())
 
     async def change_name(self):
@@ -14,14 +17,17 @@ class RenameChat(Extension):
             # prepare history
             history_text = self.agent.history.output_text()
             ctx_length = min(
-                int(self.agent.config.utility_model.ctx_length * 0.7), 5000
+                int(self.agent.config.utility_model.ctx_length * 0.7),
+                Limits.CONTEXT_MAX_LEN_DEFAULT,
             )
             history_text = tokens.trim_to_tokens(history_text, ctx_length, "start")
             # prepare system and user prompt
             system = self.agent.read_prompt("fw.rename_chat.sys.md")
             current_name = self.agent.context.name
             message = self.agent.read_prompt(
-                "fw.rename_chat.msg.md", current_name=current_name, history=history_text
+                "fw.rename_chat.msg.md",
+                current_name=current_name,
+                history=history_text,
             )
             # call utility model
             new_name = await self.agent.call_utility_model(

@@ -4,7 +4,7 @@
     <title>Image Viewer</title>
 
     <script type="module">
-        import { store } from "/components/modals/image-viewer/image-viewer-store.js";
+        import { store } from "/components/modals/image-viewer/image-viewer-store.min.js";
     </script>
 </head>
 
@@ -12,47 +12,34 @@
     <div x-data>
         <template x-if="$store.imageViewer">
             <div id="image-viewer-wrapper" class="image-modal-container">
-                <!-- Image canvas for panning -->
-                <div class="image-canvas"
-                    @pointerdown="$store.imageViewer.startDrag($event)"
-                    @pointermove="$store.imageViewer.onDrag($event)"
-                    @wheel="$store.imageViewer.onWheel($event)"
-                    @pointerup="$store.imageViewer.endDrag()"
-                    @pointercancel="$store.imageViewer.endDrag()">
-                    <img 
-                        x-show="$store.imageViewer.currentImageUrl" 
-                        :src="$store.imageViewer.currentImageUrl" 
+                <!-- Image display area -->
+                <div class="image-display-wrapper">
+                    <img
+                        x-show="$store.imageViewer.currentImageUrl"
+                        :src="$store.imageViewer.currentImageUrl"
                         :alt="$store.imageViewer.currentImageName || 'Image'"
                         class="modal-image"
-                        :class="{ 'dragging': $store.imageViewer.isDragging }"
-                        @load="$store.imageViewer.onImageLoad($event)"
+                        @load="$store.imageViewer.imageLoaded = true"
                         @error="$store.imageViewer.imageError = true"
-                        draggable="false"
                     />
-                    
+
                     <!-- Loading indicator -->
                     <div x-show="!$store.imageViewer.imageLoaded && !$store.imageViewer.imageError" class="loading-indicator">
                         <div class="loading-spinner"></div>
                         <p>Loading image...</p>
                     </div>
-                    
+
                     <!-- Error indicator -->
                     <div x-show="$store.imageViewer.imageError" class="error-indicator">
                         <p>Failed to load image</p>
                     </div>
                 </div>
 
-                <!-- Fixed zoom controls - OUTSIDE the canvas -->
+                <!-- Simple zoom controls -->
                 <div class="zoom-controls">
-                    <button type="button" @click="$store.imageViewer.zoomOut()" class="button zoom-btn">
-                        <span class="icon material-symbols-outlined">zoom_out</span>
-                    </button>
-                    <button type="button" @click="$store.imageViewer.resetZoom()" class="button zoom-btn">
-                        <span class="icon material-symbols-outlined">home</span>
-                    </button>
-                    <button type="button" @click="$store.imageViewer.zoomIn()" class="button zoom-btn">
-                        <span class="icon material-symbols-outlined">zoom_in</span>
-                    </button>
+                    <button @click="$store.imageViewer.zoomOut()" class="zoom-btn" title="Zoom Out" aria-label="Zoom Out Image">−</button>
+                    <button @click="$store.imageViewer.resetZoom()" class="zoom-btn" title="Reset Zoom" aria-label="Reset Image Zoom">⌂</button>
+                    <button @click="$store.imageViewer.zoomIn()" class="zoom-btn" title="Zoom In" aria-label="Zoom In Image">+</button>
                 </div>
             </div>
         </template>
@@ -61,46 +48,39 @@
     <style>
         .image-modal-container {
             width: 100%;
-            height: 70vh;
-            position: relative;
-            background: var(--color-bg-secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .image-canvas {
-            width: 100%;
             height: 100%;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            cursor: grab;
-            overflow: hidden;
-            touch-action: none;
-            background: repeating-linear-gradient(45deg, var(--color-panel) 0 10px, var(--color-chat-background) 10px 20px);
+            position: relative;
+            background: var(--color-bg-secondary);
         }
 
-        .image-canvas:active {
-            cursor: grabbing;
+        .image-display-wrapper {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+            width: 100%;
+            height: 100%;
+            position: relative;
         }
 
         .modal-image {
             max-width: 100%;
             max-height: 100%;
             object-fit: contain;
-            user-select: none;
-            -webkit-user-drag: none;
-            pointer-events: none;
+            transition: transform 0.2s ease;
+            cursor: grab;
         }
 
-        .modal-image.zoomed {
-            max-width: none;
-            max-height: none;
+        .modal-image:active {
+            cursor: grabbing;
         }
 
         .loading-indicator, .error-indicator {
-            position: absolute;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -134,7 +114,6 @@
             padding: 6px;
             border-radius: 12px;
             backdrop-filter: blur(5px);
-            z-index: 100;
         }
 
         .zoom-btn {
@@ -157,9 +136,19 @@
         .zoom-btn:hover {
             background: rgba(255, 255, 255, 0.15);
         }
+
+        .zoom-btn:focus-visible {
+            outline: 2px solid var(--color-highlight, #64b5f6);
+            outline-offset: 2px;
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        /* Dark mode adjustments */
+        .dark-mode .image-modal-container {
+            background: var(--color-bg-secondary);
+        }
     </style>
 
 </body>
 
 </html>
-

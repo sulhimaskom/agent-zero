@@ -1,0 +1,183 @@
+name: on-push
+
+on:
+  workflow_dispatch:
+  push:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: global
+  cancel-in-progress: false
+
+jobs:
+  analyze:
+    name: Pre-analysis
+    runs-on: ubuntu-24.04-arm
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Wait in Queue
+        uses: softprops/turnstyle@v2
+        with:
+          poll-interval-seconds: 30
+          same-branch-only: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup Extended Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.opencode
+            ~/.npm
+          key: opencode-${{ runner.os }}-${{ hashFiles('.github/prompt/*.md') }}-v3
+          restore-keys: |
+            opencode-${{ runner.os }}-v3
+            opencode-${{ runner.os }}-
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "${{ github.actor }}"
+          git config --global user.email "${{ github.actor_id }}+${{ github.actor }}@users.noreply.github.com"
+
+      - name: Install OpenCode
+        if: steps.check_changes.outputs.no_changes == 'false'
+        run: |
+          curl -fsSL https://opencode.ai/install | bash
+          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+
+      - name: Check Open Issues
+        id: check_issues
+        if: steps.check_changes.outputs.no_changes == 'false'
+        run: |
+          count=$(gh issue list --state open --json number --jq 'length')
+          echo "open_issue_count=$count" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Parallel Flow Jobs - Group 1
+  flow-00:
+    needs: analyze
+    name: Flow 00 (Strategist)
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
+    continue-on-error: true
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install OpenCode
+        run: |
+          curl -fsSL https://opencode.ai/install | bash
+          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+      - name: Run Flow 00
+        run: |
+          opencode run "$(cat .github/prompt/00-strategist.md)" \
+            --model opencode/kimi-k2.5-free \
+            --share false
+
+  flow-01:
+    needs: analyze
+    name: Flow 01 (Code Review)
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
+    continue-on-error: true
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install OpenCode
+        run: |
+          curl -fsSL https://opencode.ai/install | bash
+          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+      - name: Run Flow 01
+        run: |
+          opencode run "$(cat .github/prompt/01-code-review.md)" \
+            --model opencode/kimi-k2.5-free \
+            --share false
+
+  flow-02:
+    needs: analyze
+    name: Flow 02 (Docs Hygiene)
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
+    continue-on-error: true
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install OpenCode
+        run: |
+          curl -fsSL https://opencode.ai/install | bash
+          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+      - name: Run Flow 02
+        run: |
+          opencode run "$(cat .github/prompt/02-docs-hygiene.md)" \
+            --model opencode/kimi-k2.5-free \
+            --share false
+
+  # Parallel Flow Jobs - Group 2
+  flow-03:
+    needs: [analyze, flow-00, flow-01, flow-02]
+    name: Flow 03 (Test Coverage)
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 30
+    continue-on-error: true
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install OpenCode
+        run: |
+          curl -fsSL https://opencode.ai/install | bash
+          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+      - name: Run Flow 03
+        run: |
+          opencode run "$(cat .github/prompt/03-test-coverage.md)" \
+            --model opencode/kimi-k2.5-free \
+            --share false
+
+  # Main Analysis Phase (runs after all flows)
+  main-analysis:
+    needs: [analyze, flow-00, flow-01, flow-02, flow-03]
+    name: Main Analysis
+    runs-on: ubuntu-24.04-arm
+    timeout-minutes: 45
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Install OpenCode
+        run: |
+          curl -fsSL https://opencode.ai/install | bash
+          echo "$HOME/.opencode/bin" >> $GITHUB_PATH
+      - name: Run Main Analysis
+        run: |
+          opencode run "$(cat .github/prompt/11-main.md)" \
+            --model opencode/kimi-k2.5-free \
+            --share false

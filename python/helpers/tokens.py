@@ -1,8 +1,17 @@
+"""Token counting utilities for Agent Zero.
+
+Provides token estimation and management using tiktoken encoding.
+"""
+
+
 from typing import Literal
+
 import tiktoken
 
-APPROX_BUFFER = 1.1
-TRIM_BUFFER = 0.8
+from python.helpers.constants import Limits
+
+APPROX_BUFFER = Limits.TOKEN_APPROX_BUFFER
+TRIM_BUFFER = Limits.TOKEN_TRIM_BUFFER
 
 
 def count_tokens(text: str, encoding_name="cl100k_base") -> int:

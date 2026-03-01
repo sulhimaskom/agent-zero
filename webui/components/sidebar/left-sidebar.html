@@ -2,7 +2,7 @@
 
 <head>
   <script type="module">
-    import { store as sidebarStore } from "/components/sidebar/sidebar-store.js";
+    import { store as sidebarStore } from "/components/sidebar/sidebar-store.min.js";
   </script>
   <!-- Wrapper composes existing sidebar components -->
 </head>
@@ -12,7 +12,7 @@
     <template x-if="$store.sidebar">
       <div id="left-panel" class="panel" x-data :class="{'hidden': !$store.sidebar.isOpen}">
         <!--Sidebar upper elements-->
-        <div class="left-panel-top no-scrollbar">
+        <div class="left-panel-top">
           <!-- Top Section: Header Icons + Quick Actions -->
           <x-component path="sidebar/top-section/sidebar-top.html"></x-component>
           <!-- Chats List -->
@@ -85,6 +85,12 @@
       justify-content: space-between;
       margin-top: 3.5rem;
       padding: var(--spacing-md) var(--spacing-md) 0 var(--spacing-md);
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    .left-panel-top::-webkit-scrollbar {
+      width: 0px;
     }
 
     .left-panel-bottom {
@@ -160,10 +166,6 @@
     /* Collapsible section headers (Tasks) */
     .section-header-collapsible {
       cursor: pointer;
-    }
-
-    .light-mode #left-panel {
-      box-shadow: 1px 0 10px rgba(0, 0, 0, 0.1);
     }
 
     @media (max-width: 768px) {

@@ -1,11 +1,16 @@
+"""Document query tool for RAG-based document Q&A.
+
+Enables agents to query documents using semantic search and
+retrieve relevant content or answers to specific questions.
+"""
+
 import asyncio
 
-from python.helpers.tool import Tool, Response
 from python.helpers.document_query import DocumentQueryHelper
+from python.helpers.tool import Response, Tool
 
 
 class DocumentQueryTool(Tool):
-
     async def execute(self, **kwargs):
         document_uri = kwargs.get("document")
         document_uris = []
@@ -21,19 +26,16 @@ class DocumentQueryTool(Tool):
         queries = (
             kwargs["queries"]
             if "queries" in kwargs
-            else [kwargs["query"]]
-            if ("query" in kwargs and kwargs["query"])
-            else []
+            else ([kwargs["query"]] if (kwargs.get("query")) else [])
         )
         try:
-
             progress = []
 
             # logging callback
             def progress_callback(msg):
                 progress.append(msg)
                 self.log.update(progress="\n".join(progress))
-            
+
             helper = DocumentQueryHelper(self.agent, progress_callback)
             if not queries:
                 contents = await asyncio.gather(

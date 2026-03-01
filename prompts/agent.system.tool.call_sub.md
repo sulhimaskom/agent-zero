@@ -1,4 +1,3 @@
-{{if agent_profiles}}
 ### call_subordinate
 
 you can use subordinates for subtasks
@@ -33,4 +32,3 @@ example usage
 
 **available profiles:**
 {{agent_profiles}}
-{{endif}}

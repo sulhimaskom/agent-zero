@@ -9,7 +9,7 @@ apt clean && apt-get update && apt-get -y upgrade
 
 # install python 3.13 globally
 apt-get install -y --no-install-recommends \
-    python3.13 python3.13-venv 
+    python3.13 python3.13-venv
     #python3.13-dev
 
 
@@ -20,7 +20,7 @@ python3.13 -m venv /opt/venv
 source /opt/venv/bin/activate
 
 # upgrade pip and install static packages
-pip install --no-cache-dir --upgrade pip pipx ipython requests
+pip install --no-cache-dir --upgrade pip ipython requests
 
 echo "====================PYTHON PYVENV===================="
 

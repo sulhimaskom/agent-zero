@@ -1,7 +1,7 @@
 <html>
 <head>
   <script type="module">
-    import { store } from "/components/sidebar/bottom/preferences/preferences-store.js";
+    import { store } from "/components/sidebar/bottom/preferences/preferences-store.min.js";
   </script>
 </head>
 <body>
@@ -9,7 +9,7 @@
     <template x-if="$store.preferences">
       <div class="pref-section">
         <span>
-          <h3 class="pref-header" 
+          <h3 class="pref-header"
               data-bs-toggle="collapse"
               @click="$store.sidebar.toggleSection('preferences')"
               x-effect="!$store.sidebar.isSectionOpen('preferences') ? $el.classList.add('collapsed') : $el.classList.remove('collapsed')">
@@ -21,54 +21,44 @@
           <ul class="config-list collapse" id="preferences-collapse"
               x-effect="(() => { const c = bootstrap.Collapse.getOrCreateInstance($el, { toggle: false }); $store.sidebar.isSectionOpen('preferences') ? c.show() : c.hide(); })()">
             <li x-data>
-              <span class="switch-label">Dark mode</span>
+              <span>Autoscroll</span>
               <label class="switch">
-                <input type="checkbox" x-model="$store.preferences.darkMode">
+                <input id="auto-scroll-switch" type="checkbox" x-model="$store.preferences.autoScroll" aria-label="Autoscroll">
                 <span class="slider"></span>
               </label>
             </li>
-            <li x-data class="chat-width-setting">
-              <span class="width-label">Width</span>
-              <div class="width-buttons">
-                <template x-for="(opt, idx) in $store.preferences.chatWidthOptions" :key="opt.value">
-                  <span class="width-btn-wrapper">
-                    <button type="button" 
-                            class="width-btn"
-                            :class="{ 'active': $store.preferences.chatWidth === opt.value }"
-                            @click="$store.preferences.chatWidth = opt.value"
-                            x-text="opt.label"></button>
-                    <span class="width-sep" x-show="idx < $store.preferences.chatWidthOptions.length - 1">·</span>
-                  </span>
-                </template>
-              </div>
-            </li>
-            <li x-data class="detail-mode-setting">
-              <span class="detail-label">Detail</span>
-              <div class="detail-buttons">
-                <template x-for="(opt, idx) in $store.preferences.detailModeOptions" :key="opt.value">
-                  <span class="detail-btn-wrapper">
-                    <button type="button" 
-                            class="detail-btn"
-                            :class="{ 'active': $store.preferences.detailMode === opt.value }"
-                            @click="$store.preferences.detailMode = opt.value"
-                            :title="opt.title"
-                            x-text="opt.label"></button>
-                    <span class="detail-sep" x-show="idx < $store.preferences.detailModeOptions.length - 1">·</span>
-                  </span>
-                </template>
-              </div>
+            <li x-data>
+              <span class="switch-label">Dark mode</span>
+              <label class="switch">
+                <input id="dark-mode-switch" type="checkbox" x-model="$store.preferences.darkMode" aria-label="Dark mode">
+                <span class="slider"></span>
+              </label>
             </li>
             <li x-data>
               <span class="switch-label">Speech</span>
               <label class="switch">
-                <input type="checkbox" x-model="$store.preferences.speech">
+                <input id="speech-switch" type="checkbox" x-model="$store.preferences.speech" aria-label="Speech">
+                <span class="slider"></span>
+              </label>
+            </li>
+            <li x-data>
+              <span>Show thoughts</span>
+              <label class="switch">
+                <input id="show-thoughts-switch" type="checkbox" x-model="$store.preferences.showThoughts" aria-label="Show thoughts">
+                <span class="slider"></span>
+              </label>
+            </li>
+            <li x-data>
+              <span>Show JSON</span>
+              <label class="switch">
+                <input id="show-json-switch" type="checkbox" x-model="$store.preferences.showJson" aria-label="Show JSON">
                 <span class="slider"></span>
               </label>
             </li>
             <li x-data>
               <span>Show utility messages</span>
               <label class="switch">
-                <input type="checkbox" x-model="$store.preferences.showUtils">
+                <input id="show-utils-switch" type="checkbox" x-model="$store.preferences.showUtils" aria-label="Show utility messages">
                 <span class="slider"></span>
               </label>
             </li>
@@ -119,91 +109,155 @@
     }
     .pref-section li { display: flex; align-items: center; }
 
-    /* Chat width button bar */
-    .chat-width-setting {
-      gap: 0.25rem;
-    }
-    .chat-width-setting .width-label {
-      flex: 1;
-    }
-    .width-buttons {
-      display: flex;
-      align-items: center;
-      gap: 0;
-    }
-    .width-btn-wrapper {
-      display: flex;
-      align-items: center;
-    }
-    .width-btn {
-      background: none;
-      border: none;
-      color: var(--color-primary);
-      font-size: 0.7rem;
-      font-weight: 500;
-      letter-spacing: 0.02em;
-      padding: 0.15rem 0.1rem;
-      cursor: pointer;
-      opacity: 0.7;
-      transition: opacity 0.15s ease, color 0.15s ease;
-    }
-    .width-btn:hover {
-      opacity: 0.85;
-    }
-    .width-btn.active {
-      opacity: 1;
-      color: var(--color-text);
-    }
-    .width-sep {
-      color: var(--color-text-secondary, #666);
-      font-size: 0.6rem;
-      margin: 0 0.1rem;
-      opacity: 0.5;
+    /* ============================================
+       ENHANCED TOGGLE SWITCH MICRO-INTERACTIONS
+       Satisfying snap animation with visual feedback
+       ============================================ */
+
+    /* Base switch enhancement */
+    .pref-section .slider {
+      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      position: relative;
+      overflow: visible;
     }
 
-    /* Detail mode button bar */
-    .detail-mode-setting {
-      gap: 0.25rem;
+    /* The toggle knob */
+    .pref-section .slider:before {
+      transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
-    .detail-mode-setting .detail-label {
-      flex: 1;
+
+    /* Checked state - enhanced visual feedback */
+    .pref-section input:checked + .slider {
+      background-color: var(--color-highlight);
+      box-shadow: 0 0 8px rgba(66, 72, 241, 0.4);
     }
-    .detail-buttons {
-      display: flex;
-      align-items: center;
-      gap: 0;
+
+    /* Light mode adjustment for checked state */
+    .light-mode .pref-section input:checked + .slider {
+      box-shadow: 0 0 8px rgba(66, 72, 241, 0.3);
     }
-    .detail-btn-wrapper {
-      display: flex;
-      align-items: center;
+
+    /* Knob position when checked with enhanced animation */
+    .pref-section input:checked + .slider:before {
+      transform: translateX(16px) scale(1.05);
+      background-color: #ffffff;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
-    .detail-btn {
-      background: none;
-      border: none;
-      color: var(--color-primary);
-      font-size: 0.7rem;
+
+    /* Hover state for enhanced interactivity */
+    .pref-section .switch:hover .slider {
+      box-shadow: 0 0 0 3px rgba(66, 72, 241, 0.15);
+    }
+
+    .pref-section .switch:hover input:checked + .slider {
+      box-shadow: 0 0 0 3px rgba(66, 72, 241, 0.25),
+                  0 0 8px rgba(66, 72, 241, 0.4);
+    }
+
+    /* Active/click state for tactile feedback */
+    .pref-section .switch:active .slider:before {
+      transform: scale(0.95);
+    }
+
+    .pref-section .switch:active input:checked + .slider:before {
+      transform: translateX(16px) scale(0.9);
+    }
+
+    /* Focus visible for accessibility */
+    .pref-section .switch input:focus-visible + .slider {
+      outline: 2px solid var(--color-highlight);
+      outline-offset: 2px;
+    }
+
+    /* Toggle "snap" animation keyframes */
+    @keyframes toggle-snap-on {
+      0% {
+        transform: translateX(0) scale(1);
+      }
+      40% {
+        transform: translateX(18px) scale(1.15);
+      }
+      70% {
+        transform: translateX(14px) scale(0.95);
+      }
+      100% {
+        transform: translateX(16px) scale(1.05);
+      }
+    }
+
+    @keyframes toggle-snap-off {
+      0% {
+        transform: translateX(16px) scale(1.05);
+      }
+      40% {
+        transform: translateX(-2px) scale(1.15);
+      }
+      70% {
+        transform: translateX(2px) scale(0.95);
+      }
+      100% {
+        transform: translateX(0) scale(1);
+      }
+    }
+
+    /* Apply snap animation on toggle */
+    .pref-section .switch input:checked + .slider:before {
+      animation: toggle-snap-on 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+    }
+
+    .pref-section .switch input:not(:checked) + .slider:before {
+      animation: toggle-snap-off 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+    }
+
+    /* Glow pulse effect when toggled */
+    @keyframes toggle-glow {
+      0%, 100% {
+        box-shadow: 0 0 8px rgba(66, 72, 241, 0.4);
+      }
+      50% {
+        box-shadow: 0 0 16px rgba(66, 72, 241, 0.6),
+                    0 0 24px rgba(66, 72, 241, 0.3);
+      }
+    }
+
+    .pref-section input:checked + .slider {
+      animation: toggle-glow 0.6s ease-out;
+    }
+
+    /* Label highlight on toggle */
+    .pref-section li:has(input:checked) span {
+      color: var(--color-highlight);
       font-weight: 500;
-      letter-spacing: 0.02em;
-      padding: 0.15rem 0.1rem;
-      cursor: pointer;
-      opacity: 0.7;
-      transition: opacity 0.15s ease;
+      transition: color 0.2s ease;
     }
-    .detail-btn .material-symbols-outlined {
-      font-size: 1rem;
+
+    /* Light mode label adjustment */
+    .light-mode .pref-section li:has(input:checked) span {
+      color: var(--color-highlight);
     }
-    .detail-btn:hover {
-      opacity: 0.85;
-    }
-    .detail-btn.active {
-      opacity: 1;
-      color: var(--color-text);
-    }
-    .detail-sep {
-      color: var(--color-text-secondary, #666);
-      font-size: 0.6rem;
-      margin: 0 0.1rem;
-      opacity: 0.5;
+
+    /* Accessibility: Respect reduced motion preferences */
+    @media (prefers-reduced-motion: reduce) {
+      .pref-section .slider,
+      .pref-section .slider:before {
+        transition: none;
+        animation: none !important;
+      }
+
+      .pref-section input:checked + .slider:before {
+        transform: translateX(16px);
+        animation: none;
+      }
+
+      .pref-section input:not(:checked) + .slider:before {
+        transform: translateX(0);
+        animation: none;
+      }
+
+      .pref-section input:checked + .slider {
+        animation: none;
+      }
     }
   </style>
 </body>

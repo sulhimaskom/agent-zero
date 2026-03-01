@@ -1,9 +1,15 @@
-import asyncio, os, sys, platform, errno
+import asyncio
+import contextlib
+import errno
+import os
+import platform
+import sys
+
+from python.helpers.constants import Limits, Timeouts
 
 _IS_WIN = platform.system() == "Windows"
 if _IS_WIN:
     import winpty  # pip install pywinpty # type: ignore
-    import msvcrt
 
 
 #  Make stdin / stdout tolerant to broken UTF-8 so input() never aborts
@@ -22,7 +28,7 @@ class TTYSession:
         self.encoding = encoding
         self.echo = echo  # ← store preference
         self._proc = None
-        self._buf = None
+        self._buf = asyncio.Queue()
 
     def __del__(self):
         # Simple cleanup on object destruction
@@ -30,18 +36,13 @@ class TTYSession:
 
         nest_asyncio.apply()
         if hasattr(self, "close"):
-            try:
+            with contextlib.suppress(Exception):
                 asyncio.run(self.close())
-            except Exception:
-                pass
 
     # ── user-facing coroutines ────────────────────────────────────────
     async def start(self):
-        self._buf = asyncio.Queue()
         if _IS_WIN:
-            self._proc = await _spawn_winpty(
-                self.cmd, self.cwd, self.env, self.echo
-            )  # ← pass echo
+            self._proc = await _spawn_winpty(self.cmd, self.cwd, self.env, self.echo)  # ← pass echo
         else:
             self._proc = await _spawn_posix_pty(
                 self.cmd, self.cwd, self.env, self.echo
@@ -52,10 +53,8 @@ class TTYSession:
         # Cancel the pump task if it exists
         if hasattr(self, "_pump_task") and self._pump_task:
             self._pump_task.cancel()
-            try:
+            with contextlib.suppress(asyncio.CancelledError):
                 await self._pump_task
-            except asyncio.CancelledError:
-                pass
         # Terminate the process if it exists
         if self._proc:
             self._proc.terminate()
@@ -104,7 +103,7 @@ class TTYSession:
         # Return any decoded text the child produced, or None on timeout
         try:
             return await asyncio.wait_for(self._buf.get(), timeout)
-        except asyncio.TimeoutError:
+        except TimeoutError:
             return None
 
     # backward-compat alias:
@@ -113,12 +112,7 @@ class TTYSession:
     async def read_full_until_idle(self, idle_timeout, total_timeout):
         # Collect child output using iter_until_idle to avoid duplicate logic
         return "".join(
-            [
-                chunk
-                async for chunk in self.read_chunks_until_idle(
-                    idle_timeout, total_timeout
-                )
-            ]
+            [chunk async for chunk in self.read_chunks_until_idle(idle_timeout, total_timeout)]
         )
 
     async def read_chunks_until_idle(self, idle_timeout, total_timeout):
@@ -140,7 +134,9 @@ class TTYSession:
             raise RuntimeError("TTYSpawn is not started")
         reader = self._proc.stdout
         while True:
-            chunk = await reader.read(4096)  # grab whatever is ready # type: ignore
+            chunk = await reader.read(
+                Limits.TTY_BUFFER_SIZE
+            )  # grab whatever is ready # type: ignore
             if not chunk:
                 break
             self._buf.put_nowait(chunk.decode(self.encoding, "replace"))
@@ -150,7 +146,10 @@ class TTYSession:
 
 
 async def _spawn_posix_pty(cmd, cwd, env, echo):
-    import pty, asyncio, os, termios
+    import asyncio
+    import os
+    import pty
+    import termios
 
     master, slave = pty.openpty()
 
@@ -194,7 +193,7 @@ async def _spawn_posix_pty(cmd, cwd, env, echo):
             os.write(master, d)
 
         async def drain(self):
-            await asyncio.sleep(0)
+            await asyncio.sleep(Timeouts.TTY_DRAIN_DELAY)
 
     proc.stdin = _Stdin()  # type: ignore
     proc.stdout = reader
@@ -206,12 +205,15 @@ async def _spawn_posix_pty(cmd, cwd, env, echo):
 
 async def _spawn_winpty(cmd, cwd, env, echo):
     # Clean PowerShell startup: no logo, no profile, bypass execution policy for deterministic behavior
-    if cmd.strip().lower().startswith("powershell"):
-        if "-nolog" not in cmd.lower():
-            cmd = cmd.replace("powershell.exe", "powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass", 1)
+    if cmd.strip().lower().startswith("powershell") and "-nolog" not in cmd.lower():
+        cmd = cmd.replace(
+            "powershell.exe",
+            "powershell.exe -NoLogo -NoProfile -ExecutionPolicy Bypass",
+            1,
+        )
 
-    cols, rows = 80, 25
-    child = winpty.PtyProcess.spawn(cmd, dimensions=(rows, cols), cwd=cwd or os.getcwd(), env=env) # type: ignore
+    cols, rows = Limits.TTY_DEFAULT_COLS, Limits.TTY_DEFAULT_ROWS
+    child = winpty.PtyProcess.spawn(cmd, dimensions=(rows, cols), cwd=cwd or os.getcwd(), env=env)  # type: ignore
 
     loop = asyncio.get_running_loop()
     reader = asyncio.StreamReader()
@@ -222,11 +224,11 @@ async def _spawn_winpty(cmd, cwd, env, echo):
                 # Run blocking read in executor to not block event loop
                 data = await loop.run_in_executor(None, child.read, 1 << 16)
                 if data:
-                    reader.feed_data(data.encode('utf-8') if isinstance(data, str) else data)
+                    reader.feed_data(data.encode("utf-8") if isinstance(data, str) else data)
             except EOFError:
                 break
-            except Exception:
-                await asyncio.sleep(0.01)
+            except Exception as e:
+                await asyncio.sleep(Timeouts.TTY_WRITE_DELAY)
         reader.feed_eof()
 
     # Start pumping output in background
@@ -236,14 +238,14 @@ async def _spawn_winpty(cmd, cwd, env, echo):
         def write(self, d):
             # Use winpty's write method, not os.write
             if isinstance(d, bytes):
-                d = d.decode('utf-8', errors='replace')
+                d = d.decode("utf-8", errors="replace")
             # Windows needs \r\n for proper line endings
             if _IS_WIN:
-              d = d.replace('\n', '\r\n')
+                d = d.replace("\n", "\r\n")
             child.write(d)
 
         async def drain(self):
-            await asyncio.sleep(0.01)  # Give write time to complete
+            await asyncio.sleep(Timeouts.TTY_WRITE_DELAY)
 
     class _Proc:
         def __init__(self):
@@ -254,7 +256,7 @@ async def _spawn_winpty(cmd, cwd, env, echo):
 
         async def wait(self):
             while child.isalive():
-                await asyncio.sleep(0.2)
+                await asyncio.sleep(Timeouts.TTY_READ_CHUNK_DELAY)
             self.returncode = 0
             return 0
 
@@ -279,47 +281,33 @@ if __name__ == "__main__":
         term = TTYSession(shell_cmd)
         await term.start()
 
-        timeout = 1.0
-
-        print(f"Connected to {shell_cmd}.")
-        print("Type commands for the shell.")
-        print("• /t=<seconds>  → change idle timeout")
-        print("• /exit         → quit helper\n")
+        timeout = Timeouts.TTY_READ_TIMEOUT
 
         await term.sendline(" ")
-        print(await term.read_full_until_idle(timeout, timeout), end="", flush=True)
 
         while True:
             try:
                 user = input(f"(timeout={timeout}) {prompt_hint} ")
             except (EOFError, KeyboardInterrupt):
-                print("\nLeaving…")
                 break
 
             if user.lower() == "/exit":
                 break
             if user.startswith("/t="):
-                try:
+                with contextlib.suppress(ValueError):
                     timeout = float(user.split("=", 1)[1])
-                    print(f"[helper] idle timeout set to {timeout}s")
-                except ValueError:
-                    print("[helper] invalid number")
                 continue
 
             idle_timeout = timeout
             total_timeout = 10 * idle_timeout
             if user == "":
                 # Just read output, do not send empty line
-                async for chunk in term.read_chunks_until_idle(
-                    idle_timeout, total_timeout
-                ):
-                    print(chunk, end="", flush=True)
+                async for _chunk in term.read_chunks_until_idle(idle_timeout, total_timeout):
+                    pass
             else:
                 await term.sendline(user)
-                async for chunk in term.read_chunks_until_idle(
-                    idle_timeout, total_timeout
-                ):
-                    print(chunk, end="", flush=True)
+                async for _chunk in term.read_chunks_until_idle(idle_timeout, total_timeout):
+                    pass
 
         await term.sendline("exit")
         await term.wait()

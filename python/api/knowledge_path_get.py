@@ -1,14 +1,12 @@
+from python.helpers import files, memory, projects
 from python.helpers.api import ApiHandler, Request, Response
-from python.helpers import files, memory, notification, projects, notification
-import os
-from werkzeug.utils import secure_filename
 
 
 class GetKnowledgePath(ApiHandler):
     async def process(self, input: dict, request: Request) -> dict | Response:
         ctxid = input.get("ctxid", "")
         if not ctxid:
-            raise Exception("No context id provided")
+            raise ValueError("No context id provided")
         context = self.use_context(ctxid)
 
         project_name = projects.get_context_project_name(context)

@@ -1,13 +1,18 @@
+"""Knowledge base reindex endpoint.
+
+Triggers a rebuild of the knowledge vector index.
+Used after adding new documents to the knowledge base.
+"""
+
+from python.helpers import memory
 from python.helpers.api import ApiHandler, Request, Response
-from python.helpers import files, memory, notification, projects, notification
-import os
 
 
 class ReindexKnowledge(ApiHandler):
     async def process(self, input: dict, request: Request) -> dict | Response:
         ctxid = input.get("ctxid", "")
         if not ctxid:
-            raise Exception("No context id provided")
+            raise ValueError("No context id provided")
         context = self.use_context(ctxid)
 
         # reload memory to re-import knowledge

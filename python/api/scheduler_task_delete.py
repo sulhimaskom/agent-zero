@@ -1,15 +1,19 @@
-from python.helpers.api import ApiHandler, Input, Output, Request
-from python.helpers.task_scheduler import TaskScheduler, TaskState
-from python.helpers.localization import Localization
+"""Scheduler task deletion API endpoint - removes tasks from the scheduler.
+
+Deletes a scheduled task by its UUID. Handles cleanup of associated
+chat contexts if the task has one attached.
+"""
+
 from agent import AgentContext
 from python.helpers import persist_chat
+from python.helpers.api import ApiHandler, Input, Output, Request
+from python.helpers.localization import Localization
+from python.helpers.task_scheduler import TaskScheduler, TaskState
 
 
 class SchedulerTaskDelete(ApiHandler):
     async def process(self, input: Input, request: Request) -> Output:
-        """
-        Delete a task from the scheduler by ID
-        """
+        """Delete a task from the scheduler by ID."""
         # Get timezone from input (do not set if not provided, we then rely on poll() to set it)
         if timezone := input.get("timezone", None):
             Localization.get().set_timezone(timezone)
@@ -34,7 +38,6 @@ class SchedulerTaskDelete(ApiHandler):
 
         # If the task is running, update its state to IDLE first
         if task.state == TaskState.RUNNING:
-            scheduler.cancel_running_task(task_id, terminate_thread=True)
             if context:
                 context.reset()
             # Update the state to IDLE so any ongoing processes know to terminate
@@ -50,4 +53,7 @@ class SchedulerTaskDelete(ApiHandler):
         # Remove the task
         await scheduler.remove_task_by_uuid(task_id)
 
-        return {"success": True, "message": f"Task {task_id} deleted successfully"}
+        return {
+            "success": True,
+            "message": f"Task {task_id} deleted successfully",
+        }

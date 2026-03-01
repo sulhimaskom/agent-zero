@@ -3,28 +3,81 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Login to Agent Zero - Your personal autonomous AI agent framework.">
+    <meta name="theme-color" content="#333333">
     <title>Login - Agent Zero</title>
-    <link rel="stylesheet" href="/login.css">
+    <link rel="stylesheet" href="/login.min.css">
     <link rel="icon" type="image/svg+xml" href="/public/favicon.svg">
 </head>
 <body>
     <div class="login-container">
-        <form class="login-form" method="POST" action="/login">
-            <img src="/public/splash.jpg" alt="Agent Zero Logo" class="logo">
+        <form class="login-form" method="POST" action="/login" id="login-form">
+            <picture>
+                <source srcset="/public/splash.webp" type="image/webp">
+                <img src="/public/splash.jpg" alt="Agent Zero Logo" class="logo" width="200" height="200" loading="eager">
+            </picture>
             <h2>Agent Zero</h2>
             <div class="input-group">
                 <label for="username">Username</label>
-                <input type="text" id="username" name="username" required>
+                <input type="text" id="username" name="username" required autocomplete="username">
             </div>
             <div class="input-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
+                <input type="password" id="password" name="password" required autocomplete="current-password">
             </div>
-            <button type="submit">Login</button>
+            <button type="submit" id="login-button">
+                <span class="button-text">Login</span>
+                <span class="button-loader" aria-hidden="true">
+                    <svg class="spinner" viewBox="0 0 50 50" width="16" height="16">
+                        <circle class="spinner-track" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+                        <circle class="spinner-indicator" cx="25" cy="25" r="20" fill="none" stroke-width="5"></circle>
+                    </svg>
+                </span>
+            </button>
             {% if error %}
-                <p class="error">{{ error }}</p>
+                <p class="error" role="alert">{{ error }}</p>
             {% endif %}
         </form>
     </div>
+
+    <script>
+        (function() {
+            const form = document.getElementById('login-form');
+            const button = document.getElementById('login-button');
+            const buttonText = button.querySelector('.button-text');
+
+            form.addEventListener('submit', function(e) {
+                // Prevent double submission
+                if (button.disabled) {
+                    e.preventDefault();
+                    return;
+                }
+
+                // Show loading state
+                button.disabled = true;
+                button.classList.add('loading');
+                buttonText.textContent = 'Logging in...';
+
+                // Disable inputs during submission
+                const inputs = form.querySelectorAll('input');
+                inputs.forEach(function(input) {
+                    input.disabled = true;
+                });
+            });
+
+            // Re-enable form if page is restored from bfcache
+            window.addEventListener('pageshow', function(e) {
+                if (e.persisted) {
+                    button.disabled = false;
+                    button.classList.remove('loading');
+                    buttonText.textContent = 'Login';
+                    const inputs = form.querySelectorAll('input');
+                    inputs.forEach(function(input) {
+                        input.disabled = false;
+                    });
+                }
+            });
+        })();
+    </script>
 </body>
 </html>

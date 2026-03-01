@@ -1,28 +1,37 @@
-from typing import Callable, TypedDict
+"""LLM calling utilities for Agent Zero.
+
+Provides helper functions for calling language models with examples,
+streaming support, and callback handling using LangChain.
+"""
+
+from collections.abc import Callable
+from typing import TypedDict
+
 from langchain.prompts import (
     ChatPromptTemplate,
     FewShotChatMessagePromptTemplate,
 )
-
 from langchain.schema import AIMessage
-from langchain_core.messages import HumanMessage, SystemMessage
-
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.language_models.llms import BaseLLM
+from langchain_core.messages import HumanMessage, SystemMessage
 
 
 class Example(TypedDict):
     input: str
     output: str
 
+
 async def call_llm(
     system: str,
     model: BaseChatModel | BaseLLM,
     message: str,
-    examples: list[Example] = [],
-    callback: Callable[[str], None] | None = None
+    examples: list[Example] | None = None,
+    callback: Callable[[str], None] | None = None,
 ):
 
+    if examples is None:
+        examples = []
     example_prompt = ChatPromptTemplate.from_messages(
         [
             HumanMessage(content="{input}"),
@@ -37,7 +46,6 @@ async def call_llm(
     )
 
     few_shot_prompt.format()
-
 
     final_prompt = ChatPromptTemplate.from_messages(
         [
@@ -66,4 +74,3 @@ async def call_llm(
         response += content
 
     return response
-

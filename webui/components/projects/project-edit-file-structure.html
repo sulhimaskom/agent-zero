@@ -3,7 +3,7 @@
 <head>
     <title>Create a new project</title>
     <script type="module">
-        import { store } from "/components/projects/projects-store.js";
+        import { store } from "/components/projects/projects-store.min.js";
     </script>
 </head>
 
@@ -25,6 +25,11 @@
                             have an overview of project folders and files at all times.</span>
                     </div>
                     <div class="projects-setting-control">
+                        <label class="toggle" for="file-structure-enabled">
+                            <input type="checkbox" id="file-structure-enabled" x-model="$store.projects.selectedProject.file_structure.enabled">
+                            <span class="toggler"></span>
+                        </label>
+                    </div>
                         <label class="toggle">
                             <input type="checkbox" x-model="$store.projects.selectedProject.file_structure.enabled">
                             <span class="toggler"></span>
@@ -36,6 +41,58 @@
 
 
                     <div class="projects-form-group">
+                        <label class="projects-form-label" for="max-depth">Max Depth</label>
+                        <span class="projects-form-description">Set the maximum depth for the file structure (0 =
+                            unlimited).</span>
+                        <input type="number" id="max-depth" class="projects-form-input"
+                            x-model.number="$store.projects.selectedProject.file_structure.max_depth" min="0" step="1"
+                            placeholder="0">
+                    </div>
+
+                    <div class="projects-form-group">
+                        <label class="projects-form-label" for="max-lines">Max Lines</label>
+                        <span class="projects-form-description">Maximum total lines outputted for the agent. This limits
+                            the
+                            space occupied in the context window (0 = unlimited).</span>
+                        <input type="number" id="max-lines" class="projects-form-input"
+                            x-model.number="$store.projects.selectedProject.file_structure.max_lines" min="0" step="1"
+                            placeholder="0">
+                    </div>
+
+                    <div class="projects-form-group">
+                        <label class="projects-form-label" for="max-folders">Max Folders</label>
+                        <span class="projects-form-description">Maximum number of subfolders to display under one folder
+                            (0 =
+                            unlimited).</span>
+                        <input type="number" id="max-folders" class="projects-form-input"
+                            x-model.number="$store.projects.selectedProject.file_structure.max_folders" min="0" step="1"
+                            placeholder="0">
+                    </div>
+
+                    <div class="projects-form-group">
+                        <label class="projects-form-label" for="max-files">Max Files</label>
+                        <span class="projects-form-description">Maximum number of files to display under one folder (0 =
+                            unlimited).</span>
+                        <input type="number" id="max-files" class="projects-form-input"
+                            x-model.number="$store.projects.selectedProject.file_structure.max_files" min="0" step="1"
+                            placeholder="0">
+                    </div>
+
+                    <div class="projects-form-group">
+                        <label class="projects-form-label" for="ignored-files">Ignored files / folders</label>
+                        <span class="projects-form-description">Specify patterns in gitignore format. These files and
+                            folders will be skipped during analysis, such as meta folders, cache directories, packages,
+                            and
+                            build artifacts.</span>
+                        <textarea id="ignored-files" class="projects-form-textarea"
+                            x-model="$store.projects.selectedProject.file_structure.gitignore" rows="5"
+                            placeholder="Enter gitignore patterns (e.g., node_modules/, .git/, *.log)"></textarea>
+                    </div>
+
+                    <button class="button icon-button" x-on:click="$store.projects.testFileStructure()" aria-label="Test file structure output">
+                        <span class="icon material-symbols-outlined" aria-hidden="true">account_tree</span>
+                        <span>Test output</span>
+                    </button>
                         <label class="projects-form-label">Max Depth</label>
                         <span class="projects-form-description">Set the maximum depth for the file structure (0 =
                             unlimited).</span>
@@ -84,7 +141,7 @@
                             placeholder="Enter gitignore patterns (e.g., node_modules/, .git/, *.log)"></textarea>
                     </div>
 
-                    <button class="button icon-button" aria-label="Test file structure output" x-on:click="$store.projects.testFileStructure()">
+                    <button class="button icon-button" x-on:click="$store.projects.testFileStructure()" aria-label="Test file structure output">
                         <span class="icon material-symbols-outlined">account_tree</span>
                         <span>Test output</span>
                     </button>

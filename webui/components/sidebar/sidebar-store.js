@@ -1,4 +1,5 @@
-import { createStore } from "/js/AlpineStore.js";
+import { createStore } from '/js/AlpineStore.js';
+import Logger from '/js/logger.js';
 
 // This store manages the visibility and state of the main sidebar panel.
 const model = {
@@ -8,7 +9,7 @@ const model = {
   // Centralized collapse state for all sidebar sections (persisted in localStorage)
   sectionStates: {
     tasks: false,       // default: collapsed
-    preferences: false  // default: collapsed
+    preferences: false,  // default: collapsed
   },
 
   // Initialize the store by setting up a resize listener
@@ -20,7 +21,7 @@ const model = {
     this.loadSectionStates();
     this.handleResize();
     this.resizeHandler = () => this.handleResize();
-    window.addEventListener("resize", this.resizeHandler);
+    window.addEventListener('resize', this.resizeHandler);
   },
 
   // Load section collapse states from localStorage
@@ -31,7 +32,7 @@ const model = {
         this.sectionStates = { ...this.sectionStates, ...JSON.parse(stored) };
       }
     } catch (e) {
-      console.error('Failed to load sidebar section states', e);
+      Logger.error('Failed to load sidebar section states', e);
     }
   },
 
@@ -40,7 +41,7 @@ const model = {
     try {
       localStorage.setItem('sidebarSections', JSON.stringify(this.sectionStates));
     } catch (e) {
-      console.error('Failed to persist section states', e);
+      Logger.error('Failed to persist section states', e);
     }
   },
 
@@ -59,7 +60,7 @@ const model = {
   // Cleanup method for lifecycle management
   destroy() {
     if (this.resizeHandler) {
-      window.removeEventListener("resize", this.resizeHandler);
+      window.removeEventListener('resize', this.resizeHandler);
       this.resizeHandler = null;
     }
     this._initialized = false;
@@ -86,19 +87,6 @@ const model = {
   isMobile() {
     return window.innerWidth <= 768;
   },
-
-  // Dropdown positioning for quick-actions (fixed position to escape overflow:hidden)
-  dropdownStyle: {},
-  
-  updateDropdownPosition(triggerElement) {
-    if (!triggerElement) return;
-    const rect = triggerElement.getBoundingClientRect();
-    this.dropdownStyle = {
-      top: `${rect.bottom + 8}px`,
-      left: `${rect.left}px`,
-      width: `${rect.width}px`
-    };
-  },
 };
 
-export const store = createStore("sidebar", model);
+export const store = createStore('sidebar', model);

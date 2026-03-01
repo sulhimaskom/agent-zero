@@ -1,11 +1,12 @@
 from agent import Agent, UserMessage
-from python.helpers.tool import Tool, Response
 from initialize import initialize_agent
-from python.extensions.hist_add_tool_result import _90_save_tool_call_file as save_tool_call_file
+from python.extensions.hist_add_tool_result import (
+    _90_save_tool_call_file as save_tool_call_file,
+)
+from python.helpers.tool import Response, Tool
 
 
 class Delegation(Tool):
-
     async def execute(self, message="", reset="", **kwargs):
         # create subordinate agent using the data object on this agent and set superior agent to his data object
         if (
@@ -16,11 +17,11 @@ class Delegation(Tool):
             config = initialize_agent()
 
             # set subordinate prompt profile if provided, if not, keep original
-            agent_profile = kwargs.get("profile", kwargs.get("agent_profile", ""))
+            agent_profile = kwargs.get("profile")
             if agent_profile:
                 config.profile = agent_profile
 
-            # crate agent
+            # create agent
             sub = Agent(self.agent.number + 1, config, self.agent.context)
             # register superior/subordinate
             sub.set_data(Agent.DATA_NAME_SUPERIOR, self.agent)
@@ -32,9 +33,6 @@ class Delegation(Tool):
 
         # run subordinate monologue
         result = await subordinate.monologue()
-
-        # seal the subordinate's current topic so messages move to `topics` for compression
-        subordinate.history.new_topic()
 
         # hint to use includes for long responses
         additional = None
@@ -48,7 +46,7 @@ class Delegation(Tool):
 
     def get_log_object(self):
         return self.agent.context.log.log(
-            type="subagent",
+            type="tool",
             heading=f"icon://communication {self.agent.agent_name}: Calling Subordinate Agent",
             content="",
             kvps=self.args,

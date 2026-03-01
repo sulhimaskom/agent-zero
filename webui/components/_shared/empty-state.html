@@ -1,0 +1,352 @@
+<html>
+<head>
+    <title>Empty State Component</title>
+</head>
+<body>
+    <template x-if="type === 'chats'">
+        <div class="empty-state-container" role="status" aria-label="No chats available">
+            <div class="empty-state-illustration">
+                <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <circle cx="60" cy="60" r="50" class="empty-state-bg"/>
+                    <path d="M35 45C35 38.9249 39.9249 34 46 34H74C80.0751 34 85 38.9249 85 45V65C85 71.0751 80.0751 76 74 76H55L42 86V76H35V45Z"
+                          class="empty-state-bubble-primary"/>
+                    <path d="M45 55C45 51.6863 47.6863 49 51 49H69C72.3137 49 75 51.6863 75 55V68C75 71.3137 72.3137 74 69 74H58L48 81V74H45V55Z"
+                          class="empty-state-bubble-secondary"/>
+                    <circle cx="52" cy="61" r="3" class="empty-state-dot"/>
+                    <circle cx="60" cy="61" r="3" class="empty-state-dot"/>
+                    <circle cx="68" cy="61" r="3" class="empty-state-dot"/>
+                    <path d="M25 35L27 40L32 42L27 44L25 49L23 44L18 42L23 40L25 35Z" class="empty-state-sparkle sparkle-1"/>
+                    <path d="M90 30L91.5 33L95 34L91.5 35L90 38L88.5 35L85 34L88.5 33L90 30Z" class="empty-state-sparkle sparkle-2"/>
+                    <path d="M95 70L96 72.5L98.5 73.5L96 74.5L95 77L94 74.5L91.5 73.5L94 72.5L95 70Z" class="empty-state-sparkle sparkle-3"/>
+                </svg>
+            </div>
+            <h4 class="empty-state-title">No chats yet</h4>
+            <p class="empty-state-description">
+                Start a new conversation to begin working with your AI assistant
+            </p>
+            <button class="empty-state-cta"
+                    @click="$store.welcomeStore ? $store.welcomeStore.executeAction('new-chat') : null"
+                    @keydown.enter.prevent="$store.welcomeStore ? $store.welcomeStore.executeAction('new-chat') : null"
+                    @keydown.space.prevent="$store.welcomeStore ? $store.welcomeStore.executeAction('new-chat') : null"
+                    tabindex="0"
+                    aria-label="Start a new chat">
+                <span class="material-symbols-outlined">add</span>
+                New Chat
+            </button>
+        </div>
+    </template>
+
+    <template x-if="type === 'tasks'">
+        <div class="empty-state-container" role="status" aria-label="No tasks available">
+            <div class="empty-state-illustration">
+                <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <circle cx="60" cy="60" r="50" class="empty-state-bg"/>
+                    <rect x="32" y="28" width="56" height="64" rx="4" class="empty-state-paper"/>
+                    <rect x="42" y="42" width="8" height="8" rx="2" class="empty-state-checkbox"/>
+                    <rect x="56" y="44" width="24" height="4" rx="2" class="empty-state-line"/>
+                    <rect x="42" y="58" width="8" height="8" rx="2" class="empty-state-checkbox"/>
+                    <rect x="56" y="60" width="24" height="4" rx="2" class="empty-state-line"/>
+                    <rect x="42" y="74" width="8" height="8" rx="2" class="empty-state-checkbox"/>
+                    <rect x="56" y="76" width="16" height="4" rx="2" class="empty-state-line"/>
+                    <circle cx="85" cy="85" r="15" class="empty-state-clock-bg"/>
+                    <circle cx="85" cy="85" r="12" stroke="currentColor" stroke-width="2" fill="none" class="empty-state-clock"/>
+                    <path d="M85 79V85L90 90" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="empty-state-clock-hands"/>
+                    <path d="M22 40L24 45L29 47L24 49L22 54L20 49L15 47L20 45L22 40Z" class="empty-state-sparkle sparkle-1"/>
+                    <path d="M95 25L96.5 28L100 29L96.5 30L95 33L93.5 30L90 29L93.5 28L95 25Z" class="empty-state-sparkle sparkle-2"/>
+                </svg>
+            </div>
+            <h4 class="empty-state-title">No scheduled tasks</h4>
+            <p class="empty-state-description">
+                Create scheduled tasks to automate recurring workflows
+            </p>
+            <button class="empty-state-cta"
+                    @click="$store.schedulerSettings ? ($store.schedulerSettings.isCreating = true) : null"
+                    @keydown.enter.prevent="$store.schedulerSettings ? ($store.schedulerSettings.isCreating = true) : null"
+                    @keydown.space.prevent="$store.schedulerSettings ? ($store.schedulerSettings.isCreating = true) : null"
+                    tabindex="0"
+                    aria-label="Create a new task">
+                <span class="material-symbols-outlined">add_task</span>
+                Create Task
+            </button>
+        </div>
+    </template>
+
+    <style>
+        .empty-state-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            min-height: 200px;
+            animation: empty-state-fade-in 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+
+        @keyframes empty-state-fade-in {
+            0% {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .empty-state-illustration {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .empty-state-illustration svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .empty-state-bg {
+            fill: var(--color-border);
+            opacity: 0.3;
+        }
+
+        .empty-state-bubble-primary {
+            fill: var(--color-highlight);
+            opacity: 0.8;
+            animation: bubble-float 3s ease-in-out infinite;
+        }
+
+        .empty-state-bubble-secondary {
+            fill: var(--color-secondary);
+            opacity: 0.5;
+            animation: bubble-float 3s ease-in-out infinite;
+            animation-delay: 0.5s;
+        }
+
+        @keyframes bubble-float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-3px);
+            }
+        }
+
+        .empty-state-dot {
+            fill: var(--color-text);
+            opacity: 0.6;
+            animation: dot-pulse 1.5s ease-in-out infinite;
+        }
+
+        .empty-state-dot:nth-child(4) { animation-delay: 0s; }
+        .empty-state-dot:nth-child(5) { animation-delay: 0.2s; }
+        .empty-state-dot:nth-child(6) { animation-delay: 0.4s; }
+
+        @keyframes dot-pulse {
+            0%, 100% {
+                opacity: 0.4;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.8;
+                transform: scale(1.1);
+            }
+        }
+
+        .empty-state-paper {
+            fill: var(--color-panel);
+            stroke: var(--color-border);
+            stroke-width: 1.5;
+            animation: paper-float 3s ease-in-out infinite;
+        }
+
+        @keyframes paper-float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-2px) rotate(0.5deg);
+            }
+        }
+
+        .empty-state-checkbox {
+            fill: var(--color-highlight);
+            opacity: 0.6;
+            animation: checkbox-appear 2s ease-in-out infinite;
+        }
+
+        .empty-state-checkbox:nth-child(2) { animation-delay: 0.3s; }
+        .empty-state-checkbox:nth-child(4) { animation-delay: 0.6s; }
+        .empty-state-checkbox:nth-child(6) { animation-delay: 0.9s; }
+
+        @keyframes checkbox-appear {
+            0%, 100% {
+                opacity: 0.4;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        .empty-state-line {
+            fill: var(--color-secondary);
+            opacity: 0.4;
+        }
+
+        .empty-state-clock-bg {
+            fill: var(--color-highlight);
+            opacity: 0.2;
+            animation: clock-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes clock-pulse {
+            0%, 100% {
+                opacity: 0.2;
+                transform: scale(1);
+            }
+            50% {
+                opacity: 0.35;
+                transform: scale(1.05);
+            }
+        }
+
+        .empty-state-clock {
+            color: var(--color-highlight);
+            opacity: 0.8;
+        }
+
+        .empty-state-clock-hands {
+            color: var(--color-highlight);
+            opacity: 0.9;
+            animation: clock-tick 4s linear infinite;
+            transform-origin: 85px 85px;
+        }
+
+        @keyframes clock-tick {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .empty-state-sparkle {
+            fill: var(--color-highlight);
+            opacity: 0;
+            animation: sparkle-twinkle 2s ease-in-out infinite;
+        }
+
+        .sparkle-1 { animation-delay: 0s; }
+        .sparkle-2 { animation-delay: 0.7s; }
+        .sparkle-3 { animation-delay: 1.4s; }
+
+        @keyframes sparkle-twinkle {
+            0%, 100% {
+                opacity: 0;
+                transform: scale(0.8) rotate(0deg);
+            }
+            50% {
+                opacity: 0.6;
+                transform: scale(1) rotate(180deg);
+            }
+        }
+
+        .empty-state-title {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--color-text);
+            margin: 0 0 0.5rem 0;
+            opacity: 0.9;
+        }
+
+        .empty-state-description {
+            font-size: 0.8rem;
+            color: var(--color-secondary);
+            margin: 0 0 1.25rem 0;
+            line-height: 1.4;
+            max-width: 200px;
+        }
+
+        .empty-state-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background-color: var(--color-highlight);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 0.8rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 8px rgba(66, 72, 241, 0.3);
+            animation: cta-appear 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.3s backwards;
+        }
+
+        @keyframes cta-appear {
+            0% {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .empty-state-cta:hover {
+            background-color: var(--color-primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(66, 72, 241, 0.4);
+        }
+
+        .empty-state-cta:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(66, 72, 241, 0.3);
+        }
+
+        .empty-state-cta:focus-visible {
+            outline: 2px solid var(--color-highlight);
+            outline-offset: 2px;
+        }
+
+        .empty-state-cta .material-symbols-outlined {
+            font-size: 1rem;
+        }
+
+        .light-mode .empty-state-bg {
+            opacity: 0.2;
+        }
+
+        .light-mode .empty-state-description {
+            color: var(--color-secondary-light);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .empty-state-container,
+            .empty-state-cta {
+                animation: none;
+            }
+
+            .empty-state-bubble-primary,
+            .empty-state-bubble-secondary,
+            .empty-state-paper,
+            .empty-state-checkbox,
+            .empty-state-clock-bg,
+            .empty-state-clock-hands,
+            .empty-state-dot,
+            .empty-state-sparkle {
+                animation: none;
+            }
+
+            .empty-state-cta:hover {
+                transform: none;
+            }
+        }
+    </style>
+</body>
+</html>

@@ -1,10 +1,20 @@
-from agent import AgentContext, UserMessage
-from python.helpers.api import ApiHandler, Request, Response
+"""Chat message processing endpoint.
 
-from python.helpers import files, extension, message_queue as mq
+Handles user messages and file attachments for agent communication.
+Supports both JSON and multipart/form-data content types for flexible
+message submission with optional file uploads.
+"""
+
 import os
-from python.helpers.security import safe_filename
+
+from werkzeug.utils import secure_filename
+
+from agent import AgentContext, UserMessage
+from python.helpers import extension, files
+from python.helpers.api import ApiHandler, Request, Response
+from python.helpers.constants import Colors, Paths
 from python.helpers.defer import DeferredTask
+from python.helpers.print_style import PrintStyle
 
 
 class Message(ApiHandler):
@@ -28,17 +38,15 @@ class Message(ApiHandler):
             attachments = request.files.getlist("attachments")
             attachment_paths = []
 
-            upload_folder_int = "/a0/usr/uploads"
-            upload_folder_ext = files.get_abs_path("usr/uploads") # for development environment
+            upload_folder_int = Paths.UPLOAD_FOLDER
+            upload_folder_ext = files.get_abs_path(Paths.UPLOAD_DIR)  # for development environment
 
             if attachments:
                 os.makedirs(upload_folder_ext, exist_ok=True)
                 for attachment in attachments:
                     if attachment.filename is None:
                         continue
-                    filename = safe_filename(attachment.filename)
-                    if not filename:
-                        continue
+                    filename = secure_filename(attachment.filename)
                     save_path = files.get_abs_path(upload_folder_ext, filename)
                     attachment.save(save_path)
                     attachment_paths.append(os.path.join(upload_folder_int, filename))
@@ -57,7 +65,7 @@ class Message(ApiHandler):
         context = self.use_context(ctxid)
 
         # call extension point, alow it to modify data
-        data = { "message": message, "attachment_paths": attachment_paths }
+        data = {"message": message, "attachment_paths": attachment_paths}
         await extension.call_extensions("user_message_ui", agent=context.get_agent(), data=data)
         message = data.get("message", "")
         attachment_paths = data.get("attachment_paths", [])
@@ -65,7 +73,34 @@ class Message(ApiHandler):
         # Store attachments in agent data
         # context.agent0.set_data("attachments", attachment_paths)
 
-        # Log to console and UI using helper function
-        mq.log_user_message(context, message, attachment_paths, message_id)
+        # Prepare attachment filenames for logging
+        attachment_filenames = (
+            [os.path.basename(path) for path in attachment_paths] if attachment_paths else []
+        )
 
-        return context.communicate(UserMessage(message, attachment_paths)), context
+        # Print to console and log
+        PrintStyle(
+            background_color=Colors.AGENT_PURPLE,
+            font_color=Colors.BG_WHITE,
+            bold=True,
+            padding=True,
+        ).print("User message:")
+        PrintStyle(font_color="white", padding=False).print(f"> {message}")
+        if attachment_filenames:
+            PrintStyle(font_color="white", padding=False).print("Attachments:")
+            for filename in attachment_filenames:
+                PrintStyle(font_color="white", padding=False).print(f"- {filename}")
+
+        # Log the message with message_id and attachments
+        context.log.log(
+            type="user",
+            heading="User message",
+            content=message,
+            kvps={"attachments": attachment_filenames},
+            id=message_id,
+        )
+
+        return (
+            context.communicate(UserMessage(message, attachment_paths)),
+            context,
+        )

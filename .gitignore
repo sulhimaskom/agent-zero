@@ -1,42 +1,95 @@
 # Ignore common unwanted files globally
 **/.DS_Store
+**/Thumbs.db
 **/.env
+**/.env.*
 **/__pycache__/
 *.py[cod]
 **/.conda/
+*.bak
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
 
 #Ignore IDE files
+!.vscode/extensions.json
+!.vscode/launch.json
 .cursor/
 .windsurf/
+.vscode/
+.idea/
+*.sublime-*
 
 # ignore test files in root dir
-/*.test.py
+**/*.test.py
 
 # Ignore all contents of the virtual environment directory
 .venv/
+venv/
+env/
+ENV/
 
-# obsolete folders
-memory/
-knowledge/custom/
-instruments/
+# Handle memory directory - ignore all contents but keep directory structure
+memory/**
+!memory/**/.gitkeep
 
-# Handle logs directory
+# Handle logs directory - ignore all contents recursively
 logs/**
-!logs/**/
+!logs/**/.gitkeep
 
 # Handle tmp and usr directory
 tmp/**
-!tmp/**/
+!tmp/**/.gitkeep
 usr/**
-!usr/**/
+!usr/**/.gitkeep
 
-# Handle knowledge directory
+# Handle knowledge directory - ignore all contents but keep directory structure
+knowledge/**
+!knowledge/**/.gitkeep
+# Explicitly allow the default folder in knowledge
+!knowledge/default/
+!knowledge/default/**
 
-# Global rule to include .gitkeep files anywhere
-!**/.gitkeep
+# Handle instruments directory - ignore all contents but keep directory structure
+instruments/**
+!instruments/**/.gitkeep
+# Explicitly allow the default folder in instruments
+!instruments/default/
+!instruments/default/**
 
 # for browser-use
 agent_history.gif
+chromewebdata_*.report.html
 
-.agent/**
-.claude/**
+# Opencode AI agent
+.opencode/
+
+# Worktrees directory for isolated development
+.worktrees/
+
+# Ralph loop state files
+.sisyphus/
+
+brocula_check_*.py
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Docker
+.dockerignore

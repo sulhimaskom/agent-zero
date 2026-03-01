@@ -1,0 +1,68 @@
+# AI Code Review Hook Configuration
+#
+# This file configures the AI-powered pre-commit code review hook.
+# The hook runs on staged files and provides inline suggestions using local LLM.
+
+# LLM Configuration
+llm:
+  # Model to use (must be available in Ollama)
+  # Options: codellama, llama2, mistral, etc.
+  model: "ollama/codellama"
+  
+  # Max tokens in response
+  max_tokens: 512
+  
+  # Temperature (lower = more deterministic)
+  temperature: 0.3
+  
+  # Custom Ollama base URL (if not using default localhost:11434)
+  # base_url: "http://localhost:11434"
+
+# Review Settings
+review:
+  # Enable/disable the hook
+  enabled: true
+  
+  # File patterns to include (empty = all supported)
+  include: []
+  # include:
+  #   - "*.py"
+  #   - "*.js"
+  #   - "*.ts"
+  
+  # File patterns to exclude
+  exclude:
+    - "vendor/*"
+    - "node_modules/*"
+    - "__pycache__/*"
+    - "*.min.js"
+    - "*.bundle.js"
+  
+  # Maximum file size to review (KB)
+  max_file_size: 100
+  
+  # Categories to check
+  categories:
+    - security
+    - code_quality
+    - best_practices
+    - potential_bugs
+
+# Behavior Settings
+behavior:
+  # Non-blocking: don't prevent commit on issues
+  non_blocking: true
+  
+  # Show diff context in suggestions
+  show_context: true
+  
+  # Verbose output
+  verbose: false
+
+# Installation
+installation:
+  # Method: pre-commit (recommended) or manual
+  method: "pre-commit"
+  
+  # Install hooks automatically on make install-dev
+  auto_install: true

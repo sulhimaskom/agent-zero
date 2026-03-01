@@ -4,7 +4,6 @@ import os
 import sys
 from unittest.mock import MagicMock
 
-
 # Add the project root to Python path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -124,6 +123,27 @@ create_mock_module("markdown")
 create_mock_module("pytz")
 tiktoken_mock = create_mock_module("tiktoken")
 
+# Properly mock get_encoding to return a working encoder
+class MockEncoding:
+    def encode(self, text, disallowed_special=()):
+        if not text:
+            return []
+        # Simple word-based approximation
+        return list(range(len(text.split())))
+    
+    def encode_batch(self, texts, disallowed_special=()):
+        return [self.encode(t, disallowed_special) for t in texts]
+
+
+def mock_get_encoding(encoding_name):
+    return MockEncoding()
+
+
+tiktoken_mock.get_encoding = mock_get_encoding
+tiktoken_mock.encoding_for_model = MagicMock(
+    return_value=MockEncoding()
+)
+
 
 def mock_encode(text):
     return [1] * len(text.split()) if hasattr(text, "split") else [1]
@@ -227,8 +247,8 @@ print_style_mock = create_mock_module("python.helpers.print_style")
 print_style_class = MagicMock
 print_style_mock.PrintStyle = print_style_class
 
-# Mock files module to break circular import with strings
-create_mock_module("python.helpers.files")
-
 # python.helpers.constants is intentionally not mocked - it has no heavy
 # dependencies and is directly tested by test_constants.py
+
+# python.helpers.strings is intentionally not mocked - it has no heavy
+# dependencies and is directly tested by test_strings.py

@@ -1,11 +1,11 @@
-import { store as chatsStore } from "/components/sidebar/chats/chats-store.js";
-import { callJsonApi } from "/js/api.js";
-import * as modals from "/js/modals.js";
+import { store as chatsStore } from '/components/sidebar/chats/chats-store.js';
+import { callJsonApi } from '/js/api.js';
+import * as modals from '/js/modals.js';
 import {
   NotificationType,
   NotificationPriority,
   store as notificationStore,
-} from "/components/notifications/notification-store.js";
+} from '/components/notifications/notification-store.js';
 
 // shortcuts utils for convenience
 

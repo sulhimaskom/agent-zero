@@ -1,38 +1,156 @@
+"""Memory management with FAISS vector database for agent learnings.
+
+Provides semantic search, storage, and retrieval of agent memories
+across multiple areas (main, fragments, solutions, instruments).
+Supports AI filtering and memory consolidation.
+"""
+
+# Security: Safe expression evaluation to replace simple_eval (RCE vulnerability)
+import ast
+import json
+import logging
+import os
+from collections.abc import Sequence
 from datetime import datetime
-from typing import Any, List, Sequence
-from langchain.storage import InMemoryByteStore, LocalFileStore
-from langchain.embeddings import CacheBackedEmbeddings
-from python.helpers import guids
+from enum import Enum
+from typing import Any
+
+import faiss
+import numpy as np
+from langchain_classic.embeddings import CacheBackedEmbeddings
+from langchain_classic.storage import LocalFileStore
+from langchain_community.docstore.in_memory import InMemoryDocstore
 
 # from langchain_chroma import Chroma
 from langchain_community.vectorstores import FAISS
-
-# faiss needs to be patched for python 3.12 on arm #TODO remove once not needed
-from python.helpers import faiss_monkey_patch
-import faiss
-
-
-from langchain_community.docstore.in_memory import InMemoryDocstore
 from langchain_community.vectorstores.utils import (
     DistanceStrategy,
 )
-from langchain_core.embeddings import Embeddings
-
-import os, json
-
-import numpy as np
-
-from python.helpers.print_style import PrintStyle
-from . import files
 from langchain_core.documents import Document
-from python.helpers import knowledge_import
-from python.helpers.log import Log, LogItem
-from enum import Enum
-from agent import Agent, AgentContext
-import models
-import logging
-from simpleeval import simple_eval
+from langchain_core.stores import InMemoryByteStore
 
+# Allowed AST node types for safe expression evaluation
+ALLOWED_AST_NODES = {
+    ast.Expression, ast.Compare, ast.BoolOp, ast.UnaryOp,
+    ast.Eq, ast.NotEq, ast.Lt, ast.LtE, ast.Gt, ast.GtE,
+    ast.In, ast.NotIn, ast.Not,
+    ast.Name, ast.Constant, ast.List, ast.Tuple, ast.Set,
+    ast.Call, ast.Attribute, ast.Subscript
+}
+
+# BoolOp and Compare operators are checked via isinstance
+BOOL_OPS = {ast.And, ast.Or}
+CMP_OPS = {ast.Eq, ast.NotEq, ast.Lt, ast.LtE, ast.Gt, ast.GtE, ast.In, ast.NotIn}
+
+
+def _safe_eval_node(node: ast.AST, data: dict) -> any:
+    """Safely evaluate an AST node against the data dictionary."""
+    if isinstance(node, ast.Expression):
+        return _safe_eval_node(node.body, data)
+    elif isinstance(node, ast.Constant):
+        return node.value
+    elif isinstance(node, ast.Name):
+        if node.id in data:
+            return data[node.id]
+        raise NameError(f"Unknown variable: {node.id}")
+    elif isinstance(node, ast.Compare):
+        left = _safe_eval_node(node.left, data)
+        for op, comparator in zip(node.ops, node.comparators, strict=False):
+            right = _safe_eval_node(comparator, data)
+            if isinstance(op, ast.Eq):
+                left = left == right
+            elif isinstance(op, ast.NotEq):
+                left = left != right
+            elif isinstance(op, ast.Lt):
+                left = left < right
+            elif isinstance(op, ast.LtE):
+                left = left <= right
+            elif isinstance(op, ast.Gt):
+                left = left > right
+            elif isinstance(op, ast.GtE):
+                left = left >= right
+            elif isinstance(op, ast.In):
+                left = left in right
+            elif isinstance(op, ast.NotIn):
+                left = left not in right
+            else:
+                raise ValueError(f"Disallowed operator: {type(op).__name__}")
+        return left
+    elif isinstance(node, ast.BoolOp):
+        values = [_safe_eval_node(v, data) for v in node.values]
+        if isinstance(node.op, ast.And):
+            result = True
+            for v in values:
+                result = result and v
+                if not result:
+                    return False
+            return result
+        elif isinstance(node.op, ast.Or):
+            result = False
+            for v in values:
+                result = result or v
+                if result:
+                    return True
+            return result
+        else:
+            raise ValueError(f"Disallowed bool op: {type(node.op).__name__}")
+    elif isinstance(node, ast.UnaryOp):
+        operand = _safe_eval_node(node.operand, data)
+        if isinstance(node.op, ast.Not):
+            return not operand
+        else:
+            raise ValueError(f"Disallowed unary op: {type(node.op).__name__}")
+    elif isinstance(node, (ast.List, ast.Tuple, ast.Set)):
+        return [_safe_eval_node(e, data) for e in node.elts]
+    elif isinstance(node, ast.Call):
+        if isinstance(node.func, ast.Name) and node.func.id == "len":
+            args = [_safe_eval_node(arg, data) for arg in node.args]
+            return len(*args)
+        raise ValueError("Function calls are not allowed")
+    elif isinstance(node, ast.Attribute):
+        raise ValueError("Attribute access is not allowed")
+    elif isinstance(node, ast.Subscript):
+        value = _safe_eval_node(node.value, data)
+        idx = _safe_eval_node(node.slice, data)
+        return value[idx]
+    else:
+        raise ValueError(f"Disallowed node type: {type(node).__name__}")
+
+
+def safe_eval_condition(condition: str, data: dict) -> any:
+    """Safely evaluate a condition string against a data dictionary.
+
+    Replaces simple_eval() with a secure AST-based implementation.
+    """
+    try:
+        tree = ast.parse(condition, mode="eval")
+        for node in ast.walk(tree):
+            # Skip context-related nodes like Load, Store, Del
+            if isinstance(node, ast.expr_context):
+                continue
+            node_type = type(node)
+            if node_type not in ALLOWED_AST_NODES:
+                # Also check if it's a BoolOp or Compare operator
+                if not (node_type in BOOL_OPS or node_type in CMP_OPS):
+                    raise ValueError(f"Disallowed node type: {node_type}")
+        return _safe_eval_node(tree, data)
+    except Exception as e:
+        return False
+
+import models  # noqa: E402
+from agent import Agent, AgentContext  # noqa: E402
+
+# faiss needs to be patched for python 3.12 on arm #TODO remove once not needed
+from python.helpers import (  # noqa: F401, E402
+    faiss_monkey_patch,
+    guids,
+    knowledge_import,
+)
+from python.helpers.constants import FilePatterns, Limits, Paths  # noqa: E402
+from python.helpers.log import LogItem  # noqa: E402
+from python.helpers.print_style import PrintStyle  # noqa: E402
+
+from . import files  # noqa: E402
 
 # Raise the log level so WARNING messages aren't shown
 logging.getLogger("langchain_core.vectorstores.base").setLevel(logging.ERROR)
@@ -40,11 +158,15 @@ logging.getLogger("langchain_core.vectorstores.base").setLevel(logging.ERROR)
 
 class MyFaiss(FAISS):
     # override aget_by_ids
-    def get_by_ids(self, ids: Sequence[str], /) -> List[Document]:
+    def get_by_ids(self, ids: Sequence[str], /) -> list[Document]:
         # return all self.docstore._dict[id] in ids
-        return [self.docstore._dict[id] for id in (ids if isinstance(ids, list) else [ids]) if id in self.docstore._dict]  # type: ignore
+        return [
+            self.docstore._dict[id]
+            for id in (ids if isinstance(ids, list) else [ids])
+            if id in self.docstore._dict
+        ]  # type: ignore
 
-    async def aget_by_ids(self, ids: Sequence[str], /) -> List[Document]:
+    async def aget_by_ids(self, ids: Sequence[str], /) -> list[Document]:
         return self.get_by_ids(ids)
 
     def get_all_docs(self):
@@ -52,11 +174,11 @@ class MyFaiss(FAISS):
 
 
 class Memory:
-
     class Area(Enum):
         MAIN = "main"
         FRAGMENTS = "fragments"
         SOLUTIONS = "solutions"
+        INSTRUMENTS = "instruments"
 
     index: dict[str, "MyFaiss"] = {}
 
@@ -68,7 +190,7 @@ class Memory:
                 type="util",
                 heading=f"Initializing VectorDB in '/{memory_subdir}'",
             )
-            db, created = Memory.initialize(
+            db, _created = Memory.initialize(
                 log_item,
                 agent.config.embeddings_model,
                 memory_subdir,
@@ -111,9 +233,7 @@ class Memory:
                     memory_subdir, agent_config.knowledge_subdirs or []
                 )
                 if knowledge_subdirs:
-                    await wrap.preload_knowledge(
-                        log_item, knowledge_subdirs, memory_subdir
-                    )
+                    await wrap.preload_knowledge(log_item, knowledge_subdirs, memory_subdir)
             Memory.index[memory_subdir] = db
         return Memory(db=Memory.index[memory_subdir], memory_subdir=memory_subdir)
 
@@ -138,7 +258,7 @@ class Memory:
             log_item.stream(progress="\nInitializing VectorDB")
 
         em_dir = files.get_abs_path(
-            "tmp/memory/embeddings"
+            Paths.MEMORY_EMBEDDINGS_DIR
         )  # just caching, no need to parameterize
         db_dir = abs_db_dir(memory_subdir)
 
@@ -156,9 +276,7 @@ class Memory:
             model_config.name,
             **model_config.build_kwargs(),
         )
-        embeddings_model_id = files.safe_file_name(
-            model_config.provider + "_" + model_config.name
-        )
+        embeddings_model_id = files.safe_file_name(model_config.provider + "_" + model_config.name)
 
         # here we setup the embeddings model with the chosen cache storage
         embedder = CacheBackedEmbeddings.from_bytes_store(
@@ -264,7 +382,7 @@ class Memory:
 
         index: dict[str, knowledge_import.KnowledgeImport] = {}
         if os.path.exists(index_path):
-            with open(index_path, "r") as f:
+            with open(index_path) as f:
                 index = json.load(f)
 
         # preload knowledge folders
@@ -274,9 +392,7 @@ class Memory:
             if index[file]["state"] in ["changed", "removed"] and index[file].get(
                 "ids", []
             ):  # for knowledge files that have been changed or removed and have IDs
-                await self.delete_documents_by_ids(
-                    index[file]["ids"]
-                )  # remove original version
+                await self.delete_documents_by_ids(index[file]["ids"])  # remove original version
             if index[file]["state"] == "changed":
                 index[file]["ids"] = await self.insert_documents(
                     index[file]["documents"]
@@ -307,7 +423,7 @@ class Memory:
                 log_item,
                 abs_knowledge_dir(kn_dir),
                 index,
-                {"area": Memory.Area.MAIN.value},
+                {"area": Memory.Area.MAIN},
                 filename_pattern="*",
                 recursive=False,
             )
@@ -321,6 +437,16 @@ class Memory:
                     {"area": area.value},
                     recursive=True,
                 )
+
+        # load instruments descriptions
+        index = knowledge_import.load_knowledge(
+            log_item,
+            files.get_abs_path("instruments"),
+            index,
+            {"area": Memory.Area.INSTRUMENTS.value},
+            filename_pattern=FilePatterns.KNOWLEDGE_MARKDOWN,
+            recursive=True,
+        )
 
         return index
 
@@ -340,10 +466,8 @@ class Memory:
             filter=comparator,
         )
 
-    async def delete_documents_by_query(
-        self, query: str, threshold: float, filter: str = ""
-    ):
-        k = 100
+    async def delete_documents_by_query(self, query: str, threshold: float, filter: str = ""):
+        k = Limits.MEMORY_SEARCH_K
         tot = 0
         removed = []
 
@@ -376,9 +500,7 @@ class Memory:
 
     async def delete_documents_by_ids(self, ids: list[str]):
         # aget_by_ids is not yet implemented in faiss, need to do a workaround
-        rem_docs = await self.db.aget_by_ids(
-            ids
-        )  # existing docs to remove (prevents error)
+        rem_docs = await self.db.aget_by_ids(ids)  # existing docs to remove (prevents error)
         if rem_docs:
             rem_ids = [doc.metadata["id"] for doc in rem_docs]  # ids to remove
             await self.db.adelete(ids=rem_ids)
@@ -387,7 +509,9 @@ class Memory:
             self._save_db()  # persist
         return rem_docs
 
-    async def insert_text(self, text, metadata: dict = {}):
+    async def insert_text(self, text, metadata: dict | None = None):
+        if metadata is None:
+            metadata = {}
         doc = Document(text, metadata=metadata)
         ids = await self.insert_documents([doc])
         return ids[0]
@@ -397,7 +521,7 @@ class Memory:
         timestamp = self.get_timestamp()
 
         if ids:
-            for doc, id in zip(docs, ids):
+            for doc, id in zip(docs, ids, strict=False):
                 doc.metadata["id"] = id  # add ids to documents metadata
                 doc.metadata["timestamp"] = timestamp  # add timestamp
                 if not doc.metadata.get("area", ""):
@@ -431,13 +555,8 @@ class Memory:
     @staticmethod
     def _get_comparator(condition: str):
         def comparator(data: dict[str, Any]):
-            try:
-                result = simple_eval(condition, names=data)
-                return result
-            except Exception as e:
-                PrintStyle.error(f"Error evaluating condition: {e}")
-                return False
-
+            # Use safe_eval_condition instead of simple_eval to prevent RCE
+            return safe_eval_condition(condition, data)
         return comparator
 
     @staticmethod
@@ -448,9 +567,7 @@ class Memory:
     @staticmethod
     def _cosine_normalizer(val: float) -> float:
         res = (1 + val) / 2
-        res = max(
-            0, min(1, res)
-        )  # float precision can cause values like 1.0000000596046448
+        res = max(0, min(1, res))  # float precision can cause values like 1.0000000596046448
         return res
 
     @staticmethod
@@ -472,10 +589,8 @@ class Memory:
 def get_custom_knowledge_subdir_abs(agent: Agent) -> str:
     for dir in agent.config.knowledge_subdirs:
         if dir != "default":
-            if dir == "custom":
-                return files.get_abs_path("usr/knowledge")
-            return files.get_abs_path("usr/knowledge", dir)
-    raise Exception("No custom knowledge subdir set")
+            return files.get_abs_path("knowledge", dir)
+    raise ValueError("No custom knowledge subdir set")
 
 
 def reload():
@@ -490,7 +605,7 @@ def abs_db_dir(memory_subdir: str) -> str:
 
         return files.get_abs_path(get_project_meta_folder(memory_subdir[9:]), "memory")
     # standard subdirs
-    return files.get_abs_path("usr/memory", memory_subdir)
+    return files.get_abs_path("memory", memory_subdir)
 
 
 def abs_knowledge_dir(knowledge_subdir: str, *sub_dirs: str) -> str:
@@ -499,14 +614,12 @@ def abs_knowledge_dir(knowledge_subdir: str, *sub_dirs: str) -> str:
         from python.helpers.projects import get_project_meta_folder
 
         return files.get_abs_path(
-            get_project_meta_folder(knowledge_subdir[9:]), "knowledge", *sub_dirs
+            get_project_meta_folder(knowledge_subdir[9:]),
+            "knowledge",
+            *sub_dirs,
         )
     # standard subdirs
-    if knowledge_subdir == "default":
-        return files.get_abs_path("knowledge", *sub_dirs)
-    if knowledge_subdir == "custom":
-        return files.get_abs_path("usr/knowledge", *sub_dirs)
-    return files.get_abs_path("usr/knowledge", knowledge_subdir, *sub_dirs)
+    return files.get_abs_path("knowledge", knowledge_subdir, *sub_dirs)
 
 
 def get_memory_subdir_abs(agent: Agent) -> str:
@@ -541,12 +654,14 @@ def get_existing_memory_subdirs() -> list[str]:
         )
 
         # Get subdirectories from memory folder
-        subdirs = files.get_subdirectories("usr/memory")
+        subdirs = files.get_subdirectories("memory", exclude="embeddings")
 
         project_subdirs = files.get_subdirectories(get_projects_parent_folder())
         for project_subdir in project_subdirs:
             if files.exists(
-                get_project_meta_folder(project_subdir), "memory", "index.faiss"
+                get_project_meta_folder(project_subdir),
+                "memory",
+                "index.faiss",
             ):
                 subdirs.append(f"projects/{project_subdir}")
 
@@ -556,13 +671,11 @@ def get_existing_memory_subdirs() -> list[str]:
 
         return subdirs
     except Exception as e:
-        PrintStyle.error(f"Failed to get memory subdirectories: {str(e)}")
+        PrintStyle.error(f"Failed to get memory subdirectories: {e!s}")
         return ["default"]
 
 
-def get_knowledge_subdirs_by_memory_subdir(
-    memory_subdir: str, default: list[str]
-) -> list[str]:
+def get_knowledge_subdirs_by_memory_subdir(memory_subdir: str, default: list[str]) -> list[str]:
     if memory_subdir.startswith("projects/"):
         from python.helpers.projects import get_project_meta_folder
 

@@ -1,0 +1,239 @@
+<html>
+
+<head>
+    <title>Keyboard Shortcuts</title>
+    <script type="module">
+        import { store } from "/components/modals/keyboard-shortcuts/keyboard-shortcuts-store.min.js";
+    </script>
+</head>
+
+<body>
+    <div x-data>
+        <template x-if="$store.keyboardShortcuts">
+            <div class="keyboard-shortcuts-modal" role="dialog" aria-modal="true"
+                aria-labelledby="keyboard-shortcuts-title">
+
+                <!-- Header -->
+                <div class="keyboard-shortcuts-header">
+                    <h3 id="keyboard-shortcuts-title" class="keyboard-shortcuts-title">
+                        <span class="material-symbols-outlined" aria-hidden="true">keyboard</span>
+                        Keyboard Shortcuts
+                    </h3>
+                    <button class="modal-close" @click="$store.keyboardShortcuts.close()" aria-label="Close keyboard shortcuts">&times;</button>
+                    <p class="keyboard-shortcuts-subtitle">Press <kbd>?</kbd> anytime to show this help</p>
+                </div>
+
+                <!-- Shortcuts Grid -->
+                <div class="keyboard-shortcuts-grid">
+                    <template x-for="shortcut in $store.keyboardShortcuts.shortcuts" :key="shortcut.key">
+                        <div class="keyboard-shortcut-item">
+                            <div class="keyboard-shortcut-keys">
+                                <template x-for="(part, index) in shortcut.key.split('+')" :key="index">
+                                    <span class="keyboard-key-combo">
+                                        <kbd class="keyboard-key" x-text="part"></kbd>
+                                        <span x-show="index < shortcut.key.split('+').length - 1" class="key-plus">+</span>
+                                    </span>
+                                </template>
+                            </div>
+                            <span class="keyboard-shortcut-description" x-text="shortcut.description"></span>
+                        </div>
+                    </template>
+                </div>
+
+                <!-- Footer hint -->
+                <div class="keyboard-shortcuts-footer">
+                    <p>
+                        <span class="material-symbols-outlined" aria-hidden="true">tips_and_updates</span>
+                        Shortcuts work when you're not typing in a text field
+                    </p>
+                </div>
+
+            </div>
+        </template>
+    </div>
+
+    <style>
+        .keyboard-shortcuts-modal {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+            padding: var(--spacing-md);
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .keyboard-shortcuts-header {
+            text-align: center;
+            padding-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .keyboard-shortcuts-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-sm);
+            margin: 0 0 var(--spacing-xs) 0;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--color-text);
+        }
+
+        .keyboard-shortcuts-title .material-symbols-outlined {
+            font-size: 1.5rem;
+            color: var(--color-primary);
+        }
+
+        .keyboard-shortcuts-subtitle {
+            margin: 0;
+            font-size: 0.875rem;
+            color: var(--color-text-secondary);
+        }
+
+        .keyboard-shortcuts-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: var(--spacing-sm);
+        }
+
+        .keyboard-shortcut-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-sm) var(--spacing-md);
+            background-color: var(--color-background);
+            border: 1px solid var(--color-border);
+            border-radius: var(--spacing-xs);
+            transition: all 0.2s ease;
+        }
+
+        .keyboard-shortcut-item:hover {
+            background-color: var(--color-background-hover, rgba(255, 255, 255, 0.05));
+            border-color: var(--color-primary);
+            transform: translateX(4px);
+        }
+
+        .keyboard-shortcut-keys {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .keyboard-key-combo {
+            display: flex;
+            align-items: center;
+        }
+
+        .keyboard-key {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 28px;
+            height: 28px;
+            padding: 0 8px;
+            background: linear-gradient(180deg, var(--color-secondary) 0%, var(--color-border) 100%);
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            font-family: 'Roboto Mono', monospace;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--color-text);
+            box-shadow: 0 2px 0 var(--color-border);
+            text-transform: uppercase;
+        }
+
+        .key-plus {
+            margin: 0 4px;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+        }
+
+        .keyboard-shortcut-description {
+            font-size: 0.9375rem;
+            color: var(--color-text);
+            text-align: right;
+            margin-left: var(--spacing-md);
+        }
+
+        .keyboard-shortcuts-footer {
+            margin-top: auto;
+            padding-top: var(--spacing-md);
+            border-top: 1px solid var(--color-border);
+        }
+
+        .keyboard-shortcuts-footer p {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--spacing-xs);
+            margin: 0;
+            font-size: 0.8125rem;
+            color: var(--color-text-secondary);
+            font-style: italic;
+        }
+
+        .keyboard-shortcuts-footer .material-symbols-outlined {
+            font-size: 1rem;
+            color: var(--color-warning, #FF9800);
+        }
+
+        /* Light mode adjustments */
+        .light-mode .keyboard-key {
+            background: linear-gradient(180deg, #ffffff 0%, #e0e0e0 100%);
+            box-shadow: 0 2px 0 #cccccc;
+        }
+
+        .light-mode .keyboard-shortcut-item:hover {
+            background-color: rgba(0, 0, 0, 0.03);
+        }
+
+        /* Animation for modal appearance */
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .keyboard-shortcuts-modal {
+            animation: modalSlideIn 0.3s cubic-bezier(0.19, 0.86, 0.47, 1);
+        }
+
+        /* Stagger animation for shortcut items */
+        .keyboard-shortcut-item {
+            animation: modalSlideIn 0.3s cubic-bezier(0.19, 0.86, 0.47, 1) backwards;
+        }
+
+        .keyboard-shortcut-item:nth-child(1) {
+            animation-delay: 0.05s;
+        }
+
+        .keyboard-shortcut-item:nth-child(2) {
+            animation-delay: 0.1s;
+        }
+
+        .keyboard-shortcut-item:nth-child(3) {
+            animation-delay: 0.15s;
+        }
+
+        .keyboard-shortcut-item:nth-child(4) {
+            animation-delay: 0.2s;
+        }
+
+        .keyboard-shortcut-item:nth-child(5) {
+            animation-delay: 0.25s;
+        }
+
+        .keyboard-shortcut-item:nth-child(6) {
+            animation-delay: 0.3s;
+        }
+    </style>
+</body>
+
+</html>

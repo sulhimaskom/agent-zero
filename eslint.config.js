@@ -1,6 +1,5 @@
 // Agent Zero - ESLint Configuration
-// Lenient config for initial linting setup - warnings only, not errors
-// This allows incremental fixes without breaking the build
+// Flat config format (ESLint v9+)
 
 import { defineConfig } from 'eslint/config';
 import globals from 'globals';
@@ -23,34 +22,34 @@ export default defineConfig([
       },
     },
     rules: {
-      // Possible Errors - use warnings to not break build
-      'no-console': 'off',
+      // Possible Errors
+      'no-console': 'off', // Console logging is used for debugging
       'no-debugger': 'warn',
       'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
       'no-undef': 'warn',
 
-      // Best Practices - warnings
-      'eqeqeq': 'warn',
-      'no-var': 'warn',
+      // Best Practices
+      'eqeqeq': ['error', 'smart'],
+      'no-var': 'error',
       'prefer-const': 'warn',
       'no-implicit-globals': 'warn',
 
-      // Style - warnings for gradual adoption
-      'semi': 'warn',
-      'quotes': 'warn',
-      'indent': 'warn',
-      'comma-dangle': 'warn',
-      'no-trailing-spaces': 'warn',
-      'eol-last': 'warn',
+      // Style
+      'semi': ['error', 'always'],
+      'quotes': ['error', 'single', { avoidEscape: true }],
+      'indent': ['error', 2],
+      'comma-dangle': ['error', 'always-multiline'],
+      'no-trailing-spaces': 'error',
+      'eol-last': ['error', 'always'],
 
-      // ES6+ - warnings
-      'no-duplicate-imports': 'warn',
-      'no-useless-rename': 'warn',
+      // ES6+
+      'no-duplicate-imports': 'error',
+      'no-useless-rename': 'error',
       'object-shorthand': 'warn',
       'prefer-arrow-callback': 'warn',
       'prefer-template': 'warn',
 
-      // Best practices - errors (these are important)
+      // Best practices - error prevention
       'no-eval': 'error',
       'no-implied-eval': 'error',
       'no-new-func': 'error',
@@ -74,15 +73,15 @@ export default defineConfig([
       'no-debugger': 'warn',
       'no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
       'no-undef': 'warn',
-      'eqeqeq': 'warn',
-      'no-var': 'warn',
+      'eqeqeq': ['error', 'smart'],
+      'no-var': 'error',
       'prefer-const': 'warn',
-      'semi': 'warn',
-      'quotes': 'warn',
-      'indent': 'warn',
-      'comma-dangle': 'warn',
-      'no-trailing-spaces': 'warn',
-      'eol-last': 'warn',
+      'semi': ['error', 'always'],
+      'quotes': ['error', 'single', { avoidEscape: true }],
+      'indent': ['error', 2],
+      'comma-dangle': ['error', 'always-multiline'],
+      'no-trailing-spaces': 'error',
+      'eol-last': ['error', 'always'],
       'no-eval': 'error',
       'no-implied-eval': 'error',
       'no-new-func': 'error',
@@ -100,7 +99,7 @@ export default defineConfig([
       },
     },
     rules: {
-      'no-unused-vars': 'off',
+      'no-unused-vars': 'off', // Service workers have specific lifecycle
     },
   },
 ]);

@@ -15,13 +15,22 @@
 # Optional fields:
 #   kwargs:           A dictionary of extra parameters to pass to LiteLLM.
 #                     This is useful for `api_base`, `extra_headers`, etc.
+#
+# MODULAR CONFIGURATION:
+#   Default API endpoints can be overridden via environment variables:
+#   - VENICE_API_BASE: Override Venice.ai API base URL
+#   - A0_VENICE_API_BASE: Override Agent Zero Venice API base URL
+#   - A0_OPENROUTER_API_BASE: Override OpenRouter API base URL
+#   - A0_OPENROUTER_HTTP_REFERER: Override OpenRouter HTTP Referer header
+#   - A0_OPENROUTER_X_TITLE: Override OpenRouter X-Title header
+#   See python/helpers/constants.py for all configurable URLs
 
 chat:
   a0_venice:
-    name: Agent Zero API
+    name: Agent Zero Venice.ai
     litellm_provider: openai
     kwargs:
-      api_base: https://llm.agent-zero.ai/v1
+      api_base: https://api.agent-zero.ai/venice/v1
       venice_parameters:
         include_venice_system_prompt: false
   anthropic:
@@ -40,7 +49,6 @@ chat:
       extra_headers:
         "Editor-Version": "vscode/1.85.1"
         "Copilot-Integration-Id": "vscode-chat"
-        "Copilot-Vision-Request": "true"
   google:
     name: Google
     litellm_provider: gemini
@@ -56,9 +64,6 @@ chat:
   mistral:
     name: Mistral AI
     litellm_provider: mistral
-  moonshot:
-    name: Moonshot AI
-    litellm_provider: moonshot
   ollama:
     name: Ollama
     litellm_provider: ollama
@@ -68,9 +73,6 @@ chat:
   azure:
     name: OpenAI Azure
     litellm_provider: azure
-  bedrock:
-    name: AWS Bedrock
-    litellm_provider: bedrock
   openrouter:
     name: OpenRouter
     litellm_provider: openrouter
@@ -91,16 +93,6 @@ chat:
   xai:
     name: xAI
     litellm_provider: xai
-  zai:
-    name: Z.AI
-    litellm_provider: openai
-    kwargs:
-      api_base: https://api.z.ai/api/paas/v4
-  zai_coding:
-    name: Z.AI Coding
-    litellm_provider: openai
-    kwargs:
-      api_base: https://api.z.ai/api/coding/paas/v4
   other:
     name: Other OpenAI compatible
     litellm_provider: openai
@@ -127,9 +119,6 @@ embedding:
   azure:
     name: OpenAI Azure
     litellm_provider: azure
-  bedrock:
-    name: AWS Bedrock
-    litellm_provider: bedrock
   # TODO: OpenRouter not yet supported by LiteLLM, replace with native litellm_provider openrouter and remove api_base when ready
   openrouter:
     name: OpenRouter

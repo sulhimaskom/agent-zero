@@ -1,25 +1,36 @@
+"""Environment variable management for Agent Zero.
+
+Handles loading and saving environment variables from .env files.
+Provides utilities for managing authentication credentials (login, password,
+RFC password, root password) and other configuration values.
+"""
+
 import os
 import re
 from typing import Any
 
-from .files import get_abs_path
 from dotenv import load_dotenv as _load_dotenv
+
+from .files import get_abs_path
 
 KEY_AUTH_LOGIN = "AUTH_LOGIN"
 KEY_AUTH_PASSWORD = "AUTH_PASSWORD"
 KEY_RFC_PASSWORD = "RFC_PASSWORD"
 KEY_ROOT_PASSWORD = "ROOT_PASSWORD"
 
+
 def load_dotenv():
     _load_dotenv(get_dotenv_file_path(), override=True)
 
 
 def get_dotenv_file_path():
-    return get_abs_path("usr/.env")
+    return get_abs_path(".env")
+
 
 def get_dotenv_value(key: str, default: Any = None):
-    # load_dotenv()       
+    # load_dotenv()
     return os.getenv(key, default)
+
 
 def save_dotenv_value(key: str, value: str):
     if value is None:

@@ -1,11 +1,10 @@
-from python.helpers import files, memory
-from python.helpers.tool import Tool, Response
 from agent import Agent
+from python.helpers import files, memory
 from python.helpers.log import LogItem
+from python.helpers.tool import Response, Tool
 
 
 class UpdateBehaviour(Tool):
-
     async def execute(self, adjustments="", **kwargs):
 
         # stringify adjustments if needed
@@ -14,7 +13,8 @@ class UpdateBehaviour(Tool):
 
         await update_behaviour(self.agent, self.log, adjustments)
         return Response(
-            message=self.agent.read_prompt("behaviour.updated.md"), break_loop=False
+            message=self.agent.read_prompt("behaviour.updated.md"),
+            break_loop=False,
         )
 
     # async def before_execution(self, **kwargs):
@@ -35,7 +35,9 @@ async def update_behaviour(agent: Agent, log_item: LogItem, adjustments: str):
         log_item.stream(ruleset=content)
 
     msg = agent.read_prompt(
-        "behaviour.merge.msg.md", current_rules=current_rules, adjustments=adjustments
+        "behaviour.merge.msg.md",
+        current_rules=current_rules,
+        adjustments=adjustments,
     )
 
     # call util llm to find solutions in history
@@ -58,7 +60,7 @@ def get_custom_rules_file(agent: Agent):
 def read_rules(agent: Agent):
     rules_file = get_custom_rules_file(agent)
     if files.exists(rules_file):
-        rules = agent.read_prompt(rules_file)
+        rules = files.read_prompt_file(rules_file)
         return agent.read_prompt("agent.system.behaviour.md", rules=rules)
     else:
         rules = agent.read_prompt("agent.system.behaviour_default.md")

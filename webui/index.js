@@ -1,18 +1,18 @@
-import * as msgs from "/js/messages.js";
-import * as api from "/js/api.js";
-import * as css from "/js/css.js";
-import { sleep } from "/js/sleep.js";
-import { store as attachmentsStore } from "/components/chat/attachments/attachmentsStore.js";
-import { store as speechStore } from "/components/chat/speech/speech-store.js";
-import { store as notificationStore } from "/components/notifications/notification-store.js";
-import { store as preferencesStore } from "/components/sidebar/bottom/preferences/preferences-store.js";
-import { store as inputStore } from "/components/chat/input/input-store.js";
-import { store as chatsStore } from "/components/sidebar/chats/chats-store.js";
-import { store as tasksStore } from "/components/sidebar/tasks/tasks-store.js";
-import { store as chatTopStore } from "/components/chat/top-section/chat-top-store.js";
-import { store as _tooltipsStore } from "/components/tooltips/tooltip-store.js";
-import { store as messageQueueStore } from "/components/chat/message-queue/message-queue-store.js";
-import { store as syncStore } from "/components/sync/sync-store.js"
+import * as msgs from '/js/messages.min.js';
+import * as api from '/js/api.min.js';
+import * as css from '/js/css.min.js';
+import { sleep } from '/js/sleep.min.js';
+import { STORAGE_KEYS, TIMING, Selectors } from '/js/constants.min.js';
+import { store as attachmentsStore } from '/components/chat/attachments/attachmentsStore.min.js';
+import { store as speechStore } from '/components/chat/speech/speech-store.min.js';
+import { store as notificationStore } from '/components/notifications/notification-store.min.js';
+import { store as preferencesStore } from '/components/sidebar/bottom/preferences/preferences-store.min.js';
+import { store as inputStore } from '/components/chat/input/input-store.min.js';
+import Logger from '/js/logger.min.js';
+import { store as chatsStore } from '/components/sidebar/chats/chats-store.min.js';
+import { store as tasksStore } from '/components/sidebar/tasks/tasks-store.min.js';
+import { store as chatTopStore } from '/components/chat/top-section/chat-top-store.min.js';
+import { store as typingIndicatorStore } from '/components/chat/typing-indicator/typing-indicator-store.min.js';
 
 globalThis.fetchApi = api.fetchApi; // TODO - backward compatibility for non-modular scripts, remove once refactored to alpine
 
@@ -29,7 +29,7 @@ let leftPanel,
   autoScrollSwitch,
   timeDate;
 
-let autoScroll = true;
+const autoScroll = true;
 let context = null;
 globalThis.resetCounter = 0; // Used by stores and getChatBasedId
 let skipOneSpeech = false;
@@ -37,64 +37,51 @@ let skipOneSpeech = false;
 // Sidebar toggle logic is now handled by sidebar-store.js
 
 export async function sendMessage() {
+  const chatInputEl = document.getElementById('chat-input');
+  if (!chatInputEl) {
+    Logger.warn('chatInput not available, cannot send message');
+    return;
+  }
   try {
-    const message = inputStore.message.trim();
+    const message = chatInputEl.value.trim();
     const attachmentsWithUrls = attachmentsStore.getAttachmentsForSending();
     const hasAttachments = attachmentsWithUrls.length > 0;
 
-    // If empty input but has queued messages, send all queued
-    if (!message && !hasAttachments && messageQueueStore.hasQueue) {
-      await messageQueueStore.sendAll();
-      return;
-    }
-
     if (message || hasAttachments) {
-      // Check if agent is busy - queue instead of sending
-      if (chatsStore.selectedContext.running || messageQueueStore.hasQueue) {
-        const success = messageQueueStore.addToQueue(message, attachmentsWithUrls);
-        // no await for the queue
-        // if (success) {
-          inputStore.reset();
-        // }
-        return;
-      }
-
-      // Sending a message is an explicit user intent to go to the bottom
-      msgs.scrollOnNextProcessGroup();
-      forceScrollChatToBottom();
-
       let response;
       const messageId = generateGUID();
 
       // Clear input and attachments
-      inputStore.reset();
+      chatInputEl.value = '';
+      attachmentsStore.clearAttachments();
+      adjustTextareaHeight();
 
       // Include attachments in the user message
       if (hasAttachments) {
         const heading =
           attachmentsWithUrls.length > 0
-            ? "Uploading attachments..."
-            : "";
+            ? 'Uploading attachments...'
+            : 'User message';
 
         // Render user message with attachments
-        setMessages([{ id: messageId, type: "user", heading, content: message, kvps: {
+        setMessage(messageId, 'user', heading, message, false, {
           // attachments: attachmentsWithUrls, // skip here, let the backend properly log them
-        }}]);
+        });
 
         // sleep one frame to render the message before upload starts - better UX
         sleep(0);
 
         const formData = new FormData();
-        formData.append("text", message);
-        formData.append("context", context);
-        formData.append("message_id", messageId);
+        formData.append('text', message);
+        formData.append('context', context);
+        formData.append('message_id', messageId);
 
         for (let i = 0; i < attachmentsWithUrls.length; i++) {
-          formData.append("attachments", attachmentsWithUrls[i].file);
+          formData.append('attachments', attachmentsWithUrls[i].file);
         }
 
-        response = await api.fetchApi("/message_async", {
-          method: "POST",
+        response = await api.fetchApi('/message_async', {
+          method: 'POST',
           body: formData,
         });
       } else {
@@ -104,10 +91,10 @@ export async function sendMessage() {
           context,
           message_id: messageId,
         };
-        response = await api.fetchApi("/message_async", {
-          method: "POST",
+        response = await api.fetchApi('/message_async', {
+          method: 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
           body: JSON.stringify(data),
         });
@@ -116,44 +103,34 @@ export async function sendMessage() {
       // Handle response
       const jsonResponse = await response.json();
       if (!jsonResponse) {
-        toast("No response returned.", "error");
+        toast('No response returned.', 'error');
       } else {
         setContext(jsonResponse.context);
+        typingIndicatorStore.show();
       }
     }
   } catch (e) {
-    toastFetchError("Error sending message", e); // Will use new notification system
+    toastFetchError('Error sending message', e); // Will use new notification system
   }
 }
 globalThis.sendMessage = sendMessage;
 
-function getChatHistoryEl() {
-  return document.getElementById("chat-history");
-}
-
-function forceScrollChatToBottom() {
-  const chatHistoryEl = getChatHistoryEl();
-  if (!chatHistoryEl) return;
-  chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
-}
-globalThis.forceScrollChatToBottom = forceScrollChatToBottom;
-
 export function toastFetchError(text, error) {
-  console.error(text, error);
+  Logger.error(text, error);
   // Use new frontend error notification system (async, but we don't need to wait)
-  const errorMessage = error?.message || error?.toString() || "Unknown error";
+  const errorMessage = error?.message || error?.toString() || 'Unknown error';
 
   if (getConnectionStatus()) {
     // Backend is connected, just show the error
     toastFrontendError(`${text}: ${errorMessage}`).catch((e) =>
-      console.error("Failed to show error toast:", e)
+      Logger.error('Failed to show error toast:', e),
     );
   } else {
     // Backend is disconnected, show connection error
     toastFrontendError(
       `${text} (backend appears to be disconnected): ${errorMessage}`,
-      "Connection Error"
-    ).catch((e) => console.error("Failed to show connection error toast:", e));
+      'Connection Error',
+    ).catch((e) => Logger.error('Failed to show connection error toast:', e));
   }
 }
 globalThis.toastFetchError = toastFetchError;
@@ -161,58 +138,84 @@ globalThis.toastFetchError = toastFetchError;
 // Event listeners will be set up in DOMContentLoaded
 
 export function updateChatInput(text) {
-  const chatInputEl = document.getElementById("chat-input");
+  const chatInputEl = document.getElementById('chat-input');
   if (!chatInputEl) {
-    console.warn("`chatInput` element not found, cannot update.");
+    Logger.warn('`chatInput` element not found, cannot update.');
     return;
   }
-  console.log("updateChatInput called with:", text);
 
   // Append text with proper spacing
   const currentValue = chatInputEl.value;
-  const needsSpace = currentValue.length > 0 && !currentValue.endsWith(" ");
-  chatInputEl.value = currentValue + (needsSpace ? " " : "") + text + " ";
+  const needsSpace = currentValue.length > 0 && !currentValue.endsWith(' ');
+  chatInputEl.value = currentValue + (needsSpace ? ' ' : '') + text + ' ';
 
   // Adjust height and trigger input event
   adjustTextareaHeight();
-  chatInputEl.dispatchEvent(new Event("input"));
+  chatInputEl.dispatchEvent(new Event('input'));
 
-  console.log("Updated chat input value:", chatInputEl.value);
+  // Removed console.log for production
 }
 
 async function updateUserTime() {
-  let userTimeElement = document.getElementById("time-date");
+  try {
+    let userTimeElement = document.getElementById('time-date');
 
-  while (!userTimeElement) {
-    await sleep(100);
-    userTimeElement = document.getElementById("time-date");
+    while (!userTimeElement) {
+      await sleep(100);
+      userTimeElement = document.getElementById('time-date');
+    }
+
+    const now = new Date();
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+    const ampm = hours >= 12 ? 'pm' : 'am';
+    const formattedHours = hours % 12 || 12;
+
+    // Format the time
+    const timeString = `${formattedHours}:${minutes
+      .toString()
+      .padStart(2, '0')}:${seconds.toString().padStart(2, '0')} ${ampm}`;
+
+    // Format the date
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    const dateString = now.toLocaleDateString(undefined, options);
+
+    // Update the HTML using safe DOM manipulation instead of innerHTML
+    let dateSpan = userTimeElement.querySelector('#user-date');
+    if (!dateSpan) {
+      userTimeElement.textContent = timeString;
+      dateSpan = document.createElement('span');
+      dateSpan.id = 'user-date';
+      userTimeElement.appendChild(document.createElement('br'));
+      userTimeElement.appendChild(dateSpan);
+    } else {
+      // Update text content of first child (time)
+      if (userTimeElement.firstChild) {
+        userTimeElement.firstChild.textContent = timeString;
+      }
+    }
+    dateSpan.textContent = dateString;
+  } catch (error) {
+    // Silently ignore time update errors to prevent console spam
   }
-
-  const now = new Date();
-  const hours = now.getHours();
-  const minutes = now.getMinutes();
-  const seconds = now.getSeconds();
-  const ampm = hours >= 12 ? "pm" : "am";
-  const formattedHours = hours % 12 || 12;
-
-  // Format the time
-  const timeString = `${formattedHours}:${minutes
-    .toString()
-    .padStart(2, "0")}:${seconds.toString().padStart(2, "0")} ${ampm}`;
-
-  // Format the date
-  const options = { year: "numeric", month: "short", day: "numeric" };
-  const dateString = now.toLocaleDateString(undefined, options);
-
-  // Update the HTML
-  userTimeElement.innerHTML = `${timeString}<br><span id="user-date">${dateString}</span>`;
 }
 
 updateUserTime();
-setInterval(updateUserTime, 1000);
+const userTimeInterval = setInterval(updateUserTime, TIMING.USER_TIME_UPDATE_INTERVAL);
 
-function setMessages(...params) {
-  return msgs.setMessages(...params);
+// Cleanup interval on page unload to prevent memory leaks
+window.addEventListener('beforeunload', () => {
+  clearInterval(userTimeInterval);
+});
+
+function setMessage(id, type, heading, content, temp, kvps = null) {
+  const result = msgs.setMessage(id, type, heading, content, temp, kvps);
+  const chatHistoryEl = document.getElementById('chat-history');
+  if (preferencesStore.autoScroll && chatHistoryEl) {
+    chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
+  }
+  return result;
 }
 
 globalThis.loadKnowledge = async function () {
@@ -220,10 +223,10 @@ globalThis.loadKnowledge = async function () {
 };
 
 function adjustTextareaHeight() {
-  const chatInputEl = document.getElementById("chat-input");
+  const chatInputEl = document.getElementById('chat-input');
   if (chatInputEl) {
-    chatInputEl.style.height = "auto";
-    chatInputEl.style.height = chatInputEl.scrollHeight + "px";
+    chatInputEl.style.height = 'auto';
+    chatInputEl.style.height = chatInputEl.scrollHeight + 'px';
   }
 }
 
@@ -247,9 +250,9 @@ export const sendJsonData = async function (url, data) {
 globalThis.sendJsonData = sendJsonData;
 
 function generateGUID() {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    var r = (Math.random() * 16) | 0;
-    var v = c === "x" ? r : (r & 0x3) | 0x8;
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
     return v.toString(16);
   });
 }
@@ -273,104 +276,107 @@ function setConnectionStatus(connected) {
 }
 
 let lastLogVersion = 0;
-let lastLogGuid = "";
+let lastLogGuid = '';
 let lastSpokenNo = 0;
 
-export function buildStateRequestPayload(options = {}) {
-  const { forceFull = false } = options || {};
-  const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  return {
-    context: context || null,
-    log_from: forceFull ? 0 : lastLogVersion,
-    notifications_from: forceFull ? 0 : notificationStore.lastNotificationVersion || 0,
-    timezone,
-  };
-}
-
-export async function applySnapshot(snapshot, options = {}) {
-  const { touchConnectionStatus = false, onLogGuidReset = null } = options || {};
-
+export async function poll() {
   let updated = false;
+  try {
+    // Get timezone from navigator
+    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  // Check if the snapshot is valid
-  if (!snapshot || typeof snapshot !== "object") {
-    console.error("Invalid snapshot payload");
-    return { updated: false };
-  }
+    const log_from = lastLogVersion;
+    const response = await sendJsonData('/poll', {
+      log_from: log_from,
+      notifications_from: notificationStore.lastNotificationVersion || 0,
+      context: context || null,
+      timezone: timezone,
+    });
 
-  // deselect chat if it is requested by the backend
-  if (snapshot.deselect_chat) {
-    chatsStore.deselectChat();
-    return { updated: false };
-  }
-
-  if (
-    snapshot.context != context &&
-    context !== null
-  ) {
-    return { updated: false };
-  }
-
-  // If the chat has been reset, reset cursors and request a resync from the caller.
-  // Note: on first snapshot after a context switch, lastLogGuid is intentionally empty,
-  // so the mismatch is expected and should not trigger a second state_request/poll.
-  if (lastLogGuid != snapshot.log_guid) {
-    if (lastLogGuid) {
-      const chatHistoryEl = document.getElementById("chat-history");
-      if (chatHistoryEl) chatHistoryEl.innerHTML = "";
-      lastLogVersion = 0;
-      lastLogGuid = snapshot.log_guid;
-      if (typeof onLogGuidReset === "function") {
-        await onLogGuidReset();
+    // Check if the response is valid
+    if (!response) {
+      // Silently skip in static file mode to prevent console errors
+      if (window.location.port === '8080' || window.location.protocol === 'file:') {
+        return false;
       }
-      return { updated: false, resynced: true };
+      Logger.error('Invalid response from poll endpoint');
+      return false;
     }
-    // First guid observed for this context: accept it and continue applying snapshot.
-    lastLogVersion = 0;
-    lastLogGuid = snapshot.log_guid;
-  }
 
-  if (lastLogVersion != snapshot.log_version) {
-    updated = true;
-    setMessages(snapshot.logs);
-    afterMessagesUpdate(snapshot.logs);
-  }
+    // deselect chat if it is requested by the backend
+    if (response.deselect_chat) {
+      chatsStore.deselectChat();
+      return;
+    }
 
-  lastLogVersion = snapshot.log_version;
-  lastLogGuid = snapshot.log_guid;
+    if (
+      response.context != context &&
+      !(response.context === null && context === null) &&
+      context !== null
+    ) {
+      return;
+    }
 
-  updateProgress(snapshot.log_progress, snapshot.log_progress_active);
+    // if the chat has been reset, restart this poll as it may have been called with incorrect log_from
+    if (lastLogGuid != response.log_guid) {
+      const chatHistoryEl = document.getElementById('chat-history');
+      if (chatHistoryEl) { while (chatHistoryEl.firstChild) { chatHistoryEl.removeChild(chatHistoryEl.firstChild); } }
+      lastLogVersion = 0;
+      lastLogGuid = response.log_guid;
+      await poll();
+      return;
+    }
 
-  // Update notifications from snapshot
-  notificationStore.updateFromPoll(snapshot);
+    if (lastLogVersion != response.log_version) {
+      updated = true;
+      for (const log of response.logs) {
+        const messageId = log.id || log.no; // Use log.id if available
+        setMessage(
+          messageId,
+          log.type,
+          log.heading,
+          log.content,
+          log.temp,
+          log.kvps,
+        );
+      }
+      afterMessagesUpdate(response.logs);
+      typingIndicatorStore.hide();
+    }
 
-  // set ui model vars from backend
-  inputStore.paused = snapshot.paused;
+    lastLogVersion = response.log_version;
+    lastLogGuid = response.log_guid;
 
-  // Optional: treat snapshot application as proof of connectivity (poll path)
-  if (touchConnectionStatus) {
+    updateProgress(response.log_progress, response.log_progress_active);
+
+    // Update notifications from response
+    notificationStore.updateFromPoll(response);
+
+    //set ui model vars from backend
+    inputStore.paused = response.paused;
+
+    // Update status icon state
     setConnectionStatus(true);
-  }
 
-  // Update chats list using store
-  let contexts = snapshot.contexts || [];
-  chatsStore.applyContexts(contexts);
+    // Update chats list using store
+    const contexts = response.contexts || [];
+    chatsStore.applyContexts(contexts);
 
-  // Update tasks list using store
-  let tasks = snapshot.tasks || [];
-  tasksStore.applyTasks(tasks);
+    // Update tasks list using store
+    const tasks = response.tasks || [];
+    tasksStore.applyTasks(tasks);
 
-  // Make sure the active context is properly selected in both lists
-  if (context) {
-    // Update selection in both stores
-    chatsStore.setSelected(context);
+    // Make sure the active context is properly selected in both lists
+    if (context) {
+      // Update selection in both stores
+      chatsStore.setSelected(context);
 
-    const contextInChats = chatsStore.contains(context);
-    const contextInTasks = tasksStore.contains(context);
+      const contextInChats = chatsStore.contains(context);
+      const contextInTasks = tasksStore.contains(context);
 
-    if (contextInTasks) {
-      tasksStore.setSelected(context);
-    }
+      if (contextInTasks) {
+        tasksStore.setSelected(context);
+      }
 
       if (!contextInChats && !contextInTasks) {
         if (chatsStore.contexts.length > 0) {
@@ -380,49 +386,59 @@ export async function applySnapshot(snapshot, options = {}) {
             setContext(firstChatId);
             chatsStore.setSelected(firstChatId);
           }
-        } else if (typeof deselectChat === "function") {
+        } else if (typeof deselectChat === 'function') {
           // No contexts remain – clear state so the welcome screen can surface
           deselectChat();
         }
       }
     } else {
-      // No context selected: keep it that way so the welcome screen stays visible.
+      const welcomeStore =
+        globalThis.Alpine && typeof globalThis.Alpine.store === 'function'
+          ? globalThis.Alpine.store('welcomeStore')
+          : null;
+      const welcomeVisible = Boolean(welcomeStore && welcomeStore.isVisible);
+
+      // No context selected, try to select the first available item unless welcome screen is active
+      if (!welcomeVisible && contexts.length > 0) {
+        const firstChatId = chatsStore.firstId();
+        if (firstChatId) {
+          setContext(firstChatId);
+          chatsStore.setSelected(firstChatId);
+        }
+      }
     }
 
-    // update message queue
-    messageQueueStore.updateFromPoll();
-
-    return { updated };
-  }
-
-export async function poll() {
-  try {
-    // Get timezone from navigator
-    const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-
-    const log_from = lastLogVersion;
-    const response = await sendJsonData("/poll", {
-      log_from: log_from,
-      notifications_from: notificationStore.lastNotificationVersion || 0,
-      context: context || null,
-      timezone: timezone,
-    });
-
-    const result = await applySnapshot(response, {
-      touchConnectionStatus: true,
-      onLogGuidReset: poll,
-    });
-    return { ok: true, updated: Boolean(result && result.updated) };
+    lastLogVersion = response.log_version;
+    lastLogGuid = response.log_guid;
   } catch (error) {
-    console.error("Error:", error);
+    // Silently handle connection errors to prevent console spam
+    // Only log if it's not a common connection/backend unavailable error
+    const isConnectionError = error.message?.includes('fetch') ||
+                              error.message?.includes('network') ||
+                              error.message?.includes('CSRF') ||
+                              error.message?.includes('JSON') ||
+                              error.message?.includes('Static file mode') ||
+                              error.message?.includes('backend') ||
+                              error.message?.includes('backend not running');
+
+    if (!isConnectionError) {
+      Logger.error('Poll error:', error);
+    }
     setConnectionStatus(false);
-    return { ok: false, updated: false };
   }
+
+  return updated;
 }
 globalThis.poll = poll;
 
 function afterMessagesUpdate(logs) {
-  if (preferencesStore.speech) speakMessages(logs);
+  try {
+    if (localStorage.getItem(STORAGE_KEYS.SPEECH) == 'true') {
+      speakMessages(logs);
+    }
+  } catch (e) {
+    // Silent fail in private browsing mode
+  }
 }
 
 function speakMessages(logs) {
@@ -438,22 +454,22 @@ function speakMessages(logs) {
     // if(log.no < lastSpokenNo) break;
 
     // finished response
-    if (log.type == "response") {
+    if (log.type == 'response') {
       // lastSpokenNo = log.no;
       speechStore.speakStream(
         getChatBasedId(log.no),
         log.content,
-        log.kvps?.finished
+        log.kvps?.finished,
       );
       return;
 
       // finished LLM headline, not response
     } else if (
-      log.type == "agent" &&
+      log.type == 'agent' &&
       log.kvps &&
       log.kvps.headline &&
       log.kvps.tool_args &&
-      log.kvps.tool_name != "response"
+      log.kvps.tool_name != 'response'
     ) {
       // lastSpokenNo = log.no;
       speechStore.speakStream(getChatBasedId(log.no), log.kvps.headline, true);
@@ -463,25 +479,20 @@ function speakMessages(logs) {
 }
 
 function updateProgress(progress, active) {
-  const progressBarEl = document.getElementById("progress-bar");
+  const progressBarEl = document.getElementById('progress-bar');
   if (!progressBarEl) return;
-  if (!progress) progress = "";
+  if (!progress) progress = '';
 
-  setProgressBarShine(progressBarEl, active);
+  if (!active) {
+    removeClassFromElement(progressBarEl, 'shiny-text');
+  } else {
+    addClassToElement(progressBarEl, 'shiny-text');
+  }
 
   progress = msgs.convertIcons(progress);
 
-  if (progressBarEl.innerHTML != progress) {
-    progressBarEl.innerHTML = progress;
-  }
-}
-
-function setProgressBarShine(progressBarEl, active) {
-  if (!progressBarEl) return;
-  if (!active) {
-    removeClassFromElement(progressBarEl, "shiny-text");
-  } else {
-    addClassToElement(progressBarEl, "shiny-text");
+  if (progressBarEl.textContent !== progress) {
+    progressBarEl.textContent = progress;
   }
 }
 
@@ -491,8 +502,8 @@ globalThis.pauseAgent = async function (paused) {
 
 function generateShortId() {
   const chars =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  let result = "";
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
   for (let i = 0; i < 8; i++) {
     result += chars.charAt(Math.floor(Math.random() * chars.length));
   }
@@ -510,7 +521,7 @@ export const setContext = function (id) {
   context = id;
   // Always reset the log tracking variables when switching contexts
   // This ensures we get fresh data from the backend
-  lastLogGuid = "";
+  lastLogGuid = '';
   lastLogVersion = 0;
   lastSpokenNo = 0;
 
@@ -518,39 +529,37 @@ export const setContext = function (id) {
   speechStore.stopAudio();
 
   // Clear the chat history immediately to avoid showing stale content
-  const chatHistoryEl = document.getElementById("chat-history");
-  if (chatHistoryEl) chatHistoryEl.innerHTML = "";
+  const chatHistoryEl = document.getElementById('chat-history');
+  if (chatHistoryEl) { while (chatHistoryEl.firstChild) { chatHistoryEl.removeChild(chatHistoryEl.firstChild); } }
 
   // Update both selected states using stores
   chatsStore.setSelected(id);
   tasksStore.setSelected(id);
 
-  // Trigger a new WS handshake for the newly selected context (push-based sync).
-  // This keeps the UI current without needing /poll during healthy operation.
-  try {
-    if (typeof syncStore.sendStateRequest === "function") {
-      syncStore.sendStateRequest({ forceFull: true }).catch((error) => {
-        console.error("[index] syncStore.sendStateRequest failed:", error);
-      });
-    }
-  } catch (_error) {
-    // no-op: sync store may not be initialized yet
-  }
-
   //skip one speech if enabled when switching context
-  if (preferencesStore.speech) skipOneSpeech = true;
+  try {
+    if (localStorage.getItem(STORAGE_KEYS.SPEECH) == 'true') skipOneSpeech = true;
+  } catch (e) {
+    // Silent fail in private browsing mode
+  }
 };
 
 export const deselectChat = function () {
   // Clear current context to show welcome screen
   setContext(null);
 
-  // Clear selections so we don't auto-restore
-  sessionStorage.removeItem("lastSelectedChat");
-  sessionStorage.removeItem("lastSelectedTask");
+  // Clear localStorage selections so we don't auto-restore
+  try {
+    localStorage.removeItem(STORAGE_KEYS.LAST_SELECTED_CHAT);
+    localStorage.removeItem(STORAGE_KEYS.LAST_SELECTED_TASK);
+  } catch (e) {
+    // Silent fail in private browsing mode
+  }
 
-  // Clear the chat history
-  chatHistory.innerHTML = "";
+  // Clear the chat history safely
+  while (chatHistory.firstChild) {
+    chatHistory.removeChild(chatHistory.firstChild);
+  }
 };
 globalThis.deselectChat = deselectChat;
 
@@ -561,7 +570,7 @@ globalThis.getContext = getContext;
 globalThis.setContext = setContext;
 
 export const getChatBasedId = function (id) {
-  return context + "-" + globalThis.resetCounter + "-" + id;
+  return context + '-' + globalThis.resetCounter + '-' + id;
 };
 
 function addClassToElement(element, className) {
@@ -572,167 +581,99 @@ function removeClassFromElement(element, className) {
   element.classList.remove(className);
 }
 
-export function justToast(text, type = "info", timeout = 5000, group = "") {
-  notificationStore.addFrontendToastOnly(type, text, "", timeout / 1000, group);
+export function justToast(text, type = 'info', timeout = TIMING.TOAST_DISPLAY, group = '') {
+  notificationStore.addFrontendToastOnly(type, text, '', timeout / 1000, group);
 }
 globalThis.justToast = justToast;
 
-export function toast(text, type = "info", timeout = 5000) {
+export function toast(text, type = 'info', timeout = TIMING.TOAST_DISPLAY) {
   // Convert timeout from milliseconds to seconds for new notification system
   const display_time = Math.max(timeout / 1000, 1); // Minimum 1 second
 
   // Use new frontend notification system based on type
   switch (type.toLowerCase()) {
-    case "error":
-      return notificationStore.frontendError(text, "Error", display_time);
-    case "success":
-      return notificationStore.frontendInfo(text, "Success", display_time);
-    case "warning":
-      return notificationStore.frontendWarning(text, "Warning", display_time);
-    case "info":
-    default:
-      return notificationStore.frontendInfo(text, "Info", display_time);
+  case 'error':
+    return notificationStore.frontendError(text, 'Error', display_time);
+  case 'success':
+    return notificationStore.frontendInfo(text, 'Success', display_time);
+  case 'warning':
+    return notificationStore.frontendWarning(text, 'Warning', display_time);
+  case 'info':
+  default:
+    return notificationStore.frontendInfo(text, 'Info', display_time);
   }
 }
 globalThis.toast = toast;
 
+// OLD: hideToast function removed - now using new notification system
 
-import { store as _chatNavigationStore } from "/components/chat/navigation/chat-navigation-store.js";
+function scrollChanged(isAtBottom) {
+  // Reflect scroll state into preferences store; UI is bound via x-model
+  preferencesStore.autoScroll = isAtBottom;
+}
 
+export function updateAfterScroll() {
+  // const toleranceEm = 1; // Tolerance in em units
+  // const tolerancePx = toleranceEm * parseFloat(getComputedStyle(document.documentElement).fontSize); // Convert em to pixels
+  const tolerancePx = 10;
+  const chatHistory = document.getElementById('chat-history');
+  if (!chatHistory) return;
 
-// Navigation logic in chat-navigation-store.js
-// forceScrollChatToBottom is kept here as it is used by system events
+  const isAtBottom =
+    chatHistory.scrollHeight - chatHistory.scrollTop <=
+    chatHistory.clientHeight + tolerancePx;
 
+  scrollChanged(isAtBottom);
+}
+globalThis.updateAfterScroll = updateAfterScroll;
 
 // setInterval(poll, 250);
 
 async function startPolling() {
-  // Fallback polling cadence:
-  // - DISCONNECTED: do not poll (transport down, avoid request spam)
-  // - HANDSHAKE_PENDING/DEGRADED: steady fallback cadence to keep UI responsive
-  const degradedIntervalMs = 250;
-  let missingSyncSinceMs = null;
-  let consecutivePollFailures = 0;
-  let lastHandshakeKickMs = 0;
-  const startedAtMs = Date.now();
-  const initialNoPollGraceMs = 2000;
-  let pollInFlight = false;
+  const shortInterval = 25;
+  const longInterval = 250;
+  const shortIntervalPeriod = 100;
+  let shortIntervalCount = 0;
 
   async function _doPoll() {
-    const tickStartedAt = Date.now();
-    let nextInterval = degradedIntervalMs;
+    let nextInterval = longInterval;
 
     try {
-      const syncMode = typeof syncStore.mode === "string" ? syncStore.mode : null;
-      // Polling is a fallback. In V1:
-      // - DEGRADED: poll at fallback cadence to keep the UI usable while WS sync is unavailable.
-      // - DISCONNECTED: do not poll; rely on Socket.IO reconnect and avoid console/network spam.
-      // Safety net: if the sync store never loads, start polling after a short grace period.
-      if (!syncStore || !syncMode) {
-        if (missingSyncSinceMs == null) {
-          missingSyncSinceMs = Date.now();
-        }
-      } else {
-        missingSyncSinceMs = null;
-      }
-
-      const shouldPoll =
-        syncMode === "DEGRADED" ||
-        (missingSyncSinceMs != null && Date.now() - missingSyncSinceMs > 2000);
-      if (!shouldPoll) {
-        setTimeout(_doPoll.bind(this), nextInterval);
-        return;
-      }
-
-      if (pollInFlight) {
-        setTimeout(_doPoll.bind(this), nextInterval);
-        return;
-      }
-
-      // Avoid a “single poll on boot” while the websocket handshake is racing to take over.
-      if (Date.now() - startedAtMs < initialNoPollGraceMs && (!syncStore || !syncMode)) {
-        setTimeout(_doPoll.bind(this), nextInterval);
-        return;
-      }
-
-      // Call through `globalThis.poll` so test harnesses (and future instrumentation)
-      // can wrap/spy on polling behaviour. Fall back to the module-local function
-      // if the global is unavailable.
-      const pollFn = typeof globalThis.poll === "function" ? globalThis.poll : poll;
-      pollInFlight = true;
-      let result;
-      try {
-        result = await pollFn();
-      } finally {
-        pollInFlight = false;
-      }
-      const pollOk = Boolean(result && result.ok);
-
-      if (!pollOk) {
-        consecutivePollFailures += 1;
-      } else {
-        consecutivePollFailures = 0;
-      }
-
-      // If we are degraded but polling repeatedly fails, upgrade to DISCONNECTED.
-      if (
-        syncStore &&
-        syncMode === "DEGRADED" &&
-        !pollOk &&
-        consecutivePollFailures >= 3
-      ) {
-        syncStore.mode = "DISCONNECTED";
-      }
-
-      // If we're polling and the backend responds, try to re-establish push sync immediately.
-      if (syncStore && pollOk) {
-        const now = Date.now();
-        const modeNow = typeof syncStore.mode === "string" ? syncStore.mode : null;
-        const kickCooldownMs = modeNow === "DISCONNECTED" ? 0 : 3000;
-        const eligible =
-          (modeNow === "DISCONNECTED" || modeNow === "DEGRADED") &&
-          typeof syncStore.sendStateRequest === "function" &&
-          now - lastHandshakeKickMs >= kickCooldownMs;
-        if (eligible) {
-          lastHandshakeKickMs = now;
-          syncStore.sendStateRequest({ forceFull: true }).catch(() => {});
-        }
-      }
-
-      const effectiveMode =
-        syncStore && typeof syncStore.mode === "string" ? syncStore.mode : syncMode;
-      nextInterval =
-        effectiveMode === "DEGRADED" || effectiveMode === "HANDSHAKE_PENDING"
-          ? degradedIntervalMs
-          : degradedIntervalMs;
+      const result = await poll();
+      if (result) shortIntervalCount = shortIntervalPeriod; // Reset the counter when the result is true
+      if (shortIntervalCount > 0) shortIntervalCount--; // Decrease the counter on each call
+      nextInterval = shortIntervalCount > 0 ? shortInterval : longInterval;
     } catch (error) {
-      console.error("Error:", error);
+      Logger.error('Error:', error);
     }
 
     // Call the function again after the selected interval
-    const elapsedMs = Date.now() - tickStartedAt;
-    const delayMs = Math.max(0, nextInterval - elapsedMs);
-    setTimeout(_doPoll.bind(this), delayMs);
+    setTimeout(_doPoll.bind(this), nextInterval);
   }
 
   _doPoll();
 }
 
 // All initializations and event listeners are now consolidated here
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener('DOMContentLoaded', function () {
   // Assign DOM elements to variables now that the DOM is ready
-  leftPanel = document.getElementById("left-panel");
-  rightPanel = document.getElementById("right-panel");
-  container = document.querySelector(".container");
-  chatInput = document.getElementById("chat-input");
-  chatHistory = document.getElementById("chat-history");
-  sendButton = document.getElementById("send-button");
-  inputSection = document.getElementById("input-section");
-  statusSection = document.getElementById("status-section");
-  progressBar = document.getElementById("progress-bar");
-  autoScrollSwitch = document.getElementById("auto-scroll-switch");
-  timeDate = document.getElementById("time-date-container");
+  leftPanel = document.getElementById('left-panel');
+  rightPanel = document.getElementById('right-panel');
+  container = document.querySelector(Selectors.CONTAINER);
+  chatInput = document.getElementById('chat-input');
+  chatHistory = document.getElementById('chat-history');
+  sendButton = document.getElementById('send-button');
+  inputSection = document.getElementById('input-section');
+  statusSection = document.getElementById('status-section');
+  progressBar = document.getElementById('progress-bar');
+  autoScrollSwitch = document.getElementById('auto-scroll-switch');
+  timeDate = document.getElementById('time-date-container');
 
+  // Sidebar and input event listeners are now handled by their respective stores
+
+  if (chatHistory) {
+    chatHistory.addEventListener('scroll', updateAfterScroll);
+  }
 
   // Start polling for updates
   startPolling();
@@ -746,3 +687,59 @@ document.addEventListener("DOMContentLoaded", function () {
  * - Both lists are sorted by creation time (newest first)
  * - Tasks use the same context system as chats for communication with the backend
  */
+
+// Open the scheduler detail view for a specific task
+function openTaskDetail(taskId) {
+  // Wait for Alpine.js to be fully loaded
+  if (globalThis.Alpine) {
+    // Get the settings modal button and click it to ensure all init logic happens
+    const settingsButton = document.getElementById('settings');
+    if (settingsButton) {
+      // Programmatically click the settings button
+      settingsButton.click();
+
+      // Now get a reference to the modal element
+      const modalEl = document.getElementById('settingsModal');
+      if (!modalEl) {
+        Logger.error('Settings modal element not found after clicking button');
+        return;
+      }
+
+      // Get the Alpine.js data for the modal
+      const modalData = globalThis.Alpine ? Alpine.$data(modalEl) : null;
+
+      // Use a timeout to ensure the modal is fully rendered
+      setTimeout(() => {
+        // Switch to the scheduler tab first
+        modalData.switchTab('scheduler');
+
+        // Use another timeout to ensure the scheduler component is initialized
+        setTimeout(() => {
+          // Get the scheduler component
+          const schedulerComponent = document.querySelector(
+            '[x-data="schedulerSettings"]',
+          );
+          if (!schedulerComponent) {
+            Logger.error('Scheduler component not found');
+            return;
+          }
+
+          // Get the Alpine.js data for the scheduler component
+          const schedulerData = globalThis.Alpine
+            ? Alpine.$data(schedulerComponent)
+            : null;
+
+          // Show the task detail view for the specific task
+          schedulerData.showTaskDetail(taskId);
+        }, 50); // Give time for the scheduler tab to initialize
+      }, 25); // Give time for the modal to render
+    } else {
+      Logger.error('Settings button not found');
+    }
+  } else {
+    Logger.error('Alpine.js not loaded');
+  }
+}
+
+// Make the function available globally
+globalThis.openTaskDetail = openTaskDetail;

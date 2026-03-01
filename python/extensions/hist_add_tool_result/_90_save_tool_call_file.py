@@ -1,9 +1,10 @@
+import os
 from typing import Any
-from python.helpers.extension import Extension
-from python.helpers import files, persist_chat
-import os, re
 
-LEN_MIN = 500
+from python.helpers import files, persist_chat
+from python.helpers.constants import Extensions
+from python.helpers.extension import Extension
+
 
 class SaveToolCallFile(Extension):
     async def execute(self, data: dict[str, Any] | None = None, **kwargs):
@@ -16,7 +17,7 @@ class SaveToolCallFile(Extension):
             return
 
         # skip short results
-        if len(str(result)) < LEN_MIN:
+        if len(str(result)) < Extensions.TOOL_CALL_FILE_MIN_LENGTH:
             return
 
         # message files directory
@@ -27,7 +28,7 @@ class SaveToolCallFile(Extension):
         last_num = len(os.listdir(msgs_folder))
 
         # create new file
-        new_file = files.get_abs_path(msgs_folder, f"{last_num+1}.txt")
+        new_file = files.get_abs_path(msgs_folder, f"{last_num + 1}.txt")
         files.write_file(
             new_file,
             result,

@@ -1,21 +1,21 @@
 import asyncio
-from datetime import datetime
 import time
-from python.helpers.task_scheduler import TaskScheduler
+
+from python.helpers import errors, runtime
+from python.helpers.constants import Limits
 from python.helpers.print_style import PrintStyle
-from python.helpers import errors
-from python.helpers import runtime
+from python.helpers.task_scheduler import TaskScheduler
 
-
-SLEEP_TIME = 60
+SLEEP_TIME = Limits.JOB_LOOP_SLEEP_TIME
 
 keep_running = True
 pause_time = 0
+tick_in_progress = False
+tick_lock = asyncio.Lock()
 
 
 async def run_loop():
-    global pause_time, keep_running
-
+    global tick_in_progress
     while True:
         if runtime.is_development():
             # Signal to container that the job loop should be paused
@@ -23,15 +23,32 @@ async def run_loop():
             try:
                 await runtime.call_development_function(pause_loop)
             except Exception as e:
-                PrintStyle().error("Failed to pause job loop by development instance: " + errors.error_text(e))
+                PrintStyle().error(
+                    "Failed to pause job loop by development instance: " + errors.error_text(e)
+                )
         if not keep_running and (time.time() - pause_time) > (SLEEP_TIME * 2):
             resume_loop()
+
+        # Use lock to prevent race condition between check and set of tick_in_progress
+        # This addresses the issue where SLEEP_TIME < tick_duration causes overlapping ticks
         if keep_running:
-            try:
-                await scheduler_tick()
-            except Exception as e:
-                PrintStyle().error(errors.format_error(e))
-        await asyncio.sleep(SLEEP_TIME)  # TODO! - if we lower it under 1min, it can run a 5min job multiple times in it's target minute
+            async with tick_lock:
+                if tick_in_progress:
+                    # Log warning when skipping tick due to previous tick still running
+                    PrintStyle().warning(
+                        f"Skipping scheduler tick - previous tick still in progress "
+                        f"(SLEEP_TIME={SLEEP_TIME}s may be too short)"
+                    )
+                else:
+                    tick_in_progress = True
+                    try:
+                        await scheduler_tick()
+                    except Exception as e:
+                        PrintStyle().error(errors.format_error(e))
+                    finally:
+                        tick_in_progress = False
+
+        await asyncio.sleep(SLEEP_TIME)
 
 
 async def scheduler_tick():

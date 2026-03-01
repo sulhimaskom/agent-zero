@@ -1,13 +1,22 @@
+"""Runtime environment detection and management for Agent Zero.
+
+Handles command-line arguments, environment initialization,
+Docker operations, and runtime configuration.
+"""
+
 import argparse
-import inspect
-import secrets
-from pathlib import Path
-from typing import TypeVar, Callable, Awaitable, Union, overload, cast
-from python.helpers import dotenv, rfc, settings, files
 import asyncio
-import threading
+import inspect
 import queue
+import secrets
 import sys
+import threading
+from collections.abc import Awaitable, Callable
+from pathlib import Path
+from typing import TypeVar, cast, overload
+
+from python.helpers import dotenv, files, rfc, settings
+from python.helpers.constants import Network, Protocols, Shell, Timeouts
 
 T = TypeVar("T")
 R = TypeVar("R")
@@ -30,9 +39,7 @@ def initialize():
         default=False,
         help="Use cloudflare tunnel for public URL",
     )
-    parser.add_argument(
-        "--development", type=bool, default=False, help="Development mode"
-    )
+    parser.add_argument("--development", type=bool, default=False, help="Development mode")
 
     known, unknown = parser.parse_known_args()
     args = vars(known)
@@ -44,12 +51,10 @@ def initialize():
 
 
 def get_arg(name: str):
-    global args
-    return args.get(name, None)
+    return args.get(name)
 
 
 def has_arg(name: str):
-    global args
     return name in args
 
 
@@ -64,7 +69,7 @@ def is_development() -> bool:
 def get_local_url():
     if is_dockerized():
         return "host.docker.internal"
-    return "127.0.0.1"
+    return Network.DEFAULT_LOCALHOST
 
 
 def get_runtime_id() -> str:
@@ -83,25 +88,21 @@ def get_persistent_id() -> str:
 
 
 @overload
-async def call_development_function(
-    func: Callable[..., Awaitable[T]], *args, **kwargs
-) -> T: ...
+async def call_development_function[T](func: Callable[..., Awaitable[T]], *args, **kwargs) -> T: ...
 
 
 @overload
-async def call_development_function(func: Callable[..., T], *args, **kwargs) -> T: ...
+async def call_development_function[T](func: Callable[..., T], *args, **kwargs) -> T: ...
 
 
-async def call_development_function(
-    func: Union[Callable[..., T], Callable[..., Awaitable[T]]], *args, **kwargs
+async def call_development_function[T](
+    func: Callable[..., T] | Callable[..., Awaitable[T]], *args, **kwargs
 ) -> T:
     if is_development():
         url = _get_rfc_url()
         password = _get_rfc_password()
         # Normalize path components to build a valid Python module path across OSes
-        module_path = Path(
-            files.deabsolute_path(func.__code__.co_filename)
-        ).with_suffix("")
+        module_path = Path(files.deabsolute_path(func.__code__.co_filename)).with_suffix("")
         module = ".".join(module_path.parts)  # __module__ is not reliable
         result = await rfc.call_rfc(
             url=url,
@@ -126,15 +127,15 @@ async def handle_rfc(rfc_call: rfc.RFCCall):
 def _get_rfc_password() -> str:
     password = dotenv.get_dotenv_value(dotenv.KEY_RFC_PASSWORD)
     if not password:
-        raise Exception("No RFC password, cannot handle RFC calls.")
+        raise RuntimeError("No RFC password, cannot handle RFC calls.")
     return password
 
 
 def _get_rfc_url() -> str:
     set = settings.get_settings()
     url = set["rfc_url"]
-    if not "://" in url:
-        url = "http://" + url
+    if "://" not in url:
+        url = Protocols.HTTP + url
     if url.endswith("/"):
         url = url[:-1]
     url = url + ":" + str(set["rfc_port_http"])
@@ -142,8 +143,8 @@ def _get_rfc_url() -> str:
     return url
 
 
-def call_development_function_sync(
-    func: Union[Callable[..., T], Callable[..., Awaitable[T]]], *args, **kwargs
+def call_development_function_sync[T](
+    func: Callable[..., T] | Callable[..., Awaitable[T]], *args, **kwargs
 ) -> T:
     # run async function in sync manner
     result_queue = queue.Queue()
@@ -154,10 +155,10 @@ def call_development_function_sync(
 
     thread = threading.Thread(target=run_in_thread)
     thread.start()
-    thread.join(timeout=30)  # wait for thread with timeout
+    thread.join(timeout=Timeouts.RFC_FUNCTION_TIMEOUT)  # wait for thread with timeout
 
     if thread.is_alive():
-        raise TimeoutError("Function call timed out after 30 seconds")
+        raise TimeoutError(f"Function call timed out after {Timeouts.RFC_FUNCTION_TIMEOUT} seconds")
 
     result = result_queue.get_nowait()
     return cast(T, result)
@@ -165,7 +166,9 @@ def call_development_function_sync(
 
 def get_web_ui_port():
     web_ui_port = (
-        get_arg("port") or int(dotenv.get_dotenv_value("WEB_UI_PORT", 0)) or 5000
+        get_arg("port")
+        or int(dotenv.get_dotenv_value("WEB_UI_PORT", 0))
+        or Network.WEB_UI_PORT_DEFAULT
     )
     return web_ui_port
 
@@ -174,7 +177,7 @@ def get_tunnel_api_port():
     tunnel_api_port = (
         get_arg("tunnel_api_port")
         or int(dotenv.get_dotenv_value("TUNNEL_API_PORT", 0))
-        or 55520
+        or Network.TUNNEL_API_PORT_DEFAULT
     )
     return tunnel_api_port
 
@@ -189,6 +192,6 @@ def is_windows():
 
 def get_terminal_executable():
     if is_windows():
-        return "powershell.exe"
+        return Shell.SHELL_POWERSHELL
     else:
-        return "/bin/bash"
+        return Shell.SHELL_BASH

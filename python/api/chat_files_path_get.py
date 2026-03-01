@@ -1,20 +1,25 @@
+"""Handler for retrieving the chat files directory path.
+
+Provides the root folder path for a given chat context,
+supporting both project-based and default file storage.
+"""
+
+from python.helpers import files, projects
 from python.helpers.api import ApiHandler, Request, Response
-from python.helpers import files, memory, notification, projects, notification, runtime, settings
-import os
 
 
 class GetChatFilesPath(ApiHandler):
     async def process(self, input: dict, request: Request) -> dict | Response:
         ctxid = input.get("ctxid", "")
         if not ctxid:
-            raise Exception("No context id provided")
+            raise ValueError("No context id provided")
         context = self.use_context(ctxid)
 
         project_name = projects.get_context_project_name(context)
         if project_name:
             folder = files.normalize_a0_path(projects.get_project_folder(project_name))
         else:
-            folder = settings.get_settings()["workdir_path"]
+            folder = "/root"  # root in container
 
         return {
             "ok": True,

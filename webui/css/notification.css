@@ -1,4 +1,5 @@
 /* ===== NOTIFICATION SYSTEM STYLES ===== */
+/* Flexy Theme Integration - Using CSS Variables from theme.css */
 
 /* Notification Toggle Button */
 .notification-toggle {
@@ -7,24 +8,41 @@
     justify-content: center;
     position: relative;
     padding: 0;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 6px;
+    background: var(--bg-color-hover);
+    border: 1px solid var(--color-border-light);
+    border-radius: var(--radius-md);
     color: var(--color-text);
     cursor: pointer;
-    transition: all 0.2s ease;
-    font-size: 1rem;
-    width: 36px;
-    height: 36px;
+    transition: var(--transition-normal);
+    font-size: var(--font-size-normal);
+    width: var(--size-btn-md);
+    height: var(--size-btn-md);
     flex-shrink: 0;
     margin: 0;
     box-sizing: border-box;
     text-align: center;
+    /* Button reset styles for accessibility */
+    appearance: none;
+    -webkit-appearance: none;
+    font-family: inherit;
+    outline: none;
+}
+
+/* Focus styles for keyboard accessibility */
+.notification-toggle:focus-visible {
+    outline: var(--focus-outline-width) var(--focus-outline-style) var(--color-highlight);
+    outline-offset: var(--focus-outline-offset);
+    box-shadow: var(--shadow-focus);
+}
+
+/* Active state for button press feedback */
+.notification-toggle:active {
+    transform: scale(0.95);
 }
 
 .notification-toggle:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.2);
+    background: var(--bg-color-active);
+    border-color: var(--color-border-hover);
     transform: scale(1.05);
 }
 
@@ -32,7 +50,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1rem;
+    font-size: var(--font-size-normal);
     width: 100%;
     height: 100%;
     text-align: center;
@@ -43,21 +61,21 @@
 }
 
 .notification-toggle.has-unread {
-    border-color: #2196F3;
-    background: rgba(33, 150, 243, 0.1);
-    animation: pulse 2s infinite;
+    border-color: var(--color-primary);
+    background: rgba(var(--color-primary-rgb), 0.1);
+    animation: pulse var(--notification-pulse-duration) infinite;
 }
 
 .notification-badge {
     position: absolute;
-    top: -8px;
-    right: -8px;
-    background: #F44336;
+    top: calc(-1 * var(--spacing-sm));
+    right: calc(-1 * var(--spacing-sm));
+    background: var(--color-error);
     color: white;
-    font-size: 0.7rem;
-    font-weight: bold;
-    padding: 0.2rem 0.4rem;
-    border-radius: 10px;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--radius-full);
     min-width: 1.2rem;
     text-align: center;
     line-height: 1;
@@ -78,30 +96,28 @@
 }
 
 .notification-toggle.disabled:hover {
-    background: rgba(255, 255, 255, 0.05);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--bg-color-hover);
+    border-color: var(--color-border-light);
     transform: none;
 }
 
-
-
-/* Light Mode Styles */
-.light-mode .notification-toggle {
+/* Light Mode Styles - Using data-theme attribute */
+[data-theme="light"] .notification-toggle {
     background: rgba(0, 0, 0, 0.05);
     border-color: rgba(0, 0, 0, 0.1);
 }
 
-.light-mode .notification-toggle:hover {
+[data-theme="light"] .notification-toggle:hover {
     background: rgba(0, 0, 0, 0.1);
     border-color: rgba(0, 0, 0, 0.2);
 }
 
-.light-mode .notification-toggle.has-unread {
-    border-color: #2196F3;
-    background: rgba(33, 150, 243, 0.1);
+[data-theme="light"] .notification-toggle.has-unread {
+    border-color: var(--color-primary);
+    background: rgba(var(--color-primary-rgb), 0.1);
 }
 
-.light-mode .notification-toggle.disabled:hover {
+[data-theme="light"] .notification-toggle.disabled:hover {
     background: rgba(0, 0, 0, 0.05);
     border-color: rgba(0, 0, 0, 0.1);
 }
@@ -119,6 +135,6 @@
     .notification-toggle {
         min-width: 40px;
         min-height: 40px;
-        padding: 0.4rem;
+        padding: var(--spacing-sm);
     }
 }

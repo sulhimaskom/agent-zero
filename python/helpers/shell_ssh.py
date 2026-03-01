@@ -1,20 +1,28 @@
 import asyncio
-import paramiko
-import time
 import re
-from typing import Tuple
+import time
+
+import paramiko
+
+from python.helpers.constants import Limits, Shell, Timeouts
 from python.helpers.log import Log
 from python.helpers.print_style import PrintStyle
+
 # from python.helpers.strings import calculate_valid_match_lengths
 
 
 class SSHInteractiveSession:
-
     # end_comment = "# @@==>> SSHInteractiveSession End-of-Command  <<==@@"
     # ps1_label = "SSHInteractiveSession CLI>"
 
     def __init__(
-        self, logger: Log, hostname: str, port: int, username: str, password: str, cwd: str|None = None
+        self,
+        logger: Log,
+        hostname: str,
+        port: int,
+        username: str,
+        password: str,
+        cwd: str | None = None,
     ):
         self.logger = logger
         self.hostname = hostname
@@ -60,10 +68,13 @@ class SSHInteractiveSession:
                 # ----------------------------------------------------------------
 
                 # invoke interactive shell
-                self.shell = self.client.invoke_shell(width=100, height=50)
+                self.shell = self.client.invoke_shell(
+                    width=Limits.SSH_SHELL_WIDTH,
+                    height=Limits.SSH_SHELL_HEIGHT,
+                )
 
                 # disable systemd/OSC prompt metadata and disable local echo
-                initial_command = "unset PROMPT_COMMAND PS0; stty -echo"
+                initial_command = Shell.SSH_INIT_COMMAND
                 if self.cwd:
                     initial_command = f"cd {self.cwd}; {initial_command}"
                 self.shell.send(f"{initial_command}\n".encode())
@@ -73,7 +84,7 @@ class SSHInteractiveSession:
                     full, part = await self.read_output()
                     if full and not part:
                         return
-                    time.sleep(0.1)
+                    time.sleep(Timeouts.SSH_SHELL_DELAY)
 
             except Exception as e:
                 errors += 1
@@ -82,10 +93,11 @@ class SSHInteractiveSession:
                     self.logger.log(
                         type="info",
                         content=f"SSH Connection attempt {errors}...",
+                        temp=True,
                     )
-                    time.sleep(5)
+                    time.sleep(Timeouts.SSH_CONNECTION_DELAY)
                 else:
-                    raise e
+                    raise
 
     async def close(self):
         if self.shell:
@@ -95,7 +107,7 @@ class SSHInteractiveSession:
 
     async def send_command(self, command: str):
         if not self.shell:
-            raise Exception("Shell not connected")
+            raise ConnectionError("Shell not connected")
         self.full_output = b""
         # if len(command) > 10: # if command is long, add end_comment to split output
         #     command = (command + " \\\n" +SSHInteractiveSession.end_comment + "\n")
@@ -104,23 +116,19 @@ class SSHInteractiveSession:
         self.last_command = command.encode()
         self.trimmed_command_length = 0
         self.shell.send(self.last_command)
-        
+
     async def read_output(
         self, timeout: float = 0, reset_full_output: bool = False
-    ) -> Tuple[str, str]:
+    ) -> tuple[str, str]:
         if not self.shell:
-            raise Exception("Shell not connected")
+            raise ConnectionError("Shell not connected")
 
         if reset_full_output:
             self.full_output = b""
         partial_output = b""
-        leftover = b""
         start_time = time.time()
 
-        while self.shell.recv_ready() and (
-            timeout <= 0 or time.time() - start_time < timeout
-        ):
-
+        while self.shell.recv_ready() and (timeout <= 0 or time.time() - start_time < timeout):
             # data = self.shell.recv(1024)
             data = self.receive_bytes()
 
@@ -153,7 +161,7 @@ class SSHInteractiveSession:
 
             partial_output += data
             self.full_output += data
-            await asyncio.sleep(0.1)  # Prevent busy waiting
+            await asyncio.sleep(Timeouts.SSH_SHELL_DELAY)
 
         # Decode once at the end
         decoded_partial_output = partial_output.decode("utf-8", errors="replace")
@@ -166,7 +174,7 @@ class SSHInteractiveSession:
 
     def receive_bytes(self, num_bytes=1024):
         if not self.shell:
-            raise Exception("Shell not connected")
+            raise ConnectionError("Shell not connected")
         # Receive initial chunk of data
         shell = self.shell
         data = self.shell.recv(num_bytes)
@@ -188,9 +196,7 @@ class SSHInteractiveSession:
             # Check if the last byte is part of a multi-byte UTF-8 sequence (continuation byte)
             if (last_byte & 0b11000000) == 0b10000000:  # It's a continuation byte
                 # Now, find the start of this sequence by checking earlier bytes
-                for i in range(
-                    2, 5
-                ):  # Look back up to 4 bytes (since UTF-8 is up to 4 bytes long)
+                for i in range(2, 5):  # Look back up to 4 bytes (since UTF-8 is up to 4 bytes long)
                     if len(data) - i < 0:
                         break
                     byte = data[-i]
@@ -199,18 +205,15 @@ class SSHInteractiveSession:
                     if (byte & 0b11100000) == 0b11000000:  # 2-byte sequence (110xxxxx)
                         data += recv_all(1)  # Need 1 more byte to complete
                         break
-                    elif (
-                        byte & 0b11110000
-                    ) == 0b11100000:  # 3-byte sequence (1110xxxx)
+                    elif (byte & 0b11110000) == 0b11100000:  # 3-byte sequence (1110xxxx)
                         data += recv_all(2)  # Need 2 more bytes to complete
                         break
-                    elif (
-                        byte & 0b11111000
-                    ) == 0b11110000:  # 4-byte sequence (11110xxx)
+                    elif (byte & 0b11111000) == 0b11110000:  # 4-byte sequence (11110xxx)
                         data += recv_all(3)  # Need 3 more bytes to complete
                         break
 
         return data
+
 
 def clean_string(input_string):
     # Remove ANSI escape codes
@@ -221,9 +224,9 @@ def clean_string(input_string):
     cleaned = cleaned.replace("\x00", "")
 
     # remove ipython \r\r\n> sequences from the start
-    cleaned = re.sub(r'^[ \r]*(?:\r*\n>[ \r]*)*', '', cleaned)
+    cleaned = re.sub(r"^[ \r]*(?:\r*\n>[ \r]*)*", "", cleaned)
     # also remove any amount of '> ' sequences from the start
-    cleaned = re.sub(r'^(>\s*)+', '', cleaned)
+    cleaned = re.sub(r"^(>\s*)+", "", cleaned)
 
     # Replace '\r\n' with '\n'
     cleaned = cleaned.replace("\r\n", "\n")
@@ -238,8 +241,6 @@ def clean_string(input_string):
         # Handle carriage returns '\r' by splitting and taking the last part
         parts = [part for part in lines[i].split("\r") if part.strip()]
         if parts:
-            lines[i] = parts[
-                -1
-            ].rstrip()  # Overwrite with the last part after the last '\r'
+            lines[i] = parts[-1].rstrip()  # Overwrite with the last part after the last '\r'
 
     return "\n".join(lines)

@@ -1,9 +1,9 @@
+from python.helpers import runtime
 from python.helpers.api import ApiHandler, Request, Response
 from python.helpers.file_browser import FileBrowser
-from python.helpers import runtime, files
+
 
 class GetWorkDirFiles(ApiHandler):
-
     @classmethod
     def get_methods(cls):
         return ["GET"]
@@ -15,7 +15,9 @@ class GetWorkDirFiles(ApiHandler):
             #     current_path = "work_dir"
             # else:
             #     current_path = "root"
-            current_path = "/a0"
+            from python.helpers.constants import Paths
+
+            current_path = Paths.WORK_DIR
 
         # browser = FileBrowser()
         # result = browser.get_files(current_path)

@@ -1,21 +1,23 @@
 import base64
-from python.helpers.print_style import PrintStyle
-from python.helpers.tool import Tool, Response
-from python.helpers import runtime, files, images
 from mimetypes import guess_type
-from python.helpers import history
+
+from python.helpers import files, history, images, runtime
+from python.helpers.constants import Colors, Limits
+from python.helpers.print_style import PrintStyle
+from python.helpers.tool import Response, Tool
 
 # image optimization and token estimation for context window
-MAX_PIXELS = 768_000
-QUALITY = 75
-TOKENS_ESTIMATE = 1500
+MAX_PIXELS = Limits.VISION_MAX_PIXELS
+QUALITY = Limits.VISION_QUALITY
+TOKENS_ESTIMATE = Limits.VISION_TOKENS_ESTIMATE
 
 
 class VisionLoad(Tool):
-    async def execute(self, paths: list[str] = [], **kwargs) -> Response:
+    async def execute(self, paths: list[str] | None = None, **kwargs) -> Response:
 
+        if paths is None:
+            paths = []
         self.images_dict = {}
-        template: list[dict[str, str]] = []  # type: ignore
 
         for path in paths:
             if not await runtime.call_development_function(files.exists, str(path)):
@@ -32,14 +34,18 @@ class VisionLoad(Tool):
                         file_content = base64.b64decode(file_content)
                         # Compress and convert to JPEG
                         compressed = images.compress_image(
-                            file_content, max_pixels=MAX_PIXELS, quality=QUALITY
+                            file_content,
+                            max_pixels=MAX_PIXELS,
+                            quality=QUALITY,
                         )
                         # Encode as base64
                         file_content_b64 = base64.b64encode(compressed).decode("utf-8")
 
                         # DEBUG: Save compressed image
                         # await runtime.call_development_function(
-                        #     files.write_file_base64, str(path), file_content_b64
+                        #     files.write_file_base64,
+                        #     str(path),
+                        #     file_content_b64,
                         # )
 
                         # Construct the data URL (always JPEG after compression)
@@ -73,9 +79,7 @@ class VisionLoad(Tool):
                     )
             # append as raw message content for LLMs with vision tokens estimate
             msg = history.RawMessage(raw_content=content, preview="<Base64 encoded image data>")
-            self.agent.hist_add_message(
-                False, content=msg, tokens=TOKENS_ESTIMATE * len(content)
-            )
+            self.agent.hist_add_message(False, content=msg, tokens=TOKENS_ESTIMATE * len(content))
         else:
             self.agent.hist_add_tool_result(self.name, "No images processed")
 
@@ -86,7 +90,10 @@ class VisionLoad(Tool):
             else f"{len(self.images_dict)} images processed"
         )
         PrintStyle(
-            font_color="#1B4F72", background_color="white", padding=True, bold=True
+            font_color=Colors.PRIMARY_BLUE,
+            background_color=Colors.BG_WHITE,
+            padding=True,
+            bold=True,
         ).print(f"{self.agent.agent_name}: Response from tool '{self.name}'")
-        PrintStyle(font_color="#85C1E9").print(message)
+        PrintStyle(font_color=Colors.PRIMARY_LIGHT_BLUE).print(message)
         self.log.update(result=message)

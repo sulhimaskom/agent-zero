@@ -1,22 +1,16 @@
 from abc import abstractmethod
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
 from python.helpers import extract_tools, files
-from typing import TYPE_CHECKING
+from python.helpers.constants import Paths
 
 if TYPE_CHECKING:
     from agent import Agent
 
 
-DEFAULT_EXTENSIONS_FOLDER = "python/extensions"
-USER_EXTENSIONS_FOLDER = "usr/extensions"
-
-_cache: dict[str, list[type["Extension"]]] = {}
-
-
 class Extension:
-
     def __init__(self, agent: "Agent|None", **kwargs):
-        self.agent: "Agent" = agent  # type: ignore < here we ignore the type check as there are currently no extensions without an agent
+        self.agent: Agent = agent  # type: ignore < here we ignore the type check as there are currently no extensions without an agent
         self.kwargs = kwargs
 
     @abstractmethod
@@ -24,26 +18,30 @@ class Extension:
         pass
 
 
-async def call_extensions(
-    extension_point: str, agent: "Agent|None" = None, **kwargs
-) -> Any:
-    from python.helpers import projects, subagents
+async def call_extensions(extension_point: str, agent: "Agent|None" = None, **kwargs) -> Any:
 
-    # search for extension folders in all agent's paths
-    paths = subagents.get_paths(agent, "extensions", extension_point, default_root="python")
-    all_exts = [cls for path in paths for cls in _get_extensions(path)]
+    # get default extensions
+    defaults = await _get_extensions(Paths.get_default_extensions_path(extension_point))
+    classes = defaults
 
-    # merge: first ocurrence of file name is the override
-    unique = {}
-    for cls in all_exts:
-        file = _get_file_from_module(cls.__module__)
-        if file not in unique:
-            unique[file] = cls
-    classes = sorted(
-        unique.values(), key=lambda cls: _get_file_from_module(cls.__module__)
-    )
+    # get agent extensions
+    if agent and agent.config.profile:
+        agentics = await _get_extensions(
+            Paths.get_agent_extensions_path(agent.config.profile, extension_point)
+        )
+        if agentics:
+            # merge them, agentics overwrite defaults
+            unique = {}
+            for cls in defaults + agentics:
+                unique[_get_file_from_module(cls.__module__)] = cls
 
-    # execute unique extensions
+            # sort by name
+            classes = sorted(
+                unique.values(),
+                key=lambda cls: _get_file_from_module(cls.__module__),
+            )
+
+    # call extensions
     for cls in classes:
         await cls(agent=agent).execute(**kwargs)
 
@@ -52,8 +50,10 @@ def _get_file_from_module(module_name: str) -> str:
     return module_name.split(".")[-1]
 
 
-def _get_extensions(folder: str):
-    global _cache
+_cache: dict[str, list[type[Extension]]] = {}
+
+
+async def _get_extensions(folder: str):
     folder = files.get_abs_path(folder)
     if folder in _cache:
         classes = _cache[folder]

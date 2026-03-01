@@ -1,27 +1,62 @@
 import asyncio
-from dataclasses import dataclass
 import threading
+from collections.abc import Awaitable, Callable, Coroutine
 from concurrent.futures import Future
-from typing import Any, Callable, Optional, Coroutine, TypeVar, Awaitable
+from dataclasses import dataclass
+from typing import Any, TypeVar
 
 T = TypeVar("T")
 
-THREAD_BACKGROUND = "Background"
+# Global background task set to prevent garbage collection of fire-and-forget tasks
+_background_tasks: set[asyncio.Task] = set()
+
+
+def run_in_background(coro: Coroutine[Any, Any, Any]) -> asyncio.Task:
+    """
+    Fire-and-forget background task runner.
+
+    Simpler alternative to DeferredTask for tasks that don't need
+    complex lifecycle management or thread isolation.
+
+    Args:
+        coro: The coroutine to run in the background
+
+    Returns:
+        The created Task (for reference, but fire-and-forget usage is fine)
+    """
+    try:
+        loop = asyncio.get_running_loop()
+    except RuntimeError:
+        # No event loop running, create a new one
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+
+    task = loop.create_task(coro)
+
+    # Keep reference to prevent garbage collection
+    _background_tasks.add(task)
+
+    # Clean up when done
+    def cleanup(t: asyncio.Task) -> None:
+        _background_tasks.discard(t)
+
+    task.add_done_callback(cleanup)
+    return task
 
 
 class EventLoopThread:
-    _instances: dict[str, "EventLoopThread"] = {}
+    _instances = {}
     _lock = threading.Lock()
 
-    def __init__(self, thread_name: str = THREAD_BACKGROUND) -> None:
+    def __init__(self, thread_name: str = "Background") -> None:
         """Initialize the event loop thread."""
         self.thread_name = thread_name
         self._start()
 
-    def __new__(cls, thread_name: str = THREAD_BACKGROUND):
+    def __new__(cls, thread_name: str = "Background"):
         with cls._lock:
             if thread_name not in cls._instances:
-                instance = super(EventLoopThread, cls).__new__(cls)
+                instance = super().__new__(cls)
                 cls._instances[thread_name] = instance
             return cls._instances[thread_name]
 
@@ -41,29 +76,8 @@ class EventLoopThread:
         self.loop.run_forever()
 
     def terminate(self):
-        loop = getattr(self, "loop", None)
-        thread = getattr(self, "thread", None)
-
-        if not loop:
-            return
-
-        if loop.is_running():
-            if thread and thread is threading.current_thread():
-                loop.stop()
-            else:
-                loop.call_soon_threadsafe(loop.stop)
-                if thread:
-                    thread.join()
-        elif thread and thread.is_alive() and thread is not threading.current_thread():
-            thread.join()
-
-        if not loop.is_closed():
-            loop.close()
-
-        with self.__class__._lock:
-            if self.thread_name in self.__class__._instances:
-                del self.__class__._instances[self.thread_name]
-
+        if self.loop and self.loop.is_running():
+            self.loop.stop()
         self.loop = None
         self.thread = None
 
@@ -83,15 +97,13 @@ class ChildTask:
 class DeferredTask:
     def __init__(
         self,
-        thread_name: str = THREAD_BACKGROUND,
+        thread_name: str = "Background",
     ):
         self.event_loop_thread = EventLoopThread(thread_name)
-        self._future: Optional[Future] = None
+        self._future: Future | None = None
         self.children: list[ChildTask] = []
 
-    def start_task(
-        self, func: Callable[..., Coroutine[Any, Any, Any]], *args: Any, **kwargs: Any
-    ):
+    def start_task(self, func: Callable[..., Coroutine[Any, Any, Any]], *args: Any, **kwargs: Any):
         self.func = func
         self.args = args
         self.kwargs = kwargs
@@ -103,12 +115,6 @@ class DeferredTask:
 
     def _start_task(self):
         self._future = self.event_loop_thread.run_coroutine(self._run())
-        if self._future:
-            self._future.add_done_callback(self._on_task_done)
-
-    def _on_task_done(self, _future: Future):
-        # Ensure child background tasks are always cleaned up once the parent finishes
-        self.kill_children()
 
     async def _run(self):
         return await self.func(*self.args, **self.kwargs)
@@ -116,17 +122,15 @@ class DeferredTask:
     def is_ready(self) -> bool:
         return self._future.done() if self._future else False
 
-    def result_sync(self, timeout: Optional[float] = None) -> Any:
+    def result_sync(self, timeout: float | None = None) -> Any:
         if not self._future:
             raise RuntimeError("Task hasn't been started")
         try:
             return self._future.result(timeout)
         except TimeoutError:
-            raise TimeoutError(
-                "The task did not complete within the specified timeout."
-            )
+            raise TimeoutError("The task did not complete within the specified timeout.")
 
-    async def result(self, timeout: Optional[float] = None) -> Any:
+    async def result(self, timeout: float | None = None) -> Any:
         if not self._future:
             raise RuntimeError("Task hasn't been started")
 
@@ -138,9 +142,7 @@ class DeferredTask:
                 # self.kill()
                 return result
             except TimeoutError:
-                raise TimeoutError(
-                    "The task did not complete within the specified timeout."
-                )
+                raise TimeoutError("The task did not complete within the specified timeout.")
 
         return await loop.run_in_executor(None, _get_result)
 
@@ -150,16 +152,30 @@ class DeferredTask:
         if self._future and not self._future.done():
             self._future.cancel()
 
-        if terminate_thread and self.event_loop_thread.loop:
-            if self.event_loop_thread.loop.is_running():
-                try:
-                    cleanup_future = asyncio.run_coroutine_threadsafe(
-                        self._drain_event_loop_tasks(), self.event_loop_thread.loop
-                    )
-                    cleanup_future.result()
-                except Exception:
-                    pass
+        if (
+            terminate_thread
+            and self.event_loop_thread.loop
+            and self.event_loop_thread.loop.is_running()
+        ):
 
+            def cleanup():
+                tasks = [
+                    t
+                    for t in asyncio.all_tasks(self.event_loop_thread.loop)
+                    if t is not asyncio.current_task(self.event_loop_thread.loop)
+                ]
+                for task in tasks:
+                    task.cancel()
+                    try:
+                        # Give tasks a chance to cleanup
+                        if self.event_loop_thread.loop:
+                            self.event_loop_thread.loop.run_until_complete(
+                                asyncio.gather(task, return_exceptions=True)
+                            )
+                    except Exception as e:
+                        pass  # Ignore cleanup errors
+
+            self.event_loop_thread.loop.call_soon_threadsafe(cleanup)
             self.event_loop_thread.terminate()
 
     def kill_children(self) -> None:
@@ -174,14 +190,10 @@ class DeferredTask:
         self.kill(terminate_thread=terminate_thread)
         self._start_task()
 
-    def add_child_task(
-        self, task: "DeferredTask", terminate_thread: bool = False
-    ) -> None:
+    def add_child_task(self, task: "DeferredTask", terminate_thread: bool = False) -> None:
         self.children.append(ChildTask(task, terminate_thread))
 
-    async def _execute_in_task_context(
-        self, func: Callable[..., T], *args, **kwargs
-    ) -> T:
+    async def _execute_in_task_context(self, func: Callable[..., T], *args, **kwargs) -> T:
         """Execute a function in the task's context and return its result."""
         result = func(*args, **kwargs)
         if asyncio.iscoroutine(result):
@@ -202,29 +214,9 @@ class DeferredTask:
                 # Keep awaiting until we get a concrete value
                 while isinstance(result, Awaitable):
                     result = await result
-                self.event_loop_thread.loop.call_soon_threadsafe(
-                    future.set_result, result
-                )
+                self.event_loop_thread.loop.call_soon_threadsafe(future.set_result, result)
             except Exception as e:
-                self.event_loop_thread.loop.call_soon_threadsafe(
-                    future.set_exception, e
-                )
+                self.event_loop_thread.loop.call_soon_threadsafe(future.set_exception, e)
 
         asyncio.run_coroutine_threadsafe(wrapped(), self.event_loop_thread.loop)
         return asyncio.wrap_future(future)
-
-    @staticmethod
-    async def _drain_event_loop_tasks():
-        """Cancel and await all pending tasks on the current event loop."""
-        loop = asyncio.get_running_loop()
-        current_task = asyncio.current_task(loop=loop)
-        pending = [
-            task
-            for task in asyncio.all_tasks(loop=loop)
-            if task is not current_task
-        ]
-        if not pending:
-            return
-        for task in pending:
-            task.cancel()
-        await asyncio.gather(*pending, return_exceptions=True)

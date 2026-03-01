@@ -1,23 +1,25 @@
-import { createStore } from "/js/AlpineStore.js";
-import { callJsonApi } from "/js/api.js";
+import { createStore } from '/js/AlpineStore.js';
+import Logger from '/js/logger.js';
 import {
   sendJsonData,
   getContext,
   setContext,
+  poll as triggerPoll,
+  updateAfterScroll,
   toastFetchError,
   toast,
   justToast,
   getConnectionStatus,
-} from "/index.js";
-import { store as notificationStore } from "/components/notifications/notification-store.js";
-import { store as tasksStore } from "/components/sidebar/tasks/tasks-store.js";
-import { store as syncStore } from "/components/sync/sync-store.js";
+} from '/index.js';
+import { store as notificationStore } from '/components/notifications/notification-store.min.js';
+import { store as tasksStore } from '/components/sidebar/tasks/tasks-store.min.js';
+import { RETRY, TIMING } from '/js/constants.js';
 
 const model = {
   contexts: [],
-  selected: "",
+  selected: '',
   selectedContext: null,
-  loggedIn: false,
+  isLoading: true,
 
   // for convenience
   getSelectedChatId() {
@@ -29,11 +31,15 @@ const model = {
   },
 
   init() {
-    this.loggedIn = Boolean(window.runtimeInfo && window.runtimeInfo.loggedIn);
-    // Initialize from sessionStorage
-    const lastSelectedChat = sessionStorage.getItem("lastSelectedChat");
-    if (lastSelectedChat) {
-      this.selectChat(lastSelectedChat);
+    // Initialize from localStorage
+    try {
+      const lastSelectedChat = localStorage.getItem('lastSelectedChat');
+      if (lastSelectedChat) {
+        this.selectChat(lastSelectedChat);
+        // this.selected = lastSelectedChat;
+      }
+    } catch (e) {
+      // Silent fail in private browsing mode
     }
   },
 
@@ -41,18 +47,9 @@ const model = {
   applyContexts(contextsList) {
     // Sort by created_at time (newer first)
     this.contexts = contextsList.sort(
-      (a, b) => (b.created_at || 0) - (a.created_at || 0)
+      (a, b) => (b.created_at || 0) - (a.created_at || 0),
     );
-
-    // Keep selectedContext in sync when the currently selected context's
-    // metadata changes (e.g. project activation/deactivation).
-    if (this.selected) {
-      const selectedId = this.selected;
-      const updated = this.contexts.find((ctx) => ctx.id === selectedId);
-      if (updated) {
-        this.selectedContext = updated;
-      }
-    }
+    this.isLoading = false;
   },
 
   // Select a chat
@@ -66,27 +63,19 @@ const model = {
     // Update selection state (will also persist to localStorage)
     this.setSelected(id);
 
-    // In push mode, context switching triggers a new `state_request` via setContext().
-    // Keep polling only as a degraded-mode fallback.
-    try {
-      const mode = typeof syncStore.mode === "string" ? syncStore.mode : null;
-      const shouldFallbackPoll = mode === "DEGRADED";
-      if (shouldFallbackPoll && typeof globalThis.poll === "function") {
-        globalThis.poll();
-      }
-    } catch (_e) {
-      // no-op
-    }
+    // Trigger immediate poll
+    triggerPoll();
+
+    // Update scroll
+    updateAfterScroll();
   },
 
   // Delete a chat
   async killChat(id) {
     if (!id) {
-      console.error("No chat ID provided for deletion");
+      Logger.error('No chat ID provided for deletion');
       return;
     }
-
-    console.log("Deleting chat with ID:", id);
 
     try {
       // Switch to another context if deleting current
@@ -95,23 +84,19 @@ const model = {
       }
 
       // Delete the chat on the server
-      await sendJsonData("/chat_remove", { context: id });
+      await sendJsonData('/chat_remove', { context: id });
 
       // Update the UI - remove from contexts
       const updatedContexts = this.contexts.filter((ctx) => ctx.id !== id);
-      console.log(
-        "Updated contexts after deletion:",
-        JSON.stringify(updatedContexts.map((c) => ({ id: c.id, name: c.name })))
-      );
 
       // Force UI update by creating a new array
       this.contexts = [...updatedContexts];
 
       // Show success notification
-      justToast("Chat deleted successfully", "success", 1000, "chat-removal");
+      justToast('Chat deleted successfully', 'success', TIMING.NOTIFICATION_DISPLAY, 'chat-removal');
     } catch (e) {
-      console.error("Error deleting chat:", e);
-      toastFetchError("Error deleting chat", e);
+      Logger.error('Error deleting chat:', e);
+      toastFetchError('Error deleting chat', e);
     }
   },
 
@@ -139,16 +124,18 @@ const model = {
   async resetChat(ctxid = null) {
     try {
       const context = ctxid || this.selected || getContext();
-      await sendJsonData("/chat_reset", {
-        context
+      await sendJsonData('/chat_reset', {
+        context,
       });
 
       // Increment reset counter
       if (typeof globalThis.resetCounter === 'number') {
         globalThis.resetCounter = globalThis.resetCounter + 1;
-      }      
+      }
+
+      updateAfterScroll();
     } catch (e) {
-      toastFetchError("Error resetting chat", e);
+      toastFetchError('Error resetting chat', e);
     }
   },
 
@@ -157,8 +144,8 @@ const model = {
     try {
 
       // first create a new chat on the backend
-      const response = await sendJsonData("/chat_create", {
-        current_context: this.selected
+      const response = await sendJsonData('/chat_create', {
+        current_context: this.selected,
       });
 
       if (response.ok) {
@@ -166,8 +153,17 @@ const model = {
         return;
       }
 
+
+      // if (globalThis.newContext) {
+      //   globalThis.newContext();
+      // }
+      // if (globalThis.updateAfterScroll) {
+      //   globalThis.updateAfterScroll();
+      // }
+      // // UX: scroll-to-top
+      // requestAnimationFrame(() => this._scrollChatsToTop());
     } catch (e) {
-      toastFetchError("Error creating new chat", e);
+      toastFetchError('Error creating new chat', e);
     }
   },
 
@@ -186,19 +182,19 @@ const model = {
   async loadChats() {
     try {
       const fileContents = await this.readJsonFiles();
-      const response = await sendJsonData("/chat_load", { chats: fileContents });
+      const response = await sendJsonData('/chat_load', { chats: fileContents });
 
       if (!response) {
-        toast("No response returned.", "error");
+        toast('No response returned.', 'error');
       } else {
         // Set context to first loaded chat
         if (response.ctxids?.[0]) {
           setContext(response.ctxids[0]);
         }
-        toast("Chats loaded.", "success");
+        toast('Chats loaded.', 'success');
       }
     } catch (e) {
-      toastFetchError("Error loading chats", e);
+      toastFetchError('Error loading chats', e);
     }
   },
 
@@ -206,25 +202,25 @@ const model = {
   async saveChat() {
     try {
       const context = this.selected || getContext();
-      const response = await sendJsonData("/chat_export", { ctxid: context });
+      const response = await sendJsonData('/chat_export', { ctxid: context });
 
       if (!response) {
-        toast("No response returned.", "error");
+        toast('No response returned.', 'error');
       } else {
-        this.downloadFile(response.ctxid + ".json", response.content);
-        toast("Chat file downloaded.", "success");
+        this.downloadFile(`${response.ctxid  }.json`, response.content);
+        toast('Chat file downloaded.', 'success');
       }
     } catch (e) {
-      toastFetchError("Error saving chat", e);
+      toastFetchError('Error saving chat', e);
     }
   },
 
   // Helper: read JSON files
   readJsonFiles() {
     return new Promise((resolve, reject) => {
-      const input = document.createElement("input");
-      input.type = "file";
-      input.accept = ".json";
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
       input.multiple = true;
 
       input.click();
@@ -257,8 +253,8 @@ const model = {
 
   // Helper: download file
   downloadFile(filename, content) {
-    const blob = new Blob([content], { type: "application/json" });
-    const link = document.createElement("a");
+    const blob = new Blob([content], { type: 'application/json' });
+    const link = document.createElement('a');
     const url = URL.createObjectURL(blob);
     link.href = url;
     link.download = filename;
@@ -281,88 +277,64 @@ const model = {
 
   // Set selected context
   setSelected(contextId) {
-    this.selected = contextId || "";
-    this.selectedContext = this.contexts.find((ctx) => ctx.id === this.selected);
+    this.selected = contextId;
+    this.selectedContext = this.contexts.find((ctx) => ctx.id === contextId);
     // if not found in contexts, try to find in tasks < not nice, will need refactor later
-    if(!this.selectedContext) this.selectedContext = tasksStore.tasks.find((ctx) => ctx.id === this.selected);
-    if (this.selected) {
-      sessionStorage.setItem("lastSelectedChat", this.selected);
-    } else {
-      sessionStorage.removeItem("lastSelectedChat");
+    if(!this.selectedContext) this.selectedContext = tasksStore.tasks.find((ctx) => ctx.id === contextId);
+    try {
+      localStorage.setItem('lastSelectedChat', contextId);
+    } catch (e) {
+      // Silent fail in private browsing mode
     }
   },
 
   // Restart the backend
   async restart() {
-    // Check connection status (avoid spamming requests when already disconnected)
-    const connectionStatus = getConnectionStatus();
-    if (connectionStatus === false) {
-      await notificationStore.frontendError(
-        "Backend disconnected, cannot restart.",
-        "Restart Error",
-      );
-      return;
-    }
-
-    // Create a backend notification first so other tabs have a chance to show it
-    // before the process is replaced.
-    const notificationId = await notificationStore.info(
-      "Restarting...",
-      "System Restart",
-      "",
-      9999,
-      "restart",
-    );
-
-    // Best-effort: wait briefly for the notification to arrive via state sync so
-    // the initiating tab (and typically other tabs) renders the toast before restart.
-    if (notificationId) {
-      const deadline = Date.now() + 800;
-      while (Date.now() < deadline) {
-        try {
-          
-          const stack = Array.isArray(notificationStore.toastStack) ? notificationStore.toastStack : null;
-          if (stack && stack.some((toast) => toast && toast.id === notificationId)) {
-            break;
-          }
-        } catch (_err) {
-          break;
-        }
-        await new Promise((resolve) => setTimeout(resolve, 25));
-      }
-    }
-
-    // The restart endpoint usually drops the connection as the process is replaced.
-    // Do not wait on /health - recovery is driven by WebSocket CSRF preflight + reconnect.
     try {
-      await sendJsonData("/restart", {});
-    } catch (_e) {
-      // ignore
+      // Check connection status
+      const connectionStatus = getConnectionStatus();
+      if (connectionStatus === false) {
+        await notificationStore.frontendError(
+          'Backend disconnected, cannot restart.',
+          'Restart Error',
+        );
+        return;
+      }
+
+      // Try to initiate restart
+      const resp = await sendJsonData('/restart', {});
+    } catch (e) {
+      // Show restarting message
+      await notificationStore.frontendInfo('Restarting...', 'System Restart', 9999, 'restart');
+
+      let retries = 0;
+      const maxRetries = RETRY.MAX_RETRIES; // From constants
+
+      while (retries < maxRetries) {
+        try {
+          const resp = await sendJsonData('/health', {});
+          // Server is back up
+          await new Promise((resolve) => setTimeout(resolve, RETRY.INTERVAL_MS));
+          await notificationStore.frontendSuccess('Restarted', 'System Restart', 5, 'restart');
+          return;
+        } catch (e) {
+          // Server still down, keep waiting
+          retries++;
+          await new Promise((resolve) => setTimeout(resolve, RETRY.INTERVAL_MS));
+        }
+      }
+
+      // Restart failed or timed out
+      await notificationStore.frontendError(
+        'Restart timed out or failed',
+        'Restart Error',
+        8,
+        'restart',
+      );
     }
   },
-
-  async logout() {
-    try {
-      await callJsonApi("/logout", {});
-    } catch (_e) {
-      // ignore
-    }
-
-    try {
-      sessionStorage.removeItem("lastSelectedChat");
-      sessionStorage.removeItem("lastSelectedTask");
-    } catch (_e) {
-      // ignore
-    }
-
-    try {
-      window.location.reload();
-    } catch (_e) {
-      // ignore
-    }
-  }
 };
 
-const store = createStore("chats", model);
+const store = createStore('chats', model);
 
 export { store };

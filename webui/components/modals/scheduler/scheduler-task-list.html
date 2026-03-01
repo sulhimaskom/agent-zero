@@ -13,8 +13,8 @@
             <!-- Filter Header -->
             <div class="filters-header">
                 <div class="filter-group-inline filter-type">
-                    <label>Type</label>
-                    <select x-model="$store.schedulerStore.filterType">
+                    <label for="scheduler-filter-type">Type</label>
+                    <select id="scheduler-filter-type" x-model="$store.schedulerStore.filterType">
                         <option value="all">All Types</option>
                         <option value="scheduled">Scheduled</option>
                         <option value="adhoc">Ad-hoc</option>
@@ -23,8 +23,8 @@
                 </div>
 
                 <div class="filter-group-inline filter-state">
-                    <label>State</label>
-                    <select x-model="$store.schedulerStore.filterState">
+                    <label for="scheduler-filter-state">State</label>
+                    <select id="scheduler-filter-state" x-model="$store.schedulerStore.filterState">
                         <option value="all">All States</option>
                         <option value="idle">Idle</option>
                         <option value="running">Running</option>
@@ -59,8 +59,8 @@
                         <span class="material-symbols-outlined">chevron_left</span>
                     </button>
                     <div class="page-input-group">
-                        <label>Page</label>
-                        <input type="number" class="page-input"
+                        <label for="scheduler-page-input">Page</label>
+                        <input type="number" id="scheduler-page-input" class="page-input"
                             x-model.number="$store.schedulerStore.currentPage"
                             @change="$store.schedulerStore.goToPage($store.schedulerStore.currentPage)"
                             @keyup.enter="$store.schedulerStore.goToPage($store.schedulerStore.currentPage)"
@@ -177,8 +177,8 @@
                         <span class="material-symbols-outlined">chevron_left</span>
                     </button>
                     <div class="page-input-group">
-                        <label>Page</label>
-                        <input type="number" class="page-input"
+                        <label for="scheduler-page-input-2">Page</label>
+                        <input type="number" id="scheduler-page-input-2" class="page-input"
                             x-model.number="$store.schedulerStore.currentPage"
                             @change="$store.schedulerStore.goToPage($store.schedulerStore.currentPage)"
                             @keyup.enter="$store.schedulerStore.goToPage($store.schedulerStore.currentPage)"

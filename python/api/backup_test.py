@@ -1,5 +1,12 @@
+"""Handler for testing backup patterns.
+
+Tests which files would be included in a backup based on
+include/exclude patterns, without creating an actual backup.
+"""
+
 from python.helpers.api import ApiHandler, Request, Response
 from python.helpers.backup import BackupService
+from python.helpers.constants import Limits
 
 
 class BackupTest(ApiHandler):
@@ -16,16 +23,20 @@ class BackupTest(ApiHandler):
             # Get input parameters
             include_patterns = input.get("include_patterns", [])
             exclude_patterns = input.get("exclude_patterns", [])
-            include_hidden = input.get("include_hidden", True)
-            max_files = input.get("max_files", 1000)
+            include_hidden = input.get("include_hidden", False)
+            max_files = input.get("max_files", Limits.BACKUP_MAX_FILES_TEST)
 
             # Support legacy string patterns format for backward compatibility
             patterns_string = input.get("patterns", "")
             if patterns_string and not include_patterns:
                 # Parse patterns string into arrays
-                lines = [line.strip() for line in patterns_string.split('\n') if line.strip() and not line.strip().startswith('#')]
+                lines = [
+                    line.strip()
+                    for line in patterns_string.split("\n")
+                    if line.strip() and not line.strip().startswith("#")
+                ]
                 for line in lines:
-                    if line.startswith('!'):
+                    if line.startswith("!"):
                         exclude_patterns.append(line[1:])
                     else:
                         include_patterns.append(line)
@@ -35,14 +46,14 @@ class BackupTest(ApiHandler):
                     "success": True,
                     "files": [],
                     "total_count": 0,
-                    "truncated": False
+                    "truncated": False,
                 }
 
             # Create metadata object for testing
             metadata = {
                 "include_patterns": include_patterns,
                 "exclude_patterns": exclude_patterns,
-                "include_hidden": include_hidden
+                "include_hidden": include_hidden,
             }
 
             backup_service = BackupService()
@@ -52,11 +63,8 @@ class BackupTest(ApiHandler):
                 "success": True,
                 "files": matched_files,
                 "total_count": len(matched_files),
-                "truncated": len(matched_files) >= max_files
+                "truncated": len(matched_files) >= max_files,
             }
 
         except Exception as e:
-            return {
-                "success": False,
-                "error": str(e)
-            }
+            return {"success": False, "error": str(e)}

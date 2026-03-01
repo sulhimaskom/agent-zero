@@ -1,19 +1,20 @@
 import asyncio
 import time
-from typing import Optional, cast
-from agent import Agent, InterventionException
 from pathlib import Path
+from typing import cast
 
-from python.helpers.tool import Tool, Response
-from python.helpers import files, defer, persist_chat, strings
-from python.helpers.browser_use import browser_use  # type: ignore[attr-defined]
-from python.helpers.print_style import PrintStyle
-from python.helpers.playwright import ensure_playwright_binary
-from python.helpers.secrets import get_secrets_manager
-from python.extensions.message_loop_start._10_iteration_no import get_iter_no
 from pydantic import BaseModel
-import uuid
+
+from agent import Agent, InterventionException
+from python.extensions.message_loop_start._10_iteration_no import get_iter_no
+from python.helpers import defer, files, persist_chat, strings
+from python.helpers.browser_use import browser_use  # type: ignore[attr-defined]
+from python.helpers.constants import Browser, Limits, Paths, Shell, Timeouts
 from python.helpers.dirty_json import DirtyJson
+from python.helpers.playwright import ensure_playwright_binary
+from python.helpers.print_style import PrintStyle
+from python.helpers.secrets import get_secrets_manager
+from python.helpers.tool import Response, Tool
 
 
 class State:
@@ -24,23 +25,19 @@ class State:
 
     def __init__(self, agent: Agent):
         self.agent = agent
-        self.browser_session: Optional[browser_use.BrowserSession] = None
-        self.task: Optional[defer.DeferredTask] = None
-        self.use_agent: Optional[browser_use.Agent] = None
-        self.secrets_dict: Optional[dict[str, str]] = None
+        self.browser_session: browser_use.BrowserSession | None = None
+        self.task: defer.DeferredTask | None = None
+        self.use_agent: browser_use.Agent | None = None
+        self.secrets_dict: dict[str, str] | None = None
         self.iter_no = 0
 
     def __del__(self):
         self.kill_task()
-        files.delete_dir(self.get_user_data_dir()) # cleanup user data dir
+        files.delete_dir(self.get_user_data_dir())  # cleanup user data dir
 
     def get_user_data_dir(self):
         return str(
-            Path.home()
-            / ".config"
-            / "browseruse"
-            / "profiles"
-            / f"agent_{self.agent.context.id}"
+            Path.home() / ".config" / "browseruse" / "profiles" / f"agent_{self.agent.context.id}"
         )
 
     async def _initialize(self):
@@ -49,29 +46,38 @@ class State:
 
         # for some reason we need to provide exact path to headless shell, otherwise it looks for headed browser
         pw_binary = ensure_playwright_binary()
-                
+
         self.browser_session = browser_use.BrowserSession(
             browser_profile=browser_use.BrowserProfile(
                 headless=True,
                 disable_security=True,
                 chromium_sandbox=False,
                 accept_downloads=True,
-                downloads_path=files.get_abs_path("usr/downloads"),
-                allowed_domains=["*", "http://*", "https://*"],
+                downloads_path=files.get_abs_path(Paths.DOWNLOADS_DIR),
+                allowed_domains=Browser.ALLOWED_DOMAINS,
                 executable_path=pw_binary,
                 keep_alive=True,
-                minimum_wait_page_load_time=1.0,
-                wait_for_network_idle_page_load_time=2.0,
-                maximum_wait_page_load_time=10.0,
-                window_size={"width": 1024, "height": 2048},
-                screen={"width": 1024, "height": 2048},
-                viewport={"width": 1024, "height": 2048},
+                minimum_wait_page_load_time=Limits.BROWSER_PAGE_LOAD_MIN,
+                wait_for_network_idle_page_load_time=Limits.BROWSER_PAGE_LOAD_MED,
+                maximum_wait_page_load_time=Limits.BROWSER_PAGE_LOAD_MAX,
+                window_size={
+                    "width": Limits.BROWSER_VIEWPORT_WIDTH,
+                    "height": Limits.BROWSER_VIEWPORT_HEIGHT,
+                },
+                screen={
+                    "width": Limits.BROWSER_VIEWPORT_WIDTH,
+                    "height": Limits.BROWSER_VIEWPORT_HEIGHT,
+                },
+                viewport={
+                    "width": Limits.BROWSER_VIEWPORT_WIDTH,
+                    "height": Limits.BROWSER_VIEWPORT_HEIGHT,
+                },
                 no_viewport=False,
-                args=["--headless=new"],
+                args=[Shell.BROWSER_HEADLESS_ARG],
                 # Use a unique user data directory to avoid conflicts
                 user_data_dir=self.get_user_data_dir(),
                 extra_http_headers=self.agent.config.browser_http_headers or {},
-                )
+            )
         )
 
         await self.browser_session.start() if self.browser_session else None
@@ -88,24 +94,31 @@ class State:
             try:
                 page = await self.browser_session.get_current_page()
                 if page:
-                    await page.set_viewport_size({"width": 1024, "height": 2048})
+                    await page.set_viewport_size(
+                        {
+                            "width": Limits.BROWSER_VIEWPORT_WIDTH,
+                            "height": Limits.BROWSER_VIEWPORT_HEIGHT,
+                        }
+                    )
             except Exception as e:
                 PrintStyle().warning(f"Could not force set viewport size: {e}")
 
-        # --------------------------------------------------------------------------    
-        
+        # --------------------------------------------------------------------------
+
         # Add init script to the browser session
         if self.browser_session and self.browser_session.browser_context:
             js_override = files.get_abs_path("lib/browser/init_override.js")
-            await self.browser_session.browser_context.add_init_script(path=js_override) if self.browser_session else None
+            (
+                await self.browser_session.browser_context.add_init_script(path=js_override)
+                if self.browser_session
+                else None
+            )
 
     def start_task(self, task: str):
         if self.task and self.task.is_alive():
             self.kill_task()
 
-        self.task = defer.DeferredTask(
-            thread_name="BrowserAgent" + self.agent.context.id
-        )
+        self.task = defer.DeferredTask(thread_name="BrowserAgent" + self.agent.context.id)
         if self.agent.context.task:
             self.agent.context.task.add_child_task(self.task, terminate_thread=True)
         self.task.start_task(self._run_task, task) if self.task else None
@@ -121,7 +134,11 @@ class State:
 
                 loop = asyncio.new_event_loop()
                 asyncio.set_event_loop(loop)
-                loop.run_until_complete(self.browser_session.close()) if self.browser_session else None
+                (
+                    loop.run_until_complete(self.browser_session.close())
+                    if self.browser_session
+                    else None
+                )
                 loop.close()
             except Exception as e:
                 PrintStyle().error(f"Error closing browser session: {e}")
@@ -145,14 +162,15 @@ class State:
         @controller.registry.action("Complete task", param_model=DoneResult)
         async def complete_task(params: DoneResult):
             result = browser_use.ActionResult(
-                is_done=True, success=True, extracted_content=params.model_dump_json()
+                is_done=True,
+                success=True,
+                extracted_content=params.model_dump_json(),
             )
             return result
 
         model = self.agent.get_browser_model()
 
         try:
-
             secrets_manager = get_secrets_manager(self.agent.context)
             secrets_dict = secrets_manager.load_secrets()
 
@@ -161,13 +179,13 @@ class State:
                 browser_session=self.browser_session,
                 llm=model,
                 use_vision=self.agent.config.browser_model.vision,
-                extend_system_message=self.agent.read_prompt(
-                    "prompts/browser_agent.system.md"
-                ),
+                extend_system_message=self.agent.read_prompt("prompts/browser_agent.system.md"),
                 controller=controller,
                 enable_memory=False,  # Disable memory to avoid state conflicts
-                llm_timeout=3000, # TODO rem
-                sensitive_data=cast(dict[str, str | dict[str, str]] | None, secrets_dict or {}),  # Pass secrets
+                llm_timeout=Timeouts.BROWSER_LLM_TIMEOUT,
+                sensitive_data=cast(
+                    dict[str, str | dict[str, str]] | None, secrets_dict or {}
+                ),  # Pass secrets
             )
         except Exception as e:
             raise Exception(
@@ -185,15 +203,21 @@ class State:
         result = None
         if self.use_agent:
             result = await self.use_agent.run(
-                max_steps=50, on_step_start=hook, on_step_end=hook
+                max_steps=Timeouts.BROWSER_MAX_STEPS,
+                on_step_start=hook,
+                on_step_end=hook,
             )
         return result
 
     async def get_page(self):
         if self.use_agent and self.browser_session:
             try:
-                return await self.use_agent.browser_session.get_current_page() if self.use_agent.browser_session else None
-            except Exception:
+                return (
+                    await self.use_agent.browser_session.get_current_page()
+                    if self.use_agent.browser_session
+                    else None
+                )
+            except Exception as e:
                 # Browser session might be closed or invalid
                 return None
         return None
@@ -201,8 +225,6 @@ class State:
     async def get_selector_map(self):
         """Get the selector map for the current page state."""
         if self.use_agent:
-            await self.use_agent.browser_session.get_state_summary(cache_clickable_elements_hashes=True) if self.use_agent.browser_session else None
-            return await self.use_agent.browser_session.get_selector_map() if self.use_agent.browser_session else None
             await self.use_agent.browser_session.get_state_summary(
                 cache_clickable_elements_hashes=True
             )
@@ -211,16 +233,17 @@ class State:
 
 
 class BrowserAgent(Tool):
-
     async def execute(self, message="", reset="", **kwargs):
-        self.guid = self.agent.context.generate_id() # short random id
+        self.guid = self.agent.context.generate_id()  # short random id
         reset = str(reset).lower().strip() == "true"
         await self.prepare_state(reset=reset)
-        message = get_secrets_manager(self.agent.context).mask_values(message, placeholder="<secret>{key}</secret>") # mask any potential passwords passed from A0 to browser-use to browser-use format
+        message = get_secrets_manager(self.agent.context).mask_values(
+            message, placeholder="<secret>{key}</secret>"
+        )  # mask any potential passwords passed from A0 to browser-use to browser-use format
         task = self.state.start_task(message) if self.state else None
 
         # wait for browser agent to finish and update progress with timeout
-        timeout_seconds = 300  # 5 minute timeout
+        timeout_seconds = Timeouts.BROWSER_OPERATION_TIMEOUT  # 5 minute timeout
         start_time = time.time()
 
         fail_counter = 0
@@ -228,26 +251,33 @@ class BrowserAgent(Tool):
             # Check for timeout to prevent infinite waiting
             if time.time() - start_time > timeout_seconds:
                 PrintStyle().warning(
-                    self._mask(f"Browser agent task timeout after {timeout_seconds} seconds, forcing completion")
+                    self._mask(
+                        f"Browser agent task timeout after {timeout_seconds} seconds, forcing completion"
+                    )
                 )
                 break
 
             await self.agent.handle_intervention()
-            await asyncio.sleep(1)
+            await asyncio.sleep(Timeouts.TUNNEL_STARTUP_DELAY)
             try:
                 if task and task.is_ready():  # otherwise get_update hangs
                     break
                 try:
-                    update = await asyncio.wait_for(self.get_update(), timeout=10)
+                    update = await asyncio.wait_for(
+                        self.get_update(),
+                        timeout=Timeouts.BROWSER_ASYNC_TIMEOUT,
+                    )
                     fail_counter = 0  # reset on success
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     fail_counter += 1
                     PrintStyle().warning(
                         self._mask(f"browser_agent.get_update timed out ({fail_counter}/3)")
                     )
                     if fail_counter >= 3:
                         PrintStyle().warning(
-                            self._mask("3 consecutive browser_agent.get_update timeouts, breaking loop")
+                            self._mask(
+                                "3 consecutive browser_agent.get_update timeouts, breaking loop"
+                            )
                         )
                         break
                     continue
@@ -257,7 +287,7 @@ class BrowserAgent(Tool):
                 if screenshot:
                     self.log.update(screenshot=screenshot)
             except Exception as e:
-                PrintStyle().error(self._mask(f"Error getting update: {str(e)}"))
+                PrintStyle().error(self._mask(f"Error getting update: {e!s}"))
 
         if task and not task.is_ready():
             PrintStyle().warning(self._mask("browser_agent.get_update timed out, killing the task"))
@@ -276,9 +306,9 @@ class BrowserAgent(Tool):
         try:
             result = await task.result() if task else None
         except Exception as e:
-            PrintStyle().error(self._mask(f"Error getting browser agent task result: {str(e)}"))
+            PrintStyle().error(self._mask(f"Error getting browser agent task result: {e!s}"))
             # Return a timeout response if task.result() fails
-            answer_text = self._mask(f"Browser agent task failed to return result: {str(e)}")
+            answer_text = self._mask(f"Browser agent task failed to return result: {e!s}")
             self.log.update(answer=answer_text)
             return Response(message=answer_text, break_loop=False)
         # finally:
@@ -294,15 +324,9 @@ class BrowserAgent(Tool):
                     answer_data = DirtyJson.parse_string(answer)
                     answer_text = strings.dict_to_text(answer_data)  # type: ignore
                 else:
-                    answer_text = (
-                        str(answer) if answer else "Task completed successfully"
-                    )
+                    answer_text = str(answer) if answer else "Task completed successfully"
             except Exception as e:
-                answer_text = (
-                    str(answer)
-                    if answer
-                    else f"Task completed with parse error: {str(e)}"
-                )
+                answer_text = str(answer) if answer else f"Task completed with parse error: {e!s}"
         else:
             # Task hit max_steps without calling done()
             urls = result.urls() if result else []
@@ -319,11 +343,7 @@ class BrowserAgent(Tool):
         self.log.update(answer=answer_text)
 
         # add screenshot to the answer if we have it
-        if (
-            self.log.kvps
-            and "screenshot" in self.log.kvps
-            and self.log.kvps["screenshot"]
-        ):
+        if self.log.kvps and "screenshot" in self.log.kvps and self.log.kvps["screenshot"]:
             path = self.log.kvps["screenshot"].split("//", 1)[-1].split("&", 1)[0]
             answer_text += f"\n\nScreenshot: {path}"
 
@@ -363,13 +383,18 @@ class BrowserAgent(Tool):
                         f"{self.guid}.png",
                     )
                     files.make_dirs(path)
-                    await page.screenshot(path=path, full_page=False, timeout=3000)
-                    result["screenshot"] = f"img://{path}&t={str(time.time())}"
+                    await page.screenshot(
+                        path=path,
+                        full_page=False,
+                        timeout=Timeouts.BROWSER_SCREENSHOT_TIMEOUT,
+                    )
+                    result["screenshot"] = f"img://{path}&t={time.time()!s}"
 
                 if self.state and self.state.task and not self.state.task.is_ready():
                     await self.state.task.execute_inside(_get_update)
 
-            except Exception:
+            except Exception as e:
+                PrintStyle(font_color="yellow").print(f"Browser get_update error: {e}")
                 pass
 
         return result
@@ -422,7 +447,7 @@ def get_use_agent_log(use_agent: browser_use.Agent | None):
             else:
                 text = item.extracted_content
                 if text:
-                    first_line = text.split("\n", 1)[0][:200]
+                    first_line = text.split("\n", 1)[0][: Limits.BROWSER_FIRST_LINE_TRUNCATION]
                     short_log.append(first_line)
         result.extend(short_log)
     return result

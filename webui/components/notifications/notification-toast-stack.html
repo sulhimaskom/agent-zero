@@ -2,11 +2,34 @@
 <head>
     <title>Notification Toast Stack</title>
     <script type="module">
-        import { store } from "/components/notifications/notification-store.js";
+        import { store } from "/components/notifications/notification-store.min.js";
     </script>
 </head>
 <body>
-    <div x-data>
+    <div x-data="{
+        _keyboardHandler: null,
+        init() {
+            this.setupKeyboardHandler();
+        },
+        setupKeyboardHandler() {
+            // Store handler reference for cleanup
+            this._keyboardHandler = (e) => {
+                if (e.key === 'Escape' && $store.notificationStore.toastStack.length > 0) {
+                    e.preventDefault();
+                    $store.notificationStore.dismissNewestToast();
+                }
+            };
+            document.addEventListener('keydown', this._keyboardHandler);
+        },
+        $cleanup() {
+            // Remove keyboard listener to prevent memory leaks
+            if (this._keyboardHandler) {
+                document.removeEventListener('keydown', this._keyboardHandler);
+                this._keyboardHandler = null;
+            }
+        }
+    }" x-init="init()" @cleanup="$cleanup()">
+    }">
         <template x-if="$store.notificationStore">
             <!-- Toast Stack Container -->
             <div class="toast-stack-container"
@@ -16,6 +39,13 @@
                 <div class="toast-item"
                      :class="$store.notificationStore.getNotificationClass(toast.type)"
                      @click="$store.notificationStore.handleToastClick(toast.toastId)"
+                     @keydown.enter.prevent="$store.notificationStore.handleToastClick(toast.toastId)"
+                     @keydown.space.prevent="$store.notificationStore.handleToastClick(toast.toastId)"
+                     @mouseenter="$store.notificationStore.pauseToastTimer(toast.toastId)"
+                     @mouseleave="$store.notificationStore.resumeToastTimer(toast.toastId)"
+                     @keydown.escape.prevent="$store.notificationStore.dismissToast(toast.toastId)"
+                     tabindex="0"
+                     role="alert"
                      x-transition:enter="toast-enter"
                      x-transition:leave="toast-leave">
 
@@ -41,9 +71,17 @@
                     <!-- Toast Dismiss -->
                     <button class="toast-dismiss"
                             @click.stop="$store.notificationStore.dismissToast(toast.toastId)"
-                            title="Dismiss">
-                        <span class="material-symbols-outlined">close</span>
+                            title="Dismiss"
+                            aria-label="Dismiss notification">
+                        <span class="material-symbols-outlined" aria-hidden="true">close</span>
                     </button>
+
+                    <div class="toast-progress-container"
+                         :style="{ '--toast-duration': (toast.display_time * 1000) + 'ms' }">
+                        <div class="toast-progress-bar"
+                             :class="{ 'paused': toast.isPaused }">
+                        </div>
+                    </div>
                 </div>
             </template>
           </div>
@@ -56,7 +94,7 @@
             position: absolute;
             bottom: 5px; /* Spacing from the bottom of the zero-height container */
             padding-right: 5px;
-            z-index: 4000;
+            z-index: 15000;
             display: flex;
             flex-direction: column-reverse; /* Stack toasts upwards */
             gap: 8px;
@@ -87,6 +125,13 @@
         }
 
         .toast-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .toast-item:focus-visible {
+            outline: 3px solid var(--color-highlight);
+            outline-offset: 2px;
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
         }
@@ -171,6 +216,13 @@
             color: var(--color-primary);
         }
 
+        .toast-dismiss:focus-visible {
+            outline: 2px solid var(--color-highlight);
+            outline-offset: 2px;
+            background: var(--color-panel);
+            color: var(--color-primary);
+        }
+
         /* Toast Animations */
         .toast-enter {
             transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -208,6 +260,61 @@
             }
         }
 
+        /* Toast Progress Bar */
+        .toast-progress-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: rgba(128, 128, 128, 0.2);
+            border-radius: 0 0 8px 8px;
+            overflow: hidden;
+        }
+
+        .toast-progress-bar {
+            height: 100%;
+            width: 100%;
+            background: linear-gradient(90deg,
+                var(--toast-progress-color, #2196F3) 0%,
+                color-mix(in srgb, var(--toast-progress-color, #2196F3) 80%, white) 100%);
+            transform-origin: left;
+            animation: toast-progress var(--toast-duration, 3000ms) linear forwards;
+        }
+
+        .toast-progress-bar.paused {
+            animation-play-state: paused;
+        }
+
+        @keyframes toast-progress {
+            0% {
+                transform: scaleX(1);
+            }
+            100% {
+                transform: scaleX(0);
+            }
+        }
+
+        .toast-item.notification-info .toast-progress-bar {
+            --toast-progress-color: #2196F3;
+        }
+
+        .toast-item.notification-success .toast-progress-bar {
+            --toast-progress-color: #4CAF50;
+        }
+
+        .toast-item.notification-warning .toast-progress-bar {
+            --toast-progress-color: #FF9800;
+        }
+
+        .toast-item.notification-error .toast-progress-bar {
+            --toast-progress-color: #F44336;
+        }
+
+        .toast-item.notification-progress .toast-progress-bar {
+            --toast-progress-color: #9C27B0;
+        }
+
         /* Accessibility */
         @media (prefers-reduced-motion: reduce) {
             .toast-enter,
@@ -217,6 +324,11 @@
 
             .toast-item:hover {
                 transform: none;
+            }
+
+            .toast-progress-bar {
+                animation: none;
+                opacity: 0;
             }
         }
     </style>
