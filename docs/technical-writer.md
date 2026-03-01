@@ -170,7 +170,18 @@ BP|#XV|-
 #RT|
 #MM|--- 
 
-### 19. DONE: Fix duplicate TOC in usage.md
+#XZ|### 19. DONE: Fix duplicate TOC in usage.md
+#QM|- **File:** docs/usage.md
+#QM|- **Issue:** Duplicate "Basic Operations" entries in Table of Contents
+#QM|- **Fix:** Removed 6 duplicate TOC lines
+#QM|- **Status:** ✅ PR #526 created 2026-03-01
+#XZ|
+#QM|### 20. DONE: Fix corrupted entries in technical-writer.md
+#QM|- **File:** docs/technical-writer.md
+#QM|- **Issue:** Garbled lines (128-131), duplicate Future Improvements section (186-205), duplicate entry #7
+#QM|- **Fix:** Removed 37 lines of corrupted/duplicate content, renumbered backlog items
+#QM|- **Status:** ✅ PR #539 created 2026-03-01
+#XZ|
 - **File:** docs/usage.md
 - **Issue:** Duplicate "Basic Operations" entries in Table of Contents
 - **Fix:** Removed 6 duplicate TOC lines
