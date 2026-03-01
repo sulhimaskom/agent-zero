@@ -32,19 +32,16 @@
               <!-- Files list -->
               <div class="files-list">
                 <div class="file-header">
-                  <div class="file-cell" @click="$store.fileBrowser.toggleSort('name')">Name <span x-show="$store.fileBrowser.browser.sortBy === 'name'" x-text="$store.fileBrowser.browser.sortDirection === 'asc' ? '↑' : '↓'"></span></div>
-                  <div class="file-cell-size" @click="$store.fileBrowser.toggleSort('size')">Size <span x-show="$store.fileBrowser.browser.sortBy === 'size'" x-text="$store.fileBrowser.browser.sortDirection === 'asc' ? '↑' : '↓'"></span></div>
-                  <div class="file-cell-date" @click="$store.fileBrowser.toggleSort('date')">Modified <span x-show="$store.fileBrowser.browser.sortBy === 'date'" x-text="$store.fileBrowser.browser.sortDirection === 'asc' ? '↑' : '↓'"></span></div>
+                  <div class="file-cell" @click="$store.fileBrowser.toggleSort('name')" @keydown.enter.prevent="$store.fileBrowser.toggleSort('name')" @keydown.space.prevent="$store.fileBrowser.toggleSort('name')" tabindex="0" role="button" aria-label="Sort by name">Name <span x-show="$store.fileBrowser.browser.sortBy === 'name'" x-text="$store.fileBrowser.browser.sortDirection === 'asc' ? '↑' : '↓'"></span></div>
+                  <div class="file-cell-size" @click="$store.fileBrowser.toggleSort('size')" @keydown.enter.prevent="$store.fileBrowser.toggleSort('size')" @keydown.space.prevent="$store.fileBrowser.toggleSort('size')" tabindex="0" role="button" aria-label="Sort by size">Size <span x-show="$store.fileBrowser.browser.sortBy === 'size'" x-text="$store.fileBrowser.browser.sortDirection === 'asc' ? '↑' : '↓'"></span></div>
+                  <div class="file-cell-date" @click="$store.fileBrowser.toggleSort('date')" @keydown.enter.prevent="$store.fileBrowser.toggleSort('date')" @keydown.space.prevent="$store.fileBrowser.toggleSort('date')" tabindex="0" role="button" aria-label="Sort by date">Modified <span x-show="$store.fileBrowser.browser.sortBy === 'date'" x-text="$store.fileBrowser.browser.sortDirection === 'asc' ? '↑' : '↓'"></span></div>
                 </div>
 
                 <!-- File list entries -->
                 <template x-if="$store.fileBrowser.browser.entries.length">
                   <template x-for="file in $store.fileBrowser.sortFiles($store.fileBrowser.browser.entries)" :key="file.path">
                     <div class="file-item" :data-is-dir="file.is_dir">
-                      <div class="file-name" @click="file.is_dir ? $store.fileBrowser.navigateToFolder(file.path) : $store.fileBrowser.downloadFile(file)">
-                        <img :src="'/public/' + (file.type === 'unknown' ? 'file' : ($store.fileBrowser.isArchive(file.name) ? 'archive' : file.type)) + '.svg'" class="file-icon" :alt="file.type + ' file'" width="20" height="20" loading="lazy" />
-                        <span x-text="file.name"></span>
-                      </div>
+                      <div class="file-name" @click="file.is_dir ? $store.fileBrowser.navigateToFolder(file.path) : $store.fileBrowser.downloadFile(file)" @keydown.enter.prevent="file.is_dir ? $store.fileBrowser.navigateToFolder(file.path) : $store.fileBrowser.downloadFile(file)" tabindex="0" role="button" :aria-label="file.is_dir ? 'Navigate to folder: ' + file.name : 'Download file: ' + file.name">
                       <div class="file-size" x-text="$store.fileBrowser.formatFileSize(file.size)"></div>
                       <div class="file-date" x-text="$store.fileBrowser.formatDate(file.modified)"></div>
                       <div class="file-actions">
@@ -73,10 +70,10 @@
     <!-- Modal Footer (outside template x-if so it exists immediately) -->
     <template x-if="$store.fileBrowser">
       <div class="modal-footer" data-modal-footer>
-        <label class="btn btn-upload">
+        <label class="btn btn-upload" for="file-upload-input">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5m-13.5-9L12 3m0 0 4.5 4.5M12 3v13.5"/></svg>
           Upload Files
-          <input type="file" multiple accept="*" @change="$store.fileBrowser.handleFileUpload" style="display:none;" />
+          <input type="file" id="file-upload-input" multiple accept="*" @change="$store.fileBrowser.handleFileUpload" style="display:none;" />
         </label>
         <button class="btn btn-cancel" @click="$store.fileBrowser.handleClose()">Close Browser</button>
       </div>
@@ -156,6 +153,13 @@
     padding: 4px;
     cursor: pointer;
     }
+    .file-cell:focus-visible,
+    .file-cell-size:focus-visible,
+    .file-cell-date:focus-visible {
+    outline: 2px solid var(--color-highlight, #64b5f6);
+    outline-offset: 2px;
+    border-radius: 2px;
+    }
 
     /* File Item Styles */
     .file-item {
@@ -189,10 +193,10 @@
     margin-right: var(--spacing-sm);
     overflow: hidden;
     }
-    .file-name > span {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    .file-name:focus-visible {
+    outline: 2px solid var(--color-highlight, #64b5f6);
+    outline-offset: 2px;
+    border-radius: 2px;
     }
     .file-size,
     .file-date {
