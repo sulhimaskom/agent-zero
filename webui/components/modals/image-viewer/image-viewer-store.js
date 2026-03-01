@@ -56,6 +56,7 @@ const model = {
       }
     } catch (error) {
       console.error('Image viewer error:', error);
+      window.toastFrontendError?.(error?.message || 'Failed to open image viewer', 'Image Viewer Error');
       this.imageError = true;
     }
   },

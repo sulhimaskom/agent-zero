@@ -49,6 +49,7 @@ const model = {
 
     } catch (error) {
       console.error('Context fetch error:', error);
+      window.toastFrontendError?.(error?.message || 'Failed to load context window', 'Context Error');
       this.error = error?.message || 'Failed to load context window';
       this.isLoading = false;
       this.updateModalTitle(); // Show error in title

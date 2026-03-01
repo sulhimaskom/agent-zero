@@ -49,6 +49,7 @@ const model = {
 
     } catch (error) {
       console.error('History fetch error:', error);
+      window.toastFrontendError?.(error?.message || 'Failed to load history', 'History Error');
       this.error = error?.message || 'Failed to load history';
       this.isLoading = false;
       this.updateModalTitle(); // Show error in title
