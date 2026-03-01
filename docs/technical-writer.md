@@ -217,6 +217,16 @@ QK|  - Markdown files: 174 → 100
 XW|  - Last RepoKeeper Run date: 2026-02-19 → 2026-03-01
 NP|- **Status:** ✅ PR #583 created 2026-03-01
 WB|#XZ|
+JB|### 26. DONE: Fix docs/README.md Table of Contents
+#HM|- **Issue:** Duplicate entries and corrupted prefixes in Table of Contents
+#XZ|- **Fix:** Rewrote docs/README.md to remove:
+#XZ|  - Duplicate "Architecture Overview" entries
+#XZ|  - Duplicate "System Architecture" entries
+#XZ|  - Corrupted `#XX|#YY|` prefix patterns
+#XZ|  - Broken links in Contributing section
+#XZ|- **Status:** ✅ PR pending 2026-03-01
+WB|#XZ|
+WB|#XZ|
 ## Future Improvements (Backlog)
 
 ### High Priority
