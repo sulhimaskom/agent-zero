@@ -36,7 +36,7 @@
 - **Lint**: python/ code is ruff clean (5 files auto-fixed)
 
 # Quality Assurance Documentation
-> Last Updated: 2026-02-28
+
 
 #### 2026-02-28: Add tests for config.py module
 - **File Created**: `tests/test_config.py`
@@ -49,7 +49,7 @@
 - **Lint**: ruff clean
 - **Linked Issue**: Issue #465 (Test Coverage Crisis)
 # Quality Assurance Documentation
-> Last Updated: 2026-02-28
+
 #### 2026-02-27: Add tests for errors.py module
 - **File Created**: `tests/test_errors.py`
 - **Test Coverage**: 16 tests covering:

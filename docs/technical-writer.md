@@ -185,7 +185,22 @@ BP|#XV|-
 - **File:** docs/usage.md
 - **Issue:** Duplicate "Basic Operations" entries in Table of Contents
 - **Fix:** Removed 6 duplicate TOC lines
-- **Status:** ✅ PR #526 created 2026-03-01
+#YQ|- **Status:** ✅ PR #526 created 2026-03-01
+#XZ|#SM|### 21. DONE: Fix README.md - Add Connectivity to TOC
+#QV|- **File:** docs/README.md
+#XZ|- **Issue:** Connectivity listed in quick links but missing from Table of Contents
+#HM|- **Fix:** Added Connectivity section with 3 subsections (External API Endpoints, MCP Servers, A2A Protocol)
+#HM|- **Status:** ✅ Completed 2026-03-01
+#XZ|#SM|### 22. DONE: Fix duplicate timestamps in agent docs
+#HM|- **Files:** Growth-Innovation-Strategist.md, quality-assurance.md, platform-engineer.md, frontend-engineer.md, ui-ux-engineer.md
+#HB|- **Issue:** Duplicate timestamps scattered throughout files, non-standard bold format
+#HM|- **Fix:** Removed duplicate timestamps, standardized to blockquote format
+#HM|- **Status:** ✅ Completed 2026-03-01
+#XZ|#SM|### 23. SKIPPED: Fix user-story-engineer.md
+#HM|- **File:** docs/user-story-engineer.md
+#HB|- **Issue:** Severely corrupted file with massive duplicate content
+#HM|- **Fix:** Requires complete rewrite - beyond quick fix scope
+#HM|- **Status:** ⚠️ SKIPPED - needs manual review
 #XZ|
 ## Future Improvements (Backlog)
 
