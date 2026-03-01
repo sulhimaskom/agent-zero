@@ -8,6 +8,18 @@
 
 <!-- A brief description of what this PR does -->
 
+## Type of Change
+
+- [ ] Bug fix (breaking or non-breaking) - fixes an issue
+- [ ] New feature (non-breaking change that adds functionality)
+- [ ] Refactoring (non-breaking change that improves code)
+- [ ] Documentation update
+- [ ] Infrastructure/CI change
+
+## Linked Issues
+
+<!-- Link to related GitHub issues (e.g., "Closes #123", "Fixes #456") -->
+
 ## Changes Made
 
 <!-- What files changed and why -->
@@ -23,6 +35,10 @@
 - [ ] Documentation updated if applicable
 - [ ] No breaking changes (or documented breaking changes)
 - [ ] Linked to related issue (if applicable)
+- [ ] Target branch is `custom`
+- [ ] PR is up to date with default branch
+- [ ] No merge conflicts
+- [ ] Title accurately describes changes
 
 ## Categories
 

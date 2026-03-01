@@ -66,7 +66,7 @@ As of 2026-02-25, agent profiles in `/agents/` have this structure:
 - Keep this document updated with learnings
 - Focus on small, incremental improvements rather than large refactors
 
-## Completed Improvements
+#JW|- **2026-03-01**: Added PR template in `.github/PULL_REQUEST_TEMPLATE.md` - Provides structured PR description with sections for summary, type of change, linked issues, changes made, testing, and checklist. Addresses issue #558 (DX-engineer - Contribution Guide Too Brief).
 #JW|- **2026-02-28**: Added module docstrings to `chat_load.py`, `settings_set.py`, `scheduler_task_create.py`, `memory_dashboard.py`, and `projects.py` - improves API endpoint documentation. Fixed bare exception catch in `browser_do._py` - now properly logs inner exception instead of silently swallowing.
 #JW|- **2026-02-27**: Added module docstrings to `chat_create.py`, `settings_get.py`, and `health.py` - improves API endpoint documentation.
 - **2026-02-27**: Added module docstrings to `chat_create.py`, `settings_get.py`, and `health.py` - improves API endpoint documentation.
