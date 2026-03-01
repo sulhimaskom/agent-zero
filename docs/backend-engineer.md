@@ -11,6 +11,35 @@
 
 ## Completed Fixes
 
+### Issue #517: Command Injection Risk - shell=True in brocula_loop.py
+**Status:** FIXED (PR #527) - 2026-03-01
+
+**Problem:**
+- `agents/brocula/brocula_loop.py` used `subprocess.run(cmd, shell=True, ...)`
+- This creates potential command injection vulnerability
+- User-controlled input could be injected into shell commands
+
+**Changes:**
+1. Added `import shlex` for safe command parsing
+2. Modified `run_command()` function:
+   - Convert string commands to lists using `shlex.split()`
+   - Changed `shell=True` to `shell=False`
+3. Converted lighthouse command to use explicit list form to avoid shell parsing issues
+
+**Files Modified:**
+- agents/brocula/brocula_loop.py (+17/-5 lines)
+
+**Verification:**
+- Python syntax: PASS
+- shlex.split() tested on all commands: PASS
+- Tests: 186 passed
+- No regressions
+
+---
+
+
+## Completed Fixes
+
 ### Issue #414: MCP Handler Zero Tests - Partial Coverage Added
 **Status:** FIXED (PR #441) - 2026-02-27
 
