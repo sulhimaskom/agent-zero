@@ -170,7 +170,16 @@ BP|#XV|-
     - External API (5 endpoints)
     - Utility (3 endpoints)
   - Updated docs/README.md to include API reference link
-- **Status:** ✅ Completed 2026-02-28
+#RQ|- **Status:** ✅ Completed 2026-02-28
+#RT|
+#MM|--- 
+
+### 19. DONE: Fix duplicate TOC in usage.md
+- **File:** docs/usage.md
+- **Issue:** Duplicate "Basic Operations" entries in Table of Contents
+- **Fix:** Removed 6 duplicate TOC lines
+- **Status:** ✅ PR #526 created 2026-03-01
+#MM|---
 
 ---
 
