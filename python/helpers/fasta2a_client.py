@@ -1,5 +1,5 @@
 import uuid
-from typing import Any
+from typing import Any, cast
 
 from python.helpers.constants import MimeTypes, Timeouts
 from python.helpers.print_style import PrintStyle
@@ -132,7 +132,7 @@ class AgentConnection:
 
             # Persist context id for subsequent calls
             try:
-                ctx = response.get("result", {}).get("context_id")  # type: ignore[index]
+                ctx = cast(str | None, response.get("result", {}).get("context_id"))
                 if isinstance(ctx, str):
                     self._context_id = ctx
             except Exception:

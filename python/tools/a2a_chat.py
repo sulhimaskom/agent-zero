@@ -1,3 +1,5 @@
+from typing import cast
+
 from python.helpers.fasta2a_client import connect_to_agent, is_client_available
 from python.helpers.print_style import PrintStyle
 from python.helpers.tool import Response, Tool
@@ -37,14 +39,14 @@ class A2AChatTool(Tool):
                     attachments=attachments,
                     context_id=context_id,
                 )
-                task_id = task_resp.get("result", {}).get("id")  # type: ignore[index]
+                task_id = cast(str | None, task_resp.get("result", {}).get("id"))
                 if not task_id:
                     return Response(
                         message="Remote agent failed to create task.",
                         break_loop=False,
                     )
                 final = await conn.wait_for_completion(task_id)
-                new_context_id = final["result"].get("context_id")  # type: ignore[index]
+                new_context_id = cast(str | None, final["result"].get("context_id"))
                 if isinstance(new_context_id, str):
                     sessions[agent_url] = new_context_id
                     # persist back to agent data
