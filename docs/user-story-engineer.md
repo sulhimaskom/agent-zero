@@ -209,6 +209,10 @@ Small modules (< 100 lines) without tests:
 ## Quick Wins (Ready for Implementation)
 
 Pending candidates for test coverage (small modules without tests):
+- ~~`update_check.py` (21 lines)~~ ✅ COMPLETED (PR #541)
+- ~~`searxng.py` (22 lines)~~ ✅ Already has tests
+- ~~`duckduckgo_search.py` (24 lines)~~ ✅ COMPLETED (PR #541)
+- ~~`playwright.py` (38 lines)~~ ✅ COMPLETED (PR #541)
 - `update_check.py` (21 lines)
 - `searxng.py` (22 lines)
 - `duckduckgo_search.py` (24 lines)
@@ -220,6 +224,12 @@ Pending candidates for test coverage (small modules without tests):
 ## Quick Wins (Completed)
 
 1. ~~**Fix bare excepts in tunnel_manager.py**~~ ✅ COMPLETED
+2. ~~**Add test for rate_limiter.py**~~ ✅ COMPLETED (PR #443)
+3. ~~**Remove dead code in timed_input.py**~~ ✅ COMPLETED (PR #281)
+4. ~~**Fix config typo in model_providers.yaml**~~ ✅ COMPLETED (PR #358)
+5. ~~**Add test for crypto.py**~~ ✅ COMPLETED (PR #432)
+6. ~~**Add test for images.py**~~ ✅ COMPLETED (PR #477)
+7. ~~**Add test for update_check.py, duckduckgo_search.py, playwright.py**~~ ✅ COMPLETED (PR #541)
 2. ~~**Add test for rate_limiter.py**~~ ✅ COMPLETED (PR #443)
 3. ~~**Remove dead code in timed_input.py**~~ ✅ COMPLETED (PR #281)
 4. ~~**Fix config typo in model_providers.yaml**~~ ✅ COMPLETED (PR #358)
