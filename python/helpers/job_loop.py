@@ -11,6 +11,7 @@ SLEEP_TIME = Limits.JOB_LOOP_SLEEP_TIME
 keep_running = True
 pause_time = 0
 tick_in_progress = False
+tick_lock = asyncio.Lock()
 
 
 async def run_loop():
@@ -27,22 +28,26 @@ async def run_loop():
                 )
         if not keep_running and (time.time() - pause_time) > (SLEEP_TIME * 2):
             resume_loop()
-        # Skip tick if previous one is still running to prevent job duplication
+
+        # Use lock to prevent race condition between check and set of tick_in_progress
         # This addresses the issue where SLEEP_TIME < tick_duration causes overlapping ticks
-        if keep_running and not tick_in_progress:
-            tick_in_progress = True
-            try:
-                await scheduler_tick()
-            except Exception as e:
-                PrintStyle().error(errors.format_error(e))
-            finally:
-                tick_in_progress = False
-        elif tick_in_progress:
-            # Log warning when skipping tick due to previous tick still running
-            PrintStyle().warning(
-                f"Skipping scheduler tick - previous tick still in progress "
-                f"(SLEEP_TIME={SLEEP_TIME}s may be too short)"
-            )
+        if keep_running:
+            async with tick_lock:
+                if tick_in_progress:
+                    # Log warning when skipping tick due to previous tick still running
+                    PrintStyle().warning(
+                        f"Skipping scheduler tick - previous tick still in progress "
+                        f"(SLEEP_TIME={SLEEP_TIME}s may be too short)"
+                    )
+                else:
+                    tick_in_progress = True
+                    try:
+                        await scheduler_tick()
+                    except Exception as e:
+                        PrintStyle().error(errors.format_error(e))
+                    finally:
+                        tick_in_progress = False
+
         await asyncio.sleep(SLEEP_TIME)
 
 
