@@ -224,6 +224,7 @@ Pending candidates for test coverage (small modules without tests):
 3. ~~**Remove dead code in timed_input.py**~~ ✅ COMPLETED (PR #281)
 4. ~~**Fix config typo in model_providers.yaml**~~ ✅ COMPLETED (PR #358)
 5. ~~**Add test for crypto.py**~~ ✅ COMPLETED (PR #432)
+6. ~~**Add test for images.py**~~ ✅ COMPLETED (PR #477)
 7. ~~**Remove duplicate imports in speech-store.js**~~ ✅ COMPLETED (PR #499)
 
 
