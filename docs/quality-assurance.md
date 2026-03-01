@@ -1,39 +1,43 @@
 # Quality Assurance Documentation
-# > Last Updated: 2026-03-01
-# 
-# ### 2026-03-01: Add Traditional Testing to CI Workflow
-# - **Files Created**: `.github/workflows/tests.yml` (NEW)
-# - **Files Modified**: `pyproject.toml` (added pytest-cov dependency)
-# - **Changes**:
-#   - Created dedicated pytest CI workflow with coverage enforcement
-#   - Added pytest-cov to dev dependencies for coverage reporting
-#   - Workflow triggers on push/PR to main/custom branches
-#   - Uses uv for fast dependency installation
-#   - Enforces 20% minimum coverage threshold (addresses issue #574)
-#   - Uploads coverage reports as artifacts
-# - **Linked Issue**: Issue #577 "[CI/CD] Add traditional testing to AI-powered CI workflow"
-# - **Impact**: Traditional pytest testing now runs in CI alongside AI-powered analysis
-# - **Verification**: YAML syntax validated, workflow ready for CI execution
-# 
-# 
-# ### 2026-03-01: Fix F841 Unused Exception Variables
-# > Last Updated: 2026-03-01
-# 
-# ### 2026-03-01: Fix F841 Unused Exception Variables
-# - **Files Modified**: 28 files
-# - **Changes**: Removed 33 unused `e` variables from exception handlers (F841)
-# - **Before**: `except Exception as e:` with `e` never used
-# - **After**: `except Exception:` or properly used `e`
-# - **Verification**: 
-#   - ruff check: All checks passed
-#   - pytest: 716 passed
-# - **Lint**: ruff clean
-# 
 
-# Quality Assurance Documentation
 > Last Updated: 2026-03-01
 
-#### 2026-03-01: Proactive QA Scan - Frontend Quality
+### 2026-03-01: Fix F841 Unused Exception Variables in git.py
+- **Files Modified**: `python/helpers/git.py`
+- **Changes**:
+  - Removed unused exception variable `e` from line 34 (`except Exception as e:` → `except Exception:`)
+  - Removed unused exception variable `e` from line 56 (`except Exception as e:` → `except Exception:`)
+- **Issue Fixed**: ruff F841 errors - local variable assigned but never used
+- **Verification**:
+  - ruff check: All checks passed
+  - pytest: 738 passed
+- **Linked Issue**: Issue #595 "[Backend] MEDIUM: Bare Exception Handlers - Should Capture Exception Object"
+
+### 2026-03-01: Add Traditional Testing to CI Workflow
+- **Files Created**: `.github/workflows/tests.yml` (NEW)
+- **Files Modified**: `pyproject.toml` (added pytest-cov dependency)
+- **Changes**:
+  - Created dedicated pytest CI workflow with coverage enforcement
+  - Added pytest-cov to dev dependencies for coverage reporting
+  - Workflow triggers on push/PR to main/custom branches
+  - Uses uv for fast dependency installation
+  - Enforces 20% minimum coverage threshold (addresses issue #574)
+  - Uploads coverage reports as artifacts
+- **Linked Issue**: Issue #577 "[CI/CD] Add traditional testing to AI-powered CI workflow"
+- **Impact**: Traditional pytest testing now runs in CI alongside AI-powered analysis
+- **Verification**: YAML syntax validated, workflow ready for CI execution
+
+### 2026-03-01: Fix F841 Unused Exception Variables
+- **Files Modified**: 28 files
+- **Changes**: Removed 33 unused `e` variables from exception handlers (F841)
+- **Before**: `except Exception as e:` with `e` never used
+- **After**: `except Exception:` or properly used `e`
+- **Verification**: 
+  - ruff check: All checks passed
+  - pytest: 716 passed
+- **Lint**: ruff clean
+
+### 2026-03-01: Proactive QA Scan - Frontend Quality
 - **Scan Focus**: Memory leaks, bare catch blocks, console statements, type ignores
 - **Findings**:
   - Bare catch blocks: ✅ FIXED - No `catch {}` patterns found in JS source
@@ -43,7 +47,7 @@
 - **Remaining Issue**: CSP allows 'unsafe-eval' in index.html (#516) - requires analysis of eval usage
 - **Recommendation**: No small atomic fixes available in this scan cycle
 
-#### 2026-03-01: Fix test_searxng.py Async Mocking
+### 2026-03-01: Fix test_searxng.py Async Mocking
 - **File Modified**: `tests/test_searxng.py`
 - **Issue**: 4 tests failing due to incorrect async mocking
 - **Root Cause**: 
@@ -57,7 +61,7 @@
 - **Test Results**: 636 passed (was 632 passed + 4 failed)
 - **Lint**: ruff clean
 
-#### 2026-02-28: Test Infrastructure Improvements - Install Missing Dependencies
+### 2026-02-28: Test Infrastructure Improvements - Install Missing Dependencies
 - **Packages Installed**: tiktoken, Pillow
 - **Impact**: 
   - Fixed test collection error in test_images.py (PIL/Pillow missing)
@@ -67,10 +71,7 @@
 - **Note**: 7 pre-existing failures in test_tokens.py due to improper mocking in conftest.py (get_encoding not properly mocked)
 - **Lint**: python/ code is ruff clean (5 files auto-fixed)
 
-# Quality Assurance Documentation
-
-
-#### 2026-02-28: Add tests for config.py module
+### 2026-02-28: Add tests for config.py module
 - **File Created**: `tests/test_config.py`
 - **Test Coverage**: 23 tests covering:
   - get_frontend_config: returns dict, network/host/url keys, features, limits, static ports, port types
@@ -80,9 +81,8 @@
 - **Verification**: All 23 tests pass
 - **Lint**: ruff clean
 - **Linked Issue**: Issue #465 (Test Coverage Crisis)
-# Quality Assurance Documentation
 
-#### 2026-02-27: Add tests for errors.py module
+### 2026-02-27: Add tests for errors.py module
 - **File Created**: `tests/test_errors.py`
 - **Test Coverage**: 16 tests covering:
   - handle_error: reraises CancelledError, handles regular exceptions
@@ -93,7 +93,7 @@
 - **Lint**: ruff clean
 - **Linked PR**: #427
 
-#### 2026-02-28: Add tests for strings.py module
+### 2026-02-28: Add tests for strings.py module
 - **File Created**: `tests/test_strings.py`
 - **Test Coverage**: 47 tests covering:
   - sanitize_string: basic string, unicode, surrogates, non-string input, empty, encoding, emoji
@@ -104,10 +104,8 @@
 - **Verification**: Syntax check passed
 - **Lint**: ruff clean
 
-
-
-
 ## Overview
+
 This document serves as the long-term memory for the quality-assurance specialist agent.
 
 ## Repository QA Status
@@ -123,59 +121,35 @@ This document serves as the long-term memory for the quality-assurance specialis
 - **Issue #239**: "[INFRA] CI/CD Missing Test and Lint Gates"
 - **Issue #234**: "[TEST] Critical Test Coverage Gap - 5% Python, 0% JS Coverage"
 
-#### 2026-02-25: QA Review of PR #283
-- **PR**: #283 "fix: Resolve ruff linting issues (UP012, RUF100, T201, I001)"
-- **Review Result**: ✅ APPROVED
-- **Verification**:
-  - Ruff linting: All checks passed
-  - Pytest: 231/231 tests passed
-  - Merge status: Up to date with base branch
-  - Conflicts: None
-- **QA Comment**: [Link to review](https://github.com/sulhimaskom/agent-zero/pull/283#issuecomment-3959146535)
-- **Notes**: Pre-existing test infrastructure issue fixed (pytest-asyncio missing)
+### Implemented Improvements
 
-#HX|### Implemented Improvements
-#SZ|
-#MW|#### 2026-02-27: Add tests for rate_limiter.py module
-#NZ|- **File Created**: `tests/test_rate_limiter.py`
-#XS|- **Test Coverage**: 18 tests covering:
-#TK|  - Initialization: default, custom timeframe, custom limits, non-int coercion
-#VP|  - Add method: single value, multiple values same key, multiple keys, new key creation
-#MK|  - Cleanup: removes old entries, keeps recent entries, handles empty values
-#RJ|  - GetTotal: returns sum, unknown key returns zero, empty key returns zero
-#JS|  - Wait: exits when under limit, with callback, respects multiple keys
-#VZ|  - Integration: full rate limiting flow
-#WR|- **Verification**: All 18 tests pass
-#QM|- **Bug Fix**: Removed non-existent import `python.helpers.constants.Timeouts`
-#XK|- **Issue Found**: Test imported a module that doesn't exist in codebase
-#VD|- **Fix Applied**: Use hardcoded default value 60 for timeframe
-#MV|- **Linked PR**: #377
-#NB|- **Lint**: ruff clean
-#BR|
-#KY|#### 2026-02-27: Add tests for dirty_json.py module
-#QR|- **File Created**: `tests/test_dirty_json.py`
-#ZZ|- **Test Coverage**: 28 tests covering:
-#PZ|  - Basic parsing: objects, arrays, strings, numbers, booleans, null, undefined
-#JP|  - Edge cases: empty strings, trailing commas, comments, unquoted strings, nesting
-#JB|  - try_parse fallback function
-#ZN|  - stringify function
-#JP|  - DirtyJson class methods
-#NN|- **Verification**: All 28 tests pass
-#VX|- **Linked PR**: #383
-#NB|- **Lint**: ruff clean
-#XN|
-#KY|#### 2026-02-26: Add tests for dirty_json.py module
+#### 2026-02-27: Add tests for rate_limiter.py module
+- **File Created**: `tests/test_rate_limiter.py`
+- **Test Coverage**: 18 tests covering:
+  - Initialization: default, custom timeframe, custom limits, non-int coercion
+  - Add method: single value, multiple values same key, multiple keys, new key creation
+  - Cleanup: removes old entries, keeps recent entries, handles empty values
+  - GetTotal: returns sum, unknown key returns zero, empty key returns zero
+  - Wait: exits when under limit, with callback, respects multiple keys
+  - Integration: full rate limiting flow
+- **Verification**: All 18 tests pass
+- **Bug Fix**: Removed non-existent import `python.helpers.constants.Timeouts`
+- **Issue Found**: Test imported a module that doesn't exist in codebase
+- **Fix Applied**: Use hardcoded default value 60 for timeframe
+- **Linked PR**: #377
+- **Lint**: ruff clean
 
-#### 2026-02-26: Add tests for dirty_json.py module
+#### 2026-02-27: Add tests for dirty_json.py module
 - **File Created**: `tests/test_dirty_json.py`
-- **Test Coverage**: 35 tests covering:
+- **Test Coverage**: 28 tests covering:
   - Basic parsing: objects, arrays, strings, numbers, booleans, null, undefined
   - Edge cases: empty strings, trailing commas, comments, unquoted strings, nesting
   - try_parse fallback function
   - stringify function
   - DirtyJson class methods
-- **Verification**: All 266 tests pass (231 original + 35 new)
-- **Linked PR**: (pending creation)
+- **Verification**: All 28 tests pass
+- **Linked PR**: #383
+- **Lint**: ruff clean
 
 #### 2026-02-26: Add tests for guids.py module
 - **File Created**: `tests/test_guids.py`
@@ -232,28 +206,22 @@ This document serves as the long-term memory for the quality-assurance specialis
 4. Add JavaScript test framework and tests
 5. Increase Python test coverage from 5% to target 30%
 
-#### Proactive QA Scan (2026-02-25)
-- **Type ignores**: 20 files with `# type: ignore` - opportunity for better typing
-- **Bare exceptions**: 20 files with `except Exception:` - consider specific exception types
-- **Test infrastructure**: pytest-asyncio missing (now installed in CI)
-- **Recommendation**: Focus on type safety and exception handling in high-traffic modules (settings.py, task_scheduler.py, mcp_handler.py)
+### Test Files Available
+- tests/test_token_caching.py
+- tests/test_fasta2a_client.py
+- tests/test_file_tree_visualize.py
+- tests/test_config_manager.py
+- tests/test_config_validator.py
+- tests/test_constants.py
+- tests/test_health_check.py
+- tests/test_tool_coordinator.py
+- tests/test_login.py
+- tests/test_dirty_json.py (NEW - 35 tests)
+- tests/test_guids.py (NEW - 9 tests)
+- tests/test_strings.py (NEW - 47 tests)
+- tests/chunk_parser_test.py
+- tests/email_parser_test.py
+- tests/rate_limiter_manual.py
 
-WM|### Test Files Available
-ZK|- tests/test_token_caching.py
-JB|- tests/test_fasta2a_client.py
-JZ|- tests/test_file_tree_visualize.py
-SX|- tests/test_config_manager.py
-KX|- tests/test_config_validator.py
-KT|- tests/test_constants.py
-TR|- tests/test_health_check.py
-HB|- tests/test_tool_coordinator.py
-RR|- tests/test_login.py
-KJ|- tests/test_dirty_json.py (NEW - 35 tests)
-WJ|- tests/test_guids.py (NEW - 9 tests)
-WQ|- tests/test_strings.py (NEW - 47 tests)
-WP|- tests/chunk_parser_test.py
-XZ|- tests/email_parser_test.py
-VW|- tests/rate_limiter_manual.py
-
-VB|### Workflow Pattern
-JB|The repository uses a unique AI-powered CI (OpenCode agents) rather than traditional lint/test gates. This is intentional but creates gaps in automated quality enforcement.
+### Workflow Pattern
+The repository uses a unique AI-powered CI (OpenCode agents) rather than traditional lint/test gates. This is intentional but creates gaps in automated quality enforcement.
