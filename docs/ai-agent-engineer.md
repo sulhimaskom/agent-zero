@@ -12,6 +12,27 @@ This document serves as the long-term memory for the ai-agent-engineer domain in
 
 ## Implemented Fixes
 
+### 2026-03-01: Race Condition Fix in job_loop.py
+**Issue**: [Issue #458] - Job Duplication Risk Below 1min Interval
+
+**Root Cause**: The original code used a simple boolean flag `tick_in_progress` to prevent job duplication, but there was a potential race condition where multiple coroutines could pass the check before any of them set the flag.
+
+**Fix Applied**: Added `asyncio.Lock()` to make check-and-set of `tick_in_progress` atomic:
+- Added `tick_lock = asyncio.Lock()` as a global lock
+- Used `async with tick_lock:` to protect the tick execution logic
+- This ensures only one coroutine can check and execute the tick at a time
+
+**Files Modified**:
+- `python/helpers/job_loop.py` - Added asyncio.Lock, refactored tick execution logic
+
+**Verification**:
+- Python syntax check: PASSED
+- PR [#549](https://github.com/sulhimaskom/agent-zero/pull/549) created with ai-agent-engineer label, linked to Issue #458
+
+---
+
+### 2026-03-01: Duplicate Print Statement in task_scheduler.py
+
 ### 2026-03-01: Duplicate Print Statement in task_scheduler.py
 **Issue**: Duplicate print statement in exception handler in task_scheduler.py
 
