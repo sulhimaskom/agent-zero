@@ -391,7 +391,7 @@ export function cancelEdit() {
 export async function saveTask() {
   // Validate task data
   if (!this.editingTask.name.trim() || !this.editingTask.prompt.trim()) {
-    alert('Task name and prompt are required');
+    showToast('Task name and prompt are required', 'error');
     return;
   }
 

@@ -179,7 +179,7 @@ async function getCsrfToken() {
       document.cookie = `csrf_token_${json.runtime_id}=${csrfToken}; SameSite=Strict; Path=/`;
       return csrfToken;
     } else {
-      if (json.error) alert(json.error);
+      if (json.error) showErrorToast(json.error);
       throw new Error(json.error || 'Failed to get CSRF token');
     }
   } catch (error) {

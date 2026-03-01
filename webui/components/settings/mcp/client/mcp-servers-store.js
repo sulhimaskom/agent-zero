@@ -53,7 +53,7 @@ const model = {
       this.editor.navigateFileStart();
     } catch (error) {
       Logger.error('Failed to format JSON:', error);
-      alert(`Invalid JSON: ${  error.message}`);
+      window.toastFrontendError(`Invalid JSON: ${error.message}`, 'JSON Error');
     }
   },
 

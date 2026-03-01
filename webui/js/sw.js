@@ -44,7 +44,10 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => cache.addAll(STATIC_ASSETS))
-      .catch(() => {}),
+      .catch((error) => {
+        // Log error but don't throw - allow service worker to install anyway
+        console.error('Failed to cache static assets:', error);
+      }),
   );
   self.skipWaiting();
 });

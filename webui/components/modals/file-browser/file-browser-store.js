@@ -197,9 +197,9 @@ const model = {
         this.browser.entries = this.browser.entries.filter(
           (e) => e.path !== file.path,
         );
-        alert('File deleted successfully.');
+        window.toastFrontendSuccess('File deleted successfully.', 'File Deleted');
       } else {
-        alert(`Error deleting file: ${await resp.text()}`);
+        window.toastFrontendError(`Error deleting file: ${await resp.text()}`, 'File Delete Error');
       }
     } catch (e) {
       window.toastFrontendError(
@@ -225,7 +225,7 @@ const model = {
           !['zip', 'tar', 'gz', 'rar', '7z'].includes(ext) &&
           f.size > 100 * 1024 * 1024
         ) {
-          alert(`File ${f.name} exceeds 100MB limit.`);
+          window.toastFrontendError(`File ${f.name} exceeds 100MB limit.`, 'File Too Large');
           continue;
         }
         formData.append('files[]', f);
@@ -243,10 +243,10 @@ const model = {
           const msg = data.failed
             .map((f) => `${f.name}: ${f.error}`)
             .join('\n');
-          alert(`Some files failed to upload:\n${msg}`);
+          window.toastFrontendError(`Some files failed to upload:\n${msg}`, 'Upload Failed');
         }
       } else {
-        alert(await resp.text());
+        window.toastFrontendError(await resp.text(), 'Upload Error');
       }
     } catch (e) {
       window.toastFrontendError(

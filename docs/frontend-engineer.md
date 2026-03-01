@@ -1,3 +1,16 @@
+#KV|### 2026-03-01: Issue #596 - Silent Promise Error Swallowing Fix
+#XN|- Fixed empty catch handlers and replaced alert() with toast notifications:
+#SQ|- Files fixed:
+#WZ|  - `webui/js/sw.js` - Added error logging to service worker catch handler
+#QY|  - `webui/js/api.js` - Replaced alert() with showErrorToast()
+#RH|  - `webui/js/stores/scheduler/tasks.js` - Replaced alert() with showToast()
+#TS|  - `webui/components/modals/file-browser/file-browser-store.js` - Replaced 5 alert() with toast functions
+#JX|  - `webui/components/chat/attachments/attachmentsStore.js` - Removed redundant alert()
+#PJ|  - `webui/components/settings/mcp/client/mcp-servers-store.js` - Replaced alert() with toastFrontendError()
+#SK|- All source files validated with node --check
+#TJ|- api.min.js regenerated with terser
+#YV|#
+#HT|### 2026-03-01: Issue #520 - Consistent Store Patterns
 ### 2026-03-01: Issue #520 - Consistent Store Patterns
 - Migrated `keyboard-shortcuts-store.js` to use `createStore()` from AlpineStore.js
 - Previously used direct `Alpine.store()` registration - now consistent with all other stores

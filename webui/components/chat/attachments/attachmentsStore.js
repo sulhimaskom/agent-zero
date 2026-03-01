@@ -445,7 +445,6 @@ const model = {
       window.URL.revokeObjectURL(link.href);
     } catch (error) {
       window.toastFetchError('Error downloading file', error);
-      alert('Error downloading file');
     }
   },
 
