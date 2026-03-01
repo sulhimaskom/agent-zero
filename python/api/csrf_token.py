@@ -13,6 +13,7 @@ from flask import Request, session
 from python.helpers import dotenv, login, runtime
 from python.helpers.api import ApiHandler, Input, Output
 from python.helpers.constants import Network
+from python.helpers.print_style import PrintStyle
 
 
 class GetCsrfToken(ApiHandler):
@@ -44,12 +45,42 @@ class GetCsrfToken(ApiHandler):
         if "csrf_token" not in session:
             session["csrf_token"] = secrets.token_urlsafe(32)
 
+        # Check and log CORS security warning for production
+        cors_warning = self.get_cors_security_warning()
+        if cors_warning:
+            PrintStyle.warning(cors_warning)
+
         # return the csrf token and runtime id
-        return {
+        response = {
             "ok": True,
             "token": session["csrf_token"],
             "runtime_id": runtime.get_runtime_id(),
         }
+
+        # Add warning to response if present
+        if cors_warning:
+            response["cors_warning"] = cors_warning
+
+        return response
+
+    def get_cors_security_warning(self) -> str | None:
+        """Check if permissive CORS is used in production and return warning."""
+        if runtime.is_development():
+            return None
+
+        # Check if using default permissive origins in production
+        allowed_origins = Network.DEV_CORS_ORIGINS
+        permissive_patterns = ["localhost", "127.0.0.1"]
+
+        for origin in allowed_origins:
+            for pattern in permissive_patterns:
+                if pattern in origin:
+                    return (
+                        "SECURITY WARNING: Permissive CORS origins detected in production. "
+                        "Default origins include localhost which may allow unauthorized cross-origin requests. "
+                        "Set A0_DEV_CORS_ORIGINS to your production domain or empty string for same-origin only."
+                    )
+        return None
 
     async def check_allowed_origin(self, request: Request):
         # if login is required, this che
