@@ -32,7 +32,7 @@ from mcp.shared.message import SessionMessage
 from mcp.types import CallToolResult, ListToolsResult
 from pydantic import BaseModel, Discriminator, Field, PrivateAttr, Tag
 
-from python.helpers import dirty_json, errors, settings
+from python.helpers import dirty_json, errors, files, settings
 from python.helpers.constants import Colors, Limits, Messages, Timeouts
 from python.helpers.print_style import PrintStyle
 from python.helpers.tool import Response, Tool
@@ -728,16 +728,14 @@ class MCPConfig(BaseModel):
 
                     prompt += "\n"
 
-                    prompt += (
-                        f"#### Usage:\n"
-                        f"{{\n"
-                        # f'    "observations": ["..."],\n' # TODO: this should be a prompt file with placeholders
-                        f'    "thoughts": ["..."],\n'
-                        # f'    "reflection": ["..."],\n' # TODO: this should be a prompt file with placeholders
-                        f'    "tool_name": "{server_name}.{tool["name"]}",\n'
-                        f'    "tool_args": !follow schema above\n'
-                        f"}}\n"
+                    # Use external prompt file for usage format
+                    usage_prompt = files.read_prompt_file(
+                        "fw.mcp_tools_usage.md",
+                        _directories=["prompts"],
+                        server_name=server_name,
+                        tool_name=tool["name"]
                     )
+                    prompt += usage_prompt
 
         return prompt
 
