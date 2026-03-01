@@ -462,3 +462,26 @@ TH|- No regressions in existing tests
 - No regressions: Existing tests unaffected (700 total tests pass)
 
 - No regressions in existing tests
+---
+
+### Issue #403: History.py - Three Similar Record Class set_summary() Methods
+**Status:** FIXED - 2026-03-01
+
+**Problem:**
+- history.py had four `set_summary()` methods - three were redundant overrides
+- `Topic.set_summary()` and `Bulk.set_summary()` just called `super().set_summary(summary)`
+- This violates DRY principle and creates unnecessary maintenance burden
+
+**Changes:**
+1. Removed redundant `Topic.set_summary()` method (lines 172-174)
+2. Removed redundant `Bulk.set_summary()` method (lines 339-341)
+3. Both classes now inherit the base implementation from `Record` class
+
+**Files Modified:**
+- python/helpers/history.py (-6 lines)
+
+**Verification:**
+- Python syntax: PASS (py_compile)
+- Reduced from 4 to 2 `set_summary` methods in history.py
+- Functionality preserved: Topic and Bulk still properly set summaries
+- Remaining methods: Record base class (proper impl), Message (extends with token recalculation)
