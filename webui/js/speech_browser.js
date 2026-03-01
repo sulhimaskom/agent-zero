@@ -1,6 +1,7 @@
 import { pipeline, read_audio } from './transformers@3.0.2.min.js';
 import { updateChatInput, sendMessage } from '../index.js';
 import { TIMING, SPEECH } from './constants.js';
+import Logger from './logger.js';
 
 const microphoneButton = document.getElementById('microphone-button');
 let microphoneInput = null;
@@ -175,7 +176,7 @@ class MicrophoneInput {
       return true;
     } catch (error) {
 
-      console.error('Microphone initialization error:', error);
+      Logger.error('Microphone initialization error:', error);
       window.toastFrontendError('Failed to access microphone. Please check permissions.', 'Microphone Error');
       return false;
     }
@@ -264,7 +265,7 @@ class MicrophoneInput {
         await this.updateCallback(result.text, true);
       }
     } catch (error) {
-      console.error('Transcription error:', error);
+      Logger.error('Transcription error:', error);
       window.toastFrontendError('Transcription failed.', 'Speech Recognition Error');
     } finally {
       URL.revokeObjectURL(audioUrl);
@@ -343,7 +344,7 @@ async function requestMicrophonePermission() {
     await navigator.mediaDevices.getUserMedia({ audio: true });
     return true;
   } catch (err) {
-    console.error('Error accessing microphone:', err);
+    Logger.error('Error accessing microphone:', err);
     window.toastFrontendError('Microphone access denied. Please enable microphone access in your browser settings.', 'Microphone Error');
     return false;
   }

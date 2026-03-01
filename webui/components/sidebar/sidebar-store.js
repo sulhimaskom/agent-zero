@@ -1,4 +1,5 @@
 import { createStore } from '/js/AlpineStore.js';
+import Logger from '/js/logger.js';
 
 // This store manages the visibility and state of the main sidebar panel.
 const model = {
@@ -31,7 +32,7 @@ const model = {
         this.sectionStates = { ...this.sectionStates, ...JSON.parse(stored) };
       }
     } catch (e) {
-      console.error('Failed to load sidebar section states', e);
+      Logger.error('Failed to load sidebar section states', e);
     }
   },
 
@@ -40,7 +41,7 @@ const model = {
     try {
       localStorage.setItem('sidebarSections', JSON.stringify(this.sectionStates));
     } catch (e) {
-      console.error('Failed to persist section states', e);
+      Logger.error('Failed to persist section states', e);
     }
   },
 

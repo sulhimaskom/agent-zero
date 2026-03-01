@@ -2,6 +2,7 @@ import { createStore } from '/js/AlpineStore.js';
 import { scrollModal } from '/js/modals.js';
 import sleep from '/js/sleep.js';
 import * as API from '/js/api.js';
+import Logger from '/js/logger.js';
 import { TIMING } from '/js/constants.js';
 
 const model = {
@@ -50,7 +51,7 @@ const model = {
       // move cursor to start
       this.editor.navigateFileStart();
     } catch (error) {
-      console.error('Failed to format JSON:', error);
+      Logger.error('Failed to format JSON:', error);
       alert(`Invalid JSON: ${  error.message}`);
     }
   },
@@ -113,7 +114,7 @@ const model = {
       await sleep(100); // wait for ui and scroll
       scrollModal('mcp-servers-status');
     } catch (error) {
-      console.error('Failed to apply MCP servers:', error);
+      Logger.error('Failed to apply MCP servers:', error);
     }
     this.loading = false;
   },

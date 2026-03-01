@@ -2,6 +2,7 @@ import { createStore } from '/js/AlpineStore.js';
 import * as shortcuts from '/js/shortcuts.js';
 import { store as fileBrowserStore } from '/components/modals/file-browser/file-browser-store.js';
 import { TIMING } from '/js/constants.js';
+import Logger from '/js/logger.js';
 
 const model = {
   paused: false,
@@ -272,7 +273,7 @@ const model = {
         });
         if (resp.ok) path = resp.path;
       } catch (_e) {
-        console.error('Error getting chat files path', _e);
+        Logger.error('Error getting chat files path', _e);
       }
     }
     await fileBrowserStore.open(path);
