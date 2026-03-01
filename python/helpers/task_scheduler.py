@@ -936,7 +936,6 @@ class TaskScheduler:
                                     self._printer.print(f"Skipping attachment: [{attachment}]")
                             except Exception as e:
                                 self._printer.print(f"Skipping attachment: [{attachment}]")
-                                self._printer.print(f"Skipping attachment: [{attachment}]")
 
                 self._printer.print("User message:")
                 self._printer.print(f"> {current_task.prompt}")

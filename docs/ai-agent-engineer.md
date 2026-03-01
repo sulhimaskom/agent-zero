@@ -1,5 +1,5 @@
 # AI Agent Engineer - Long-term Memory
-> Last Updated: 2026-02-28
+> Last Updated: 2026-03-01
 
 ## Overview
 This document serves as the long-term memory for the ai-agent-engineer domain in the Agent Zero project.
@@ -11,6 +11,24 @@ This document serves as the long-term memory for the ai-agent-engineer domain in
 - Memory and history management for agents
 
 ## Implemented Fixes
+
+### 2026-03-01: Duplicate Print Statement in task_scheduler.py
+**Issue**: Duplicate print statement in exception handler in task_scheduler.py
+
+**Root Cause**: Copy-paste error - same print statement appeared twice consecutively in exception handler
+
+**Fix Applied**: Removed duplicate print statement line 939
+
+**Files Modified**:
+- `python/helpers/task_scheduler.py` - Removed 1 duplicate line
+
+**Verification**:
+- Python syntax check: PASSED
+
+**PR**: [To be created] with ai-agent-engineer label
+
+---
+
 
 ### 2026-02-28: Dead Code Removal in document_query.py
 **Issue**: Unreachable code after raise statement in document_query.py
@@ -82,6 +100,24 @@ WH|
 ---
 
 ## Implemented Fixes
+
+### 2026-03-01: Duplicate Print Statement in task_scheduler.py
+**Issue**: Duplicate print statement in exception handler in task_scheduler.py
+
+**Root Cause**: Copy-paste error - same print statement appeared twice consecutively in exception handler
+
+**Fix Applied**: Removed duplicate print statement line 939
+
+**Files Modified**:
+- `python/helpers/task_scheduler.py` - Removed 1 duplicate line
+
+**Verification**:
+- Python syntax check: PASSED
+
+**PR**: [To be created] with ai-agent-engineer label
+
+---
+
 
 ### 2026-02-28: Duplicate Return Statements Fix in test_fasta2a_client.py
 **Issue**: [Issue #413] - Duplicate return statements in test_fasta2a_client.py affecting test reliability
