@@ -1,6 +1,7 @@
+import { createStore } from '/js/AlpineStore.js';
 import { getRegisteredShortcuts } from '/js/keyboard-shortcuts.js';
 
-export const store = {
+const model = {
   isOpen: false,
   shortcuts: [],
 
@@ -32,10 +33,4 @@ export const store = {
   },
 };
 
-if (globalThis.Alpine) {
-  globalThis.Alpine.store('keyboardShortcuts', store);
-} else {
-  document.addEventListener('alpine:init', () => {
-    globalThis.Alpine.store('keyboardShortcuts', store);
-  });
-}
+export const store = createStore('keyboardShortcuts', model);
