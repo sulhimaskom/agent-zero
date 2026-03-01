@@ -1,4 +1,19 @@
 # Quality Assurance Documentation
+> Last Updated: 2026-03-01
+
+### 2026-03-01: Fix F841 Unused Exception Variables in git.py
+- **Files Modified**: `python/helpers/git.py`
+- **Changes**:
+  - Removed unused exception variable `e` from line 34 (`except Exception as e:` → `except Exception:`)
+  - Removed unused exception variable `e` from line 56 (`except Exception as e:` → `except Exception:`)
+- **Issue Fixed**: ruff F841 errors - local variable assigned but never used
+- **Verification**:
+  - ruff check: All checks passed
+  - pytest: 738 passed
+- **Linked Issue**: Issue #595 "[Backend] MEDIUM: Bare Exception Handlers - Should Capture Exception Object"
+
+
+# Quality Assurance Documentation
 # > Last Updated: 2026-03-01
 # 
 # ### 2026-03-01: Add Traditional Testing to CI Workflow
