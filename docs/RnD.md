@@ -1,5 +1,34 @@
 ## 2026-03-01
 
+### Issue #595: Bare Exception Handlers in extract_tools.py and print_style.py - FIXED ✅
+
+**Problem**:
+- Issue #595 identified 2 Python files with bare `except Exception:` handlers
+- `python/helpers/extract_tools.py` line 28: bare exception swallows parsing errors
+- `python/helpers/print_style.py` line 188: bare exception swallows secret masking failures
+
+**Root Cause**:
+- Exception handlers written without capturing the exception object
+- Makes debugging difficult as exception details are lost
+- Violates best practice of capturing exception for logging/debugging
+
+**Solution Applied**:
+- `extract_tools.py`: Changed `except Exception:` to `except Exception as e:`
+- `print_style.py`: Changed `except Exception:` to `except Exception as e:` with debug logging
+
+**Files Changed**:
+- `python/helpers/extract_tools.py` (+1 line)
+- `python/helpers/print_style.py` (+2 lines)
+
+**Verification**:
+- Python syntax validated: ✅
+- Ruff linting: ✅ (all checks passed)
+
+**Status**: Changes pushed to custom branch (default branch). No PR needed as custom is the default branch.
+
+---
+## 2026-03-01
+
 ### Issue: Type Safety - Remove index Type Ignores - PR #588 ✅
 
 **Problem**:
