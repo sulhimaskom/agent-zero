@@ -256,7 +256,7 @@ export function _drawMessage(
         preElement.appendChild(spanElement);
       }
 
-      spanElement.innerHTML = convertHTML(content);
+      spanElement.innerHTML = sanitizeHTML(content);
 
       // Ensure action buttons exist
       addActionButtonsToElement(bodyDiv);
@@ -769,7 +769,7 @@ function drawKvps(container, kvps, latex) {
         } else {
           const pre = document.createElement('pre');
           const span = document.createElement('span');
-          span.innerHTML = convertHTML(value);
+          span.innerHTML = sanitizeHTML(value);
           pre.appendChild(span);
           tdiv.appendChild(pre);
 
@@ -895,7 +895,7 @@ function drawKvpsIncremental(container, kvps, latex) {
       } else {
         const pre = document.createElement('pre');
         const span = document.createElement('span');
-        span.innerHTML = convertHTML(value);
+        span.innerHTML = sanitizeHTML(value);
         pre.appendChild(span);
         tdiv.appendChild(pre);
 
