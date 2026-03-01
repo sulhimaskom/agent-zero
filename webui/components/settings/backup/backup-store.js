@@ -447,7 +447,8 @@ const model = {
         try {
           const errorJson = JSON.parse(errorText);
           this.error = errorJson.error || 'Backup creation failed';
-        } catch {
+        } catch (e) {
+          Logger.error('Failed to parse backup error response', e);
           this.error = `Backup creation failed: ${response.status} ${response.statusText}`;
         }
         this.addFileOperation(`Error: ${this.error}`);

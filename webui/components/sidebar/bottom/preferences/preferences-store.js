@@ -67,14 +67,16 @@ const model = {
       try {
         const storedDarkMode = localStorage.getItem('darkMode');
         this._darkMode = storedDarkMode !== 'false';
-      } catch {
+      } catch (e) {
+        Logger.error('Failed to load darkMode preference', e);
         this._darkMode = true; // Default to dark mode if localStorage is unavailable
       }
 
       try {
         const storedSpeech = localStorage.getItem('speech');
         this._speech = storedSpeech === 'true';
-      } catch {
+      } catch (e) {
+        Logger.error('Failed to load speech preference', e);
         this._speech = false; // Default to speech off if localStorage is unavailable
       }
 

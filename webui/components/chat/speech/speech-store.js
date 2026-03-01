@@ -584,7 +584,8 @@ const model = {
     text = text.replace(/https?:\/\/[^\s]+/g, (match) => {
       try {
         return new URL(match).hostname;
-      } catch {
+      } catch (e) {
+        Logger.error('Failed to parse URL', e);
         return "";
       }
     });
