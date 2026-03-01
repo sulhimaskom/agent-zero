@@ -233,7 +233,7 @@ const model = {
       editor.clearSelection();
       editor.navigateFileStart();
     } catch (error) {
-      console.error('Failed to format JSON:', error);
+      Logger.error('Failed to format JSON:', error);
       this.error = `Invalid JSON: ${  error.message}`;
     }
   },
@@ -479,7 +479,7 @@ const model = {
         window.URL.revokeObjectURL(url);
       }
     } catch (error) {
-      console.error('Download error:', error);
+      Logger.error('Download error:', error);
     }
   },
 

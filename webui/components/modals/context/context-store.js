@@ -48,7 +48,7 @@ const model = {
       this.scheduleEditorInit();
 
     } catch (error) {
-      console.error('Context fetch error:', error);
+      Logger.error('Context fetch error:', error);
       this.error = error?.message || 'Failed to load context window';
       this.isLoading = false;
       this.updateModalTitle(); // Show error in title
@@ -77,14 +77,14 @@ const model = {
 
     // Check if ACE is available
     if (!window.ace?.edit) {
-      console.error('ACE editor not available');
+      Logger.error('ACE editor not available');
       this.error = 'Editor library not loaded';
       return;
     }
 
     const editorInstance = window.ace.edit('context-viewer-container');
     if (!editorInstance) {
-      console.error('Failed to create ACE editor instance');
+      Logger.error('Failed to create ACE editor instance');
       return;
     }
 

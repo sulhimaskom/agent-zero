@@ -1,5 +1,6 @@
 import { createStore } from '/js/AlpineStore.js';
 import { TIMING } from '/js/constants.js';
+import Logger from '/js/logger.js';
 
 const model = {
 
@@ -49,7 +50,7 @@ const model = {
         // start polling for devices
         this.pollForDevices();
       } catch (err) {
-        console.error('Microphone permission denied');
+        Logger.error('Microphone permission denied');
         this.requestingPermission = false;
       }
     }, 0);

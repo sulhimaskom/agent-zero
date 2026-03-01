@@ -1,5 +1,6 @@
 import { createStore } from '/js/AlpineStore.js';
 import { fetchApi } from '/js/api.js';
+import Logger from '/js/logger.js';
 
 // Model migrated from legacy file_browser.js (lift-and-shift)
 const model = {
@@ -55,7 +56,7 @@ const model = {
       this.destroy();
 
     } catch (error) {
-      console.error('File browser error:', error);
+      Logger.error('File browser error:', error);
       this.error = error?.message || 'Failed to load files';
       this.isLoading = false;
     }
@@ -142,7 +143,7 @@ const model = {
         this.browser.currentPath = data.data.current_path;
         this.browser.parentPath = data.data.parent_path;
       } else {
-        console.error('Error fetching files:', await response.text());
+        Logger.error('Error fetching files:', await response.text());
         this.browser.entries = [];
       }
     } catch (e) {

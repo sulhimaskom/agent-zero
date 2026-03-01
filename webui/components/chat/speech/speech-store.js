@@ -129,7 +129,7 @@ const model = {
       }
     } catch (error) {
       window.toastFetchError("Failed to load speech settings", error);
-      console.error("Failed to load speech settings:", error);
+      Logger.error("Failed to load speech settings:", error);
     }
   },
 
@@ -275,7 +275,7 @@ const model = {
     try {
       await await this.speakWithKokoro(text, waitForPrevious, terminator);
     } catch (error) {
-      console.error(error);
+      Logger.error(error);
       return await this.speakWithBrowser(text, waitForPrevious, terminator);
     }
   },
@@ -725,7 +725,7 @@ class MicrophoneInput {
       this.setupAudioAnalysis(stream);
       return true;
     } catch (error) {
-      console.error("Microphone initialization error:", error);
+      Logger.error("Microphone initialization error:", error);
       toast("Failed to access microphone. Please check permissions.", "error");
       return false;
     }
@@ -892,7 +892,7 @@ class MicrophoneInput {
       }
     } catch (error) {
       window.toastFetchError("Transcription error", error);
-      console.error("Transcription error:", error);
+      Logger.error("Transcription error:", error);
     } finally {
       this.audioChunks = [];
       this.status = Status.LISTENING;
@@ -944,7 +944,7 @@ class MicrophoneInput {
       await navigator.mediaDevices.getUserMedia({ audio: true });
       return true;
     } catch (err) {
-      console.error("Error accessing microphone:", err);
+      Logger.error("Error accessing microphone:", err);
       toast(
         "Microphone access denied. Please enable microphone access in your browser settings.",
         "error"

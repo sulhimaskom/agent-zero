@@ -186,7 +186,10 @@
         </div>
         -->
 
-        <script>
+        <script type="module">
+            import Logger from '/js/logger.js';
+            window.Logger = Logger;
+
             setTimeout(() => {
                 const url = window.location.origin;
                 const token = settingsModalProxy.settings.sections.filter(x => x.id == "mcp_server")[0].fields.filter(x => x.id == "mcp_server_token")[0].value;
@@ -210,16 +213,16 @@ async function sendMessage() {
         const data = await response.json();
 
         if (response.ok) {
-            console.log('✅ Success!');
-            console.log('Response:', data.response);
-            console.log('Context ID:', data.context_id);
+            Logger.log('✅ Success!');
+            Logger.log('Response:', data.response);
+            Logger.log('Context ID:', data.context_id);
             return data;
         } else {
-            console.error('❌ Error:', data.error);
+            Logger.error('❌ Error:', data.error);
             return null;
         }
     } catch (error) {
-        console.error('❌ Request failed:', error);
+        Logger.error('❌ Request failed:', error);
         return null;
     }
 }
@@ -227,7 +230,7 @@ async function sendMessage() {
 // Call the function
 sendMessage().then(result => {
     if (result) {
-        console.log('Message sent successfully!');
+        Logger.log('Message sent successfully!');
     }
 });`;
 
@@ -251,15 +254,15 @@ async function continueConversation(contextId) {
         const data = await response.json();
 
         if (response.ok) {
-            console.log('✅ Continuation Success!');
-            console.log('Response:', data.response);
+            Logger.log('✅ Continuation Success!');
+            Logger.log('Response:', data.response);
             return data;
         } else {
-            console.error('❌ Error:', data.error);
+            Logger.error('❌ Error:', data.error);
             return null;
         }
     } catch (error) {
-        console.error('❌ Request failed:', error);
+        Logger.error('❌ Request failed:', error);
         return null;
     }
 }
@@ -303,15 +306,15 @@ async function sendWithAttachment() {
         const data = await response.json();
 
         if (response.ok) {
-            console.log('✅ File sent successfully!');
-            console.log('Response:', data.response);
+            Logger.log('✅ File sent successfully!');
+            Logger.log('Response:', data.response);
             return data;
         } else {
-            console.error('❌ Error:', data.error);
+            Logger.error('❌ Error:', data.error);
             return null;
         }
     } catch (error) {
-        console.error('❌ Request failed:', error);
+        Logger.error('❌ Request failed:', error);
         return null;
     }
 }
@@ -338,17 +341,17 @@ async function getLogsGET(contextId, length = 50) {
         const data = await response.json();
 
         if (response.ok) {
-            console.log('✅ Logs retrieved successfully!');
-            console.log('Total items:', data.log.total_items);
-            console.log('Returned items:', data.log.returned_items);
-            console.log('Log items:', data.log.items);
+            Logger.log('✅ Logs retrieved successfully!');
+            Logger.log('Total items:', data.log.total_items);
+            Logger.log('Returned items:', data.log.returned_items);
+            Logger.log('Log items:', data.log.items);
             return data;
         } else {
-            console.error('❌ Error:', data.error);
+            Logger.error('❌ Error:', data.error);
             return null;
         }
     } catch (error) {
-        console.error('❌ Request failed:', error);
+        Logger.error('❌ Request failed:', error);
         return null;
     }
 }
@@ -375,21 +378,21 @@ async function getLogsPOST(contextId, length = 50) {
         const data = await response.json();
 
         if (response.ok) {
-            console.log('✅ Logs retrieved successfully!');
-            console.log('Context ID:', data.context_id);
-            console.log('Log GUID:', data.log.guid);
-            console.log('Total items:', data.log.total_items);
-            console.log('Returned items:', data.log.returned_items);
-            console.log('Start position:', data.log.start_position);
-            console.log('Progress:', data.log.progress);
-            console.log('Log items:', data.log.items);
+            Logger.log('✅ Logs retrieved successfully!');
+            Logger.log('Context ID:', data.context_id);
+            Logger.log('Log GUID:', data.log.guid);
+            Logger.log('Total items:', data.log.total_items);
+            Logger.log('Returned items:', data.log.returned_items);
+            Logger.log('Start position:', data.log.start_position);
+            Logger.log('Progress:', data.log.progress);
+            Logger.log('Log items:', data.log.items);
             return data;
         } else {
-            console.error('❌ Error:', data.error);
+            Logger.error('❌ Error:', data.error);
             return null;
         }
     } catch (error) {
-        console.error('❌ Request failed:', error);
+        Logger.error('❌ Request failed:', error);
         return null;
     }
 }
@@ -415,15 +418,15 @@ async function terminateChat(contextId) {
         const data = await response.json();
 
         if (response.ok) {
-            console.log('✅ Chat deleted successfully!');
-            console.log('Message:', data.message);
+            Logger.log('✅ Chat deleted successfully!');
+            Logger.log('Message:', data.message);
             return data;
         } else {
-            console.error('❌ Error:', data.error);
+            Logger.error('❌ Error:', data.error);
             return null;
         }
     } catch (error) {
-        console.error('❌ Request failed:', error);
+        Logger.error('❌ Request failed:', error);
         return null;
     }
 }
@@ -437,14 +440,14 @@ async function simpleWorkflow() {
     const result = await sendMessage();
 
     if (result && result.context_id) {
-        console.log('Chat created:', result.context_id);
+        Logger.log('Chat created:', result.context_id);
 
         // Do some work with the chat...
         // await continueConversation(result.context_id);
 
         // Clean up when done
         await terminateChat(result.context_id);
-        console.log('Chat cleaned up');
+        Logger.log('Chat cleaned up');
     }
 }
 
@@ -469,16 +472,16 @@ async function resetChat(contextId) {
         const data = await response.json();
 
         if (response.ok) {
-            console.log('✅ Chat reset successfully!');
-            console.log('Message:', data.message);
-            console.log('Context ID:', data.context_id);
+            Logger.log('✅ Chat reset successfully!');
+            Logger.log('Message:', data.message);
+            Logger.log('Context ID:', data.context_id);
             return data;
         } else {
-            console.error('❌ Error:', data.error);
+            Logger.error('❌ Error:', data.error);
             return null;
         }
     } catch (error) {
-        console.error('❌ Request failed:', error);
+        Logger.error('❌ Request failed:', error);
         return null;
     }
 }
@@ -494,7 +497,7 @@ async function resetAndContinue() {
     const resetResult = await resetChat(contextId);
 
     if (resetResult) {
-        console.log('Chat reset, starting fresh conversation...');
+        Logger.log('Chat reset, starting fresh conversation...');
 
         // Continue with same context_id but fresh history
         const response = await fetch('${url}/api_message', {
@@ -511,7 +514,7 @@ async function resetAndContinue() {
         });
 
         const data = await response.json();
-        console.log('New conversation started:', data.response);
+        Logger.log('New conversation started:', data.response);
     }
 }
 
@@ -536,26 +539,26 @@ async function getFiles(filePaths) {
         const data = await response.json();
 
         if (response.ok) {
-            console.log('✅ Files retrieved successfully!');
-            console.log('Retrieved files:', Object.keys(data));
+            Logger.log('✅ Files retrieved successfully!');
+            Logger.log('Retrieved files:', Object.keys(data));
 
             // Convert base64 back to text for display
             for (const [filename, base64Content] of Object.entries(data)) {
                 try {
                     const textContent = atob(base64Content);
-                    console.log(\`\${filename}: \${textContent.substring(0, 100)}...\`);
+                    Logger.log(\`\${filename}: \${textContent.substring(0, 100)}...\`);
                 } catch (e) {
-                    console.log(\`\${filename}: Binary file (\${base64Content.length} chars)\`);
+                    Logger.log(\`\${filename}: Binary file (\${base64Content.length} chars)\`);
                 }
             }
 
             return data;
         } else {
-            console.error('❌ Error:', data.error);
+            Logger.error('❌ Error:', data.error);
             return null;
         }
     } catch (error) {
-        console.error('❌ Request failed:', error);
+        Logger.error('❌ Request failed:', error);
         return null;
     }
 }
@@ -587,14 +590,14 @@ async function attachmentWorkflow() {
     });
 
     if (messageResponse.ok) {
-        console.log('Message sent with attachment');
+        Logger.log('Message sent with attachment');
 
         // Step 2: Retrieve the uploaded file
         const retrievedFiles = await getFiles(["/a0/tmp/uploads/test.txt"]);
 
         if (retrievedFiles && retrievedFiles["test.txt"]) {
             const originalContent = atob(retrievedFiles["test.txt"]);
-            console.log('Retrieved content:', originalContent);
+            Logger.log('Retrieved content:', originalContent);
         }
     }
 }

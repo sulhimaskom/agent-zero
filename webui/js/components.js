@@ -2,6 +2,7 @@
 // Import a component and recursively load its nested components
 // Returns the parsed document for additional processing
 
+import Logger from './logger.js';
 // cache object to store loaded components
 const componentCache = {};
 
@@ -161,7 +162,7 @@ export async function importComponent(path, targetElement) {
     // Return parsed document
     return doc;
   } catch (error) {
-    console.error('Error importing component:', error);
+    Logger.error('Error importing component:', error);
     throw error;
   } finally {
     // Release the lock when done, regardless of success or failure
@@ -186,14 +187,14 @@ export async function loadComponents(roots = [document.documentElement]) {
       components.map(async (component) => {
         const path = component.getAttribute('path');
         if (!path) {
-          console.error('x-component missing path attribute:', component);
+          Logger.error('x-component missing path attribute:', component);
           return;
         }
         await importComponent(path, component);
       }),
     );
   } catch (error) {
-    console.error('Error loading components:', error);
+    Logger.error('Error loading components:', error);
   }
 }
 

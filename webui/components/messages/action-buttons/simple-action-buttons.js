@@ -1,5 +1,6 @@
 // Simplified Message Action Buttons - Keeping the Great Look & Feel
 import { store as speechStore } from '/components/chat/speech/speech-store.min.js';
+import Logger from '/js/logger.js';
 
 // Extract text content from different message types
 function getTextContent(element,html=false) {
@@ -86,7 +87,7 @@ export function addActionButtonsToElement(element) {
         copyBtn.classList.remove('success');
       }, 2000);
     } catch (err) {
-      console.error('Copy failed:', err);
+      Logger.error('Copy failed:', err);
       icon.textContent = 'error';
       copyBtn.classList.add('error');
       copyTooltip.textContent = 'Failed!';
@@ -134,7 +135,7 @@ export function addActionButtonsToElement(element) {
       // Use speech store
       await speechStore.speak(text);
     } catch (err) {
-      console.error('Speech failed:', err);
+      Logger.error('Speech failed:', err);
       icon.textContent = 'error';
       speakBtn.classList.add('error');
       setTimeout(() => {

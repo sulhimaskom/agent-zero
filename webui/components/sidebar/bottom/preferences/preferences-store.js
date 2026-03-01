@@ -1,6 +1,7 @@
 import { createStore } from '/js/AlpineStore.js';
 import * as css from '/js/css.js';
 import { store as speechStore } from '/components/chat/speech/speech-store.min.js';
+import Logger from '/js/logger.js';
 
 // Preferences store centralizes user preference toggles and side-effects
 const model = {
@@ -85,7 +86,7 @@ const model = {
       this._applyShowJson(this._showJson);
       this._applyShowUtils(this._showUtils);
     } catch (e) {
-      console.error('Failed to initialize preferences store', e);
+      Logger.error('Failed to initialize preferences store', e);
       window.toastFrontendWarning(
         'Some preferences could not be loaded.',
         'Preferences',

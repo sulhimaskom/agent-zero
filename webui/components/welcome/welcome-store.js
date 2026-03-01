@@ -6,6 +6,7 @@ import { store as chatsStore } from "/components/sidebar/chats/chats-store.js";
 import { store as memoryStore } from "/components/settings/memory/memory-dashboard-store.js";
 import { store as projectsStore } from "/components/projects/projects-store.js";
 import { TIMING } from "/js/constants.js";
+import Logger from '/js/logger.js';
 
 const model = {
   // State
@@ -38,7 +39,7 @@ const model = {
         this.openSetupWizard();
       }
     } catch (e) {
-      console.error('Failed to check settings status:', e);
+      Logger.error('Failed to check settings status:', e);
     }
   },
 
