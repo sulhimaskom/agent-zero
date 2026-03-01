@@ -377,6 +377,11 @@ class Network:
         "http://127.0.0.1:50001",
     ]
 
+    # Production CORS defaults - more restrictive
+    # Empty by default (same-origin only) for production security
+    # Set A0_DEV_CORS_ORIGINS env var to configure
+    PROD_CORS_ORIGINS: Final[list[str]] = []
+
     # External API endpoints
     UPDATE_CHECK_URL: Final[str] = "https://api.agent-zero.ai/a0-update-check"
     PERPLEXITY_API_BASE_URL: Final[str] = "https://api.perplexity.ai"
