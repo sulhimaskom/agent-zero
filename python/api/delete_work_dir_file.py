@@ -1,3 +1,9 @@
+"""Work directory file deletion API endpoint - deletes a file from the work directory.
+
+Removes a file from the work directory and returns the updated
+file listing after deletion.
+"""
+
 from python.api import get_work_dir_files
 from python.helpers import runtime
 from python.helpers.api import ApiHandler, Input, Output, Request

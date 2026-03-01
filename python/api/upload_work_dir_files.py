@@ -1,3 +1,9 @@
+"""Work directory file upload API endpoint - uploads files to the work directory.
+
+Handles multipart file uploads to the specified work directory path,
+returning the updated file listing after upload.
+"""
+
 import base64
 
 from werkzeug.datastructures import FileStorage

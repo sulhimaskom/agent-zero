@@ -1,3 +1,9 @@
+"""Knowledge path retrieval API endpoint - returns the filesystem path for knowledge storage.
+
+Returns the absolute path to the knowledge folder for the current
+context, supporting both project-specific and global knowledge.
+"""
+
 from python.helpers import files, memory, projects
 from python.helpers.api import ApiHandler, Request, Response
 
