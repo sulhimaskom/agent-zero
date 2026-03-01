@@ -1,9 +1,8 @@
 """Tests for attachment_manager.py module."""
-import io
 import os
 import tempfile
 import unittest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 from python.helpers.attachment_manager import AttachmentManager
 
