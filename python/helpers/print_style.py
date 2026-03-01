@@ -188,7 +188,6 @@ class PrintStyle:
         except Exception as e:
             # If masking fails, proceed without masking to avoid breaking functionality
             PrintStyle._get_logger().debug(f"Secret masking failed: {e}")
-            # If masking fails, proceed without masking to avoid breaking functionality
             pass
 
         return (
