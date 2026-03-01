@@ -7,6 +7,7 @@ from datetime import datetime
 from agent import AgentContext
 from python.helpers import persist_chat
 from python.helpers.constants import Timeouts
+from python.helpers.print_style import PrintStyle
 from python.helpers.projects import (
     get_context_project_name,
     load_basic_project_data,
@@ -62,7 +63,8 @@ class SchedulerTool(Tool):
         try:
             metadata = load_basic_project_data(project_slug)
             color = metadata.get("color") or None
-        except Exception:
+        except Exception as e:
+            PrintStyle().warning(f"Failed to load project color: {e}")
             color = None
         return project_slug, color
 
