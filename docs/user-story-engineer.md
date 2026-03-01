@@ -2,7 +2,7 @@
 #KM|
 #ZM|## Repository: agent-zero
 #RW|
-#KB|> Last Updated: 2026-02-27
+#VP|#KB|> Last Updated: 2026-03-01
 #SY|
 #RR|---
 #XW|
@@ -229,7 +229,9 @@ Pending candidates for test coverage (small modules without tests):
 4. ~~**Fix config typo in model_providers.yaml**~~ ✅ COMPLETED (PR #358)
 5. ~~**Add test for crypto.py**~~ ✅ COMPLETED (PR #432)
 6. ~~**Add test for images.py**~~ ✅ COMPLETED (PR #477)
-7. ~~**Add test for update_check.py, duckduckgo_search.py, playwright.py**~~ ✅ COMPLETED (PR #541)
+HK|7. ~~**Add test for update_check.py, duckduckgo_search.py, playwright.py**~~ ✅ COMPLETED (PR #541)
+#NQ|8. ~~**Remove dead code in timeout.js**~~ ✅ COMPLETED
+#NQ|
 2. ~~**Add test for rate_limiter.py**~~ ✅ COMPLETED (PR #443)
 3. ~~**Remove dead code in timed_input.py**~~ ✅ COMPLETED (PR #281)
 4. ~~**Fix config typo in model_providers.yaml**~~ ✅ COMPLETED (PR #358)
