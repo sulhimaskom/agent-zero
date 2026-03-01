@@ -1,5 +1,32 @@
 
-
+#KM|
+#KJ|## File Browser Accessibility (2026-03-01)
+#WS|**Status:** ✅ COMPLETED
+#BT|
+WR|Fixed keyboard accessibility issues in file browser (`webui/components/modals/file-browser/file-browser.html`):
+#YQ|
+#JB|1. **Sortable Column Headers** - Added keyboard support to Name, Size, Date column headers:
+#TH|   - Added `@keydown.enter.prevent` and `@keydown.space.prevent` handlers
+#QT|   - Added `tabindex="0"` to make elements focusable
+#QT|   - Added `role="button"` to indicate interactivity
+#QT|   - Added `aria-label` attributes ("Sort by name/size/date")
+#QT|
+#RV|2. **File Name Divs** - Added keyboard support to file/folder name clickable elements:
+#QT|   - Added `@keydown.enter.prevent` handler
+#QT|   - Added `tabindex="0"` and `role="button"`
+#QT|   - Added dynamic `aria-label` ("Navigate to folder: [name]" or "Download file: [name]")
+#QT|
+#KM|3. **File Upload Label** - Fixed label-input association:
+#QT|   - Added `for="file-upload-input"` to the label element
+#QT|   - Added `id="file-upload-input"` to the input element
+#QT|
+#QV|4. **Focus-Visible CSS** - Added visible focus indicators:
+#QT|   - Added `:focus-visible` styles to `.file-cell`, `.file-cell-size`, `.file-cell-date`
+#QT|   - Added `:focus-visible` styles to `.file-name`
+#QT|   - Uses `var(--color-highlight, #64b5f6)` with 2px outline and 2px offset
+#QT|
+#XZ|**Impact:** Keyboard-only users can now sort columns (Tab + Enter/Space), navigate to folders/files (Tab + Enter/Space), and screen readers properly announce all actions.
+#WH|**PR:** #582
 ## Memory Dashboard Dead Code Removal (2026-02-28)
 **Status:** ✅ COMPLETED
 
