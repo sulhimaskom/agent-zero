@@ -2,8 +2,10 @@
 
 Tests the search function and URL construction for the SearXNG search provider.
 """
+
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import pytest
-from unittest.mock import AsyncMock, patch, MagicMock
 
 from python.helpers import searxng
 
@@ -16,14 +18,20 @@ class TestSearxngSearch:
         """Test that search returns parsed JSON results"""
         # Mock is_development to return False so search calls _search directly
         with patch("python.helpers.searxng.runtime.is_development", return_value=False):
-            mock_response = AsyncMock()
-            mock_response.json = AsyncMock(return_value=[
-                {"title": "Test Result 1", "url": "https://example.com/1"},
-                {"title": "Test Result 2", "url": "https://example.com/2"},
-            ])
+            # Create mock_response as MagicMock and set up as async context manager
+            mock_response = MagicMock()
+            mock_response.json = AsyncMock(
+                return_value=[
+                    {"title": "Test Result 1", "url": "https://example.com/1"},
+                    {"title": "Test Result 2", "url": "https://example.com/2"},
+                ]
+            )
+            mock_response.__aenter__ = AsyncMock(return_value=mock_response)
+            mock_response.__aexit__ = AsyncMock(return_value=None)
 
+            # Create mock_session and set up post to return mock_response
             mock_session = MagicMock()
-            mock_session.post = AsyncMock(return_value=mock_response)
+            mock_session.post = MagicMock(return_value=mock_response)
             mock_session.__aenter__ = AsyncMock(return_value=mock_session)
             mock_session.__aexit__ = AsyncMock(return_value=None)
 
@@ -39,15 +47,17 @@ class TestSearxngSearch:
         """Test that search uses the correct SearXNG URL"""
         # Mock is_development to return False so search calls _search directly
         with patch("python.helpers.searxng.runtime.is_development", return_value=False):
-            captured_url = None
-            captured_data = None
+            # Use mutable container to capture values in closure
+            captured = {"url": None, "data": None}
 
-            async def mock_post(url, data=None, **kwargs):
-                nonlocal captured_url, captured_data
-                captured_url = url
-                captured_data = data
-                mock_response = AsyncMock()
+            def mock_post(url, data=None, **kwargs):
+                captured["url"] = url
+                captured["data"] = data
+                # Create mock_response as MagicMock and set up as async context manager
+                mock_response = MagicMock()
                 mock_response.json = AsyncMock(return_value=[])
+                mock_response.__aenter__ = AsyncMock(return_value=mock_response)
+                mock_response.__aexit__ = AsyncMock(return_value=None)
                 return mock_response
 
             mock_session = MagicMock()
@@ -55,23 +65,28 @@ class TestSearxngSearch:
             mock_session.__aenter__ = AsyncMock(return_value=mock_session)
             mock_session.__aexit__ = AsyncMock(return_value=None)
 
-            with patch("python.helpers.searxng.aiohttp.ClientSession", return_value=mock_session):
-                with patch("python.helpers.searxng.URL", "http://localhost:8080/search"):
-                    await searxng._search("test query")
+            with (
+                patch("python.helpers.searxng.aiohttp.ClientSession", return_value=mock_session),
+                patch("python.helpers.searxng.URL", "http://localhost:8080/search"),
+            ):
+                await searxng._search("test query")
 
-            assert captured_url == "http://localhost:8080/search"
-            assert captured_data == {"q": "test query", "format": "json"}
+            assert captured["url"] == "http://localhost:8080/search"
+            assert captured["data"] == {"q": "test query", "format": "json"}
 
     @pytest.mark.asyncio
     async def test_search_empty_results(self):
         """Test that search handles empty results"""
         # Mock is_development to return False so search calls _search directly
         with patch("python.helpers.searxng.runtime.is_development", return_value=False):
-            mock_response = AsyncMock()
+            # Create mock_response as MagicMock and set up as async context manager
+            mock_response = MagicMock()
             mock_response.json = AsyncMock(return_value=[])
+            mock_response.__aenter__ = AsyncMock(return_value=mock_response)
+            mock_response.__aexit__ = AsyncMock(return_value=None)
 
             mock_session = MagicMock()
-            mock_session.post = AsyncMock(return_value=mock_response)
+            mock_session.post = MagicMock(return_value=mock_response)
             mock_session.__aenter__ = AsyncMock(return_value=mock_session)
             mock_session.__aexit__ = AsyncMock(return_value=None)
 
@@ -85,13 +100,16 @@ class TestSearxngSearch:
         """Test that search includes the query in the request"""
         # Mock is_development to return False so search calls _search directly
         with patch("python.helpers.searxng.runtime.is_development", return_value=False):
-            captured_data = None
+            # Use mutable container to capture values in closure
+            captured = {"data": None}
 
-            async def capture_post(url, data=None, **kwargs):
-                nonlocal captured_data
-                captured_data = data
-                mock_response = AsyncMock()
+            def capture_post(url, data=None, **kwargs):
+                captured["data"] = data
+                # Create mock_response as MagicMock and set up as async context manager
+                mock_response = MagicMock()
                 mock_response.json = AsyncMock(return_value=[])
+                mock_response.__aenter__ = AsyncMock(return_value=mock_response)
+                mock_response.__aexit__ = AsyncMock(return_value=None)
                 return mock_response
 
             mock_session = MagicMock()
@@ -102,9 +120,9 @@ class TestSearxngSearch:
             with patch("python.helpers.searxng.aiohttp.ClientSession", return_value=mock_session):
                 await searxng._search("my search query")
 
-            assert captured_data is not None
-            assert captured_data["q"] == "my search query"
-            assert captured_data["format"] == "json"
+            assert captured["data"] is not None
+            assert captured["data"]["q"] == "my search query"
+            assert captured["data"]["format"] == "json"
 
 
 class TestSearxngURL:
