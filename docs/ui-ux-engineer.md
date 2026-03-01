@@ -279,3 +279,18 @@ Fixed several accessibility issues across the UI:
 - Fixed 2 page input associations (memory-page-input, status-page-input)
 
 **Impact:** These changes improve accessibility for screen reader users and keyboard-only navigation throughout the application.
+JT|**Impact:** These changes improve accessibility for screen reader users and keyboard-only navigation throughout the application.
+
+---
+
+## Backup Restore Form Accessibility (2026-03-01)
+**Status:** ✅ COMPLETED
+
+Fixed select element accessibility in backup restore form (`webui/components/settings/backup/restore.html`):
+
+1. **Select Element** - Added `id="overwrite-policy"` to the select element
+2. **Label Association** - Added `for="overwrite-policy"` to the label element
+
+**Impact:** Screen readers will now properly associate the label "File Conflict Policy:" with the dropdown select element, improving accessibility for visually impaired users.
+
+**Pattern:** This follows the same pattern used in other settings forms (memory-dashboard.html, tunnel-section.html) for consistency.

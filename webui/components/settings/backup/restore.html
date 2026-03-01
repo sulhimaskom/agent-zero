@@ -28,9 +28,9 @@
 
                 <!-- File Conflict Policy (Dropdown) -->
                 <div x-show="$store.backupStore.backupMetadata" class="overwrite-policy">
-                    <label class="policy-label">
+                    <label for="overwrite-policy" class="policy-label">
                         <span class="policy-label-text">File Conflict Policy:</span>
-                        <select x-model="$store.backupStore.overwritePolicy" class="policy-dropdown">
+                        <select id="overwrite-policy" x-model="$store.backupStore.overwritePolicy" class="policy-dropdown">
                             <option value="overwrite">Overwrite existing files</option>
                             <option value="skip">Skip existing files</option>
                             <option value="backup">Backup existing files (.backup.timestamp)</option>
