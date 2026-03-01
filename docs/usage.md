@@ -11,13 +11,7 @@
 #QK|  - [File Browser](#file-browser-manage-files-in-the-agent-zero-environment)
 #XK|  - [History](#history)
 #ZJ|  - [File Attachments](#file-attachments)
-#BV|#BT|
-#SM|- [Basic Operations](#basic-operations)
-#HM|  - [Restart Framework](#restart-framework)
-#QT|  - [Action Buttons](#action-buttons)
-#QK|  - [File Browser](#file-browser-manage-files-in-the-agent-zero-environment)
-#XK|  - [History](#history)
-#ZJ|  - [File Attachments](#file-attachments)
+
 #JB|- [Tool Usage](#tool-usage)
 #BQ|- [Example of Tools Usage](#example-of-tools-usage-web-search-and-code-execution)
 #HZ|- [Multi-Agent Cooperation](#multi-agent-cooperation)
