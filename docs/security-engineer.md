@@ -1,3 +1,35 @@
+## 2026-03-01: Insecure random Module for ID Generation
+
+---
+
+**Issue**: Cryptographically Insecure ID Generation Using `random` Module
+
+**Date Fixed**: 2026-03-01
+
+**Severity**: MEDIUM (Cryptographic Security)
+
+**Files Changed**: 
+- `python/helpers/guids.py`
+- `agent.py`
+
+**Vulnerability**: 
+The Python `random` module was used to generate session IDs, GUIDs, and other identifiers. The `random` module is NOT cryptographically secure and can be predicted by attackers. This could allow attackers to guess session IDs or GUIDs.
+
+**Solution**:
+Replaced `random.choices()` with `secrets.choice()` in:
+- `python/helpers/guids.py`: `generate_id()` function
+- `agent.py`: `generate_short_id()` function
+
+The `secrets` module provides cryptographically secure random values suitable for security-sensitive operations.
+
+**Testing**:
+- Python syntax validation passed
+- Functionality verified - generates 8-character alphanumeric IDs
+- IDs are unique and cryptographically secure
+
+---
+
+## 2026-02-28: SSH Default User Changed to Non-Root
 # Security Engineer Agent Documentation
 > Last Updated: 2026-02-27
 
