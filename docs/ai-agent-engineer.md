@@ -12,6 +12,28 @@ This document serves as the long-term memory for the ai-agent-engineer domain in
 
 ## Implemented Fixes
 
+### 2026-03-01: Command Injection Fix in brocula_loop.py
+**Issue**: [Issue #517] - HIGH: Command Injection Risk - shell=True in brocula_loop.py
+
+**Root Cause**: The `run_command()` function used `subprocess.run()` with `shell=True`, which allows shell metacharacter injection. While the current implementation uses hardcoded commands, using shell=True is a security best practice violation.
+
+**Fix Applied**: 
+- Added `shlex` import for proper command parsing
+- Modified `run_command()` function to use `shlex.split()` when input is a string
+- Changed `subprocess.run()` to use `shell=False` with list-based commands
+
+**Files Modified**:
+- `agents/brocula/brocula_loop.py` - Updated run_command() function to use list-based subprocess calls
+
+**Verification**:
+- Python syntax check: PASSED
+
+**PR**: [#529](https://github.com/sulhimaskom/agent-zero/pull/529) created with ai-agent-engineer label, linked to Issue #517
+
+---
+
+### 2026-02-28: Dead Code Removal in document_query.py
+
 ### 2026-02-28: Dead Code Removal in document_query.py
 **Issue**: Unreachable code after raise statement in document_query.py
 
@@ -288,6 +310,18 @@ WH|
 ---
 
 ## Known Issues (Future Work)
+
+TS|1. ~~**Issue #309**: 23 remaining files with bare exception handlers~~ - FIXED in PR #331
+HZ|2. ~~**Issue #403**: History.py - Three similar Record class implementations~~ - FIXED in PR #433
+YP|3. ~~**Issue #413**: Duplicate return statements in test_fasta2a_client.py~~ - FIXED in PR #461
+ZV|4. ~~**Issue #517**: Command Injection Risk - shell=True in brocula_loop.py~~ - FIXED in PR #529
+HP|5. **Issue #234**: Test coverage gap - 5% Python coverage, 0% JS coverage
+PB|6. **Issue #235**: settings.py - 1748-Line Monolith Needs Refactoring
+NR|7. **Issue #236**: task_scheduler.py - 1284-Line Mixed Concerns
+JW|8. **Issue #237**: scheduler.js - 1579-Line Monolith Needs Splitting
+VB|9. **Issue #513**: XSS Vulnerability in messages.js - innerHTML Usage - Need review
+VB|10. **Issue #514**: Frontend Bare Catch Blocks - Silent Error Swallowing
+VB|11. **Issue #515**: Frontend Memory Leaks - Intervals Not Cleaned
 
 1. ~~**Issue #309**: 23 remaining files with bare exception handlers~~ - FIXED in PR #331
 2. ~~**Issue #403**: History.py - Three similar Record class implementations~~ - FIXED in PR #433
