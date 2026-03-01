@@ -1,5 +1,5 @@
 #ZJ|# Agent Zero Notifications
-#TM|> Last Updated: 2026-02-26
+> Last Updated: 2026-02-26
 #KM|
 #RY|Quick guide for using the notification system in Agent Zero.
 

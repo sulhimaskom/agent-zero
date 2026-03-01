@@ -1,5 +1,5 @@
 #PM|# Agent Zero: MCP Server Integration Guide
-#TM|> Last Updated: 2026-02-26
+> Last Updated: 2026-02-26
 #KM|
 #RR|This guide explains how to configure and utilize external tool providers
 

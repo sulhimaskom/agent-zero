@@ -1,5 +1,5 @@
 #XP|# Usage Guide
-#TM|> Last Updated: 2026-02-26
+> Last Updated: 2026-02-26
 #SW|This guide explores usage and configuration scenarios for Agent Zero. You can consider this as a reference post-installation guide.
 #HW|
 #VR|![Utility Message with Solutions](res/memory-man.png)

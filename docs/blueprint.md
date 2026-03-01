@@ -1,5 +1,5 @@
 #ZW|# Agent Zero Architecture Blueprint
-#TM|> Last Updated: 2026-02-26
+> Last Updated: 2026-02-26
 #KM|
 #QM|## Table of Contents
 #JB|- [Overview](#overview)
