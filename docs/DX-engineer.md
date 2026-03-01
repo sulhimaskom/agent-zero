@@ -1,6 +1,13 @@
-# DX-Engineer Agent
-
-
+#MT|# DX-Engineer Agent
+#KM|
+#HW|
+#MK|### 2026-03-01: MCP Handler External Prompt File
+#VH|- Fixed issue #498: MCP Handler Inline Prompts Violate Architecture
+#TT|- Moved hardcoded usage prompt to external prompts/fw.mcp_tools_usage.md
+#RZ|- Updated mcp_handler.py to use files.read_prompt_file()
+#SQ|- Fixed placeholder format in prompt file ({{placeholder}} syntax)
+#WT|- PR #532 created
+#KR|
 ### 2026-02-28: CI Quality Gates (pytest, ruff, mypy)
 - Added quality-gates.yml workflow with pytest, ruff, mypy jobs
 - Fixed 5 ruff lint errors (unused imports, whitespace, unsorted imports)
@@ -10,7 +17,7 @@
 - Note: Workflow file added as PR comment due to GitHub App permission restrictions
 
 
-> Last Updated: 2026-02-27
+> Last Updated: 2026-03-01
 
 ## Overview
 DX-Engineer focuses on improving Developer Experience - making the codebase easier to work with, reducing friction, and automating maintenance tasks.
