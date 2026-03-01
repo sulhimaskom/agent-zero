@@ -1,6 +1,7 @@
 # Platform Engineer Agent - Long-term Memory
 
-**Created:** 2026-02-25
+#NZ|**Created:** 2026-02-25
+#VN|> Last Updated: 2026-03-01
 > Last Updated: 2026-02-28
 
 
@@ -46,6 +47,22 @@ Deliver small, safe, measurable improvements strictly inside the platform engine
   - Benefits from latest v5 features and bug fixes
 
 ## Improvements Log
+
+### 2026-03-01 - Add pytest Job to CI Workflow
+- **Change:** Added pytest job to `.github/workflows/on-pull-optimized.yml`
+- **Details:**
+  - New `pytest` job runs in parallel with AI analysis
+  - Uses Python 3.12 with pip caching
+  - Installs dev dependencies via `pip install -e ".[dev]"`
+  - Runs pytest on `tests/` directory
+  - 15 minute timeout
+- **Rationale:** Addresses Issue #512 - No Real CI Test Gates. Tests were not being run in CI, this adds proper test validation to catch regressions before merging.
+- **Impact:**
+  - Tests now run automatically on every PR
+  - Faster feedback loop for breaking changes
+  - Better regression detection
+  - 775 tests verified passing locally
+
 
 ### 2026-02-28 - Docker Compose Healthcheck Configuration
 - **Change:** Added healthcheck configuration to `docker/run/docker-compose.yml`
