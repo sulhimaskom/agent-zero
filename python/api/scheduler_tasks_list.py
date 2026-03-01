@@ -1,3 +1,9 @@
+"""Scheduler task listing API endpoint - retrieves all scheduled tasks.
+
+Returns a serialized list of all tasks in the scheduler including
+their types, states, schedules, and execution history.
+"""
+
 import traceback
 
 from python.helpers.api import ApiHandler, Input, Output, Request

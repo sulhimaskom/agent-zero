@@ -1,3 +1,9 @@
+"""Scheduler task on-demand execution API endpoint - runs tasks immediately.
+
+Manually triggers execution of a scheduled task by its UUID.
+Useful for testing or forcing immediate task execution.
+"""
+
 from python.helpers.api import ApiHandler, Input, Output, Request
 from python.helpers.localization import Localization
 from python.helpers.print_style import PrintStyle

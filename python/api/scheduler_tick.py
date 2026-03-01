@@ -1,3 +1,9 @@
+"""Scheduler heartbeat/tick API endpoint - internal scheduler timing.
+
+Provides a heartbeat mechanism for the scheduler to track time
+and trigger due tasks. Restricted to loopback (localhost) only.
+"""
+
 from datetime import datetime
 
 from python.helpers.api import ApiHandler, Input, Output, Request
