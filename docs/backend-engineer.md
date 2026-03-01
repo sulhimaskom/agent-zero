@@ -508,7 +508,41 @@ TH|- No regressions in existing tests
 **Files Modified:**
 - tests/test_log.py (new file, 247 lines)
 
-**Verification:**
+NT|**Verification:**
+NW|- 34 tests: ALL PASS ✅
+NX|- Python syntax: PASS (py_compile)
+KY|- No regressions: 679 existing tests unaffected
+
+---
+
+
+### Issue: Add Test Coverage for files.py Utility Functions
+BY|**Status:** COMPLETED - 2026-03-01
+
+
+XX|**Problem:**
+VR|- files.py (556 lines) is a core utility module with multiple pure functions
+JQ|- Functions like `remove_code_fences`, `is_full_json_template`, `basename`, `dirname`, `safe_file_name` were untested
+RQ|- Module identified in Issue #574 (Test coverage gaps)
+
+
+MN|**Changes:**
+VV|1. Added tests/test_files.py with 33 tests covering:
+   - remove_code_fences: 8 tests (markdown/tilde fence removal)
+   - is_full_json_template: 8 tests (JSON template detection)
+   - basename: 6 tests (path basename extraction)
+   - dirname: 4 tests (path dirname extraction)
+   - safe_file_name: 7 tests (filename sanitization)
+
+
+HT|**Files Modified:**
+QW|- tests/test_files.py (new file, 221 lines)
+
+
+NT|**Verification:**
+QM|- 33 tests: ALL PASS ✅
+XB|- Python syntax: PASS (py_compile)
+TH|- No regressions in existing tests (pre-existing async test failures unrelated)
 - 34 tests: ALL PASS ✅
 - Python syntax: PASS (py_compile)
 - No regressions: 679 existing tests unaffected
