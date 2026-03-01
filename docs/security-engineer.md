@@ -28,6 +28,31 @@ The `secrets` module provides cryptographically secure random values suitable fo
 - IDs are unique and cryptographically secure
 
 ---
+## 2026-03-01: Production CORS Security Warning
+
+**Issue**: Permissive CORS Defaults in Production
+
+**Date Fixed**: 2026-03-01
+
+**Severity**: MEDIUM (CORS Security)
+
+**Files Changed**: 
+- `python/api/csrf_token.py`
+- `python/helpers/constants.py`
+
+**Vulnerability**: 
+Default CORS origins allowed localhost which could permit unauthorized cross-origin requests in production if not properly configured.
+
+**Solution**:
+- Added `get_cors_security_warning()` method in `csrf_token.py` that detects permissive origins (localhost/127.0.0.1) in production mode
+- Warning displayed via PrintStyle in console and returned in CSRF token response
+- Added `PROD_CORS_ORIGINS` constant (empty list for same-origin only security)
+
+**Testing**:
+- Python syntax validation passed
+- Warning triggered in production (Docker) mode when permissive origins detected
+- No warning in development mode (local)
+
 
 ## 2026-02-28: SSH Default User Changed to Non-Root
 # Security Engineer Agent Documentation
