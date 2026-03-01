@@ -59,6 +59,11 @@ const model = {
       Logger.error('File browser error:', error);
       this.error = error?.message || 'Failed to load files';
       this.isLoading = false;
+      window.toastFrontendError?.(this.error, 'File Browser Error');
+    }
+      Logger.error('File browser error:', error);
+      this.error = error?.message || 'Failed to load files';
+      this.isLoading = false;
     }
   },
 
@@ -143,6 +148,11 @@ const model = {
         this.browser.currentPath = data.data.current_path;
         this.browser.parentPath = data.data.parent_path;
       } else {
+        const errorText = await response.text();
+        Logger.error('Error fetching files:', errorText);
+        window.toastFrontendError?.('Failed to load files', 'File Browser Error');
+        this.browser.entries = [];
+      }
         Logger.error('Error fetching files:', await response.text());
         this.browser.entries = [];
       }

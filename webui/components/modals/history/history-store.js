@@ -1,6 +1,9 @@
 import { createStore } from '/js/AlpineStore.js';
 import Logger from '/js/logger.js';
 
+// NOTE: window.toastFrontendError is available globally from notification-store.js
+import Logger from '/js/logger.js';
+
 const model = {
   // State
   isLoading: false,
@@ -52,6 +55,13 @@ const model = {
       this.error = error?.message || 'Failed to load history';
       this.isLoading = false;
       this.updateModalTitle(); // Show error in title
+      // Show user-facing error notification
+      window.toastFrontendError?.(this.error, 'History Error');
+    }
+      Logger.error('History fetch error:', error);
+      this.error = error?.message || 'Failed to load history';
+      this.isLoading = false;
+      this.updateModalTitle(); // Show error in title
     }
   },
 
@@ -79,10 +89,22 @@ const model = {
     if (!window.ace?.edit) {
       Logger.error('ACE editor not available');
       this.error = 'Editor library not loaded';
+      window.toastFrontendError?.('Editor library not loaded', 'History Error');
+      return;
+    }
+    if (!window.ace?.edit) {
+      Logger.error('ACE editor not available');
+      this.error = 'Editor library not loaded';
       return;
     }
 
     const editorInstance = window.ace.edit('history-viewer-container');
+    if (!editorInstance) {
+      Logger.error('Failed to create ACE editor instance');
+      this.error = 'Failed to initialize editor';
+      window.toastFrontendError?.('Failed to initialize editor', 'History Error');
+      return;
+    }
     if (!editorInstance) {
       Logger.error('Failed to create ACE editor instance');
       return;

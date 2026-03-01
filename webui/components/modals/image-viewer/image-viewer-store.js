@@ -1,6 +1,8 @@
 import { createStore } from '/js/AlpineStore.js';
 import Logger from '/js/logger.js';
 
+// NOTE: window.toastFrontendError is available globally from notification-store.js
+
 const model = {
   // State
   currentImageUrl: null,
@@ -58,6 +60,7 @@ const model = {
     } catch (error) {
       Logger.error('Image viewer error:', error);
       this.imageError = true;
+      window.toastFrontendError?.('Failed to open image viewer', 'Image Viewer Error');
     }
   },
 
@@ -95,6 +98,7 @@ const model = {
         this.imageLoaded = false; // Trigger reload animation
       }
     } catch (err) {
+      // Log but don't show toast for preload failures - they can be noisy during refresh
       Logger.error('Failed to preload image:', err);
     }
   },
@@ -186,4 +190,3 @@ const model = {
 };
 
 export const store = createStore('imageViewer', model);
-
