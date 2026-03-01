@@ -5,6 +5,7 @@ Continuously monitors browser console and lighthouse scores, fixes issues automa
 """
 
 import json
+import shlex
 import subprocess
 import sys
 import time
@@ -16,7 +17,9 @@ from python.helpers.constants import Network, Timeouts
 def run_command(cmd, timeout=Timeouts.BROCULA_COMMAND_TIMEOUT):
     """Run a shell command and return output."""
     try:
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=timeout)
+        # Use shlex.split to safely convert string command to list (avoids shell injection)
+        cmd_list = shlex.split(cmd) if isinstance(cmd, str) else cmd
+        result = subprocess.run(cmd_list, shell=False, capture_output=True, text=True, timeout=timeout)
         return result.returncode, result.stdout, result.stderr
     except subprocess.TimeoutExpired:
         return -1, "", "Command timed out"
