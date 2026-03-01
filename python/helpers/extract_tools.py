@@ -20,7 +20,7 @@ def json_parse_dirty(json:str) -> dict[str,Any] | None:
             return None
     return None
 
-def extract_json_object_string(content):
+def extract_json_object_string(content: str) -> str:
     start = content.find('{')
     if start == -1:
         return ""
@@ -34,7 +34,7 @@ def extract_json_object_string(content):
         # If there's a closing '}', return the substring from start to end
         return content[start:end+1]
 
-def extract_json_string(content):
+def extract_json_string(content: str) -> str:
     # Regular expression pattern to match a JSON object
     pattern = r'\{(?:[^{}]|(?R))*\}|\[(?:[^\[\]]|(?R))*\]|"(?:\\.|[^"\\])*"|true|false|null|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?'
 
@@ -47,7 +47,7 @@ def extract_json_string(content):
     else:
         return ""
 
-def fix_json_string(json_string):
+def fix_json_string(json_string: str) -> str:
     # Function to replace unescaped line breaks within JSON string values
     def replace_unescaped_newlines(match):
         return match.group(0).replace('\n', '\\n')
