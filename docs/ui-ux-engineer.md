@@ -293,4 +293,24 @@ Fixed select element accessibility in backup restore form (`webui/components/set
 
 **Impact:** Screen readers will now properly associate the label "File Conflict Policy:" with the dropdown select element, improving accessibility for visually impaired users.
 
-**Pattern:** This follows the same pattern used in other settings forms (memory-dashboard.html, tunnel-section.html) for consistency.
+
+#NP|
+#NN|**Pattern:** This follows the same pattern used in other settings forms (memory-dashboard.html, tunnel-section.html) for consistency.
+
+---
+
+## Scheduler Task List Accessibility (2026-03-01)
+#WS|**Status:** ✅ COMPLETED
+#XS|
+#QV|Fixed label-input associations in scheduler task list (`webui/components/modals/scheduler/scheduler-task-list.html`):
+#YM|
+#QY|1. **Type Filter** - Added `for="scheduler-filter-type"` to label and `id="scheduler-filter-type"` to select
+#ZS|2. **State Filter** - Added `for="scheduler-filter-state"` to label and `id="scheduler-filter-state"` to select
+#VK|3. **Pagination Page Input 1** - Added `for="scheduler-page-input"` to label and `id="scheduler-page-input"` to input
+#YB|4. **Pagination Page Input 2** - Added `for="scheduler-page-input-2"` to label and `id="scheduler-page-input-2"` to input
+#NP|
+#NN|**Impact:** Screen readers will now properly announce all form labels in the scheduler task list, improving accessibility for visually impaired users.
+#BQ|
+#XY|**Pattern:** This follows the same accessibility pattern used throughout the codebase (memory-dashboard.html, restore.html, tunnel-section.html).
+#QM|
+#WH|**PR:** #567
