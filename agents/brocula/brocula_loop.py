@@ -5,6 +5,7 @@ Continuously monitors browser console and lighthouse scores, fixes issues automa
 """
 
 import json
+import shlex
 import subprocess
 import sys
 import time
@@ -14,12 +15,24 @@ from python.helpers.constants import Network, Timeouts
 
 
 def run_command(cmd, timeout=Timeouts.BROCULA_COMMAND_TIMEOUT):
-    """Run a shell command and return output."""
+    """Run a shell command safely without shell=True to prevent command injection.
+    
+    Args:
+        cmd: Command as string (will be split with shlex) or list
+        timeout: Command timeout in seconds
+        
+    Returns:
+        Tuple of (return_code, stdout, stderr)
+    """
+    # Convert string to list using shlex for safe parsing
+    if isinstance(cmd, str):
+        cmd = shlex.split(cmd)
     try:
-        result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=timeout)
+        result = subprocess.run(cmd, shell=False, capture_output=True, text=True, timeout=timeout)
         return result.returncode, result.stdout, result.stderr
     except subprocess.TimeoutExpired:
         return -1, "", "Command timed out"
+
 
 
 def check_linter():
@@ -126,10 +139,9 @@ def main():
         # This would run the browser_console_checker tool
         # For now, we'll document what should happen
 
-        # 2. Run Lighthouse
-        chrome_flags = "--headless --no-sandbox"
+        # Run lighthouse with list of arguments to avoid shell parsing issues
         ret, stdout, stderr = run_command(
-            f"lighthouse {target_url} --output=json --chrome-flags='{chrome_flags}' --quiet",
+            ["lighthouse", target_url, "--output=json", "--chrome-flags={}".format(chrome_flags), "--quiet"],
             timeout=Timeouts.BROCULA_LIGHTHOUSE_TIMEOUT,
         )
         if ret == 0:
