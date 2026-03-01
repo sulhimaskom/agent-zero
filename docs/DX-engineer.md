@@ -1,6 +1,14 @@
 #MT|# DX-Engineer Agent
 #KM|
 #HW|
+### 2026-03-01: Enable mypy in CI
+- Fixed issue #557: Pre-commit mypy and AI review skipped in CI
+- Removed mypy from ci.skip in .pre-commit-config.yaml
+- mypy now runs via pre-commit.ci on every PR
+- Kept ai-code-review skipped (requires Ollama, Ruff handles linting)
+- PR #560 created
+
+
 #MK|### 2026-03-01: MCP Handler External Prompt File
 #VH|- Fixed issue #498: MCP Handler Inline Prompts Violate Architecture
 #TT|- Moved hardcoded usage prompt to external prompts/fw.mcp_tools_usage.md
