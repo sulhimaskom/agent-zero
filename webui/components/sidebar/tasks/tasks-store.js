@@ -42,7 +42,7 @@ const model = {
   // Update selected task and persist for tab restore
   setSelected(taskId) {
     this.selected = taskId || '';
-    try { localStorage.setItem('lastSelectedTask', this.selected); } catch {}
+    try { localStorage.setItem('lastSelectedTask', this.selected); } catch (e) { Logger.debug('Could not persist task selection (private browsing?)', e); }
   },
 
   // Returns true if a task with the given id exists in the current list
