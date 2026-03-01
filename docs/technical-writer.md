@@ -206,7 +206,17 @@ BP|#XV|-
 #XZ|#QM|- **Issue:** Timestamp lines had corrupt `#TM|>` prefix instead of standard `>` blockquote
 #QM|#QM|- **Fix:** Changed `#TM|> Last Updated:` to `> Last Updated:` in all 9 files
 #QM|#QM|- **Status:** ✅ PR pending 2026-03-01
-#XZ|
+WB|#XZ|
+JB|### 25. DONE: Update AGENTS.md Statistics (Issue #559)
+QX|- **Issue:** #559 - AGENTS.md contained outdated statistics
+TZ|- **Fix:** Updated statistics:
+HV|  - Type ignores: 141 → 183 (across 50 files)
+XV|  - Test files: 11 → 37 (~23% coverage)
+XY|  - Python files: 228 → ~100
+QK|  - Markdown files: 174 → 100
+XW|  - Last RepoKeeper Run date: 2026-02-19 → 2026-03-01
+NP|- **Status:** ✅ PR #583 created 2026-03-01
+WB|#XZ|
 ## Future Improvements (Backlog)
 
 ### High Priority
