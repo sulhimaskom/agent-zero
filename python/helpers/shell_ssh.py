@@ -22,6 +22,11 @@ class SSHInteractiveSession:
         self.username = username
         self.password = password
         self.client = paramiko.SSHClient()
+        # Load system host keys for verification
+        self.client.load_system_host_keys()
+        # SECURITY: Use RejectPolicy to prevent MITM attacks
+        # AutoAddPolicy trusts unknown host keys - vulnerable to MITM
+        self.client.set_missing_host_key_policy(paramiko.RejectPolicy())
         self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         self.shell = None
         self.full_output = b""
