@@ -124,6 +124,10 @@ const memoryDashboardStore = {
     } catch (error) {
       Logger.error('Failed to get current memory subdirectory:', error);
       this.selectedMemorySubdir = 'default';
+      justToast('Failed to get current memory subdirectory', 'error');
+    }
+      Logger.error('Failed to get current memory subdirectory:', error);
+      this.selectedMemorySubdir = 'default';
     }
   },
 
@@ -161,7 +165,10 @@ const memoryDashboardStore = {
     } catch (error) {
       this.error = error.message || 'Failed to load memory subdirectories';
       this.memorySubdirs = ['default'];
-      // Only fallback to default if current selection is not available
+      }
+      Logger.error('Memory subdirectory loading error:', error);
+      justToast('Failed to load memory subdirectories', 'error');
+    } finally {
       if (!this.memorySubdirs.includes(this.selectedMemorySubdir)) {
         this.selectedMemorySubdir = 'default';
       }
@@ -254,6 +261,7 @@ const memoryDashboardStore = {
         this.memories = [];
         this.message = null;
         Logger.error('Memory search error:', error);
+        justToast('Failed to search memories', 'error');
       } else {
         // For silent updates, just log the error but don't break the UI
         Logger.warn('Memory dashboard polling error:', error);

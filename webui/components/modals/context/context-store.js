@@ -1,6 +1,9 @@
 import { createStore } from '/js/AlpineStore.js';
 import Logger from '/js/logger.js';
 
+// NOTE: window.toastFrontendError is available globally from notification-store.js
+import Logger from '/js/logger.js';
+
 const model = {
   // State
   isLoading: false,
@@ -52,6 +55,13 @@ const model = {
       this.error = error?.message || 'Failed to load context window';
       this.isLoading = false;
       this.updateModalTitle(); // Show error in title
+      // Show user-facing error notification
+      window.toastFrontendError?.(this.error, 'Context Error');
+    }
+      Logger.error('Context fetch error:', error);
+      this.error = error?.message || 'Failed to load context window';
+      this.isLoading = false;
+      this.updateModalTitle(); // Show error in title
     }
   },
 
@@ -79,10 +89,22 @@ const model = {
     if (!window.ace?.edit) {
       Logger.error('ACE editor not available');
       this.error = 'Editor library not loaded';
+      window.toastFrontendError?.('Editor library not loaded', 'Context Error');
+      return;
+    }
+    if (!window.ace?.edit) {
+      Logger.error('ACE editor not available');
+      this.error = 'Editor library not loaded';
       return;
     }
 
     const editorInstance = window.ace.edit('context-viewer-container');
+    if (!editorInstance) {
+      Logger.error('Failed to create ACE editor instance');
+      this.error = 'Failed to initialize editor';
+      window.toastFrontendError?.('Failed to initialize editor', 'Context Error');
+      return;
+    }
     if (!editorInstance) {
       Logger.error('Failed to create ACE editor instance');
       return;
