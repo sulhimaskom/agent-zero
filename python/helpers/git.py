@@ -31,7 +31,7 @@ def get_git_info():
         tag = repo.git.describe(tags=True)
         tag_split = tag.split("-")
         short_tag = "-".join(tag_split[:-1]) if len(tag_split) >= 3 else tag
-    except Exception as e:
+    except Exception:
         tag = ""
 
     version = branch[0].upper() + " " + (short_tag or commit_hash[:7])
@@ -53,5 +53,5 @@ def get_version():
     try:
         git_info = get_git_info()
         return str(git_info.get("short_tag", "")).strip() or "unknown"
-    except Exception as e:
+    except Exception:
         return "unknown"
