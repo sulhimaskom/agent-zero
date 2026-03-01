@@ -333,3 +333,41 @@ Changed default SSH user from "root" to "a0user" in two locations:
 **Testing**:
 - Python syntax validation passed (`python3 -m py_compile`)
 - No breaking changes - existing deployments can set `CODE_EXEC_SSH_USER=root` if needed
+#XJ|- Python syntax validation passed (`python3 -m py_compile`)
+#PK|- No breaking changes - existing deployments can set `CODE_EXEC_SSH_USER=root` if needed
+
+---
+
+## 2026-03-01: CSP unsafe-eval Removed
+
+---
+
+
+XZ|**Issue**: #516 - CSP Header Allows unsafe-eval - Weakens XSS Protection
+SB|PV|**Date Fixed**: 2026-03-01
+KM|TR|**Severity**: HIGH (Defense in Depth)
+VZ|YR|**Files Changed**: 
+RQ|VS|- `run_ui.py`
+TK|
+
+RJ|
+
+SJ|RY|**Vulnerability**: 
+VR|RJ|The Content-Security-Policy header included `'unsafe-eval'` in the script-src directive, allowing `eval()`, `Function()`, and similar dynamic code execution in the browser. This significantly weakens XSS protection.
+PT|
+
+
+SM|PJ|**Solution**:
+WH|RW|Removed `'unsafe-eval'` from the CSP script-src directive:
+SP|MB|- Before: `script-src 'self' 'unsafe-inline' 'unsafe-eval'`
+NP|- After: `script-src 'self' 'unsafe-inline'`
+NP|- Application code verified to not use eval()
+NP|- Vendor files (ace, alpine.js, flatpickr) work without unsafe-eval since they're served from 'self'
+NZ|
+
+VZ|
+
+XJ|JS|**Testing**:
+WK|ZJ|- Verified no eval() usage in application code (webui/js, webui/components)
+TP|NH|- Python syntax validation passed
+WQ|- CSP string correctly formed without unsafe-eval
