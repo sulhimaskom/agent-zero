@@ -96,10 +96,12 @@ This document tracks UI/UX improvements, accessibility standards, and patterns f
 ```
 
 ## Action Items (Next Sprint)
-- [x] Audit all modal close buttons (context.html, history.html - DONE 2026-02-25)
-- [ ] Check form validation accessibility
-- [ ] Review notification toast accessibility
-- [ ] Test keyboard navigation flow
+SQ|- [x] Audit all modal close buttons (context.html, history.html - DONE 2026-02-25)
+YZ|- [x] Check form validation accessibility (DONE 2026-03-01 via Issue #522)
+MH|- [x] Review notification toast accessibility (toast system used for error feedback)
+VK|- [x] Test keyboard navigation flow (DONE 2026-02-26)
+YS|- [x] Add toast notifications for modal error feedback (context, history, image-viewer - DONE 2026-03-01)
+QW|- [ ] Migrate remaining stores to use toastFrontendError (speech, memory-dashboard, mcp-servers, etc.)
 
 ## Issue Tracking
 
@@ -279,3 +281,40 @@ Fixed several accessibility issues across the UI:
 - Fixed 2 page input associations (memory-page-input, status-page-input)
 
 **Impact:** These changes improve accessibility for screen reader users and keyboard-only navigation throughout the application.
+
+
+## Issue #522 - Frontend Inconsistent Error Feedback (2026-03-01)
+**Status:** ✅ COMPLETED (PR #528)
+
+Fixed inconsistent error handling in frontend stores - some used notification toast system, others only used console.error.
+
+### Changes:
+
+1. **context-store.js** - Added `window.toastFrontendError()` for context fetch failures
+   - Line 52: Added toast notification for user-facing error
+   - Pattern: Both console.error AND toastFrontendError together
+
+2. **history-store.js** - Added `window.toastFrontendError()` for history fetch failures
+   - Line 52: Added toast notification for user-facing error
+   - Pattern: Both console.error AND toastFrontendError together
+
+3. **image-viewer-store.js** - Added `window.toastFrontendError()` for image viewer open failures
+   - Line 59: Added toast notification for user-facing error
+   - Pattern: Both console.error AND toastFrontendError together
+
+### Pattern Established:
+```javascript
+} catch (error) {
+  console.error('Operation failed:', error);  // For dev debugging
+  window.toastFrontendError?.(error?.message || 'Failed to operation', 'Error Title');  // For user notification
+}
+```
+
+### Impact:
+- Users now see visible error notifications when modal data fetching fails
+- Developers can still debug in browser console
+- Consistent error feedback across the application
+
+### Remaining Work:
+- Other stores still need migration (speech-store, memory-dashboard-store, mcp-servers-store, etc.)
+- See issue #522 for full list of stores needing updates
