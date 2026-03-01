@@ -3,7 +3,6 @@
 Tests the truncate functions that are pure and don't depend on external state.
 """
 
-import pytest
 
 from python.helpers import log
 
