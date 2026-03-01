@@ -163,7 +163,7 @@ export function _drawMessage(
       headingH4 = document.createElement('h4');
       headingElement.appendChild(headingH4);
     }
-    headingH4.innerHTML = convertIcons(escapeHTML(heading));
+    headingH4.innerHTML = sanitizeHTML(convertIcons(heading));
 
     if (resizeBtns) {
       let minMaxBtn = headingElement.querySelector('.msg-min-max-btns');
