@@ -1,3 +1,9 @@
+"""Knowledge import API endpoint - uploads documents to the knowledge base.
+
+Handles multipart file uploads to import documents into the
+agent's knowledge base for RAG-based retrieval.
+"""
+
 import os
 
 from werkzeug.utils import secure_filename

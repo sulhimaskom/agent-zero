@@ -1,3 +1,9 @@
+"""Context window retrieval API endpoint - returns current context window content and token count.
+
+Provides access to the agent's context window for display in the UI,
+including the full text content and token usage statistics.
+"""
+
 from python.helpers.api import ApiHandler, Input, Output, Request
 
 

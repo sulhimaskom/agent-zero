@@ -1,3 +1,9 @@
+"""Chat history retrieval API endpoint - returns message history and token count.
+
+Provides access to the conversation history for a given context,
+including all messages and token usage statistics.
+"""
+
 from python.helpers.api import ApiHandler, Request, Response
 
 

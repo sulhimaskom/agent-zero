@@ -1,3 +1,9 @@
+"""File info API endpoint - retrieves detailed metadata for a specific file.
+
+Returns comprehensive file information including path, size,
+permissions, timestamps, and whether it exists.
+"""
+
 import os
 from typing import TypedDict
 

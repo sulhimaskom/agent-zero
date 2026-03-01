@@ -1,7 +1,7 @@
 # Product-Architect Agent - Long-term Memory
 
 **Created:** 2026-02-25
-#RJ|> Last Updated: 2026-02-28
+#NQ|#RJ|> Last Updated: 2026-03-01
 
 ## Domain
 Product-Architect focuses on small, safe, measurable improvements to the Agent Zero framework.
@@ -81,3 +81,5 @@ JW|- **2026-02-28**: Added module docstrings to 8 backup/chat API files: `backup
 #JW|- **2026-03-01**: Fixed 5 bare catch blocks in frontend JavaScript stores - Added Logger.error calls in `speech-store.js` (URL parsing), `preferences-store.js` (darkMode/speech loading), `tasks-store.js` (task selection persistence), and `backup-store.js` (error response parsing). Improves debugging by logging errors instead of silently swallowing. PR #540.
 
 #JW|- **2026-02-28**: Added module docstrings to 4 helper utility files: `guids.py`, `dotenv.py`, `wait.py`, and `crypto.py` - improves helper module documentation. PR #476.
+#JW|- **2026-03-01**: Added module docstrings to 8 file/knowledge API endpoints: `ctx_window_get.py`, `history_get.py`, `file_info.py`, `get_work_dir_files.py`, `delete_work_dir_file.py`, `import_knowledge.py`, `knowledge_path_get.py`, and `upload_work_dir_files.py` - improves API endpoint documentation for core file operations and knowledge management.
+
