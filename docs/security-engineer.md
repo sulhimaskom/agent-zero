@@ -439,3 +439,49 @@ First-time SSH connections to new hosts will now be rejected. Users must:
 - Implementation follows Paramiko best practices
 - No runtime errors expected - standard Paramiko API
 
+---
+
+## 2026-03-02: Unrestricted File Upload Vulnerability Fixed
+
+---
+
+**Issue**: #591 - CRITICAL: Unrestricted File Upload - Allows Any File Type
+**Date Fixed**: 2026-03-02
+**Severity**: CRITICAL (RCE Risk)
+**Files Changed**: 
+- `python/api/upload.py`
+- `tests/test_upload_security.py` (new)
+
+**Vulnerability**: 
+The file upload endpoint allowed uploading ANY file type without validation. The `allowed_file()` method always returned `True`, enabling attackers to upload:
+- Executable scripts (.php, .py, .sh)
+- Web shells (.jsp, .asp)
+- Malicious payloads (.exe, .jar)
+
+This could lead to Remote Code Execution (RCE) if the uploaded files were accessible via the web server.
+
+**Solution**:
+Added extension whitelist and MIME type validation:
+
+1. **ALLOWED_EXTENSIONS** - Whitelist of safe extensions:
+   - Images: png, jpg, jpeg, gif, bmp, webp
+   - Documents: pdf, txt, md, csv, json, xml, yaml, yml
+   - Office: doc, docx, xls, xlsx, ppt, pptx
+
+2. **validate_mime_type()** - MIME type validation using Content-Type header
+
+3. **Modified process()** - Validates both extension and MIME type before saving
+
+**Testing**:
+- Python syntax validation passed
+- Ruff linting passes with no warnings
+- Unit tests added covering:
+  - Allowed image/document/office extensions
+  - Blocked dangerous extensions (.php, .py, .exe, .jsp, .asp, .sh)
+  - Case-insensitive extension matching
+  - MIME type validation
+
+**Pattern Followed**:
+- Consistent with `attachment_manager.py` and `file_browser.py` patterns
+- Uses allowlist approach (secure by default)
+
