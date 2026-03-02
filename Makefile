@@ -19,7 +19,7 @@
 #   ai-review-install - Install AI code review hook
 #   clean         - Clean up cache files
 
-.PHONY: help install install-dev lint lint-fix format lint-js lint-js-fix typecheck typecheck-js test run docker-build docker-run pre-commit ai-review ai-review-install clean
+.PHONY: help install install-dev lint lint-fix format lint-js lint-js-fix lint-all check typecheck typecheck-js test run docker-build docker-run pre-commit ai-review ai-review-install clean
 
 # Default target
 help:
@@ -31,10 +31,12 @@ help:
 	@echo "  install-dev   - Install development dependencies"
 	@echo "  lint          - Run ruff linter (Python)"
 	@echo "  lint-fix      - Auto-fix ruff linter issues (Python)"
+	@echo "  lint-all      - Run all linters (Python + JavaScript)"
 	@echo "  format        - Format code with ruff (Python)"
 	@echo "  lint-js       - Run ESLint (JavaScript)"
 	@echo "  lint-js-fix   - Auto-fix ESLint issues (JavaScript)"
 	@echo "  typecheck     - Run mypy type checker"
+	@echo "  check         - Run all quality checks (lint + typecheck + test)"
 	@echo "  test          - Run pytest tests"
 	@echo "  run           - Run Agent Zero in development mode"
 	@echo "  pre-commit    - Install pre-commit hooks"
@@ -54,9 +56,11 @@ help:
 	@echo "Examples:"
 	@echo "  make install-dev      # Install dev dependencies"
 	@echo "  make lint             # Check for linting errors (Python)"
+	@echo "  make lint-all         # Check for linting errors (Python + JavaScript)"
 	@echo "  make lint-js          # Check for linting errors (JavaScript)"
 	@echo "  make format           # Auto-fix linting issues (Python)"
 	@echo "  make lint-js-fix      # Auto-fix linting issues (JavaScript)"
+	@echo "  make check            # Run all quality checks"
 	@echo "  make test             # Run tests"
 	@echo "  make run              # Start development server"
 	@echo "  make ai-review        # Run AI code review"
@@ -89,6 +93,30 @@ lint-js:
 # Auto-fix JavaScript linter issues
 lint-js-fix:
 	cd webui && npm run lint:fix
+
+# Run all linters (Python + JavaScript)
+lint-all:
+	@echo "Running Python linter..."
+	ruff check .
+	@echo ""
+	@echo "Running JavaScript linter..."
+	cd webui && npm run lint
+
+# Run all quality checks (lint + typecheck + test)
+check:
+	@echo "Running all quality checks..."
+	@echo ""
+	@echo "=== Linting (Python) ==="
+	ruff check .
+	@echo ""
+	@echo "=== Linting (JavaScript) ==="
+	cd webui && npm run lint || true
+	@echo ""
+	@echo "=== Type Checking ==="
+	mypy python/
+	@echo ""
+	@echo "=== Tests ==="
+	pytest tests/ -v
 
 # Run mypy type checker
 typecheck:
