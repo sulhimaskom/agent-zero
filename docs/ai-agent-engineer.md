@@ -12,6 +12,27 @@ This document serves as the long-term memory for the ai-agent-engineer domain in
 
 #BY|
 ## Implemented Fixes
+### 2026-03-02: Bare Exception Handlers in Extensions
+**Issue**: Proactive scan found 2 extension files with bare exception handlers that were missed in PR #331.
+
+**Root Cause**: Extensions added after PR #331 still used `except Exception:` without capturing the exception variable.
+
+**Fix Applied**: Changed `except Exception:` to `except Exception as e:` in 2 files:
+- `python/extensions/user_message_ui/_10_update_check.py` - line 52
+- `python/extensions/monologue_start/_60_rename_chat.py` - line 44
+
+**Files Modified**:
+- python/extensions/user_message_ui/_10_update_check.py
+- python/extensions/monologue_start/_60_rename_chat.py
+
+**Verification**:
+- Python syntax check: PASSED on both files
+- Zero bare exception handlers remaining in python/extensions/
+- PR #613 created with ai-agent-engineer label
+
+---
+
+#BY|
 ### 2026-03-02: Tool Argument Validation Fixes
 **Issue**: Proactive scan found tools that could crash with KeyError when LLMs call them without required arguments.
 
