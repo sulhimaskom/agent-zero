@@ -29,7 +29,7 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 ├── knowledge/          # RAG document storage (separate from agent memory)
 ├── lib/                # Library dependencies (browser automation, etc.)
 ├── memory/             # FAISS vector DB for agent's persistent learnings
-# pytest tests (46 test files, 851 tests, pytest/ruff/mypy configured)
+# pytest tests (48 test files, 711 tests, pytest/ruff/mypy configured)
 └── usr/                # User-specific configurations and data
 ```
 
@@ -101,7 +101,7 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 - `/python/helpers/history.py:236` - FIXME: vision bytes sent to utility LLM (inefficiency)
 - `/python/helpers/vector_db.py`, `/python/helpers/memory.py` - FAISS patch for Python 3.12 ARM (remove when fixed upstream)
 - `/python/helpers/job_loop.py:34` - TODO: lowering SLEEP_TIME below 1min causes job duplication
-- 139 `# type: ignore` comments across 39 files - mostly legitimate (external libraries)
+- 173 `# type: ignore` comments across 45 files - mostly legitimate (external libraries)
 - Zero bare `except Exception:` handlers (all fixed to capture as `e`)
 - 289 PrintStyle calls across 45 files - intentional framework logging (not bare prints)
 
@@ -109,7 +109,7 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 - pytest.ini exists and configured (asyncio mode, markers, test paths)
 - conftest.py exists with fixtures and mocks
 - All tests passing
-- 37 test files for ~100 Python files (~23% coverage) - tests passing
+- 48 test files for ~100 Python files (~23% coverage) - tests passing
 - Tests not run in CI (GitHub workflows use OpenCode AI agent only)
 - Mixed naming: `test_*.py` and `*_test.py` both used
 - Coverage tool not configured
@@ -210,21 +210,21 @@ docker run -p 50001:80 agent0ai/agent-zero
 
 | Criterion | Weight | Score | Notes |
 |-----------|--------|-------|-------|
-Valid syntax, 139 type ignores
+Valid syntax, 173 type ignores
 | Readability | 10% | 7/10 | Good structure, prints for logging |
 | Simplicity | 10% | 6/10 | Large modules (settings.py: 1747 lines) |
 | Modularity | 15% | 9/15 | Extensions good, some too large |
 | Consistency | 5% | 3/5 | Mixed patterns |
-**Testability** | **15%** | **12/20** | **37 test files with 711 tests (~23% coverage)**
+**Testability** | **15%** | **12/20** | **48 test files with 711 tests (~23% coverage)**
 | Maintainability | 10% | 5/10 | Complexity hotspot in helpers/ |
 | **Error Handling** | **10%** | **7/10** | **Fixed: 62 bare exception handlers → 0** |
 | Dependencies | 5% | 4/5 | Well-defined requirements |
 | Determinism | 5% | 5/5 | No randomness issues |
 
 **Critical Issues:**
-1. ~~**Test Coverage Crisis**: Only 11 test files for 228 Python files (~5% coverage) - tests passing~~ ✅ **IMPROVED**: 37 test files with 711 tests (~23% coverage)
+1. ~~**Test Coverage Crisis**: Only 11 test files for 228 Python files (~5% coverage) - tests passing~~ ✅ **IMPROVED**: 48 test files with 711 tests (~23% coverage)
 2. ~~**Error Handling**: 182 broad `except Exception` handlers mask bugs~~ ✅ **FIXED**: All bare `except Exception:` handlers converted to `except Exception as e:`
-3. **Type Safety**: 139 `# type: ignore` comments bypass type checking
+3. **Type Safety**: 173 `# type: ignore` comments bypass type checking
 4. **Observability**: PrintStyle logging is intentional framework behavior (not bare print statements)
 
 ### B. SYSTEM QUALITY BREAKDOWN (72/100)
@@ -257,7 +257,7 @@ Documentation | 18/20 | Comprehensive (33 docs files) |
 | Release Safety | 20% | 13/20 | No rollback mechanism |
 | Config Parity | 15% | 11/15 | Docker configs consistent |
 | Migration Safety | 15% | 10/15 | Backup/restore exists |
-Tech Debt | 15% | 9/15 | 139 type ignores, complex modules |
+Tech Debt | 15% | 9/15 | 173 type ignores, complex modules |
 | Change Velocity | 15% | 8/15 | Large modules slow dev |
 
 ### RECOMMENDED PRIORITY ACTIONS
@@ -286,7 +286,7 @@ Tech Debt | 15% | 9/15 | 139 type ignores, complex modules |
     - JSON format for production
     - Log rotation
 
-6. ~~**Type Safety**: Address 176 `# type: ignore` comments~~ ✅ **IMPROVED**: 139 type ignores (reduced from 185), gradual mypy enforcement underway
+6. ~~**Type Safety**: Address 176 `# type: ignore` comments~~ ✅ **IMPROVED**: 173 type ignores (reduced from 185), gradual mypy enforcement underway
    - Add proper type annotations
    - Use stubs for external libs
    - Gradual mypy enforcement
@@ -297,7 +297,7 @@ Tech Debt | 15% | 9/15 | 139 type ignores, complex modules |
 |--------|---------|--------|----------|
 Test Coverage | ~23% (711 tests passing) | 30% | P0 |
 | Broad Exceptions | 0 ✅ | 0 | P1 |
-Type Ignores | 139 | 70 | P2 |
+Type Ignores | 173 | 70 | P2 |
 | PrintStyle Calls | Intentional | N/A | - |
 Linter Configs | 5 ✅ (ruff/mypy/pre-commit) | 3+ | P2 |
 
@@ -313,6 +313,6 @@ Linter Configs | 5 ✅ (ruff/mypy/pre-commit) | 3+ | P2 |
 ### RECENT CLEANUP (2026-03-01)
 
 ✅ **Branch synchronized**: Merged origin/main into custom branch
-✅ **Updated AGENTS.md statistics**: ~100 Python files, 587 JS files, 100 Markdown files, 139 type ignores, 0 bare exceptions, 46 test files (851 tests)
+✅ **Updated AGENTS.md statistics**: ~100 Python files, 587 JS files, 100 Markdown files, 173 type ignores, 0 bare exceptions, 48 test files (711 tests)
 ✅ **Verified repository cleanliness**: No .pyc, __pycache__, .DS_Store, Thumbs.db, or temp files found
 ✅ **No temporary files**: Repository clean of .pyc, __pycache__, .DS_Store, Thumbs.db, cache directories
