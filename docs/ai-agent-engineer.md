@@ -12,6 +12,28 @@ This document serves as the long-term memory for the ai-agent-engineer domain in
 
 #BY|
 ## Implemented Fixes
+### 2026-03-02: Extension Ordering Bug Fix
+**Issue**: Extensions were sorted alphabetically instead of by numeric prefix, violating documented behavior.
+
+**Root Cause**: 
+- The `_get_file_from_module()` function returned the full filename (e.g., "_10_example.py")
+- Python's alphabetical sort placed "_100_" before "_10_" (character by character: '1'='1', '0'='0', '0'>nothing)
+- This caused extensions like `_90_*.py` to run before `_10_*.py` in some cases
+
+**Fix Applied**:
+- Added `_get_sort_key()` function that extracts numeric prefix using regex `r"_(\d+)"`
+- Sort key returns `(int(prefix), filename)` tuple for proper numeric ordering
+- Files without numeric prefix default to 999999 (run last)
+
+**Files Modified**:
+- python/helpers/extension.py - Added _get_sort_key function, updated sorting logic
+
+**Verification**:
+- Python syntax check: PASSED
+- Logic test: _2_ < _10_ < _90_ < _100_ < no_prefix ✓
+
+---
+
 ### 2026-03-02: Bare Exception Handlers and KeyError Fix
 **Issue**: Proactive scan found bare exception handlers in API files and KeyError risk in search_engine.py.
 

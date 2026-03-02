@@ -18,6 +18,18 @@ class Extension:
         pass
 
 
+def _get_file_from_module(module_name: str) -> str:
+    return module_name.split(".")[-1]
+
+
+def _get_sort_key(filename: str) -> tuple[int, str]:
+    import re
+    match = re.match(r"_(\d+)", filename)
+    if match:
+        return (int(match.group(1)), filename)
+    return (999999, filename)
+
+
 async def call_extensions(extension_point: str, agent: "Agent|None" = None, **kwargs) -> Any:
 
     # get default extensions
@@ -35,19 +47,15 @@ async def call_extensions(extension_point: str, agent: "Agent|None" = None, **kw
             for cls in defaults + agentics:
                 unique[_get_file_from_module(cls.__module__)] = cls
 
-            # sort by name
+            # sort by numeric prefix (e.g., _10_, _20_) to respect execution order
             classes = sorted(
                 unique.values(),
-                key=lambda cls: _get_file_from_module(cls.__module__),
+                key=lambda cls: _get_sort_key(_get_file_from_module(cls.__module__)),
             )
 
     # call extensions
     for cls in classes:
         await cls(agent=agent).execute(**kwargs)
-
-
-def _get_file_from_module(module_name: str) -> str:
-    return module_name.split(".")[-1]
 
 
 _cache: dict[str, list[type[Extension]]] = {}
