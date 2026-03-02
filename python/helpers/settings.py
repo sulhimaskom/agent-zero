@@ -198,420 +198,375 @@ def _run_background_task(coro, task_name: str = "background task"):
     return defer.run_in_background(wrapped())
 
 
-def convert_out(settings: Settings) -> SettingsOutput:
-    default_settings = get_default_settings()
+def _create_field(
+    field_id: str,
+    title: str,
+    description: str,
+    field_type: Literal[
+        "text",
+        "number",
+        "select",
+        "range",
+        "textarea",
+        "password",
+        "switch",
+        "button",
+        "html",
+    ],
+    value: Any,
+    **kwargs: Any,
+) -> SettingsField:
+    field: SettingsField = {
+        "id": field_id,
+        "title": title,
+        "description": description,
+        "type": field_type,
+        "value": value,
+    }
+    for key, val in kwargs.items():
+        field[key] = val  # type: ignore[assignment]
+    return field
 
-    # main model section
-    chat_model_fields: list[SettingsField] = []
-    chat_model_fields.append(
-        {
-            "id": "chat_model_provider",
-            "title": "Chat model provider",
-            "description": "Select provider for main chat model used by Agent Zero",
-            "type": "select",
-            "value": settings["chat_model_provider"],
-            "options": cast(list[FieldOption], get_providers("chat")),
-        }
-    )
-    chat_model_fields.append(
-        {
-            "id": "chat_model_name",
-            "title": "Chat model name",
-            "description": "Exact name of model from selected provider",
-            "type": "text",
-            "value": settings["chat_model_name"],
-        }
-    )
 
-    chat_model_fields.append(
-        {
-            "id": "chat_model_api_base",
-            "title": "Chat model API base URL",
-            "description": "API base URL for main chat model. Leave empty for default. Only relevant for Azure, local and custom (other) providers.",
-            "type": "text",
-            "value": settings["chat_model_api_base"],
-        }
-    )
+def _create_text_field(
+    field_id: str,
+    title: str,
+    description: str,
+    value: Any,
+) -> SettingsField:
+    return _create_field(field_id, title, description, "text", value)
 
-    chat_model_fields.append(
-        {
-            "id": "chat_model_ctx_length",
-            "title": "Chat model context length",
-            "description": "Maximum number of tokens in the context window for LLM. System prompt, chat history, RAG and response all count towards this limit.",
-            "type": "number",
-            "value": settings["chat_model_ctx_length"],
-        }
-    )
 
-    chat_model_fields.append(
-        {
-            "id": "chat_model_ctx_history",
-            "title": "Context window space for chat history",
-            "description": "Portion of context window dedicated to chat history visible to the agent. Chat history will automatically be optimized to fit. Smaller size will result in shorter and more summarized history. The remaining space will be used for system prompt, RAG and response.",
-            "type": "range",
-            "min": 0.01,
-            "max": 1,
-            "step": 0.01,
-            "value": settings["chat_model_ctx_history"],
-        }
-    )
+def _create_select_field(
+    field_id: str,
+    title: str,
+    description: str,
+    value: str,
+    options: list[FieldOption],
+) -> SettingsField:
+    return _create_field(field_id, title, description, "select", value, options=options)
 
-    chat_model_fields.append(
-        {
-            "id": "chat_model_vision",
-            "title": "Supports Vision",
-            "description": "Models capable of Vision can for example natively see the content of image attachments.",
-            "type": "switch",
-            "value": settings["chat_model_vision"],
-        }
-    )
 
-    chat_model_fields.append(
-        {
-            "id": "chat_model_rl_requests",
-            "title": "Requests per minute limit",
-            "description": "Limits the number of requests per minute to the chat model. Waits if the limit is exceeded. Set to 0 to disable rate limiting.",
-            "type": "number",
-            "value": settings["chat_model_rl_requests"],
-        }
-    )
+def _create_switch_field(
+    field_id: str,
+    title: str,
+    description: str,
+    value: bool,
+) -> SettingsField:
+    return _create_field(field_id, title, description, "switch", value)
 
-    chat_model_fields.append(
-        {
-            "id": "chat_model_rl_input",
-            "title": "Input tokens per minute limit",
-            "description": "Limits the number of input tokens per minute to the chat model. Waits if the limit is exceeded. Set to 0 to disable rate limiting.",
-            "type": "number",
-            "value": settings["chat_model_rl_input"],
-        }
+
+def _create_number_field(
+    field_id: str,
+    title: str,
+    description: str,
+    value: Any,
+) -> SettingsField:
+    return _create_field(field_id, title, description, "number", value)
+
+
+def _create_range_field(
+    field_id: str,
+    title: str,
+    description: str,
+    value: Any,
+    min_val: float = 0,
+    max_val: float = 100,
+    step: float = 1,
+) -> SettingsField:
+    return _create_field(
+        field_id, title, description, "range", value, min=min_val, max=max_val, step=step
     )
 
-    chat_model_fields.append(
-        {
-            "id": "chat_model_rl_output",
-            "title": "Output tokens per minute limit",
-            "description": "Limits the number of output tokens per minute to the chat model. Waits if the limit is exceeded. Set to 0 to disable rate limiting.",
-            "type": "number",
-            "value": settings["chat_model_rl_output"],
-        }
-    )
 
-    chat_model_fields.append(
-        {
-            "id": "chat_model_kwargs",
-            "title": "Chat model additional parameters",
-            "description": "Any other parameters supported by <a href='https://docs.litellm.ai/docs/set_keys' target='_blank'>LiteLLM</a>. Format is KEY=VALUE on individual lines, like .env file. Value can also contain JSON objects - when unquoted, it is treated as object, number etc., when quoted, it is treated as string.",
-            "type": "textarea",
-            "value": _dict_to_env(settings["chat_model_kwargs"]),
-        }
-    )
+def _create_textarea_field(
+    field_id: str,
+    title: str,
+    description: str,
+    value: Any,
+) -> SettingsField:
+    return _create_field(field_id, title, description, "textarea", value)
 
-    chat_model_section: SettingsSection = {
+
+def _convert_chat_model_fields(settings: Settings) -> SettingsSection:
+    fields: list[SettingsField] = []
+    fields.append(_create_select_field(
+        "chat_model_provider",
+        "Chat model provider",
+        "Select provider for main chat model used by Agent Zero",
+        settings["chat_model_provider"],
+        cast(list[FieldOption], get_providers("chat")),
+    ))
+    fields.append(_create_text_field(
+        "chat_model_name",
+        "Chat model name",
+        "Exact name of model from selected provider",
+        settings["chat_model_name"],
+    ))
+    fields.append(_create_text_field(
+        "chat_model_api_base",
+        "Chat model API base URL",
+        "API base URL for main chat model. Leave empty for default. Only relevant for Azure, local and custom (other) providers.",
+        settings["chat_model_api_base"],
+    ))
+    fields.append(_create_number_field(
+        "chat_model_ctx_length",
+        "Chat model context length",
+        "Maximum number of tokens in the context window for LLM. System prompt, chat history, RAG and response all count towards this limit.",
+        settings["chat_model_ctx_length"],
+    ))
+    fields.append(_create_range_field(
+        "chat_model_ctx_history",
+        "Context window space for chat history",
+        "Portion of context window dedicated to chat history visible to the agent. Chat history will automatically be optimized to fit. Smaller size will result in shorter and more summarized history. The remaining space will be used for system prompt, RAG and response.",
+        settings["chat_model_ctx_history"],
+        min_val=0.01, max_val=1, step=0.01,
+    ))
+    fields.append(_create_switch_field(
+        "chat_model_vision",
+        "Supports Vision",
+        "Models capable of Vision can for example natively see the content of image attachments.",
+        settings["chat_model_vision"],
+    ))
+    fields.append(_create_number_field(
+        "chat_model_rl_requests",
+        "Requests per minute limit",
+        "Limits the number of requests per minute to the chat model. Waits if the limit is exceeded. Set to 0 to disable rate limiting.",
+        settings["chat_model_rl_requests"],
+    ))
+    fields.append(_create_number_field(
+        "chat_model_rl_input",
+        "Input tokens per minute limit",
+        "Limits the number of input tokens per minute to the chat model. Waits if the limit is exceeded. Set to 0 to disable rate limiting.",
+        settings["chat_model_rl_input"],
+    ))
+    fields.append(_create_number_field(
+        "chat_model_rl_output",
+        "Output tokens per minute limit",
+        "Limits the number of output tokens per minute to the chat model. Waits if the limit is exceeded. Set to 0 to disable rate limiting.",
+        settings["chat_model_rl_output"],
+    ))
+    fields.append(_create_textarea_field(
+        "chat_model_kwargs",
+        "Chat model additional parameters",
+        "Any other parameters supported by <a href='https://docs.litellm.ai/docs/set_keys' target='_blank'>LiteLLM</a>. Format is KEY=VALUE on individual lines, like .env file. Value can also contain JSON objects - when unquoted, it is treated as object, number etc., when quoted, it is treated as string.",
+        _dict_to_env(settings["chat_model_kwargs"]),
+    ))
+    return {
         "id": "chat_model",
         "title": "Chat Model",
         "description": "Selection and settings for main chat model used by Agent Zero",
-        "fields": chat_model_fields,
+        "fields": fields,
         "tab": "agent",
     }
 
-    # main model section
-    util_model_fields: list[SettingsField] = []
-    util_model_fields.append(
-        {
-            "id": "util_model_provider",
-            "title": "Utility model provider",
-            "description": "Select provider for utility model used by the framework",
-            "type": "select",
-            "value": settings["util_model_provider"],
-            "options": cast(list[FieldOption], get_providers("chat")),
-        }
-    )
-    util_model_fields.append(
-        {
-            "id": "util_model_name",
-            "title": "Utility model name",
-            "description": "Exact name of model from selected provider",
-            "type": "text",
-            "value": settings["util_model_name"],
-        }
-    )
 
-    util_model_fields.append(
-        {
-            "id": "util_model_api_base",
-            "title": "Utility model API base URL",
-            "description": "API base URL for utility model. Leave empty for default. Only relevant for Azure, local and custom (other) providers.",
-            "type": "text",
-            "value": settings["util_model_api_base"],
-        }
-    )
-
-    util_model_fields.append(
-        {
-            "id": "util_model_rl_requests",
-            "title": "Requests per minute limit",
-            "description": "Limits the number of requests per minute to the utility model. Waits if the limit is exceeded. Set to 0 to disable rate limiting.",
-            "type": "number",
-            "value": settings["util_model_rl_requests"],
-        }
-    )
-
-    util_model_fields.append(
-        {
-            "id": "util_model_rl_input",
-            "title": "Input tokens per minute limit",
-            "description": "Limits the number of input tokens per minute to the utility model. Waits if the limit is exceeded. Set to 0 to disable rate limiting.",
-            "type": "number",
-            "value": settings["util_model_rl_input"],
-        }
-    )
-
-    util_model_fields.append(
-        {
-            "id": "util_model_rl_output",
-            "title": "Output tokens per minute limit",
-            "description": "Limits the number of output tokens per minute to the utility model. Waits if the limit is exceeded. Set to 0 to disable rate limiting.",
-            "type": "number",
-            "value": settings["util_model_rl_output"],
-        }
-    )
-
-    util_model_fields.append(
-        {
-            "id": "util_model_kwargs",
-            "title": "Utility model additional parameters",
-            "description": "Any other parameters supported by <a href='https://docs.litellm.ai/docs/set_keys' target='_blank'>LiteLLM</a>. Format is KEY=VALUE on individual lines, like .env file. Value can also contain JSON objects - when unquoted, it is treated as object, number etc., when quoted, it is treated as string.",
-            "type": "textarea",
-            "value": _dict_to_env(settings["util_model_kwargs"]),
-        }
-    )
-
-    util_model_section: SettingsSection = {
+def _convert_util_model_fields(settings: Settings) -> SettingsSection:
+    fields: list[SettingsField] = []
+    fields.append(_create_select_field(
+        "util_model_provider",
+        "Utility model provider",
+        "Select provider for utility model used by the framework",
+        settings["util_model_provider"],
+        cast(list[FieldOption], get_providers("chat")),
+    ))
+    fields.append(_create_text_field(
+        "util_model_name",
+        "Utility model name",
+        "Exact name of model from selected provider",
+        settings["util_model_name"],
+    ))
+    fields.append(_create_text_field(
+        "util_model_api_base",
+        "Utility model API base URL",
+        "API base URL for utility model. Leave empty for default. Only relevant for Azure, local and custom (other) providers.",
+        settings["util_model_api_base"],
+    ))
+    fields.append(_create_number_field(
+        "util_model_rl_requests",
+        "Requests per minute limit",
+        "Limits the number of requests per minute to the utility model. Waits if the limit is exceeded. Set to 0 to disable rate limiting.",
+        settings["util_model_rl_requests"],
+    ))
+    fields.append(_create_number_field(
+        "util_model_rl_input",
+        "Input tokens per minute limit",
+        "Limits the number of input tokens per minute to the utility model. Waits if the limit is exceeded. Set to 0 to disable rate limiting.",
+        settings["util_model_rl_input"],
+    ))
+    fields.append(_create_number_field(
+        "util_model_rl_output",
+        "Output tokens per minute limit",
+        "Limits the number of output tokens per minute to the utility model. Waits if the limit is exceeded. Set to 0 to disable rate limiting.",
+        settings["util_model_rl_output"],
+    ))
+    fields.append(_create_textarea_field(
+        "util_model_kwargs",
+        "Utility model additional parameters",
+        "Any other parameters supported by <a href='https://docs.litellm.ai/docs/set_keys' target='_blank'>LiteLLM</a>. Format is KEY=VALUE on individual lines, like .env file. Value can also contain JSON objects - when unquoted, it is treated as object, number etc., when quoted, it is treated as string.",
+        _dict_to_env(settings["util_model_kwargs"]),
+    ))
+    return {
         "id": "util_model",
         "title": "Utility model",
         "description": "Smaller, cheaper, faster model for handling utility tasks like organizing memory, preparing prompts, summarizing.",
-        "fields": util_model_fields,
+        "fields": fields,
         "tab": "agent",
     }
 
-    # embedding model section
-    embed_model_fields: list[SettingsField] = []
-    embed_model_fields.append(
-        {
-            "id": "embed_model_provider",
-            "title": "Embedding model provider",
-            "description": "Select provider for embedding model used by the framework",
-            "type": "select",
-            "value": settings["embed_model_provider"],
-            "options": cast(list[FieldOption], get_providers("embedding")),
-        }
-    )
-    embed_model_fields.append(
-        {
-            "id": "embed_model_name",
-            "title": "Embedding model name",
-            "description": "Exact name of model from selected provider",
-            "type": "text",
-            "value": settings["embed_model_name"],
-        }
-    )
 
-    embed_model_fields.append(
-        {
-            "id": "embed_model_api_base",
-            "title": "Embedding model API base URL",
-            "description": "API base URL for embedding model. Leave empty for default. Only relevant for Azure, local and custom (other) providers.",
-            "type": "text",
-            "value": settings["embed_model_api_base"],
-        }
-    )
-
-    embed_model_fields.append(
-        {
-            "id": "embed_model_rl_requests",
-            "title": "Requests per minute limit",
-            "description": "Limits the number of requests per minute to the embedding model. Waits if the limit is exceeded. Set to 0 to disable rate limiting.",
-            "type": "number",
-            "value": settings["embed_model_rl_requests"],
-        }
-    )
-
-    embed_model_fields.append(
-        {
-            "id": "embed_model_rl_input",
-            "title": "Input tokens per minute limit",
-            "description": "Limits the number of input tokens per minute to the embedding model. Waits if the limit is exceeded. Set to 0 to disable rate limiting.",
-            "type": "number",
-            "value": settings["embed_model_rl_input"],
-        }
-    )
-
-    embed_model_fields.append(
-        {
-            "id": "embed_model_kwargs",
-            "title": "Embedding model additional parameters",
-            "description": "Any other parameters supported by <a href='https://docs.litellm.ai/docs/set_keys' target='_blank'>LiteLLM</a>. Format is KEY=VALUE on individual lines, like .env file. Value can also contain JSON objects - when unquoted, it is treated as object, number etc., when quoted, it is treated as string.",
-            "type": "textarea",
-            "value": _dict_to_env(settings["embed_model_kwargs"]),
-        }
-    )
-
-    embed_model_section: SettingsSection = {
+def _convert_embed_model_fields(settings: Settings, default_settings: Settings) -> SettingsSection:
+    fields: list[SettingsField] = []
+    fields.append(_create_select_field(
+        "embed_model_provider",
+        "Embedding model provider",
+        "Select provider for embedding model used by the framework",
+        settings["embed_model_provider"],
+        cast(list[FieldOption], get_providers("embedding")),
+    ))
+    fields.append(_create_text_field(
+        "embed_model_name",
+        "Embedding model name",
+        "Exact name of model from selected provider",
+        settings["embed_model_name"],
+    ))
+    fields.append(_create_text_field(
+        "embed_model_api_base",
+        "Embedding model API base URL",
+        "API base URL for embedding model. Leave empty for default. Only relevant for Azure, local and custom (other) providers.",
+        settings["embed_model_api_base"],
+    ))
+    fields.append(_create_number_field(
+        "embed_model_rl_requests",
+        "Requests per minute limit",
+        "Limits the number of requests per minute to the embedding model. Waits if the limit is exceeded. Set to 0 to disable rate limiting.",
+        settings["embed_model_rl_requests"],
+    ))
+    fields.append(_create_number_field(
+        "embed_model_rl_input",
+        "Input tokens per minute limit",
+        "Limits the number of input tokens per minute to the embedding model. Waits if the limit is exceeded. Set to 0 to disable rate limiting.",
+        settings["embed_model_rl_input"],
+    ))
+    fields.append(_create_textarea_field(
+        "embed_model_kwargs",
+        "Embedding model additional parameters",
+        "Any other parameters supported by <a href='https://docs.litellm.ai/docs/set_keys' target='_blank'>LiteLLM</a>. Format is KEY=VALUE on individual lines, like .env file. Value can also contain JSON objects - when unquoted, it is treated as object, number etc., when quoted, it is treated as string.",
+        _dict_to_env(settings["embed_model_kwargs"]),
+    ))
+    return {
         "id": "embed_model",
         "title": "Embedding Model",
         "description": f"Settings for the embedding model used by Agent Zero.<br><h4>⚠️ No need to change</h4>The default HuggingFace model {default_settings['embed_model_name']} is preloaded and runs locally within the docker container and there's no need to change it unless you have a specific requirements for embedding.",
-        "fields": embed_model_fields,
+        "fields": fields,
         "tab": "agent",
     }
 
-    # embedding model section
-    browser_model_fields: list[SettingsField] = []
-    browser_model_fields.append(
-        {
-            "id": "browser_model_provider",
-            "title": "Web Browser model provider",
-            "description": "Select provider for web browser model used by <a href='https://github.com/browser-use/browser-use' target='_blank'>browser-use</a> framework",
-            "type": "select",
-            "value": settings["browser_model_provider"],
-            "options": cast(list[FieldOption], get_providers("chat")),
-        }
-    )
-    browser_model_fields.append(
-        {
-            "id": "browser_model_name",
-            "title": "Web Browser model name",
-            "description": "Exact name of model from selected provider",
-            "type": "text",
-            "value": settings["browser_model_name"],
-        }
-    )
 
-    browser_model_fields.append(
-        {
-            "id": "browser_model_api_base",
-            "title": "Web Browser model API base URL",
-            "description": "API base URL for web browser model. Leave empty for default. Only relevant for Azure, local and custom (other) providers.",
-            "type": "text",
-            "value": settings["browser_model_api_base"],
-        }
-    )
-
-    browser_model_fields.append(
-        {
-            "id": "browser_model_vision",
-            "title": "Use Vision",
-            "description": "Models capable of Vision can use it to analyze web pages from screenshots. Increases quality but also token usage.",
-            "type": "switch",
-            "value": settings["browser_model_vision"],
-        }
-    )
-
-    browser_model_fields.append(
-        {
-            "id": "browser_model_rl_requests",
-            "title": "Web Browser model rate limit requests",
-            "description": "Rate limit requests for web browser model.",
-            "type": "number",
-            "value": settings["browser_model_rl_requests"],
-        }
-    )
-
-    browser_model_fields.append(
-        {
-            "id": "browser_model_rl_input",
-            "title": "Web Browser model rate limit input",
-            "description": "Rate limit input for web browser model.",
-            "type": "number",
-            "value": settings["browser_model_rl_input"],
-        }
-    )
-
-    browser_model_fields.append(
-        {
-            "id": "browser_model_rl_output",
-            "title": "Web Browser model rate limit output",
-            "description": "Rate limit output for web browser model.",
-            "type": "number",
-            "value": settings["browser_model_rl_output"],
-        }
-    )
-
-    browser_model_fields.append(
-        {
-            "id": "browser_model_kwargs",
-            "title": "Web Browser model additional parameters",
-            "description": "Any other parameters supported by <a href='https://docs.litellm.ai/docs/set_keys' target='_blank'>LiteLLM</a>. Format is KEY=VALUE on individual lines, like .env file. Value can also contain JSON objects - when unquoted, it is treated as object, number etc., when quoted, it is treated as string.",
-            "type": "textarea",
-            "value": _dict_to_env(settings["browser_model_kwargs"]),
-        }
-    )
-
-    browser_model_fields.append(
-        {
-            "id": "browser_http_headers",
-            "title": "HTTP Headers",
-            "description": "HTTP headers to include with all browser requests. Format is KEY=VALUE on individual lines, like .env file. Value can also contain JSON objects - when unquoted, it is treated as object, number etc., when quoted, it is treated as string. Example: Authorization=Bearer token123",
-            "type": "textarea",
-            "value": _dict_to_env(settings.get("browser_http_headers", {})),
-        }
-    )
-
-    browser_model_section: SettingsSection = {
+def _convert_browser_model_fields(settings: Settings) -> SettingsSection:
+    fields: list[SettingsField] = []
+    fields.append(_create_select_field(
+        "browser_model_provider",
+        "Web Browser model provider",
+        "Select provider for web browser model used by <a href='https://github.com/browser-use/browser-use' target='_blank'>browser-use</a> framework",
+        settings["browser_model_provider"],
+        cast(list[FieldOption], get_providers("chat")),
+    ))
+    fields.append(_create_text_field(
+        "browser_model_name",
+        "Web Browser model name",
+        "Exact name of model from selected provider",
+        settings["browser_model_name"],
+    ))
+    fields.append(_create_text_field(
+        "browser_model_api_base",
+        "Web Browser model API base URL",
+        "API base URL for web browser model. Leave empty for default. Only relevant for Azure, local and custom (other) providers.",
+        settings["browser_model_api_base"],
+    ))
+    fields.append(_create_switch_field(
+        "browser_model_vision",
+        "Use Vision",
+        "Models capable of Vision can use it to analyze web pages from screenshots. Increases quality but also token usage.",
+        settings["browser_model_vision"],
+    ))
+    fields.append(_create_number_field(
+        "browser_model_rl_requests",
+        "Web Browser model rate limit requests",
+        "Rate limit requests for web browser model.",
+        settings["browser_model_rl_requests"],
+    ))
+    fields.append(_create_number_field(
+        "browser_model_rl_input",
+        "Web Browser model rate limit input",
+        "Rate limit input for web browser model.",
+        settings["browser_model_rl_input"],
+    ))
+    fields.append(_create_number_field(
+        "browser_model_rl_output",
+        "Web Browser model rate limit output",
+        "Rate limit output for web browser model.",
+        settings["browser_model_rl_output"],
+    ))
+    fields.append(_create_textarea_field(
+        "browser_model_kwargs",
+        "Web Browser model additional parameters",
+        "Any other parameters supported by <a href='https://docs.litellm.ai/docs/set_keys' target='_blank'>LiteLLM</a>. Format is KEY=VALUE on individual lines, like .env file. Value can also contain JSON objects - when unquoted, it is treated as object, number etc., when quoted, it is treated as string.",
+        _dict_to_env(settings["browser_model_kwargs"]),
+    ))
+    fields.append(_create_textarea_field(
+        "browser_http_headers",
+        "HTTP Headers",
+        "HTTP headers to include with all browser requests. Format is KEY=VALUE on individual lines, like .env file. Value can also contain JSON objects - when unquoted, it is treated as object, number etc., when quoted, it is treated as string. Example: Authorization=Bearer token123",
+        _dict_to_env(settings.get("browser_http_headers", {})),
+    ))
+    return {
         "id": "browser_model",
         "title": "Web Browser Model",
         "description": "Settings for the web browser model. Agent Zero uses <a href='https://github.com/browser-use/browser-use' target='_blank'>browser-use</a> agentic framework to handle web interactions.",
-        "fields": browser_model_fields,
+        "fields": fields,
         "tab": "agent",
     }
 
-    # basic auth section
-    auth_fields: list[SettingsField] = []
 
-    auth_fields.append(
-        {
-            "id": "auth_login",
-            "title": "UI Login",
-            "description": "Set user name for web UI",
-            "type": "text",
-            "value": dotenv.get_dotenv_value(dotenv.KEY_AUTH_LOGIN) or "",
-        }
-    )
-
-    auth_fields.append(
-        {
-            "id": "auth_password",
-            "title": "UI Password",
-            "description": "Set user password for web UI",
-            "type": "password",
-            "value": (
-                PASSWORD_PLACEHOLDER if dotenv.get_dotenv_value(dotenv.KEY_AUTH_PASSWORD) else ""
-            ),
-        }
-    )
+def _convert_auth_fields(settings: Settings) -> SettingsSection:
+    fields: list[SettingsField] = []
+    fields.append(_create_text_field(
+        "auth_login",
+        "UI Login",
+        "Set user name for web UI",
+        dotenv.get_dotenv_value(dotenv.KEY_AUTH_LOGIN) or "",
+    ))
+    fields.append({
+        "id": "auth_password",
+        "title": "UI Password",
+        "description": "Set user password for web UI",
+        "type": "password",
+        "value": (
+            PASSWORD_PLACEHOLDER if dotenv.get_dotenv_value(dotenv.KEY_AUTH_PASSWORD) else ""
+        ),
+    })
 
     if runtime.is_dockerized():
-        auth_fields.append(
-            {
-                "id": "root_password",
-                "title": "root Password",
-                "description": "Change linux root password in docker container. This password can be used for SSH access. Original password was randomly generated during setup.",
-                "type": "password",
-                "value": "",
-            }
-        )
+        fields.append({
+            "id": "root_password",
+            "title": "root Password",
+            "description": "Change linux root password in docker container. This password can be used for SSH access. Original password was randomly generated during setup.",
+            "type": "password",
+            "value": "",
+        })
 
-    auth_section: SettingsSection = {
+    return {
         "id": "auth",
         "title": "Authentication",
         "description": "Settings for authentication to use Agent Zero Web UI.",
-        "fields": auth_fields,
+        "fields": fields,
         "tab": "external",
     }
 
-    # api keys model section
-    api_keys_fields: list[SettingsField] = []
 
-    # Collect unique providers from both chat and embedding sections
+def _convert_api_keys_fields(settings: Settings) -> SettingsSection:
+    fields: list[SettingsField] = []
     providers_seen: set[str] = set()
     for p_type in ("chat", "embedding"):
         for provider in get_providers(p_type):
@@ -619,77 +574,215 @@ def convert_out(settings: Settings) -> SettingsOutput:
             if pid_lower in providers_seen:
                 continue
             providers_seen.add(pid_lower)
-            api_keys_fields.append(_get_api_key_field(settings, pid_lower, provider["label"]))
+            fields.append(_get_api_key_field(settings, pid_lower, provider["label"]))
 
-    api_keys_section: SettingsSection = {
+    return {
         "id": "api_keys",
         "title": "API Keys",
         "description": "API keys for model providers and services used by Agent Zero. You can set multiple API keys separated by a comma (,). They will be used in round-robin fashion.<br>For more information abou Agent Zero Venice provider, see <a href='http://agent-zero.ai/?community/api-dashboard/about' target='_blank'>Agent Zero Venice</a>.",
-        "fields": api_keys_fields,
+        "fields": fields,
         "tab": "external",
     }
 
-    # LiteLLM global config section
-    litellm_fields: list[SettingsField] = []
 
-    litellm_fields.append(
-        {
-            "id": "litellm_global_kwargs",
-            "title": "LiteLLM global parameters",
-            "description": "Global LiteLLM params (e.g. timeout, stream_timeout) in .env format: one KEY=VALUE per line. Example: <code>stream_timeout=30</code>. Applied to all LiteLLM calls unless overridden. See <a href='https://docs.litellm.ai/docs/set_keys' target='_blank'>LiteLLM</a> and <a href='https://docs.litellm.ai/docs/proxy/timeout' target='_blank'>timeouts</a>.",
-            "type": "textarea",
-            "value": _dict_to_env(settings["litellm_global_kwargs"]),
-            "style": "height: 12em",
-        }
-    )
-
-    litellm_section: SettingsSection = {
+def _convert_litellm_fields(settings: Settings) -> SettingsSection:
+    fields: list[SettingsField] = []
+    fields.append({
+        "id": "litellm_global_kwargs",
+        "title": "LiteLLM global parameters",
+        "description": "Global LiteLLM params (e.g. timeout, stream_timeout) in .env format: one KEY=VALUE per line. Example: <code>stream_timeout=30</code>. Applied to all LiteLLM calls unless overridden. See <a href='https://docs.litellm.ai/docs/set_keys' target='_blank'>LiteLLM</a> and <a href='https://docs.litellm.ai/docs/proxy/timeout' target='_blank'>timeouts</a>.",
+        "type": "textarea",
+        "value": _dict_to_env(settings["litellm_global_kwargs"]),
+        "style": "height: 12em",
+    })
+    return {
         "id": "litellm",
         "title": "LiteLLM Global Settings",
         "description": "Configure global parameters passed to LiteLLM for all providers.",
-        "fields": litellm_fields,
+        "fields": fields,
         "tab": "external",
     }
 
-    # Agent config section
-    agent_fields: list[SettingsField] = []
 
-    agent_fields.append(
-        {
-            "id": "agent_profile",
-            "title": "Default agent profile",
-            "description": "Subdirectory of /agents folder to be used by default agent no. 0. Subordinate agents can be spawned with other profiles, that is on their superior agent to decide. This setting affects the behaviour of the top level agent you communicate with.",
-            "type": "select",
-            "value": settings["agent_profile"],
-            "options": [
-                {"value": subdir, "label": subdir}
-                for subdir in files.get_subdirectories("agents")
-                if subdir != "_example"
-            ],
-        }
-    )
-
-    agent_fields.append(
-        {
-            "id": "agent_knowledge_subdir",
-            "title": "Knowledge subdirectory",
-            "description": "Subdirectory of /knowledge folder to use for agent knowledge import. 'default' subfolder is always imported and contains framework knowledge.",
-            "type": "select",
-            "value": settings["agent_knowledge_subdir"],
-            "options": [
-                {"value": subdir, "label": subdir}
-                for subdir in files.get_subdirectories("knowledge", exclude="default")
-            ],
-        }
-    )
-
-    agent_section: SettingsSection = {
+def _convert_agent_fields(settings: Settings) -> SettingsSection:
+    fields: list[SettingsField] = []
+    fields.append({
+        "id": "agent_profile",
+        "title": "Default agent profile",
+        "description": "Subdirectory of /agents folder to be used by default agent no. 0. Subordinate agents can be spawned with other profiles, that is on their superior agent to decide. This setting affects the behaviour of the top level agent you communicate with.",
+        "type": "select",
+        "value": settings["agent_profile"],
+        "options": [
+            {"value": subdir, "label": subdir}
+            for subdir in files.get_subdirectories("agents")
+            if subdir != "_example"
+        ],
+    })
+    fields.append({
+        "id": "agent_knowledge_subdir",
+        "title": "Knowledge subdirectory",
+        "description": "Subdirectory of /knowledge folder to use for agent knowledge import. 'default' subfolder is always imported and contains framework knowledge.",
+        "type": "select",
+        "value": settings["agent_knowledge_subdir"],
+        "options": [
+            {"value": subdir, "label": subdir}
+            for subdir in files.get_subdirectories("knowledge", exclude="default")
+        ],
+    })
+    return {
         "id": "agent",
         "title": "Agent Config",
         "description": "Agent parameters.",
-        "fields": agent_fields,
+        "fields": fields,
         "tab": "agent",
     }
+
+
+def _convert_memory_fields(settings: Settings) -> SettingsSection:
+    fields: list[SettingsField] = []
+    fields.append(_create_text_field(
+        "agent_memory_subdir",
+        "Memory Subdirectory",
+        "Subdirectory of /memory folder to use for agent memory storage. Used to separate memory storage between different instances.",
+        settings["agent_memory_subdir"],
+    ))
+    fields.append({
+        "id": "memory_dashboard",
+        "title": "Memory Dashboard",
+        "description": "View and explore all stored memories in a table format with filtering and search capabilities.",
+        "type": "button",
+        "value": "Open Dashboard",
+    })
+    fields.append(_create_switch_field(
+        "memory_recall_enabled",
+        "Memory auto-recall enabled",
+        "Agent Zero will automatically recall memories based on convesation context.",
+        settings["memory_recall_enabled"],
+    ))
+    fields.append(_create_switch_field(
+        "memory_recall_delayed",
+        "Memory auto-recall delayed",
+        "The agent will not wait for auto memory recall. Memories will be delivered one message later. This speeds up agent's response time but may result in less relevant first step.",
+        settings["memory_recall_delayed"],
+    ))
+    fields.append(_create_switch_field(
+        "memory_recall_query_prep",
+        "Auto-recall AI query preparation",
+        "Enables vector DB query preparation from conversation context by utility LLM for auto-recall. Improves search quality, adds 1 utility LLM call per auto-recall.",
+        settings["memory_recall_query_prep"],
+    ))
+    fields.append(_create_switch_field(
+        "memory_recall_post_filter",
+        "Auto-recall AI post-filtering",
+        "Enables memory relevance filtering by utility LLM for auto-recall. Improves search quality, adds 1 utility LLM call per auto-recall.",
+        settings["memory_recall_post_filter"],
+    ))
+    fields.append(_create_range_field(
+        "memory_recall_interval",
+        "Memory auto-recall interval",
+        "Memories are recalled after every user or superior agent message. During agent's monologue, memories are recalled every X turns based on this parameter.",
+        settings["memory_recall_interval"],
+        min_val=1, max_val=10, step=1,
+    ))
+    fields.append(_create_number_field(
+        "memory_recall_history_len",
+        "Memory auto-recall history length",
+        "The length of conversation history passed to memory recall LLM for context (in characters).",
+        settings["memory_recall_history_len"],
+    ))
+    fields.append(_create_range_field(
+        "memory_recall_similarity_threshold",
+        "Memory auto-recall similarity threshold",
+        "The threshold for similarity search in memory recall (0 = no similarity, 1 = exact match).",
+        settings["memory_recall_similarity_threshold"],
+        min_val=0, max_val=1, step=0.01,
+    ))
+    fields.append(_create_number_field(
+        "memory_recall_memories_max_search",
+        "Memory auto-recall max memories to search",
+        "The maximum number of memories returned by vector DB for further processing.",
+        settings["memory_recall_memories_max_search"],
+    ))
+    fields.append(_create_number_field(
+        "memory_recall_memories_max_result",
+        "Memory auto-recall max memories to use",
+        "The maximum number of memories to inject into A0's context window.",
+        settings["memory_recall_memories_max_result"],
+    ))
+    fields.append(_create_number_field(
+        "memory_recall_solutions_max_search",
+        "Memory auto-recall max solutions to search",
+        "The maximum number of solutions returned by vector DB for further processing.",
+        settings["memory_recall_solutions_max_search"],
+    ))
+    fields.append(_create_number_field(
+        "memory_recall_solutions_max_result",
+        "Memory auto-recall max solutions to use",
+        "The maximum number of solutions to inject into A0's context window.",
+        settings["memory_recall_solutions_max_result"],
+    ))
+    fields.append(_create_switch_field(
+        "memory_memorize_enabled",
+        "Auto-memorize enabled",
+        "A0 will automatically memorize facts and solutions from conversation history.",
+        settings["memory_memorize_enabled"],
+    ))
+    fields.append(_create_switch_field(
+        "memory_memorize_consolidation",
+        "Auto-memorize AI consolidation",
+        "A0 will automatically consolidate similar memories using utility LLM. Improves memory quality over time, adds 2 utility LLM calls per memory.",
+        settings["memory_memorize_consolidation"],
+    ))
+    fields.append(_create_range_field(
+        "memory_memorize_replace_threshold",
+        "Auto-memorize replacement threshold",
+        "Only applies when AI consolidation is disabled. Replaces previous similar memories with new ones based on this threshold. 0 = replace even if not similar at all, 1 = replace only if exact match.",
+        settings["memory_memorize_replace_threshold"],
+        min_val=0, max_val=1, step=0.01,
+    ))
+    return {
+        "id": "memory",
+        "title": "Memory",
+        "description": "Configuration of A0's memory system. A0 memorizes and recalls memories automatically to help it's context awareness.",
+        "fields": fields,
+        "tab": "agent",
+    }
+
+
+def _convert_dev_fields(settings: Settings) -> SettingsSection:
+    fields: list[SettingsField] = []
+    fields.append({
+        "id": "shell_interface",
+        "title": "Shell Interface",
+        "description": f"Terminal interface used for Code Execution Tool. Local Python TTY works locally in both dockerized and development environments. SSH always connects to dockerized environment (automatically at {Config.DEFAULT_HOSTNAME} or RFC host address).",
+        "type": "select",
+        "value": settings["shell_interface"],
+        "options": [
+            {"value": "local", "label": "Local Python TTY"},
+            {"value": "ssh", "label": "SSH"},
+        ],
+    })
+    return {
+        "id": "dev",
+        "title": "Developer",
+        "description": "Developer settings",
+        "fields": fields,
+        "tab": "dev",
+    }
+
+
+def convert_out(settings: Settings) -> SettingsOutput:
+    default_settings = get_default_settings()
+
+    chat_model_section = _convert_chat_model_fields(settings)
+    util_model_section = _convert_util_model_fields(settings)
+    embed_model_section = _convert_embed_model_fields(settings, default_settings)
+    browser_model_section = _convert_browser_model_fields(settings)
+
+    auth_section = _convert_auth_fields(settings)
+    api_keys_section = _convert_api_keys_fields(settings)
+    litellm_section = _convert_litellm_fields(settings)
+    agent_section = _convert_agent_fields(settings)
 
     memory_fields: list[SettingsField] = []
 
