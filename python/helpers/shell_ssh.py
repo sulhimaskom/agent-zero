@@ -29,6 +29,7 @@ class SSHInteractiveSession:
         self.port = port
         self.username = username
         self.password = password
+        self.client = paramiko.SSHClient()
         # Load system host keys for verification
         self.client.load_system_host_keys()
         # SECURITY: Use RejectPolicy to prevent MITM attacks
