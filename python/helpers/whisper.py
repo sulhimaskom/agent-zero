@@ -101,5 +101,5 @@ async def _transcribe(model_name: str, audio_bytes_b64: str):
     finally:
         try:
             os.remove(temp_path)
-        except Exception as e:
+        except Exception:
             pass  # ignore errors during cleanup
