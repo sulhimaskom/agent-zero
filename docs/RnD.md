@@ -1,3 +1,37 @@
+#YQ|## 2026-03-02
+#MM|
+#NM|### Bare Exception Handlers in python/helpers/ - FIXED ✅
+#QT|
+#HV|**Problem**:
+#QT|- 8 bare `except Exception:` handlers found in 6 python/helpers/ files
+#QT|- Previous R&D work fixed most bare exceptions but missed these
+#QT|
+#VP|**Root Cause**:
+#BY|- Exception handlers written without capturing the exception object
+#XJ|- Makes debugging difficult as exception details are lost
+#QT|
+#WR|**Solution Applied**:
+#QT|- strings.py line 203: Changed to `except Exception as e:`
+#QT|- vector_db.py line 117: Changed to `except Exception as e:`
+#QT|- files.py line 540: Changed to `except Exception as e:`
+#QT|- git.py lines 34, 56: Changed to `except Exception as e:`
+#QT|- whisper.py line 104: Changed to `except Exception as e:`
+#QT|- fasta2a_client.py lines 79, 138: Changed to `except Exception as e:`
+#QT|
+#YR|**Files Changed**:
+#QT|- `python/helpers/strings.py` (+1 line)
+#QT|- `python/helpers/vector_db.py` (+1 line)
+#QT|- `python/helpers/files.py` (+1 line)
+#QT|- `python/helpers/git.py` (+2 lines)
+#QT|- `python/helpers/whisper.py` (+1 line)
+#QT|- `python/helpers/fasta2a_client.py` (+2 lines)
+#QT|
+#YX|**Verification**:
+#QT|- Python syntax validated: ✅
+#QT|
+#HZ|**Status**: Changes pushed to custom branch. PR #605 created.
+#QT|
+#MW|---
 ## 2026-03-01
 
 ### Issue #595: Bare Exception Handlers in extract_tools.py and print_style.py - FIXED ✅
