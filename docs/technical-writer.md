@@ -235,6 +235,16 @@ WB|#XZ|
 #HM|- **Files Updated:** AGENTS.md (7 locations)
 #HM|- **Status:** ✅ Completed 2026-03-02
 
+### 28. DONE: Fix AGENTS.md Statistics - Update Current Counts
+- **Issue:** AGENTS.md had outdated statistics
+- **Fix:** Corrected statistics:
+  - Prompt files: 96 → 97 (line 190)
+  - Python files: ~100 → 197 (lines 112, 188, 225, 316)
+  - Test files: 48 → 51 (lines 112, 225, 316)
+  - JavaScript files: 587 → 593 (line 189, 316)
+- **Files Updated:** AGENTS.md (multiple locations)
+- **Status:** ✅ Completed 2026-03-02
+
 ## Future Improvements (Backlog)
 
 ### High Priority

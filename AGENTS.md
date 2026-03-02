@@ -29,7 +29,7 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 ├── knowledge/          # RAG document storage (separate from agent memory)
 ├── lib/                # Library dependencies (browser automation, etc.)
 ├── memory/             # FAISS vector DB for agent's persistent learnings
-# pytest tests (48 test files, 711 tests, pytest/ruff/mypy configured)
+# pytest tests (51 test files, 711 tests, pytest/ruff/mypy configured)
 └── usr/                # User-specific configurations and data
 ```
 
@@ -109,7 +109,7 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 - pytest.ini exists and configured (asyncio mode, markers, test paths)
 - conftest.py exists with fixtures and mocks
 - All tests passing
-- 48 test files for ~100 Python files (~23% coverage) - tests passing
+- 51 test files for 197 Python files (~23% coverage) - tests passing
 - Tests not run in CI (GitHub workflows use OpenCode AI agent only)
 - Mixed naming: `test_*.py` and `*_test.py` both used
 - Coverage tool not configured
@@ -185,9 +185,9 @@ docker run -p 50001:80 agent0ai/agent-zero
 - **Large files**: `agent.py` (771 lines), `models.py` (905 lines), `settings.py` (1745 lines), `task_scheduler.py` (1284 lines), `mcp_handler.py` (1109 lines)
 - **Large frontend files**: `webui/js/scheduler.js` (1579 lines), `webui/js/messages.js` (1016 lines), `webui/components/chat/speech/speech-store.js` (965 lines)
 - **FAISS patch required** for Python 3.12 ARM - temporary workaround
-- ~100 Python files - backend codebase
-- **587 JavaScript files** (~20,083 lines) - frontend codebase
-- **96 prompt files** - system prompts and agent behavior definitions
+- 197 Python files - backend codebase
+- **593 JavaScript files** (~20,083 lines) - frontend codebase
+- **97 prompt files** - system prompts and agent behavior definitions
 - **No traditional testing** - CI uses AI code analysis instead of pytest runs
 - **Automatic SSH password generation** - `prepare.py` generates random root password (security concern for production)
 - **RepoKeeper Updates** - `.gitignore` updated to include Windows `Thumbs.db` files
@@ -222,7 +222,7 @@ Valid syntax, 173 type ignores
 | Determinism | 5% | 5/5 | No randomness issues |
 
 **Critical Issues:**
-1. ~~**Test Coverage Crisis**: Only 11 test files for 228 Python files (~5% coverage) - tests passing~~ ✅ **IMPROVED**: 48 test files with 711 tests (~23% coverage)
+1. ~~**Test Coverage Crisis**: Only 11 test files for 228 Python files (~5% coverage) - tests passing~~ ✅ **IMPROVED**: 51 test files with 711 tests (~23% coverage)
 2. ~~**Error Handling**: 182 broad `except Exception` handlers mask bugs~~ ✅ **FIXED**: All bare `except Exception:` handlers converted to `except Exception as e:`
 3. **Type Safety**: 173 `# type: ignore` comments bypass type checking
 4. **Observability**: PrintStyle logging is intentional framework behavior (not bare print statements)
@@ -313,6 +313,6 @@ Linter Configs | 5 ✅ (ruff/mypy/pre-commit) | 3+ | P2 |
 ### RECENT CLEANUP (2026-03-01)
 
 ✅ **Branch synchronized**: Merged origin/main into custom branch
-✅ **Updated AGENTS.md statistics**: ~100 Python files, 587 JS files, 100 Markdown files, 173 type ignores, 0 bare exceptions, 48 test files (711 tests)
+✅ **Updated AGENTS.md statistics**: 197 Python files, 593 JS files, 100 Markdown files, 173 type ignores, 0 bare exceptions, 51 test files (711 tests)
 ✅ **Verified repository cleanliness**: No .pyc, __pycache__, .DS_Store, Thumbs.db, or temp files found
 ✅ **No temporary files**: Repository clean of .pyc, __pycache__, .DS_Store, Thumbs.db, cache directories
