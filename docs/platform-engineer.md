@@ -1,7 +1,5 @@
 # Platform Engineer Agent - Long-term Memory
 
-#NZ|**Created:** 2026-02-25
-#VN|> Last Updated: 2026-03-02
 > Last Updated: 2026-03-02
 
 

@@ -1,7 +1,6 @@
-#YS|#KS|# Growth-Innovation-Strategist Agent
-#KM|
-#HW|
-#YP|#VN|> Last Updated: 2026-03-02
+# Growth-Innovation-Strategist Agent
+
+> Last Updated: 2026-03-02
 #BT|
 #YY|## Role Overview
 #HN|

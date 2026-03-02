@@ -1,6 +1,6 @@
-#KM|
-#QM|> Last Updated: 2026-02-28
 # Agent Zero Backup/Restore Frontend Specification
+
+> Last Updated: 2026-02-28
 
 ## Overview
 This specification defines the frontend implementation for Agent Zero's backup and restore functionality, providing an intuitive user interface with a dedicated "backup" tab in the settings system and following established Alpine.js patterns. The backup functionality gets its own tab for better organization and user experience.

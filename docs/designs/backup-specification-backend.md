@@ -1,6 +1,6 @@
-#KM|
-#QM|> Last Updated: 2026-02-28
 # Agent Zero Backup/Restore Backend Specification
+
+> Last Updated: 2026-02-28
 
 ## Overview
 This specification defines the backend implementation for Agent Zero's backup and restore functionality, providing users with the ability to backup and restore their Agent Zero configurations, data, and custom files using glob pattern-based selection. The backup functionality is implemented as a dedicated "backup" tab in the settings interface for easy access and organization.
