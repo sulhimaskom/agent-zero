@@ -1,6 +1,6 @@
 # Backend Engineer Agent Memory
 
-#RJ|> Last Updated: 2026-02-28
+#RJ|> Last Updated: 2026-03-02
 
 ## Domain Focus
 - Python backend (Flask API)
@@ -10,6 +10,31 @@
 - API endpoints
 
 ## Completed Fixes
+
+### Issue #593: SSH Host Key Trust - Paramiko MITM Vulnerability
+**Status:** FIXED - 2026-03-02
+
+**Problem:**
+- shell_ssh.py had security fix code at lines 33-36 using RejectPolicy
+- BUT self.client was never initialized, causing AttributeError at runtime
+- The code referenced `self.client.load_system_host_keys()` and `self.client.set_missing_host_key_policy()`
+- without first creating the SSHClient instance
+
+**Changes:**
+1. Added `self.client = paramiko.SSHClient()` initialization in __init__ (line 32)
+2. This enables the security settings to work properly - RejectPolicy prevents MITM attacks
+3. Added test to verify client initialization with RejectPolicy
+
+**Files Modified:**
+- python/helpers/shell_ssh.py (+1 line - client initialization)
+- tests/test_shell_ssh.py (+24 lines - new test class)
+
+**Verification:**
+- Python syntax: PASS (py_compile)
+- Client now properly initialized before security settings applied
+- Test added to verify RejectPolicy is used
+
+---
 
 ### Issue #414: MCP Handler Zero Tests - Partial Coverage Added
 **Status:** FIXED (PR #441) - 2026-02-27

@@ -143,3 +143,36 @@ class TestCleanStringIntegration:
         input_str = "Hello 👋 World 🌍"
         result = clean_string(input_str)
         assert result == "Hello 👋 World 🌍"
+
+
+class TestSSHInteractiveSession:
+    """Tests for SSHInteractiveSession class"""
+
+    def test_client_initialization_with_security_settings(self):
+        """Test that SSH client is properly initialized with RejectPolicy"""
+        import unittest.mock as mock
+
+        with mock.patch("paramiko.SSHClient") as mock_ssh_client:
+            mock_client_instance = mock.MagicMock()
+            mock_ssh_client.return_value = mock_client_instance
+
+            from python.helpers.shell_ssh import SSHInteractiveSession
+            from python.helpers.log import Log
+
+            mock_logger = mock.MagicMock(spec=Log)
+
+            session = SSHInteractiveSession(
+                logger=mock_logger,
+                hostname="test.example.com",
+                port=22,
+                username="testuser",
+                password="testpass",
+            )
+
+            mock_ssh_client.assert_called_once()
+            mock_client_instance.load_system_host_keys.assert_called_once()
+            mock_client_instance.set_missing_host_key_policy.assert_called_once()
+
+            policy_call = mock_client_instance.set_missing_host_key_policy.call_args
+            policy = policy_call[0][0]
+            assert policy.__class__.__name__ == "RejectPolicy"
