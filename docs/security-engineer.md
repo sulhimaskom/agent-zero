@@ -485,3 +485,42 @@ Added extension whitelist and MIME type validation:
 - Consistent with `attachment_manager.py` and `file_browser.py` patterns
 - Uses allowlist approach (secure by default)
 
+---
+
+## 2026-03-02: API Authentication Audit - Config Validation Endpoint
+
+**Issue**: #592 - 10+ API Endpoints Disable Authentication - Partially Fixed
+**Date Fixed**: 2026-03-02
+**Severity**: MEDIUM (Authentication Bypass)
+**Files Changed**: 
+- `python/api/config_validation.py`
+
+**Vulnerability**: 
+The config_validation endpoint was accessible without any authentication (no web session, no API key). This exposed sensitive configuration data including internal settings, environment variables, and system configuration.
+
+**Solution**:
+Added `requires_api_key()` returning `True` to `config_validation.py`:
+- Endpoint now requires API key authentication
+- API key can be provided via `X-API-Key` header or `api_key` in request body
+- Uses the same `mcp_server_token` setting as other API endpoints
+
+**Analysis Summary**:
+After auditing all endpoints mentioned in Issue #592:
+
+| Endpoint | Auth Status | Assessment |
+|----------|-------------|------------|
+| api_message.py | requires_api_key=True | ✅ Protected |
+| api_log_get.py | requires_api_key=True | ✅ Protected |
+| api_files_get.py | requires_api_key=True | ✅ Protected |
+| api_reset_chat.py | requires_api_key=True | ✅ Protected |
+| api_terminate_chat.py | requires_api_key=True | ✅ Protected |
+| backup_*.py | requires_auth=True | ✅ Protected (web auth) |
+| health.py | Public | ✅ Acceptable (load balancers) |
+| csrf_token.py | Public | ✅ Acceptable (chicken-egg) |
+| scheduler_tick.py | requires_loopback=True | ✅ Protected (localhost) |
+| config_validation.py | NOW REQUIRES_API_KEY | ✅ Fixed |
+
+**Testing**:
+- Python syntax validation passed
+- No breaking changes - API key is additive security
+
