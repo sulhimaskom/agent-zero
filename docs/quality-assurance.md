@@ -2,6 +2,20 @@
 
 > Last Updated: 2026-03-02
 
+### 2026-03-02: Fix Upload Security Tests + Security Bug Fix
+- **Files Modified**: 
+  - `tests/test_upload_security.py`
+  - `python/api/upload.py`
+- **Changes**:
+  - Fixed test initialization: Added mock Flask app and thread_lock arguments to allow UploadFile instantiation in tests
+  - Security fix: Added check to block filenames that are only an extension (e.g., `.pdf`) - prevents potential bypass of validation
+- **Verification**:
+  - pytest: 940 passed (+14 tests fixed)
+  - Upload security tests: 14/14 pass
+- **Impact**: 
+  - Test suite improved: 14 previously failing tests now pass
+  - Security improved: Files with no name before extension are now blocked
+
 ### 2026-03-02: Add test coverage for rfc.py module
 - **Files Created**: `tests/test_rfc.py`
 - **Changes**:

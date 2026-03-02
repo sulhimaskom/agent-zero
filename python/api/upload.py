@@ -85,6 +85,11 @@ class UploadFile(ApiHandler):
         """
         if not filename or "." not in filename:
             return False
+        # SECURITY: Block files that are only extension (no actual filename)
+        # e.g., ".pdf" - this could be used to bypass validation
+        name_part = filename.rsplit(".", 1)[0]
+        if not name_part:
+            return False
         ext = filename.rsplit(".", 1)[1].lower()
         return ext in self.ALLOWED_EXTENSIONS
 

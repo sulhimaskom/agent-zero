@@ -7,7 +7,7 @@ These tests verify the file upload security fixes:
 """
 
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import MagicMock, Mock
 
 from python.api.upload import UploadFile
 
@@ -17,7 +17,10 @@ class TestUploadFileAllowedFile(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        self.handler = UploadFile()
+        # Create mock Flask app and thread_lock
+        mock_app = Mock()
+        mock_thread_lock = MagicMock()
+        self.handler = UploadFile(mock_app, mock_thread_lock)
 
     # Tests for allowed extensions (should pass)
 
@@ -103,7 +106,9 @@ class TestUploadFileMimeType(unittest.TestCase):
 
     def setUp(self):
         """Set up test fixtures."""
-        self.handler = UploadFile()
+        mock_app = Mock()
+        mock_thread_lock = MagicMock()
+        self.handler = UploadFile(mock_app, mock_thread_lock)
 
     def test_validate_mime_type_image(self):
         """Test allowed image MIME types."""
