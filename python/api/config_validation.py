@@ -14,6 +14,10 @@ class ConfigValidation(ApiHandler):
         return False
 
     @classmethod
+    def requires_api_key(cls) -> bool:
+        return True
+
+    @classmethod
     def get_methods(cls) -> list[str]:
         return ["GET", "POST"]
 
