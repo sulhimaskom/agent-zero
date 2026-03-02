@@ -20,7 +20,7 @@ class TestGetGitInfo:
         mock_repo.head.commit.committed_date = 1704067200
         mock_repo.git.describe.return_value = "v1.0.0"
         mock_repo_class.return_value = mock_repo
-        
+
         result = git.get_git_info()
         assert isinstance(result, dict)
 
@@ -35,7 +35,7 @@ class TestGetGitInfo:
         mock_repo.head.commit.committed_date = 1704067200
         mock_repo.git.describe.return_value = "v1.0.0"
         mock_repo_class.return_value = mock_repo
-        
+
         result = git.get_git_info()
         assert "branch" in result
 
@@ -50,7 +50,7 @@ class TestGetGitInfo:
         mock_repo.head.commit.committed_date = 1704067200
         mock_repo.git.describe.return_value = "v1.0.0"
         mock_repo_class.return_value = mock_repo
-        
+
         result = git.get_git_info()
         assert "commit_hash" in result
 
@@ -65,7 +65,7 @@ class TestGetGitInfo:
         mock_repo.head.commit.committed_date = 1704067200
         mock_repo.git.describe.return_value = "v1.0.0"
         mock_repo_class.return_value = mock_repo
-        
+
         result = git.get_git_info()
         assert "commit_time" in result
 
@@ -80,7 +80,7 @@ class TestGetGitInfo:
         mock_repo.head.commit.committed_date = 1704067200
         mock_repo.git.describe.return_value = "v1.0.0"
         mock_repo_class.return_value = mock_repo
-        
+
         result = git.get_git_info()
         assert "tag" in result
 
@@ -95,7 +95,7 @@ class TestGetGitInfo:
         mock_repo.head.commit.committed_date = 1704067200
         mock_repo.git.describe.return_value = "v1.0.0"
         mock_repo_class.return_value = mock_repo
-        
+
         result = git.get_git_info()
         assert "version" in result
 
@@ -105,7 +105,7 @@ class TestGetGitInfo:
         mock_repo = MagicMock()
         mock_repo.bare = True
         mock_repo_class.return_value = mock_repo
-        
+
         with pytest.raises(ValueError, match="bare"):
             git.get_git_info()
 
@@ -124,7 +124,7 @@ class TestGetVersion:
         mock_repo.head.commit.committed_date = 1704067200
         mock_repo.git.describe.return_value = "v1.0.0"
         mock_repo_class.return_value = mock_repo
-        
+
         result = git.get_version()
         assert isinstance(result, str)
 
@@ -139,7 +139,7 @@ class TestGetVersion:
         mock_repo.head.commit.committed_date = 1704067200
         mock_repo.git.describe.return_value = "v1.0.0"
         mock_repo_class.return_value = mock_repo
-        
+
         result = git.get_version()
         assert len(result) > 0
 

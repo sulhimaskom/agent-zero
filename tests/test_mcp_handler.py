@@ -3,6 +3,7 @@
 These tests verify the core utility functions in the MCP handler.
 Due to pydantic mocking in conftest.py, we only test pure functions.
 """
+
 import pytest
 
 from python.helpers.mcp_handler import (
@@ -62,7 +63,10 @@ class TestDetermineServerType:
     def test_determine_server_type_stdio(self):
         """Test stdio type detection"""
         assert _determine_server_type({"command": "npx"}) == "MCPServerLocal"
-        assert _determine_server_type({"command": "python", "args": ["-m", "server"]}) == "MCPServerLocal"
+        assert (
+            _determine_server_type({"command": "python", "args": ["-m", "server"]})
+            == "MCPServerLocal"
+        )
 
     def test_determine_server_type_explicit_sse(self):
         """Test explicit SSE type"""

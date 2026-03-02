@@ -123,6 +123,7 @@ create_mock_module("markdown")
 create_mock_module("pytz")
 tiktoken_mock = create_mock_module("tiktoken")
 
+
 # Properly mock get_encoding to return a working encoder
 class MockEncoding:
     def encode(self, text, disallowed_special=()):
@@ -130,7 +131,7 @@ class MockEncoding:
             return []
         # Simple word-based approximation
         return list(range(len(text.split())))
-    
+
     def encode_batch(self, texts, disallowed_special=()):
         return [self.encode(t, disallowed_special) for t in texts]
 
@@ -140,9 +141,7 @@ def mock_get_encoding(encoding_name):
 
 
 tiktoken_mock.get_encoding = mock_get_encoding
-tiktoken_mock.encoding_for_model = MagicMock(
-    return_value=MockEncoding()
-)
+tiktoken_mock.encoding_for_model = MagicMock(return_value=MockEncoding())
 
 
 def mock_encode(text):

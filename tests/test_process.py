@@ -127,10 +127,10 @@ def run_tests():
         failed += 1
 
     # Summary
-    print(f"\n{'='*50}")
+    print(f"\n{'=' * 50}")
     print(f"Tests passed: {passed}")
     print(f"Tests failed: {failed}")
-    print(f"{'='*50}")
+    print(f"{'=' * 50}")
 
     return failed == 0
 

@@ -35,13 +35,13 @@ class TestProviderManager:
         ProviderManager._raw = None
         ProviderManager._options = None
 
-        with patch('python.helpers.providers.files.get_abs_path') as mock_path, \
-             patch('builtins.open', MagicMock()), \
-             patch('yaml.safe_load') as mock_yaml:
+        with (
+            patch("python.helpers.providers.files.get_abs_path") as mock_path,
+            patch("builtins.open", MagicMock()),
+            patch("yaml.safe_load") as mock_yaml,
+        ):
             mock_path.return_value = "/fake/path"
-            mock_yaml.return_value = {
-                "chat": [{"id": "openai", "name": "OpenAI"}]
-            }
+            mock_yaml.return_value = {"chat": [{"id": "openai", "name": "OpenAI"}]}
             instance1 = ProviderManager.get_instance()
             instance2 = ProviderManager.get_instance()
             assert instance1 is instance2
@@ -51,15 +51,12 @@ class TestProviderManager:
         # Reset for testing
         ProviderManager._instance = None
         ProviderManager._raw = {
-            "chat": [
-                {"id": "openai", "name": "OpenAI"},
-                {"id": "anthropic", "name": "Anthropic"}
-            ]
+            "chat": [{"id": "openai", "name": "OpenAI"}, {"id": "anthropic", "name": "Anthropic"}]
         }
         ProviderManager._options = {
             "chat": [
                 {"value": "openai", "label": "OpenAI"},
-                {"value": "anthropic", "label": "Anthropic"}
+                {"value": "anthropic", "label": "Anthropic"},
             ]
         }
 
@@ -84,11 +81,7 @@ class TestProviderManager:
     def test_get_raw_providers(self):
         """Test get_raw_providers returns raw provider data"""
         ProviderManager._instance = None
-        ProviderManager._raw = {
-            "chat": [
-                {"id": "openai", "name": "OpenAI", "api_key": "test-key"}
-            ]
-        }
+        ProviderManager._raw = {"chat": [{"id": "openai", "name": "OpenAI", "api_key": "test-key"}]}
         ProviderManager._options = {}
 
         manager = ProviderManager.get_instance()
@@ -113,9 +106,7 @@ class TestProviderManager:
         """Test get_provider_config returns config for existing provider"""
         ProviderManager._instance = None
         ProviderManager._raw = {
-            "chat": [
-                {"id": "openai", "name": "OpenAI", "api_base": "https://api.openai.com"}
-            ]
+            "chat": [{"id": "openai", "name": "OpenAI", "api_base": "https://api.openai.com"}]
         }
         ProviderManager._options = {}
 
@@ -129,11 +120,7 @@ class TestProviderManager:
     def test_get_provider_config_case_insensitive(self):
         """Test get_provider_config is case insensitive"""
         ProviderManager._instance = None
-        ProviderManager._raw = {
-            "chat": [
-                {"id": "OpenAI", "name": "OpenAI"}
-            ]
-        }
+        ProviderManager._raw = {"chat": [{"id": "OpenAI", "name": "OpenAI"}]}
         ProviderManager._options = {}
 
         manager = ProviderManager.get_instance()
@@ -145,11 +132,7 @@ class TestProviderManager:
     def test_get_provider_config_not_found(self):
         """Test get_provider_config returns None for non-existent provider"""
         ProviderManager._instance = None
-        ProviderManager._raw = {
-            "chat": [
-                {"id": "openai", "name": "OpenAI"}
-            ]
-        }
+        ProviderManager._raw = {"chat": [{"id": "openai", "name": "OpenAI"}]}
         ProviderManager._options = {}
 
         manager = ProviderManager.get_instance()
@@ -160,11 +143,7 @@ class TestProviderManager:
     def test_get_provider_config_uses_value_fallback(self):
         """Test get_provider_config falls back to 'value' if 'id' not present"""
         ProviderManager._instance = None
-        ProviderManager._raw = {
-            "chat": [
-                {"value": "openai", "name": "OpenAI"}
-            ]
-        }
+        ProviderManager._raw = {"chat": [{"value": "openai", "name": "OpenAI"}]}
         ProviderManager._options = {}
 
         manager = ProviderManager.get_instance()
@@ -182,14 +161,10 @@ class TestProviderConvenienceFunctions:
         # Reset singleton
         ProviderManager._instance = None
         ProviderManager._raw = {
-            "embedding": [
-                {"id": "sentence-transformers", "name": "Sentence Transformers"}
-            ]
+            "embedding": [{"id": "sentence-transformers", "name": "Sentence Transformers"}]
         }
         ProviderManager._options = {
-            "embedding": [
-                {"value": "sentence-transformers", "label": "Sentence Transformers"}
-            ]
+            "embedding": [{"value": "sentence-transformers", "label": "Sentence Transformers"}]
         }
 
         result = get_providers("embedding")
@@ -201,11 +176,7 @@ class TestProviderConvenienceFunctions:
         """Test the get_raw_providers convenience function"""
         # Reset singleton
         ProviderManager._instance = None
-        ProviderManager._raw = {
-            "chat": [
-                {"id": "test", "name": "Test"}
-            ]
-        }
+        ProviderManager._raw = {"chat": [{"id": "test", "name": "Test"}]}
         ProviderManager._options = {}
 
         result = get_raw_providers("chat")
@@ -216,11 +187,7 @@ class TestProviderConvenienceFunctions:
         """Test the get_provider_config convenience function"""
         # Reset singleton
         ProviderManager._instance = None
-        ProviderManager._raw = {
-            "chat": [
-                {"id": "test-provider", "name": "Test Provider"}
-            ]
-        }
+        ProviderManager._raw = {"chat": [{"id": "test-provider", "name": "Test Provider"}]}
         ProviderManager._options = {}
 
         result = get_provider_config("chat", "test-provider")
@@ -238,9 +205,11 @@ class TestProviderManagerLoading:
         ProviderManager._raw = None
         ProviderManager._options = None
 
-        with patch('python.helpers.providers.files.get_abs_path') as mock_path, \
-             patch('builtins.open', MagicMock()), \
-             patch('yaml.safe_load') as mock_yaml:
+        with (
+            patch("python.helpers.providers.files.get_abs_path") as mock_path,
+            patch("builtins.open", MagicMock()),
+            patch("yaml.safe_load") as mock_yaml,
+        ):
             mock_path.return_value = "/fake/path"
             mock_yaml.return_value = {}
             manager = ProviderManager()
@@ -253,16 +222,15 @@ class TestProviderManagerLoading:
         ProviderManager._raw = None
         ProviderManager._options = None
 
-        with patch('python.helpers.providers.files.get_abs_path') as mock_path, \
-             patch('builtins.open', MagicMock()), \
-             patch('yaml.safe_load') as mock_yaml:
+        with (
+            patch("python.helpers.providers.files.get_abs_path") as mock_path,
+            patch("builtins.open", MagicMock()),
+            patch("yaml.safe_load") as mock_yaml,
+        ):
             mock_path.return_value = "/fake/path"
             # New dict format
             mock_yaml.return_value = {
-                "chat": {
-                    "openai": {"name": "OpenAI"},
-                    "anthropic": {"name": "Anthropic"}
-                }
+                "chat": {"openai": {"name": "OpenAI"}, "anthropic": {"name": "Anthropic"}}
             }
             manager = ProviderManager()
 
@@ -281,16 +249,14 @@ class TestProviderManagerLoading:
         ProviderManager._raw = None
         ProviderManager._options = None
 
-        with patch('python.helpers.providers.files.get_abs_path') as mock_path, \
-             patch('builtins.open', MagicMock()), \
-             patch('yaml.safe_load') as mock_yaml:
+        with (
+            patch("python.helpers.providers.files.get_abs_path") as mock_path,
+            patch("builtins.open", MagicMock()),
+            patch("yaml.safe_load") as mock_yaml,
+        ):
             mock_path.return_value = "/fake/path"
             # Legacy list format
-            mock_yaml.return_value = {
-                "chat": [
-                    {"id": "openai", "name": "OpenAI"}
-                ]
-            }
+            mock_yaml.return_value = {"chat": [{"id": "openai", "name": "OpenAI"}]}
             manager = ProviderManager()
 
             assert "chat" in manager._raw

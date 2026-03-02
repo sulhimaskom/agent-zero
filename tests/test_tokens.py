@@ -86,9 +86,7 @@ class TestTrimToTokens:
     def test_custom_ellipsis(self):
         """Test custom ellipsis character"""
         text = "This is a very long string that should be trimmed"
-        result = trim_to_tokens(
-            text, max_tokens=5, direction="start", ellipsis="***"
-        )
+        result = trim_to_tokens(text, max_tokens=5, direction="start", ellipsis="***")
         # direction="start" keeps start, adds ellipsis at end
         assert result.endswith("***")
         assert result.startswith("This")

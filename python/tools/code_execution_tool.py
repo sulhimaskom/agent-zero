@@ -76,9 +76,7 @@ class CodeExecution(Tool):
         elif runtime == "nodejs":
             response = await self.execute_nodejs_code(code=code, session=session)
         elif runtime == "terminal":
-            response = await self.execute_terminal_command(
-                command=code, session=session
-            )
+            response = await self.execute_terminal_command(command=code, session=session)
         elif runtime == "output":
             response = await self.get_terminal_output(session=session, timeouts=OUTPUT_TIMEOUTS)
         elif runtime == "reset":

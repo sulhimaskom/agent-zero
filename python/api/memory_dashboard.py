@@ -154,7 +154,7 @@ class MemoryDashboard(ApiHandler):
             }
 
         except Exception as e:
-            PrintStyle.debug(f"Failed to get current memory subdir: {e}")
+            PrintStyle.warning(f"Failed to get current memory subdir: {e}")
             return {
                 "success": True,  # Still success, just fallback to default
                 "memory_subdir": "default",

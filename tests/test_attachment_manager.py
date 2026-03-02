@@ -1,4 +1,5 @@
 """Tests for attachment_manager.py module."""
+
 import os
 import tempfile
 import unittest
@@ -18,6 +19,7 @@ class TestAttachmentManager(unittest.TestCase):
     def tearDown(self):
         """Clean up test fixtures."""
         import shutil
+
         if os.path.exists(self.temp_dir):
             shutil.rmtree(self.temp_dir)
 
@@ -159,6 +161,7 @@ class TestAttachmentManagerEdgeCases(unittest.TestCase):
     def tearDown(self):
         """Clean up test fixtures."""
         import shutil
+
         if os.path.exists(self.temp_dir):
             shutil.rmtree(self.temp_dir)
 

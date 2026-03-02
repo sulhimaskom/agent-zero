@@ -144,6 +144,7 @@ class GetCsrfToken(ApiHandler):
             if tunnel and isinstance(tunnel, dict) and tunnel["success"]:
                 allowed_origins.append(tunnel["tunnel_url"])
         except Exception as e:
+            # Log debug message and silently ignore tunnel API errors - fallback to default origins
             PrintStyle.debug(f"Failed to get tunnel URL: {e}")
 
         return allowed_origins

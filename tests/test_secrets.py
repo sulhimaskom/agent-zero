@@ -66,7 +66,7 @@ class TestEnvLineDataclass:
             type="pair",
             key="SECRET",
             value="value",
-            inline_comment="  # inline comment"
+            inline_comment="  # inline comment",
         )
         assert line.inline_comment == "  # inline comment"
 
@@ -84,7 +84,7 @@ class TestStreamingSecretsFilter:
         """Test filter with no secrets configured."""
         key_to_value = {}
         filter_obj = StreamingSecretsFilter(key_to_value)
-        
+
         result = filter_obj.process_chunk("Hello world")
         assert result == "Hello world"
 
@@ -92,7 +92,7 @@ class TestStreamingSecretsFilter:
         """Test replacement of full secret values."""
         key_to_value = {"API_KEY": "secret123"}
         filter_obj = StreamingSecretsFilter(key_to_value)
-        
+
         result = filter_obj.process_chunk("My API_KEY is secret123")
         assert result == "My API_KEY is §§secret(API_KEY)"
 
@@ -100,12 +100,12 @@ class TestStreamingSecretsFilter:
         """Test that partial secrets are held until complete."""
         key_to_value = {"TOKEN": "abc123"}
         filter_obj = StreamingSecretsFilter(key_to_value, min_trigger=3)
-        
+
         # First chunk ends with partial secret
         result1 = filter_obj.process_chunk("Token: abc")
         # Should hold the partial
         assert result1 == "Token: "
-        
+
         # Second chunk completes the secret
         result2 = filter_obj.process_chunk("123 more")
         assert result2 == "§§secret(TOKEN) more"
@@ -114,34 +114,28 @@ class TestStreamingSecretsFilter:
         """Test finalize masks unresolved partial secrets."""
         key_to_value = {"SECRET": "mysecret"}
         filter_obj = StreamingSecretsFilter(key_to_value, min_trigger=3)
-        
+
         # Partial secret at end
         filter_obj.process_chunk("Value: myse")
         result = filter_obj.finalize()
-        
+
         # Should mask the unresolved partial
         assert "***" in result
 
     def test_filter_multiple_secrets(self):
         """Test filtering multiple different secrets."""
-        key_to_value = {
-            "KEY1": "value1",
-            "KEY2": "value2"
-        }
+        key_to_value = {"KEY1": "value1", "KEY2": "value2"}
         filter_obj = StreamingSecretsFilter(key_to_value)
-        
+
         result = filter_obj.process_chunk("key1=value1 and key2=value2")
         assert "§§secret(KEY1)" in result
         assert "§§secret(KEY2)" in result
 
     def test_filter_longest_secret_first(self):
         """Test that longer secrets are replaced first to avoid partial issues."""
-        key_to_value = {
-            "SHORT": "ab",
-            "LONGER": "abcd"
-        }
+        key_to_value = {"SHORT": "ab", "LONGER": "abcd"}
         filter_obj = StreamingSecretsFilter(key_to_value)
-        
+
         # Test that longer value is handled correctly
         result = filter_obj.process_chunk("ab and abcd")
         # Both should be replaced
@@ -151,7 +145,7 @@ class TestStreamingSecretsFilter:
         """Test filter with empty chunk."""
         key_to_value = {"KEY": "value"}
         filter_obj = StreamingSecretsFilter(key_to_value)
-        
+
         result = filter_obj.process_chunk("")
         assert result == ""
 
@@ -159,7 +153,7 @@ class TestStreamingSecretsFilter:
         """Test finalize with no pending data."""
         key_to_value = {"KEY": "value"}
         filter_obj = StreamingSecretsFilter(key_to_value)
-        
+
         result = filter_obj.finalize()
         assert result == ""
 
@@ -173,7 +167,7 @@ class TestSecretsManagerReplacePlaceholders:
         manager = SecretsManager("/nonexistent/env/file")
         manager._secrets_cache = {"API_KEY": "secret123"}
         manager._lock = threading.RLock()  # Ensure lock is set
-        
+
         result = manager.replace_placeholders("My key is §§secret(API_KEY)")
         assert result == "My key is secret123"
 
@@ -182,7 +176,7 @@ class TestSecretsManagerReplacePlaceholders:
         manager = SecretsManager("/nonexistent/env/file")
         manager._secrets_cache = {"KEY1": "val1", "KEY2": "val2"}
         manager._lock = threading.RLock()
-        
+
         result = manager.replace_placeholders("§§secret(KEY1) and §§secret(KEY2)")
         assert result == "val1 and val2"
 
@@ -191,7 +185,7 @@ class TestSecretsManagerReplacePlaceholders:
         manager = SecretsManager("/nonexistent/env/file")
         manager._secrets_cache = {"EXISTING_KEY": "value"}
         manager._lock = threading.RLock()
-        
+
         with pytest.raises(Exception):
             # Should raise RepairableException
             manager.replace_placeholders("§§secret(NONEXISTENT)")
@@ -201,7 +195,7 @@ class TestSecretsManagerReplacePlaceholders:
         manager = SecretsManager("/nonexistent/env/file")
         manager._secrets_cache = {"KEY": "value"}
         manager._lock = threading.RLock()
-        
+
         result = manager.replace_placeholders("")
         assert result == ""
 
@@ -214,7 +208,7 @@ class TestSecretsManagerMaskValues:
         manager = SecretsManager("/nonexistent/env/file")
         manager._secrets_cache = {"API_KEY": "mysecret"}
         manager._lock = threading.RLock()
-        
+
         result = manager.mask_values("The API_KEY is mysecret")
         assert "mysecret" not in result
         assert "§§secret(API_KEY)" in result
@@ -224,7 +218,7 @@ class TestSecretsManagerMaskValues:
         manager = SecretsManager("/nonexistent/env/file")
         manager._secrets_cache = {"KEY1": "val1", "KEY2": "val2"}
         manager._lock = threading.RLock()
-        
+
         result = manager.mask_values("key1=val1 and key2=val2")
         assert "val1" not in result
         assert "val2" not in result
@@ -234,7 +228,7 @@ class TestSecretsManagerMaskValues:
         manager = SecretsManager("/nonexistent/env/file")
         manager._secrets_cache = {"KEY": "value"}
         manager._lock = threading.RLock()
-        
+
         result = manager.mask_values("")
         assert result == ""
 
@@ -243,7 +237,7 @@ class TestSecretsManagerMaskValues:
         manager = SecretsManager("/nonexistent/env/file")
         manager._secrets_cache = {"KEY": "ab"}  # Only 2 chars
         manager._lock = threading.RLock()
-        
+
         result = manager.mask_values("ab", min_length=4)
         # Short value shouldn't be masked
         assert "ab" in result
@@ -257,9 +251,9 @@ class TestSecretsManagerGetKeys:
         manager = SecretsManager("/nonexistent/env/file")
         manager._secrets_cache = {"KEY1": "val1", "KEY2": "val2"}
         manager._lock = threading.RLock()
-        
+
         keys = manager.get_keys()
-        
+
         assert isinstance(keys, list)
         assert "KEY1" in keys
         assert "KEY2" in keys
@@ -300,20 +294,16 @@ class TestSecretsManagerSerialization:
     def test_serialize_with_values(self):
         """Test serialization with values included."""
         manager = SecretsManager()
-        lines = [
-            EnvLine(raw="KEY=value", type="pair", key="KEY", value="value")
-        ]
-        
+        lines = [EnvLine(raw="KEY=value", type="pair", key="KEY", value="value")]
+
         result = manager._serialize_env_lines(lines, with_values=True)
         assert "value" in result
 
     def test_serialize_without_values(self):
         """Test serialization without values (for prompts)."""
         manager = SecretsManager()
-        lines = [
-            EnvLine(raw="KEY=value", type="pair", key="KEY", value="value")
-        ]
-        
+        lines = [EnvLine(raw="KEY=value", type="pair", key="KEY", value="value")]
+
         result = manager._serialize_env_lines(lines, with_values=False)
         assert "KEY" in result
         assert "value" not in result
@@ -321,24 +311,20 @@ class TestSecretsManagerSerialization:
     def test_serialize_with_comments(self):
         """Test serialization preserves comments."""
         manager = SecretsManager()
-        lines = [
-            EnvLine(raw="# comment", type="comment", key=None)
-        ]
-        
+        lines = [EnvLine(raw="# comment", type="comment", key=None)]
+
         result = manager._serialize_env_lines(lines, with_comments=True)
         assert "# comment" in result or "#comment" in result
 
     def test_serialize_key_formatter(self):
         """Test serialization with custom key formatter."""
         manager = SecretsManager()
-        lines = [
-            EnvLine(raw="KEY=value", type="pair", key="KEY", value="value")
-        ]
-        
+        lines = [EnvLine(raw="KEY=value", type="pair", key="KEY", value="value")]
+
         # Use a simple formatter
         def format_key(k):
             return "SECRET_" + k
-        
+
         result = manager._serialize_env_lines(lines, key_formatter=format_key)
         assert "SECRET_KEY" in result
 
@@ -347,9 +333,9 @@ class TestSecretsManagerSerialization:
         manager = SecretsManager()
         lines = [
             EnvLine(raw="", type="blank", key=None),
-            EnvLine(raw="KEY=value", type="pair", key="KEY", value="value")
+            EnvLine(raw="KEY=value", type="pair", key="KEY", value="value"),
         ]
-        
+
         result = manager._serialize_env_lines(lines, with_blank=False)
         # Blank line should not appear
         lines_in_result = [l for l in result.split("\n") if l]

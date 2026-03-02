@@ -127,7 +127,8 @@ class PrintStyle:
             self.padding_added = True
 
     def _log_html(self, html):
-        with open(PrintStyle.log_file_path, "a", encoding="utf-8") as f:  # type: ignore # add encoding='utf-8'
+        # log_file_path is set in __init__ and guaranteed non-None here
+        with open(PrintStyle.log_file_path, "a", encoding="utf-8") as f:  # type: ignore
             f.write(html)
 
     @staticmethod

@@ -25,7 +25,13 @@ class SearchEngine(Tool):
             return f"{source} search failed: {result!s}"
 
         outputs = []
-        for item in result["results"]:
-            outputs.append(f"{item['title']}\n{item['url']}\n{item['content']}")
+        if not isinstance(result, dict) or "results" not in result:
+            return f"{source} search returned invalid result"
+
+        for item in result.get("results", []):
+            title = item.get("title", "Untitled")
+            url = item.get("url", "")
+            content = item.get("content", "")
+            outputs.append(f"{title}\n{url}\n{content}")
 
         return "\n\n".join(outputs[: Search.DEFAULT_RESULTS_COUNT]).strip()

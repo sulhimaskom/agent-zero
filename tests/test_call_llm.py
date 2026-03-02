@@ -17,6 +17,7 @@ from python.helpers.call_llm import Example
 # Helper to create async iterator
 class AsyncChunkIterator:
     """Helper class to create async iterator for testing"""
+
     def __init__(self, chunks):
         self.chunks = chunks
         self.index = 0
@@ -50,7 +51,7 @@ class TestCallLlmFunction:
 
         mock_chain.astream = MagicMock(return_value=async_streamer())
 
-        with patch('python.helpers.call_llm.ChatPromptTemplate') as mock_template:
+        with patch("python.helpers.call_llm.ChatPromptTemplate") as mock_template:
             mock_prompt = MagicMock()
             mock_prompt.__or__ = MagicMock(return_value=mock_chain)
             mock_template.from_messages.return_value = mock_prompt
@@ -62,9 +63,7 @@ class TestCallLlmFunction:
 
             # This should execute without raising an exception
             result = await call_llm_func(
-                system="You are a helpful assistant.",
-                model=model,
-                message="Say hello"
+                system="You are a helpful assistant.", model=model, message="Say hello"
             )
 
     @pytest.mark.asyncio
@@ -81,7 +80,7 @@ class TestCallLlmFunction:
 
         mock_chain.astream = MagicMock(return_value=async_streamer())
 
-        with patch('python.helpers.call_llm.ChatPromptTemplate') as mock_template:
+        with patch("python.helpers.call_llm.ChatPromptTemplate") as mock_template:
             mock_prompt = MagicMock()
             mock_prompt.__or__ = MagicMock(return_value=mock_chain)
             mock_template.from_messages.return_value = mock_prompt
@@ -91,10 +90,7 @@ class TestCallLlmFunction:
             from python.helpers.call_llm import call_llm as call_llm_func
 
             result = await call_llm_func(
-                system="You are helpful.",
-                model=model,
-                message="Test",
-                callback=callback
+                system="You are helpful.", model=model, message="Test", callback=callback
             )
 
             # Verify callback was called for each chunk
@@ -105,7 +101,7 @@ class TestCallLlmFunction:
         """Test LLM call with few-shot examples passes examples parameter"""
         examples: list[Example] = [
             {"input": "Hi", "output": "Hello!"},
-            {"input": "Bye", "output": "Goodbye!"}
+            {"input": "Bye", "output": "Goodbye!"},
         ]
 
         mock_chain = MagicMock()
@@ -115,7 +111,7 @@ class TestCallLlmFunction:
 
         mock_chain.astream = MagicMock(return_value=async_streamer())
 
-        with patch('python.helpers.call_llm.ChatPromptTemplate') as mock_template:
+        with patch("python.helpers.call_llm.ChatPromptTemplate") as mock_template:
             mock_prompt = MagicMock()
             mock_prompt.__or__ = MagicMock(return_value=mock_chain)
             mock_template.from_messages.return_value = mock_prompt
@@ -126,10 +122,7 @@ class TestCallLlmFunction:
 
             # Should not raise - examples are passed
             result = await call_llm_func(
-                system="You are helpful.",
-                model=model,
-                message="Hi there",
-                examples=examples
+                system="You are helpful.", model=model, message="Hi there", examples=examples
             )
 
     @pytest.mark.asyncio
@@ -142,7 +135,7 @@ class TestCallLlmFunction:
 
         mock_chain.astream = MagicMock(return_value=async_streamer())
 
-        with patch('python.helpers.call_llm.ChatPromptTemplate') as mock_template:
+        with patch("python.helpers.call_llm.ChatPromptTemplate") as mock_template:
             mock_prompt = MagicMock()
             mock_prompt.__or__ = MagicMock(return_value=mock_chain)
             mock_template.from_messages.return_value = mock_prompt
@@ -152,10 +145,7 @@ class TestCallLlmFunction:
             from python.helpers.call_llm import call_llm as call_llm_func
 
             result = await call_llm_func(
-                system="You are helpful.",
-                model=model,
-                message="Test",
-                examples=[]
+                system="You are helpful.", model=model, message="Test", examples=[]
             )
 
     @pytest.mark.asyncio
@@ -168,7 +158,7 @@ class TestCallLlmFunction:
 
         mock_chain.astream = MagicMock(return_value=async_streamer())
 
-        with patch('python.helpers.call_llm.ChatPromptTemplate') as mock_template:
+        with patch("python.helpers.call_llm.ChatPromptTemplate") as mock_template:
             mock_prompt = MagicMock()
             mock_prompt.__or__ = MagicMock(return_value=mock_chain)
             mock_template.from_messages.return_value = mock_prompt
@@ -179,10 +169,7 @@ class TestCallLlmFunction:
 
             # Should not raise - callback is None
             result = await call_llm_func(
-                system="You are helpful.",
-                model=model,
-                message="Test",
-                callback=None
+                system="You are helpful.", model=model, message="Test", callback=None
             )
 
     @pytest.mark.asyncio
@@ -195,7 +182,7 @@ class TestCallLlmFunction:
 
         mock_chain.astream = MagicMock(return_value=async_streamer())
 
-        with patch('python.helpers.call_llm.ChatPromptTemplate') as mock_template:
+        with patch("python.helpers.call_llm.ChatPromptTemplate") as mock_template:
             mock_prompt = MagicMock()
             mock_prompt.__or__ = MagicMock(return_value=mock_chain)
             mock_template.from_messages.return_value = mock_prompt
@@ -204,11 +191,7 @@ class TestCallLlmFunction:
 
             from python.helpers.call_llm import call_llm as call_llm_func
 
-            result = await call_llm_func(
-                system="Test",
-                model=model,
-                message="Test"
-            )
+            result = await call_llm_func(system="Test", model=model, message="Test")
 
     @pytest.mark.asyncio
     async def test_call_llm_ai_message_chunk_handling(self):
@@ -223,7 +206,7 @@ class TestCallLlmFunction:
 
         mock_chain.astream = MagicMock(return_value=async_streamer())
 
-        with patch('python.helpers.call_llm.ChatPromptTemplate') as mock_template:
+        with patch("python.helpers.call_llm.ChatPromptTemplate") as mock_template:
             mock_prompt = MagicMock()
             mock_prompt.__or__ = MagicMock(return_value=mock_chain)
             mock_template.from_messages.return_value = mock_prompt
@@ -232,11 +215,7 @@ class TestCallLlmFunction:
 
             from python.helpers.call_llm import call_llm as call_llm_func
 
-            result = await call_llm_func(
-                system="Test",
-                model=model,
-                message="Test"
-            )
+            result = await call_llm_func(system="Test", model=model, message="Test")
 
     @pytest.mark.asyncio
     async def test_call_llm_string_chunk_handling(self):
@@ -248,7 +227,7 @@ class TestCallLlmFunction:
 
         mock_chain.astream = MagicMock(return_value=async_streamer())
 
-        with patch('python.helpers.call_llm.ChatPromptTemplate') as mock_template:
+        with patch("python.helpers.call_llm.ChatPromptTemplate") as mock_template:
             mock_prompt = MagicMock()
             mock_prompt.__or__ = MagicMock(return_value=mock_chain)
             mock_template.from_messages.return_value = mock_prompt
@@ -257,11 +236,7 @@ class TestCallLlmFunction:
 
             from python.helpers.call_llm import call_llm as call_llm_func
 
-            result = await call_llm_func(
-                system="Test",
-                model=model,
-                message="Test"
-            )
+            result = await call_llm_func(system="Test", model=model, message="Test")
 
 
 class TestExampleTypedDict:
@@ -279,7 +254,7 @@ class TestExampleTypedDict:
         examples: list[Example] = [
             {"input": "Q1", "output": "A1"},
             {"input": "Q2", "output": "A2"},
-            {"input": "Q3", "output": "A3"}
+            {"input": "Q3", "output": "A3"},
         ]
 
         assert len(examples) == 3
