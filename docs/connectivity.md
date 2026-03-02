@@ -2,8 +2,6 @@
 
 > Last Updated: 2026-02-26
 
-This guide covers
-
 This guide covers the different ways to connect to Agent Zero from external applications, including using the External API, connecting as an MCP client, and enabling agent-to-agent communication.
 
 **Note:** You can find your specific URLs and API tokens in your Agent Zero instance under `Settings > External Services`.
