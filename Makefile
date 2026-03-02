@@ -19,7 +19,7 @@
 #   ai-review-install - Install AI code review hook
 #   clean         - Clean up cache files
 
-.PHONY: help install install-dev lint format typecheck test run docker-build docker-run pre-commit ai-review ai-review-install clean
+.PHONY: help install install-dev lint lint-fix format lint-js lint-js-fix typecheck typecheck-js test run docker-build docker-run pre-commit ai-review ai-review-install clean
 
 # Default target
 help:
@@ -29,8 +29,11 @@ help:
 	@echo ""
 	@echo "Development:"
 	@echo "  install-dev   - Install development dependencies"
-	@echo "  lint          - Run ruff linter"
-	@echo "  format        - Format code with ruff"
+	@echo "  lint          - Run ruff linter (Python)"
+	@echo "  lint-fix      - Auto-fix ruff linter issues (Python)"
+	@echo "  format        - Format code with ruff (Python)"
+	@echo "  lint-js       - Run ESLint (JavaScript)"
+	@echo "  lint-js-fix   - Auto-fix ESLint issues (JavaScript)"
 	@echo "  typecheck     - Run mypy type checker"
 	@echo "  test          - Run pytest tests"
 	@echo "  run           - Run Agent Zero in development mode"
@@ -50,8 +53,10 @@ help:
 	@echo ""
 	@echo "Examples:"
 	@echo "  make install-dev      # Install dev dependencies"
-	@echo "  make lint             # Check for linting errors"
-	@echo "  make format           # Auto-fix linting issues"
+	@echo "  make lint             # Check for linting errors (Python)"
+	@echo "  make lint-js          # Check for linting errors (JavaScript)"
+	@echo "  make format           # Auto-fix linting issues (Python)"
+	@echo "  make lint-js-fix      # Auto-fix linting issues (JavaScript)"
 	@echo "  make test             # Run tests"
 	@echo "  make run              # Start development server"
 	@echo "  make ai-review        # Run AI code review"
@@ -69,9 +74,21 @@ install-dev: install
 lint:
 	ruff check .
 
+# Auto-fix ruff linter issues
+lint-fix:
+	ruff check --fix .
+
 # Format code with ruff
 format:
 	ruff format .
+
+# Run JavaScript linter (ESLint)
+lint-js:
+	cd webui && npm run lint
+
+# Auto-fix JavaScript linter issues
+lint-js-fix:
+	cd webui && npm run lint:fix
 
 # Run mypy type checker
 typecheck:

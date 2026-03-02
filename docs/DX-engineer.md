@@ -1,5 +1,12 @@
 # DX-Engineer Agent
 
+### 2026-03-02: Makefile JavaScript Lint Targets
+- Added `lint-js` target: Runs ESLint on JavaScript/TypeScript files
+- Added `lint-js-fix` target: Auto-fixes ESLint issues
+- Updated help text and examples to include JavaScript linting commands
+- Unified developer experience: all linting now available via Makefile
+- Developers can run `make lint-js` and `make lint-js-fix` alongside Python linting
+
 ### 2026-03-02: Ruff Test Lint Configuration
 - Fixed import sorting in `python/helpers/shell_ssh.py`
 - Expanded `pyproject.toml` per-file-ignores for tests folder
