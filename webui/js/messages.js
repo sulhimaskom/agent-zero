@@ -987,7 +987,7 @@ function convertPathsToLinks(str) {
     let html = '';
     for (const part of parts) {
       conc += `/${  part}`;
-      html += `/<a href="#" class="path-link" onclick="openFileLink('${conc.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}');">${part}</a>`;
+      html += `/<a href="#" class="path-link" onclick="openFileLink('${conc.replace(/\\/g, '\\\\').replace(/'/g, "\\'")}');">${escapeHTML(part)}</a>`;
     }
     return html;
   }

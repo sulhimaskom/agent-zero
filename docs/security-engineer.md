@@ -439,3 +439,29 @@ First-time SSH connections to new hosts will now be rejected. Users must:
 - Implementation follows Paramiko best practices
 - No runtime errors expected - standard Paramiko API
 
+
+
+---
+
+## 2026-03-02: Proactive Security Scan - XSS Fix
+
+---
+
+**Scan Performed**: eval/exec/compile, subprocess shell=True, hardcoded secrets, SQL injection, pickle/yaml unsafe, XSS
+
+**Results**: 1 HIGH severity vulnerability fixed
+
+### Fixed:
+- ✅ `webui/js/messages.js` - Added `escapeHTML()` to path display text in onclick handler (line 990)
+
+### Verified Safe:
+- ✅ No eval/exec/compile vulnerabilities - only sandboxed vm.runInNewContext in node_eval.js
+- ✅ No subprocess shell=True - all use lists or shell=False
+- ✅ No hardcoded secrets - all credentials via environment variables
+- ✅ No SQL injection - uses FAISS vector DB (not SQL)
+- ✅ No unsafe pickle/yaml - uses safe_load
+- ✅ No other XSS vulnerabilities - all innerHTML uses sanitizeHTML or escapeHTML
+
+### Remaining Observations (By Design):
+- Terminal runtime (`tty_session.py`, `code_execution_tool.py`) allows shell commands - intended for agent functionality, protected by Docker
+- Scheduler tokens use `random.randint` - not security-critical (not session/auth tokens)
