@@ -143,8 +143,8 @@ class GetCsrfToken(ApiHandler):
             tunnel = await tunnel_api_process({"action": "get"})
             if tunnel and isinstance(tunnel, dict) and tunnel["success"]:
                 allowed_origins.append(tunnel["tunnel_url"])
-        except Exception:
-            pass
+        except Exception as e:
+            PrintStyle.debug(f"Failed to get tunnel URL: {e}")
 
         return allowed_origins
 
