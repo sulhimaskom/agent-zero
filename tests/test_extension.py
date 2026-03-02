@@ -3,7 +3,6 @@
 Tests the extension helper functions for loading and managing extensions.
 """
 
-import pytest
 
 from python.helpers.extension import _get_file_from_module
 
