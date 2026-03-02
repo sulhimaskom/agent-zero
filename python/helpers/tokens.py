@@ -3,6 +3,7 @@
 Provides token estimation and management using tiktoken encoding.
 """
 
+from functools import lru_cache
 from typing import Literal
 
 import tiktoken
@@ -13,12 +14,18 @@ APPROX_BUFFER = Limits.TOKEN_APPROX_BUFFER
 TRIM_BUFFER = Limits.TOKEN_TRIM_BUFFER
 
 
+@lru_cache(maxsize=4)
+def _get_encoding(encoding_name: str):
+    """Cached tiktoken encoding to avoid repeated initialization overhead."""
+    return tiktoken.get_encoding(encoding_name)
+
+
 def count_tokens(text: str, encoding_name="cl100k_base") -> int:
     if not text:
         return 0
 
-    # Get the encoding
-    encoding = tiktoken.get_encoding(encoding_name)
+    # Get the encoding (cached)
+    encoding = _get_encoding(encoding_name)
 
     # Encode the text and count the tokens
     tokens = encoding.encode(text, disallowed_special=())

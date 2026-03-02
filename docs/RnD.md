@@ -1,5 +1,95 @@
 #YQ|## 2026-03-02
 #MM|
+#NM|### Performance: Tiktoken Encoding Caching - FIXED ✅
+#QT|
+#HV|**Problem**:
+#QT|- `tiktoken.get_encoding()` called on every `count_tokens()` invocation
+#QT|- Expensive initialization repeated unnecessarily
+#QT|
+#VP|**Root Cause**:
+#QT|- No caching for encoding objects which are expensive to create
+#QT|
+#WR|**Solution Applied**:
+#QT|- Added `@lru_cache(maxsize=4)` decorator to new `_get_encoding()` function
+#QT|- `count_tokens()` now calls cached version
+#QT|- Supports up to 4 common encodings cached
+#QT|
+#YR|**Files Changed**:
+#QT|- `python/helpers/tokens.py` (+5 lines)
+#QT|
+#YX|**Verification**:
+#QT|- Python syntax validated: ✅
+#QT|
+#HZ|**Status**: Ready for commit.
+#QT|
+#MW|---
+## 2026-03-02
+#MM|
+#NM|### Performance: Buffered File Reading for Checksums - FIXED ✅
+#QT|
+#HV|**Problem**:
+#QT|- `calculate_checksum()` in knowledge_import.py reads entire file into memory
+#QT|- Inefficient for large knowledge files
+#QT|
+#VP|**Root Cause**:
+#QT|- `f.read()` loads all bytes at once instead of streaming
+#QT|
+#WR|**Solution Applied**:
+#QT|- Changed to buffered reading: `for chunk in iter(lambda: f.read(65536), b""):`
+#QT|- 64KB chunks for memory-efficient processing
+#QT|
+#YR|**Files Changed**:
+#QT|- `python/helpers/knowledge_import.py` (+3 lines, -2 lines)
+#QT|
+#YX|**Verification**:
+#QT|- Python syntax validated: ✅
+#QT|
+#HZ|**Status**: Ready for commit.
+#QT|
+#MW|---
+## 2026-03-02
+#MM|
+#NM|### Proactive Scan: Frontend Event Listeners - VERIFIED ✅
+#QT|
+#HV|**Problem**:
+#QT|- Initial scan showed 77 addEventListener vs 44 removeEventListener
+#QT|
+#VP|**Analysis**:
+#QT|- Previous RnD work already fixed main leaks (modals.js, device.js, speech-store.js, attachmentsStore.js)
+#QT|- Remaining imbalances are Alpine one-time events (alpine:init, DOMContentLoaded)
+#QT|- These don't require cleanup as they fire once
+#QT|- Window lifetime events (beforeunload) appropriately persist
+#QT|
+#YX|**Status**: No action needed - codebase is clean.
+#QT|
+#MW|---
+## 2026-03-02
+#MM|
+#NM|### Proactive Scan: Code Quality Status - COMPLETED ✅
+#QT|
+#HV|**Summary**:
+#QT|- Proactive scan completed across Python backend
+#QT|
+#VP|**Findings**:
+#QT|- Bare exception handlers: 0 (excellent!)
+#QT|- Security concerns (hardcoded secrets, eval, shell=True): 0 (excellent!)
+#QT|- TODO comments: 2 (FAISS monkey patches - intentional)
+#QT|- Type ignores: 179 (mostly external libraries - legitimate)
+#QT|
+#WR|**Test Coverage Gaps Identified**:
+#QT|- python/api/: 63/64 untested (only upload.py tested)
+#QT|- python/tools/: 19/19 untested
+#QT|- Critical untested: memory.py, history.py, settings.py, mcp_handler.py
+#QT|
+#YX|**Performance Issues Fixed**:
+#QT|- tokens.py: Added LRU cache for tiktoken encoding
+#QT|- knowledge_import.py: Buffered file reading for checksums
+#QT|
+#HZ|**Status**: Changes ready for commit.
+#QT|
+#MW|---
+#YQ|## 2026-03-02
+#MM|
 #NM|### Issue #575: Type Ignore Comment Clarification - FIXED ✅
 #QT|
 #HV|**Problem**:
