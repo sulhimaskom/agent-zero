@@ -626,6 +626,9 @@ if (window.Alpine) {
   });
 }
 
+// Store reference for cleanup to prevent memory leak
+let _schedulerTabClickGlobalHandler = null;
+
 // Add a document ready event handler to ensure the scheduler tab can be clicked on first load
 document.addEventListener('DOMContentLoaded', () => {
   // Setup scheduler tab click handling
@@ -637,7 +640,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Create a global event listener for clicks on the scheduler tab
-    document.addEventListener('click', (e) => {
+    _schedulerTabClickGlobalHandler = (e) => {
       // Find if the click was on the scheduler tab or its children
       const schedulerTab = e.target.closest('.settings-tab[title="Task Scheduler"]');
       if (!schedulerTab) return;
@@ -673,9 +676,18 @@ document.addEventListener('DOMContentLoaded', () => {
       } catch (err) {
         Logger.error('Error handling scheduler tab click:', err);
       }
-    }, true); // Use capture phase to intercept before Alpine.js handlers
+    }; // Use capture phase to intercept before Alpine.js handlers
+    document.addEventListener('click', _schedulerTabClickGlobalHandler, true);
   };
 
   // Initialize the tab handling
   setupSchedulerTab();
 });
+
+// Cleanup function to remove global event listener
+export function cleanupSchedulerGlobalHandlers() {
+  if (_schedulerTabClickGlobalHandler) {
+    document.removeEventListener('click', _schedulerTabClickGlobalHandler, true);
+    _schedulerTabClickGlobalHandler = null;
+  }
+}
