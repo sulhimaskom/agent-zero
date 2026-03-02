@@ -12,19 +12,19 @@ class TestCleanStringAnsiRemoval:
 
     def test_remove_ansi_escape_codes(self):
         """Test that ANSI escape codes are removed"""
-        input_str = "\x1B[31mred text\x1B[0m"
+        input_str = "\x1b[31mred text\x1b[0m"
         result = clean_string(input_str)
         assert result == "red text"
 
     def test_remove_multiple_ansi_codes(self):
         """Test removal of multiple ANSI codes"""
-        input_str = "\x1B[1m\x1B[4m\x1B[31mbold underlined red\x1B[0m"
+        input_str = "\x1b[1m\x1b[4m\x1b[31mbold underlined red\x1b[0m"
         result = clean_string(input_str)
         assert result == "bold underlined red"
 
     def test_remove_ansi_cursor_movement(self):
         """Test removal of cursor movement escape sequences"""
-        input_str = "\x1B[2J\x1B[HHello"
+        input_str = "\x1b[2J\x1b[HHello"
         result = clean_string(input_str)
         assert result == "Hello"
 
@@ -57,7 +57,7 @@ class TestCleanStringNullBytes:
 
     def test_null_bytes_with_ansi(self):
         """Test null bytes mixed with ANSI codes"""
-        input_str = "\x1B[31m\x00red\x00\x1B[0m"
+        input_str = "\x1b[31m\x00red\x00\x1b[0m"
         result = clean_string(input_str)
         assert result == "red"
 
@@ -120,14 +120,14 @@ class TestCleanStringIntegration:
 
     def test_complex_mixed_input(self):
         """Test complex input with ANSI, null bytes, and whitespace"""
-        input_str = "\x1B[32m\x00success\x1B[0m\r\n> done"
+        input_str = "\x1b[32m\x00success\x1b[0m\r\n> done"
         result = clean_string(input_str)
         assert "success" in result
         assert "done" in result
 
     def test_shell_output_simulation(self):
         """Test simulated shell output"""
-        input_str = "\x1B[0m\x1B[27m\x1B[24m\x1B[22m$ ls -la\r\ntotal 24\r\ndrwxr-xr-x  5 user  4096 Jan 15 10:30 .\x1B[0m"
+        input_str = "\x1b[0m\x1b[27m\x1b[24m\x1b[22m$ ls -la\r\ntotal 24\r\ndrwxr-xr-x  5 user  4096 Jan 15 10:30 .\x1b[0m"
         result = clean_string(input_str)
         assert "$ ls -la" in result
         assert "total 24" in result

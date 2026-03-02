@@ -25,10 +25,7 @@ class GetSettingsStatus(ApiHandler):
             api_keys = current_settings.get("api_keys", {})
             has_api_key = any(bool(v) for v in api_keys.values())
 
-        return {
-            "isFirstTime": is_first_time,
-            "hasApiKey": has_api_key
-        }
+        return {"isFirstTime": is_first_time, "hasApiKey": has_api_key}
 
     @classmethod
     def get_methods(cls) -> list[str]:

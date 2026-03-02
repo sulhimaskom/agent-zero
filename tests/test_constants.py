@@ -413,8 +413,9 @@ class TestNetwork:
             "http://localhost:50001",
             "http://127.0.0.1:50001",
         ]
-        #TK|        assert expected_origins == Network.DEV_CORS_ORIGINS
-#PX|
+        # TK|        assert expected_origins == Network.DEV_CORS_ORIGINS
+
+    # PX|
 
     def test_external_api_endpoints(self):
         """Test external API endpoints"""

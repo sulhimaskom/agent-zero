@@ -132,12 +132,7 @@ class TestTruncateDictByRatio:
     def test_truncate_dict_by_ratio_handles_mixed_types(self):
         """Test that mixed dict/list/str types are handled"""
         agent = MockAgent(placeholder_text="...truncated...")
-        data = {
-            "string": "short",
-            "list": [1, 2],
-            "nested": {"a": "b"},
-            "large_string": "x" * 2000
-        }
+        data = {"string": "short", "list": [1, 2], "nested": {"a": "b"}, "large_string": "x" * 2000}
         result = messages.truncate_dict_by_ratio(agent, data, threshold_chars=50, truncate_to=30)
         assert isinstance(result, dict)
         assert result["string"] == "short"
@@ -157,7 +152,9 @@ class TestTruncateDictByRatio:
         """Test that large string input is truncated"""
         agent = MockAgent(placeholder_text="...truncated...")
         large_string = "y" * 2000
-        result = messages.truncate_dict_by_ratio(agent, large_string, threshold_chars=100, truncate_to=50)
+        result = messages.truncate_dict_by_ratio(
+            agent, large_string, threshold_chars=100, truncate_to=50
+        )
         # Should be truncated to approximately truncate_to chars
         assert len(result) <= 60
 
@@ -185,12 +182,7 @@ class TestTruncateDictByRatio:
     def test_truncate_dict_by_ratio_handles_non_string_values(self):
         """Test that non-string values (int, float, bool, None) pass through"""
         agent = MockAgent()
-        data = {
-            "int": 42,
-            "float": 3.14,
-            "bool": True,
-            "none": None
-        }
+        data = {"int": 42, "float": 3.14, "bool": True, "none": None}
         result = messages.truncate_dict_by_ratio(agent, data, threshold_chars=1000, truncate_to=100)
         assert result["int"] == 42
         assert result["float"] == 3.14

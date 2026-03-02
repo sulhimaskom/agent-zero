@@ -4,7 +4,6 @@ Provides functions for handling, formatting, and reporting errors
 across the framework.
 """
 
-
 import asyncio
 import re
 import traceback

@@ -77,7 +77,6 @@ class Record:
         cls = data["_cls"]
         return globals()[cls].from_dict(data, history=history)
 
-
     def output_langchain(self):
         return output_langchain(self.output())
 
@@ -168,7 +167,6 @@ class Topic(Record):
         self.summary = await self.summarize_messages(self.messages)
         self._tokens = None
         return self.summary
-
 
     async def compress_large_messages(self) -> bool:
         set = settings.get_settings()
@@ -308,7 +306,7 @@ class Bulk(Record):
         # Check if any record contains image data
         has_vision = False
         for r in self.records:
-            if hasattr(r, 'content') and _is_raw_message(r.content):
+            if hasattr(r, "content") and _is_raw_message(r.content):
                 raw_content = r.content.get("raw_content")
                 if isinstance(raw_content, list):
                     if any(
@@ -322,7 +320,9 @@ class Bulk(Record):
             output_text_val = "[Image]"
         else:
             # Replace any remaining base64 image data URLs with placeholder
-            output_text_val = re.sub(r"data:image/[^;]+;base64,[A-Za-z0-9+/=]+", "[Image]", output_text_val)
+            output_text_val = re.sub(
+                r"data:image/[^;]+;base64,[A-Za-z0-9+/=]+", "[Image]", output_text_val
+            )
 
         self.summary = await self.history.agent.call_utility_model(
             system=self.history.agent.read_prompt("fw.topic_summary.sys.md"),
@@ -332,8 +332,6 @@ class Bulk(Record):
         )
         self._tokens = None
         return self.summary
-
-
 
     def to_dict(self):
         return {

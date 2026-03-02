@@ -7,6 +7,7 @@ Tests pure functions that don't require file system setup:
 - dirname
 - safe_file_name
 """
+
 import pytest
 
 from python.helpers.files import (
@@ -35,7 +36,7 @@ class TestRemoveCodeFences:
 
     def test_triple_backticks_fence(self):
         """Test triple backticks code fence"""
-        text = "```json\n{\"key\": \"value\"}\n```"
+        text = '```json\n{"key": "value"}\n```'
         result = remove_code_fences(text)
         assert result == '{"key": "value"}\n'
 
@@ -76,13 +77,13 @@ class TestIsFullJsonTemplate:
 
     def test_json_fence(self):
         """Test text enclosed in json code fence"""
-        text = "```json\n{\"key\": \"value\"}\n```"
+        text = '```json\n{"key": "value"}\n```'
         result = is_full_json_template(text)
         assert result is True
 
     def test_tilde_json_fence(self):
         """Test text enclosed in tilde json fence"""
-        text = "~~~json\n{\"key\": \"value\"}\n~~~"
+        text = '~~~json\n{"key": "value"}\n~~~'
         result = is_full_json_template(text)
         assert result is True
 
@@ -94,13 +95,13 @@ class TestIsFullJsonTemplate:
 
     def test_with_whitespace(self):
         """Test JSON fence with extra whitespace"""
-        text = "  ```json\n{\"key\": \"value\"}\n```  "
+        text = '  ```json\n{"key": "value"}\n```  '
         result = is_full_json_template(text)
         assert result is True
 
     def test_incomplete_fence(self):
         """Test incomplete fence returns False"""
-        text = "```json\n{\"key\": \"value\"}"
+        text = '```json\n{"key": "value"}'
         result = is_full_json_template(text)
         assert result is False
 
@@ -112,7 +113,7 @@ class TestIsFullJsonTemplate:
 
     def test_nested_json(self):
         """Test nested JSON in fence"""
-        text = "```json\n{\"outer\": {\"inner\": 1}}\n```"
+        text = '```json\n{"outer": {"inner": 1}}\n```'
         result = is_full_json_template(text)
         assert result is True
 

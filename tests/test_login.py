@@ -79,11 +79,14 @@ class TestVerifyPassword:
 class TestGetCredentialsHash:
     """Test get_credentials_hash function"""
 
-    @pytest.mark.parametrize("auth_login,auth_password,expected", [
-        (None, "password", None),
-        ("user", None, None),
-        (None, None, None),
-    ])
+    @pytest.mark.parametrize(
+        "auth_login,auth_password,expected",
+        [
+            (None, "password", None),
+            ("user", None, None),
+            (None, None, None),
+        ],
+    )
     def test_get_credentials_hash_no_credentials(self, auth_login, auth_password, expected):
         """Test that get_credentials_hash returns None when credentials aren't set"""
         with pytest.MonkeyPatch.context() as mp:
@@ -93,6 +96,7 @@ class TestGetCredentialsHash:
             import importlib
 
             import python.helpers.dotenv
+
             importlib.reload(python.helpers.dotenv)
 
             # Note: This test may not work perfectly due to module caching

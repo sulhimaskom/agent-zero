@@ -36,20 +36,20 @@ class TestExtractJsonObjectString:
 
     def test_no_opening_brace(self):
         # Returns empty string when no opening brace found
-        result = extract_json_object_string('no json here')
-        assert result == ''
+        result = extract_json_object_string("no json here")
+        assert result == ""
 
     def test_no_closing_brace(self):
         result = extract_json_object_string('{"key": "value"')
         assert result == '{"key": "value"'
 
     def test_empty_input(self):
-        result = extract_json_object_string('')
-        assert result == ''
+        result = extract_json_object_string("")
+        assert result == ""
 
     def test_only_braces(self):
-        result = extract_json_object_string('{}')
-        assert result == '{}'
+        result = extract_json_object_string("{}")
+        assert result == "{}"
 
 
 class TestFixJsonString:
@@ -100,11 +100,11 @@ class TestJsonParseDirty:
         assert result == {"outer": {"inner": 42}}
 
     def test_parse_invalid_json_returns_none(self):
-        result = json_parse_dirty('not json at all')
+        result = json_parse_dirty("not json at all")
         assert result is None
 
     def test_parse_empty_string(self):
-        result = json_parse_dirty('')
+        result = json_parse_dirty("")
         assert result is None
 
     def test_parse_none_returns_none(self):

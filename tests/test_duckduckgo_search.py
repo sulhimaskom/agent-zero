@@ -10,10 +10,12 @@ class TestDuckDuckGoSearch:
     def test_search_returns_list_of_strings(self):
         """Test that search returns a list of string results"""
         mock_ddgs = MagicMock()
-        mock_ddgs.text.return_value = iter([
-            {"title": "Result 1", "href": "https://example.com/1", "body": "Description 1"},
-            {"title": "Result 2", "href": "https://example.com/2", "body": "Description 2"},
-        ])
+        mock_ddgs.text.return_value = iter(
+            [
+                {"title": "Result 1", "href": "https://example.com/1", "body": "Description 1"},
+                {"title": "Result 2", "href": "https://example.com/2", "body": "Description 2"},
+            ]
+        )
 
         with patch("python.helpers.duckduckgo_search.DDGS", return_value=mock_ddgs):
             results = duckduckgo_search.search("test query")
@@ -36,7 +38,7 @@ class TestDuckDuckGoSearch:
         # DDGS.text(query, **kwargs) - query is positional
         if call_args.args:
             assert call_args.args[0] == "test query"
-        
+
         # Check keyword arguments
         call_kwargs = call_args.kwargs
         assert call_kwargs.get("max_results") == Search.DDG_DEFAULT_RESULTS
@@ -54,7 +56,7 @@ class TestDuckDuckGoSearch:
                 query="custom query",
                 results=10,
                 region="us-en",
-                time="m"  # past month
+                time="m",  # past month
             )
 
         call_kwargs = mock_ddgs.text.call_args.kwargs
@@ -65,9 +67,9 @@ class TestDuckDuckGoSearch:
     def test_search_converts_dict_to_string(self):
         """Test that search converts dict results to string representation"""
         mock_ddgs = MagicMock()
-        mock_ddgs.text.return_value = iter([
-            {"title": "Test Title", "href": "https://test.com", "body": "Test body text"}
-        ])
+        mock_ddgs.text.return_value = iter(
+            [{"title": "Test Title", "href": "https://test.com", "body": "Test body text"}]
+        )
 
         with patch("python.helpers.duckduckgo_search.DDGS", return_value=mock_ddgs):
             results = duckduckgo_search.search("test")
@@ -95,7 +97,7 @@ class TestDuckDuckGoSearch:
             {"title": f"Result {i}", "href": f"https://example.com/{i}", "body": f"Body {i}"}
             for i in range(5)
         ]
-        
+
         mock_ddgs = MagicMock()
         mock_ddgs.text.return_value = iter(mock_results)
 
@@ -110,7 +112,7 @@ class TestDuckDuckGoSearch:
             mock_ddgs = MagicMock()
             mock_ddgs.text.return_value = iter([])
             mock_ddgs_class.return_value = mock_ddgs
-            
+
             duckduckgo_search.search("test")
-            
+
             mock_ddgs_class.assert_called_once()

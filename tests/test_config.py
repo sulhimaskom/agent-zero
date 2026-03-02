@@ -3,7 +3,6 @@
 These tests verify the configuration functions for frontend injection.
 """
 
-
 from python.helpers.config import (
     get_env_config_js,
     get_frontend_config,
@@ -83,8 +82,15 @@ class TestGetFrontendConfig:
         """Test that port values are integers"""
         result = get_frontend_config()
 
-        port_keys = ["WEB_UI_PORT", "TUNNEL_API_PORT", "SEARXNG_PORT", "A2A_PORT",
-                     "BROCULA_PORT", "RFC_PORT_HTTP", "RFC_PORT_SSH"]
+        port_keys = [
+            "WEB_UI_PORT",
+            "TUNNEL_API_PORT",
+            "SEARXNG_PORT",
+            "A2A_PORT",
+            "BROCULA_PORT",
+            "RFC_PORT_HTTP",
+            "RFC_PORT_SSH",
+        ]
 
         for key in port_keys:
             assert isinstance(result[key], int), f"{key} should be an integer"
@@ -175,7 +181,7 @@ class TestInjectConfigIntoHtml:
 
     def test_inject_config_into_html_preserves_original_content(self):
         """Test that original HTML content is preserved"""
-        original = '<html><head><title>My Title</title></head><body>Content</body></html>'
+        original = "<html><head><title>My Title</title></head><body>Content</body></html>"
         result = inject_config_into_html(original)
 
         # Original content should be preserved

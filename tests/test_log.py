@@ -3,7 +3,6 @@
 Tests the truncate functions that are pure and don't depend on external state.
 """
 
-
 from python.helpers import log
 
 
@@ -199,7 +198,20 @@ class TestTruncateContent:
     def test_truncate_content_different_types(self):
         """Test truncation works with different log types."""
         long = "x" * (log.CONTENT_MAX_LEN + 100)
-        for log_type in ["agent", "browser", "code_exe", "error", "hint", "info", "progress", "tool", "input", "user", "util", "warning"]:
+        for log_type in [
+            "agent",
+            "browser",
+            "code_exe",
+            "error",
+            "hint",
+            "info",
+            "progress",
+            "tool",
+            "input",
+            "user",
+            "util",
+            "warning",
+        ]:
             result = log._truncate_content(long, log_type)
             assert isinstance(result, str)
             # Should contain hidden message to show truncation happened

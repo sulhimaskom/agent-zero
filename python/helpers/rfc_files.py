@@ -15,7 +15,6 @@ get_abs_path = files.get_abs_path
 # =====================================================
 
 
-
 def read_file_bin(relative_path: str, backup_dirs=None) -> bytes:
     """
     Read binary file content.
