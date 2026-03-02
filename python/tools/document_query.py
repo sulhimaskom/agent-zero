@@ -24,9 +24,9 @@ class DocumentQueryTool(Tool):
             return Response(message="Error: no document provided", break_loop=False)
 
         queries = (
-            kwargs["queries"]
-            if "queries" in kwargs
-            else ([kwargs["query"]] if (kwargs.get("query")) else [])
+            kwargs.get("queries", [])
+            if kwargs.get("queries")
+            else ([kwargs.get("query")] if kwargs.get("query") else [])
         )
         try:
             progress = []
