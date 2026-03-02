@@ -2,7 +2,7 @@
 
 **Created:** 2026-02-25
 #NZ|**Created:** 2026-02-25
-#TM|#NQ|#RJ|> Last Updated: 2026-03-01
+#TM|#NQ|#RJ|#JW|> Last Updated: 2026-03-02
 
 ## Domain
 Product-Architect focuses on small, safe, measurable improvements to the Agent Zero framework.
@@ -86,4 +86,5 @@ JW|- **2026-02-28**: Added module docstrings to 8 backup/chat API files: `backup
 #NV|#JW|- **2026-03-01**: Fixed 2 bare exception handlers in Python helpers - Changed `except Exception:` to `except Exception as e:` in `extract_tools.py` (line 28) and `print_style.py` (line 188). Added debug logging for secret masking failure in print_style.py. Addresses Issue #595.
 #XB|
 #JW|- **2026-03-02**: Fixed 14 bare exception handlers in python/helpers/ - Changed `except Exception:` to `except Exception as e:` in backup.py, browser_use_monkeypatch.py, defer.py, file_browser.py, localization.py, log.py (2), login.py, projects.py (2), shell_ssh.py, task_scheduler.py, tty_session.py. This enables debugging of silently caught exceptions without changing behavior. Proactive scan found 11 files with bare exception handlers in python/helpers/. PR pending.
+#JW|- **2026-03-02**: Fixed empty catch block in `webui/components/settings/a2a/a2a-connection.html` - Added console.error logging instead of silently swallowing exception when failing to get token field. Improves debugging for A2A connection issues. PR #637.
 
