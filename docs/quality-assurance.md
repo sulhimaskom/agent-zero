@@ -1,5 +1,33 @@
 # Quality Assurance Documentation
 
+> Last Updated: 2026-03-02
+
+### 2026-03-02: Add Real CI Test Gates - pytest Execution
+- **Files Created**: `.github/workflows/tests.yml` (NEW)
+- **Changes**:
+  - Created dedicated pytest CI workflow that runs on push/PR to main/custom branches
+  - Uses Python 3.12 with pytest, pytest-asyncio, pytest-cov, Pillow, werkzeug, flask
+  - Runs full pytest suite with verbose output and short traceback
+  - Uploads coverage reports as artifacts
+  - **CRITICAL**: Unlike previous attempts, this workflow DOES NOT use `|| true` - test failures WILL fail the CI
+- **Issue Fixed**: Issue #512 "CRITICAL: No Real CI Test Gates - pytest uses || true"
+- **Issue Fixed**: Issue #577 "[CI/CD] Add traditional testing to AI-powered CI workflow"
+- **Verification**:
+  - YAML syntax validated
+  - pytest: 816 passed, 1 warning
+  - Workflow ready for CI execution
+
+### 2026-03-01: Fix F841 Unused Exception Variables in git.py
+- **Files Modified**: `python/helpers/git.py`
+- **Changes**:
+  - Removed unused exception variable `e` from line 34 (`except Exception as e:` → `except Exception:`)
+  - Removed unused exception variable `e` from line 56 (`except Exception as e:` → `except Exception:`)
+- **Issue Fixed**: ruff F841 errors - local variable assigned but never used
+- **Verification**:
+  - ruff check: All checks passed
+  - pytest: 738 passed
+- **Linked Issue**: Issue #595 "[Backend] MEDIUM: Bare Exception Handlers - Should Capture Exception Object"
+
 > Last Updated: 2026-03-01
 
 ### 2026-03-01: Fix F841 Unused Exception Variables in git.py
