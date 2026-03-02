@@ -363,3 +363,52 @@ Fixed checkbox accessibility in backup restore form (`webui/components/settings/
 2. **Label Association** - Added `for="clean-before-restore"` to the label element
 
 **Impact:** Screen readers will now properly associate the label "Clean before restore" with the checkbox, improving accessibility for visually impaired users.
+
+---
+
+## Tunnel Section Dead Code Removal (2026-03-02)
+**Status:** ✅ COMPLETED
+
+Removed git merge conflict markers from tunnel-section.html (`webui/components/settings/tunnel/tunnel-section.html`):
+
+1. **Duplicate Stop Tunnel Button** - Removed duplicate button code at lines 85-91 that had conflicting markup from a git merge
+2. **Duplicate Create Tunnel Button** - Removed duplicate button code at lines 96-102 that had conflicting markup from a git merge
+
+**Impact:** Cleaned up dead code, prevents potential UI bugs from duplicate elements, and improves code maintainability.
+
+---
+
+## MCP Servers Button Accessibility (2026-03-02)
+**Status:** ✅ COMPLETED
+
+Added aria-label attributes to buttons in MCP servers configuration (`webui/components/settings/mcp/client/mcp-servers.html`):
+
+1. **Examples Button** - Added `aria-label="View MCP server configuration examples"`
+2. **Reformat Button** - Added `aria-label="Reformat MCP server JSON configuration"`
+3. **Apply Now Button** - Added `aria-label="Apply MCP server configuration changes"`
+
+**Impact:** Screen readers will now properly announce button purposes, improving accessibility for visually impaired users.
+
+---
+
+## Backup Configuration Button Accessibility (2026-03-02)
+**Status:** ✅ COMPLETED
+
+Added aria-label attributes to buttons in backup configuration (`webui/components/settings/backup/backup.html`):
+
+1. **Format Button** - Added `aria-label="Format backup configuration JSON"`
+2. **Reset Button** - Added `aria-label="Reset backup configuration to defaults"`
+3. **Dry Run Button** - Added `aria-label="Perform a dry run of backup without creating actual files"`
+4. **Create Backup Button** - Added `aria-label="Create backup now"`
+
+**Impact:** Screen readers will now properly announce button purposes, improving accessibility for visually impaired users.
+
+---
+
+
+Fixed checkbox accessibility in backup restore form (`webui/components/settings/backup/restore.html`):
+
+1. **Checkbox ID** - Added `id="clean-before-restore"` to the checkbox input
+2. **Label Association** - Added `for="clean-before-restore"` to the label element
+
+**Impact:** Screen readers will now properly associate the label "Clean before restore" with the checkbox, improving accessibility for visually impaired users.

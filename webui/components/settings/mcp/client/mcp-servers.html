@@ -15,11 +15,11 @@
 
                 <h3>MCP Servers Configuration JSON
                     <button class="btn slim btn-ml-5"
-                        onclick="openModal('settings/mcp/client/example.html')">Examples</button>
+                        onclick="openModal('settings/mcp/client/example.html')" aria-label="View MCP server configuration examples">Examples</button>
                     <button class="btn slim btn-ml-5"
-                        @click="$store.mcpServersStore.formatJson()">Reformat</button>
+                        @click="$store.mcpServersStore.formatJson()" aria-label="Reformat MCP server JSON configuration">Reformat</button>
                     <button class="btn slim primary btn-ml-5" :disabled="$store.mcpServersStore.loading"
-                        @click="$store.mcpServersStore.applyNow()">Apply now</button>
+                        @click="$store.mcpServersStore.applyNow()" aria-label="Apply MCP server configuration changes">Apply now</button>
                 </h3>
                 <div id="mcp-servers-config-json"></div>
 
