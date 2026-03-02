@@ -169,6 +169,7 @@ API_KEY_PLACEHOLDER = "************"
 SETTINGS_FILE = files.get_abs_path(Paths.SETTINGS_FILE)
 _settings: Settings | None = None
 
+
 def _run_background_task(coro, task_name: str = "background task"):
     """
     Run a coroutine in the background with error handling.
@@ -183,6 +184,7 @@ def _run_background_task(coro, task_name: str = "background task"):
     Returns:
         The created task
     """
+
     async def wrapped():
         try:
             await coro
@@ -194,6 +196,7 @@ def _run_background_task(coro, task_name: str = "background task"):
             ).print(f"Error in {task_name}: {e}")
 
     return defer.run_in_background(wrapped())
+
 
 def convert_out(settings: Settings) -> SettingsOutput:
     default_settings = get_default_settings()

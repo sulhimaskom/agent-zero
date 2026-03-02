@@ -151,9 +151,9 @@ def truncate_text(text: str, length: int, at_end: bool = True, replacement: str 
         return replacement[:length]
 
     if at_end:
-        return text[:length - replacement_length] + replacement
+        return text[: length - replacement_length] + replacement
     else:
-        return replacement + text[-(length - replacement_length):]
+        return replacement + text[-(length - replacement_length) :]
 
 
 def truncate_text_by_ratio(

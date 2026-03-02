@@ -125,9 +125,7 @@ class TestSaveDotenvValue:
     @patch("python.helpers.dotenv.get_dotenv_file_path")
     @patch("python.helpers.dotenv.load_dotenv")
     @patch("python.helpers.dotenv.open", create=True)
-    def test_create_file_if_not_exists(
-        self, mock_open, mock_load_dotenv, mock_get_path
-    ):
+    def test_create_file_if_not_exists(self, mock_open, mock_load_dotenv, mock_get_path):
         """Test creating .env file if it doesn't exist"""
         mock_get_path.return_value = "/test/.env"
 
@@ -145,9 +143,7 @@ class TestSaveDotenvValue:
     @patch("python.helpers.dotenv.get_dotenv_file_path")
     @patch("python.helpers.dotenv.load_dotenv")
     @patch("python.helpers.dotenv.open", create=True)
-    def test_none_value_becomes_empty_string(
-        self, mock_open, mock_load_dotenv, mock_get_path
-    ):
+    def test_none_value_becomes_empty_string(self, mock_open, mock_load_dotenv, mock_get_path):
         """Test that None value is converted to empty string"""
         mock_get_path.return_value = "/test/.env"
 

@@ -2,6 +2,7 @@
 
 Tests the compress_image function for image processing and compression.
 """
+
 import io
 
 import pytest
@@ -56,6 +57,7 @@ class TestCompressImage:
         # Should maintain approximately 2:1 aspect ratio (accounting for integer rounding)
         ratio = img.width / img.height
         assert 1.9 < ratio < 2.1
+
     def test_compress_with_rgba_mode(self):
         img_bytes = self._create_image_bytes(2000, 1000)  # 2:1 ratio
         result = compress_image(img_bytes, max_pixels=100000)

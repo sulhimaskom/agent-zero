@@ -48,6 +48,7 @@ class TestDeferredTask:
     @pytest.mark.asyncio
     async def test_start_task_returns_self(self):
         """Test that start_task returns self for chaining"""
+
         async def dummy_func():
             return 42
 
@@ -60,6 +61,7 @@ class TestDeferredTask:
     @pytest.mark.asyncio
     async def test_task_executes_coroutine(self):
         """Test that task executes coroutine and returns result"""
+
         async def slow_func():
             await asyncio.sleep(0.1)
             return "completed"
@@ -77,6 +79,7 @@ class TestDeferredTask:
     @pytest.mark.asyncio
     async def test_result_sync_timeout(self):
         """Test that result_sync raises TimeoutError on timeout"""
+
         async def long_running():
             await asyncio.sleep(10)
             return "done"
@@ -91,6 +94,7 @@ class TestDeferredTask:
     @pytest.mark.asyncio
     async def test_kill_cancels_task(self):
         """Test that kill cancels the running task"""
+
         async def infinite_loop():
             while True:
                 await asyncio.sleep(0.01)
@@ -127,6 +131,7 @@ class TestDeferredTask:
     @pytest.mark.asyncio
     async def test_add_child_task(self):
         """Test that child tasks can be added"""
+
         async def parent_func():
             return "parent"
 
@@ -147,6 +152,7 @@ class TestDeferredTask:
     @pytest.mark.asyncio
     async def test_kill_children(self):
         """Test that kill_children terminates all child tasks"""
+
         async def long_running_child():
             await asyncio.sleep(10)
             return "child"
@@ -170,6 +176,7 @@ class TestDeferredTask:
     @pytest.mark.asyncio
     async def test_result_async(self):
         """Test async result() method"""
+
         async def get_value():
             await asyncio.sleep(0.1)
             return "async_result"
@@ -186,6 +193,7 @@ class TestRunInBackground:
     @pytest.mark.asyncio
     async def test_run_in_background_returns_task(self):
         """Test that run_in_background returns an asyncio.Task"""
+
         async def background_task():
             return "background"
 
@@ -215,6 +223,7 @@ class TestDeferredTaskWithArgs:
     @pytest.mark.asyncio
     async def test_task_with_args(self):
         """Test task execution with positional arguments"""
+
         async def add(a, b):
             return a + b
 
@@ -227,6 +236,7 @@ class TestDeferredTaskWithArgs:
     @pytest.mark.asyncio
     async def test_task_with_kwargs(self):
         """Test task execution with keyword arguments"""
+
         async def greet(name, greeting="Hello"):
             return f"{greeting}, {name}!"
 
@@ -239,6 +249,7 @@ class TestDeferredTaskWithArgs:
     @pytest.mark.asyncio
     async def test_task_with_args_and_kwargs(self):
         """Test task execution with both positional and keyword arguments"""
+
         async def func(a, b, c=10):
             return a + b + c
 

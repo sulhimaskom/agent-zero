@@ -3,7 +3,6 @@
 Handles root password retrieval and encryption for development environments.
 """
 
-
 from python.helpers import crypto, dotenv, runtime
 
 

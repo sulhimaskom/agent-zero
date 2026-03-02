@@ -1,4 +1,3 @@
-
 import asyncio
 import json
 import re
@@ -666,7 +665,9 @@ class MCPConfig(BaseModel):
                     try:
                         tools = server.get_tools()
                     except Exception as e:
-                        PrintStyle(font_color="red").print(f"Failed to get tools for server {server_name}: {e}")
+                        PrintStyle(font_color="red").print(
+                            f"Failed to get tools for server {server_name}: {e}"
+                        )
                         tools = []
                     return {
                         "name": server.name,
@@ -733,7 +734,7 @@ class MCPConfig(BaseModel):
                         "fw.mcp_tools_usage.md",
                         _directories=["prompts"],
                         server_name=server_name,
-                        tool_name=tool["name"]
+                        tool_name=tool["name"],
                     )
                     prompt += usage_prompt
 

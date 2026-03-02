@@ -186,7 +186,20 @@ ignore = [
 convention = "google"
 
 [tool.ruff.lint.per-file-ignores]
-"tests/*" = ["D", "S"]
+"tests/*" = [
+    "D",  # Docstrings - tests don't need docstrings
+    "S",  # Security - tests don't need security checks
+    "W293",  # Blank line contains whitespace - common in test files
+    "I001",  # Import sorting - test imports often grouped by source
+    "T201",  # Print - tests use print for debugging/output
+    "F401",  # Unused imports - common in test files
+    "RUF059",  # Unused variables - common with tuple unpacking
+    "SIM117",  # Nested with statements - readability sometimes better nested
+    "B017",  # Blind exception - sometimes intentional in tests
+    "E741",  # Ambiguous variable name - single letter vars common in tests
+    "F811",  # Redefinition - sometimes intentional for test methods
+    "UP012",  # Unnecessary encode - string literals common in tests
+]
 "python/helpers/settings.py" = ["C901"]  # Too complex - known issue
 "python/helpers/task_scheduler.py" = ["C901"]  # Too complex - known issue
 "python/helpers/mcp_handler.py" = ["C901"]  # Too complex - known issue

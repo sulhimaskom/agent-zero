@@ -5,6 +5,7 @@ These tests verify the file upload security fixes:
 - MIME type validation
 - Blocking dangerous file types (.php, .py, .exe, etc.)
 """
+
 import unittest
 from unittest.mock import MagicMock
 

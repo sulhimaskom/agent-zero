@@ -8,6 +8,7 @@ class TestTunnelManager:
         """Reset singleton before each test"""
         # Import and reset the singleton
         import python.helpers.tunnel_manager as tm
+
         tm.TunnelManager._instance = None
         tm.TunnelManager._lock = MagicMock()
 
@@ -49,8 +50,10 @@ class TestTunnelManager:
 
     def test_start_tunnel_cloudflared(self):
         """Test starting tunnel with cloudflared provider sets correct state"""
-        with patch("python.helpers.tunnel_manager.PrintStyle"), \
-             patch("python.helpers.tunnel_manager.threading.Thread"):
+        with (
+            patch("python.helpers.tunnel_manager.PrintStyle"),
+            patch("python.helpers.tunnel_manager.threading.Thread"),
+        ):
             from python.helpers.tunnel_manager import TunnelManager
 
             manager = TunnelManager()
@@ -63,8 +66,10 @@ class TestTunnelManager:
 
     def test_start_tunnel_serveo(self):
         """Test starting tunnel with serveo provider sets correct state"""
-        with patch("python.helpers.tunnel_manager.PrintStyle"), \
-             patch("python.helpers.tunnel_manager.threading.Thread"):
+        with (
+            patch("python.helpers.tunnel_manager.PrintStyle"),
+            patch("python.helpers.tunnel_manager.threading.Thread"),
+        ):
             from python.helpers.tunnel_manager import TunnelManager
 
             manager = TunnelManager()

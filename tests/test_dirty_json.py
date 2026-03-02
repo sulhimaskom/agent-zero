@@ -79,7 +79,7 @@ class TestEdgeCases:
         assert result == {"key": "value"}
 
     def test_parse_array_with_trailing_comma(self):
-        result = parse('[1, 2, 3,]')
+        result = parse("[1, 2, 3,]")
         assert result == [1, 2, 3]
 
     def test_parse_single_line_comment(self):
@@ -99,7 +99,7 @@ class TestEdgeCases:
         assert result == {"outer": {"inner": "value"}}
 
     def test_parse_nested_arrays(self):
-        result = parse('[[1, 2], [3, 4]]')
+        result = parse("[[1, 2], [3, 4]]")
         assert result == [[1, 2], [3, 4]]
 
     def test_parse_mixed_nesting(self):
@@ -175,4 +175,4 @@ class TestDirtyJsonClass:
         parser = DirtyJson()
         assert parser.get_start_pos('{"key": "value"}') == 0
         assert parser.get_start_pos('  {"key": "value"}') == 2
-        assert parser.get_start_pos('   [1,2,3]') == 3
+        assert parser.get_start_pos("   [1,2,3]") == 3

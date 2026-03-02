@@ -31,11 +31,27 @@ from langchain_core.stores import InMemoryByteStore
 
 # Allowed AST node types for safe expression evaluation
 ALLOWED_AST_NODES = {
-    ast.Expression, ast.Compare, ast.BoolOp, ast.UnaryOp,
-    ast.Eq, ast.NotEq, ast.Lt, ast.LtE, ast.Gt, ast.GtE,
-    ast.In, ast.NotIn, ast.Not,
-    ast.Name, ast.Constant, ast.List, ast.Tuple, ast.Set,
-    ast.Call, ast.Attribute, ast.Subscript
+    ast.Expression,
+    ast.Compare,
+    ast.BoolOp,
+    ast.UnaryOp,
+    ast.Eq,
+    ast.NotEq,
+    ast.Lt,
+    ast.LtE,
+    ast.Gt,
+    ast.GtE,
+    ast.In,
+    ast.NotIn,
+    ast.Not,
+    ast.Name,
+    ast.Constant,
+    ast.List,
+    ast.Tuple,
+    ast.Set,
+    ast.Call,
+    ast.Attribute,
+    ast.Subscript,
 }
 
 # BoolOp and Compare operators are checked via isinstance
@@ -137,6 +153,7 @@ def safe_eval_condition(condition: str, data: dict) -> any:
     except Exception as e:
         PrintStyle().warning(f"Safe eval failed: {e}")
         return False
+
 
 import models  # noqa: E402
 from agent import Agent, AgentContext  # noqa: E402
@@ -558,6 +575,7 @@ class Memory:
         def comparator(data: dict[str, Any]):
             # Use safe_eval_condition instead of simple_eval to prevent RCE
             return safe_eval_condition(condition, data)
+
         return comparator
 
     @staticmethod

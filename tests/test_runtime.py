@@ -166,8 +166,10 @@ class TestPortManagement:
         from python.helpers.constants import Network
         from python.helpers.runtime import get_web_ui_port
 
-        with patch("python.helpers.runtime.get_arg", return_value=None), \
-             patch("python.helpers.runtime.dotenv.get_dotenv_value", return_value="0"):
+        with (
+            patch("python.helpers.runtime.get_arg", return_value=None),
+            patch("python.helpers.runtime.dotenv.get_dotenv_value", return_value="0"),
+        ):
             result = get_web_ui_port()
             assert result == Network.WEB_UI_PORT_DEFAULT
 
@@ -198,6 +200,7 @@ class TestPlatformDetection:
         import importlib
 
         import python.helpers.runtime
+
         importlib.reload(python.helpers.runtime)
 
         result = python.helpers.runtime.is_windows()
@@ -209,6 +212,7 @@ class TestPlatformDetection:
         import importlib
 
         import python.helpers.runtime
+
         importlib.reload(python.helpers.runtime)
 
         result = python.helpers.runtime.is_windows()
@@ -220,6 +224,7 @@ class TestPlatformDetection:
         import importlib
 
         import python.helpers.runtime
+
         importlib.reload(python.helpers.runtime)
 
         result = python.helpers.runtime.is_windows()

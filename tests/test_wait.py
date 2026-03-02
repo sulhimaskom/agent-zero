@@ -2,6 +2,7 @@
 
 Tests the format_remaining_time function for time formatting.
 """
+
 from python.helpers.wait import format_remaining_time
 
 
