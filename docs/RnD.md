@@ -20,6 +20,31 @@
 #MW|---
 ## 2026-03-02
 #MM|
+#NM|### Bare print() Statement in tunnel_proxy.py - FIXED ✅
+#QT|
+#HV|**Problem**:
+#QT|- Bare `print()` statement in python/api/tunnel_proxy.py line 32
+#QT|- All other Python files use PrintStyle for logging
+#QT|
+#VP|**Root Cause**:
+#QT|- print() statement was not converted to PrintStyle during previous refactoring
+#QT|- Violates framework logging convention
+#QT|
+#WR|**Solution Applied**:
+#QT|- Added import: `from python.helpers.print_style import PrintStyle`
+#QT|- Replaced `print(f"...")` with `PrintStyle.error(f"...")`
+#QT|
+#YR|**Files Changed**:
+#QT|- `python/api/tunnel_proxy.py` (+1 line)
+#QT|
+#YX|**Verification**:
+#QT|- Python syntax validated: ✅
+#QT|
+#HZ|**Status**: Ready for commit.
+#QT|
+#MW|---
+## 2026-03-02
+#MM|
 #NM|### Issue #559: AGENTS.md Statistics Outdated - FIXED ✅
 #QT|
 #HV|**Problem**:

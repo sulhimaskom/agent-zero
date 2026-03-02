@@ -3,6 +3,7 @@ import requests
 from python.helpers import dotenv, runtime
 from python.helpers.api import ApiHandler, Request, Response
 from python.helpers.constants import HttpStatus, Network, Protocols, Timeouts
+from python.helpers.print_style import PrintStyle
 
 
 class TunnelProxy(ApiHandler):
@@ -29,7 +30,7 @@ async def process(input: dict) -> dict | Response:
         if response.status_code == HttpStatus.OK:
             service_ok = True
     except Exception as e:
-        print(f"Tunnel proxy health check failed: {e}")
+        PrintStyle.error(f"Tunnel proxy health check failed: {e}")
         service_ok = False
 
     # forward this request to the tunnel service if OK
