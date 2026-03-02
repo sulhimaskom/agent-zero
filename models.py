@@ -641,8 +641,8 @@ class BrowserCompatibleChatWrapper(ChatOpenRouter):
                 cleaned = browser_use_monkeypatch.gemini_clean_and_conform(msg.content)  # type: ignore
                 if cleaned:
                     msg.content = cleaned
-        except (AttributeError, TypeError):
-            pass
+        except (AttributeError, TypeError) as e:
+            logging.warning(f"Gemini content cleaning failed: {e}")
 
         # another hack for browser-use post process invalid jsons
         try:
@@ -654,8 +654,8 @@ class BrowserCompatibleChatWrapper(ChatOpenRouter):
                 ].message.content.startswith("{"):  # type: ignore
                     js = dirty_json.parse(resp.choices[0].message.content)  # type: ignore
                     resp.choices[0].message.content = dirty_json.stringify(js)  # type: ignore
-        except (KeyError, IndexError, AttributeError):
-            pass
+        except (KeyError, IndexError, AttributeError) as e:
+            logging.warning(f"JSON response format fix failed: {e}")
 
         return resp
 
