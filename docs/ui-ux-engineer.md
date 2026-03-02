@@ -321,3 +321,45 @@ Fixed select element accessibility in backup restore form (`webui/components/set
 **Impact:** Screen readers will now properly associate the label "File Conflict Policy:" with the dropdown select element, improving accessibility for visually impaired users.
 
 **Pattern:** This follows the same pattern used in other settings forms (memory-dashboard.html, tunnel-section.html) for consistency.
+
+---
+
+## Project Edit Form Dead Code Removal (2026-03-02)
+**Status:** ✅ COMPLETED
+
+Removed duplicate/broken code from project-edit-file-structure.html:
+
+1. **Duplicate Checkbox** - Removed orphan checkbox code at lines 33-36 that had:
+   - No `id` on the input element
+   - No `for` attribute on the label
+   - No opening `<div class="projects-setting-control">` wrapper
+
+2. **Clean Markup** - The file structure toggle now has proper accessible markup:
+   - Proper `id="file-structure-enabled"` on the input
+   - Proper `for="file-structure-enabled"` on the label
+   - Proper wrapper div structure
+
+**Impact:** Improves code quality and ensures proper accessibility association between the checkbox and its label.
+
+---
+
+## Memory Dashboard Select All Accessibility (2026-03-02)
+**Status:** ✅ COMPLETED
+
+Added aria-label to the "Select All" checkbox in memory dashboard (`webui/components/settings/memory/memory-dashboard.html`):
+
+1. **Checkbox Enhancement** - Added `aria-label="Select all memories for deletion"` to the select all checkbox in the memory table header.
+
+**Impact:** Screen readers will now properly announce the checkbox purpose, improving accessibility for visually impaired users.
+
+---
+
+## Backup Restore Checkbox Accessibility (2026-03-02)
+**Status:** ✅ COMPLETED
+
+Fixed checkbox accessibility in backup restore form (`webui/components/settings/backup/restore.html`):
+
+1. **Checkbox ID** - Added `id="clean-before-restore"` to the checkbox input
+2. **Label Association** - Added `for="clean-before-restore"` to the label element
+
+**Impact:** Screen readers will now properly associate the label "Clean before restore" with the checkbox, improving accessibility for visually impaired users.
