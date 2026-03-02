@@ -2,7 +2,7 @@
 
 ## Repository: agent-zero
 
-#RJ|> Last Updated: 2026-03-01
+#RJ|> Last Updated: 2026-03-02
 
 ---
 
@@ -226,7 +226,15 @@ JB|### 26. DONE: Fix docs/README.md Table of Contents
 #XZ|  - Broken links in Contributing section
 #XZ|- **Status:** ✅ PR pending 2026-03-01
 WB|#XZ|
-WB|#XZ|
+
+### 27. DONE: Fix AGENTS.md Statistics (Issue #559) - CORRECTION
+#HM|- **Issue:** Previous update (#25) had incorrect statistics
+#HM|- **Fix:** Corrected statistics:
+#HM|  - Test files: 37 → 48 (actual count)
+#HM|  - Type ignores: 183 → 173 (actual count in 45 files)
+#HM|- **Files Updated:** AGENTS.md (7 locations)
+#HM|- **Status:** ✅ Completed 2026-03-02
+
 ## Future Improvements (Backlog)
 
 ### High Priority

@@ -39,7 +39,7 @@ class Localization:
             if persisted_offset is not None:
                 try:
                     self._offset_minutes = int(str(persisted_offset))
-                except Exception:
+                except Exception as e:
                     self._offset_minutes = self._compute_offset_minutes(self.timezone)
                     save_dotenv_value(
                         "DEFAULT_USER_UTC_OFFSET_MINUTES",
