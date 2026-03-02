@@ -232,6 +232,7 @@ Pending candidates for test coverage (small modules without tests):
 7. ~~**Add test for update_check.py, duckduckgo_search.py, playwright.py**~~ ✅ COMPLETED (PR #541)
 8. ~~**Remove dead code in timeout.js**~~ ✅ COMPLETED (PR #579)
 9. ~~**Add test for rfc_exchange.py**~~ ✅ COMPLETED (PR #590+)
+10. ~~**Add test for messages.py**~~ ✅ COMPLETED (20 tests covering truncate_text and truncate_dict_by_ratio)
 
 ---
 
@@ -239,9 +240,7 @@ Pending candidates for test coverage (small modules without tests):
 
 Small modules without test coverage:
 - `shell_local.py` (51 lines)
-- `extension.py` (66 lines)
 - `job_loop.py` (70 lines)
-- `messages.py` (71 lines)
 - `tunnel_manager.py` (84 lines)
 
 1. ~~**Fix bare excepts in tunnel_manager.py**~~ ✅ COMPLETED
