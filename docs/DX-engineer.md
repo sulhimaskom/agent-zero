@@ -1,5 +1,12 @@
 # DX-Engineer Agent
 
+### 2026-03-02: Makefile lint-all and check Targets
+- Added `lint-all` target: Runs both Python (ruff) and JavaScript (ESLint) linters with a single command
+- Added `check` target: Runs all quality gates (lint + typecheck + test) for comprehensive validation
+- Updated help text and examples to document new targets
+- Improves developer workflow by providing unified quality gate commands
+- Developers can run `make lint-all` or `make check` for complete quality checks
+
 ### 2026-03-02: Makefile JavaScript Lint Targets
 - Added `lint-js` target: Runs ESLint on JavaScript/TypeScript files
 - Added `lint-js-fix` target: Auto-fixes ESLint issues
