@@ -67,13 +67,17 @@ class CodeExecution(Tool):
         session = int(self.args.get("session", 0))
         self.allow_running = bool(self.args.get("allow_running", False))
 
+        code = self.args.get("code", "")
+        if not code:
+            return Response(message="Error: No code provided", break_loop=False)
+
         if runtime == "python":
-            response = await self.execute_python_code(code=self.args["code"], session=session)
+            response = await self.execute_python_code(code=code, session=session)
         elif runtime == "nodejs":
-            response = await self.execute_nodejs_code(code=self.args["code"], session=session)
+            response = await self.execute_nodejs_code(code=code, session=session)
         elif runtime == "terminal":
             response = await self.execute_terminal_command(
-                command=self.args["code"], session=session
+                command=code, session=session
             )
         elif runtime == "output":
             response = await self.get_terminal_output(session=session, timeouts=OUTPUT_TIMEOUTS)
