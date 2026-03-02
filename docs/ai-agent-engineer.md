@@ -12,6 +12,33 @@ This document serves as the long-term memory for the ai-agent-engineer domain in
 
 #BY|
 ## Implemented Fixes
+### 2026-03-02: Bare Exception Handlers and KeyError Fix
+**Issue**: Proactive scan found bare exception handlers in API files and KeyError risk in search_engine.py.
+
+**Root Cause**: 
+- 4 API files had bare exception handlers without capturing exception variable
+- search_engine.py accessed dict keys directly without validation
+
+**Fix Applied**:
+- tunnel_proxy.py: Added exception capture and logging for health check
+- csrf_token.py: Added exception logging for tunnel API errors
+- poll.py: Removed duplicate context retrieval code
+- memory_dashboard.py: Added PrintStyle logging for memory subdir errors
+- search_engine.py: Fixed KeyError risk with safe dict access using .get()
+
+**Files Modified**:
+- python/api/tunnel_proxy.py - Added exception logging
+- python/api/csrf_token.py - Added exception logging
+- python/api/poll.py - Removed duplicate code
+- python/api/memory_dashboard.py - Added PrintStyle import and logging
+- python/tools/search_engine.py - Fixed KeyError with safe .get() access
+
+**Verification**:
+- Python syntax check: PASSED on all 5 files
+- PR #626 created with ai-agent-engineer label
+
+---
+
 ### 2026-03-02: Tool Argument Validation Fixes
 **Issue**: Proactive scan found tools that could crash with KeyError when LLMs call them without required arguments.
 
