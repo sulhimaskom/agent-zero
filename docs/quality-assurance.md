@@ -2,6 +2,18 @@
 
 > Last Updated: 2026-03-02
 
+### 2026-03-02: Add test coverage for rfc.py module
+- **Files Created**: `tests/test_rfc.py`
+- **Changes**:
+  - Added 11 tests for `python/helpers/rfc.py` module
+  - Test classes: TestGetFunction, TestCallFunction, TestCallRfcInput, TestHandleRfc
+  - Coverage: `_get_function`, `_call_function`, `call_rfc` input generation, hash verification
+- **Verification**:
+  - pytest: 850 passed (11 new + 839 existing)
+  - No regressions
+- **Linked PR**: PR #626 (quality-assurance label added)
+- **Impact**: RFC module (89 lines) now has 100% test coverage
+
 ### 2026-03-02: Add Real CI Test Gates - pytest Execution
 - **Files Created**: `.github/workflows/tests.yml` (NEW)
 - **Changes**:
