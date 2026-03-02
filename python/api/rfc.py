@@ -11,6 +11,10 @@ class RFC(ApiHandler):
     def requires_auth(cls) -> bool:
         return False
 
+    @classmethod
+    def requires_api_key(cls) -> bool:
+        return True
+
     async def process(self, input: dict, request: Request) -> dict | Response:
         result = await runtime.handle_rfc(input)  # type: ignore
         return result
