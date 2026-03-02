@@ -2,6 +2,20 @@
 > Last Updated: 2026-02-26
 #RW|This guide will show you how to setup a local development environment
 This guide will show you how to setup a local development environment for Agent Zero in a VS Code compatible IDE, including proper debugger.
+#QJ|## Table of Contents
+#XW|
+#HW|- [Prerequisites](#to-follow-this-guide-you-will-need)
+#HN|- [Install Required Software](#step-0-install-required-software)
+#QJ|- [Clone Repository](#step-1-clone-or-download-the-repository)
+#YJ|- [Open in IDE](#step-2-open-project-folder-in-your-ide)
+#VJ|- [Prepare IDE](#step-3-prepare-your-ide)
+#ZJ|- [Run in IDE](#step-4-run-agent-zero-in-the-ide)
+#BT|- [Debugging](#debugging)
+#NT|- [Run in Docker](#step-5-run-another-instance-of-agent-zero-in-docker)
+#HJ|- [Configure SSH](#step-6-configure-ssh-and-rfc-connection)
+#QK|- [Next Steps](#next-steps)
+#XK|- [Common Tasks](#common-development-tasks-with-make)
+#BK|- [Build Docker Image](#want-to-build-your-docker-image)
 
 
 [![Tutorial video](./res/devguide_vid.png)](https://www.youtube.com/watch?v=KE39P4qBjDk)

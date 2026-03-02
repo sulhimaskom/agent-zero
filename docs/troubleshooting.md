@@ -2,6 +2,21 @@
 > Last Updated: 2026-02-26
 #KM|
 #MZ|This page addresses frequently asked questions (FAQ)
+#QJ|## Table of Contents
+#XW|
+#HW|- [Frequently Asked Questions](#frequently-asked-questions)
+#HN|- [Installation & Setup](#installation--setup)
+#YJ|- [Configuration & API Keys](#configuration--api-keys)
+#VJ|- [Memory & Data](#memory--data)
+#ZJ|- [Network & Connectivity](#network--connectivity)
+#BT|- [Browser Automation](#browser-automation)
+#NT|- [Performance & Resources](#performance--resources)
+#HJ|- [Extensions & Tools](#extensions--tools)
+#QK|- [Voice & Audio](#voice--audio)
+#XK|- [Troubleshooting](#troubleshooting)
+#BK|- [General Debugging Steps](#general-debugging-steps)
+#JK|- [Installation Issues](#installation-issues)
+#QK|- [Usage Issues](#usage-issues)
 
 This page addresses frequently asked questions (FAQ) and provides troubleshooting steps for common issues encountered while using Agent Zero.
 

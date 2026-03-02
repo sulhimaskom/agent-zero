@@ -2,6 +2,19 @@
 
 > Last Updated: 2026-03-01
 
+#QJ|## Table of Contents
+#XW|
+#HW|- [Getting Started](#getting-started)
+#HN|- [Branch Naming Convention](#branch-naming-convention)
+#YJ|- [Commit Message Format](#commit-message-format)
+#VJ|- [Making Changes](#making-changes)
+#ZJ|- [Code Quality Standards](#code-quality-standards)
+#BT|- [Pre-commit Hooks](#pre-commit-hooks)
+#NT|- [Submitting a Pull Request](#submitting-a-pull-request)
+#HJ|- [Code Review Expectations](#code-review-expectations)
+#QK|- [First Contribution Steps](#first-contribution-steps)
+#XK|- [Documentation Stack](#documentation-stack)
+#BK|- [Related Resources](#related-resources)
 Contributions to improve Agent Zero are very welcome! This guide outlines how to contribute code, documentation, or other improvements.
 
 ## Getting Started
