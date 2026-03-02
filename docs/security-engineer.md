@@ -485,3 +485,44 @@ Added extension whitelist and MIME type validation:
 - Consistent with `attachment_manager.py` and `file_browser.py` patterns
 - Uses allowlist approach (secure by default)
 
+---
+
+## 2026-03-02: RFC Endpoint Missing Authentication
+
+**Issue**: #592 - CRITICAL: 10+ API Endpoints Disable Authentication
+**Date Fixed**: 2026-03-02
+**Severity**: HIGH (Unauthorized Access)
+**Files Changed**: 
+- `python/api/rfc.py`
+
+**Vulnerability**: 
+The RFC (Remote Function Call) endpoint had no authentication:
+- `requires_auth()` returned `False`
+- `requires_csrf()` returned `False`
+- `requires_api_key()` was not set (defaulted to `False`)
+
+This allowed unauthenticated access to internal RFC operations.
+
+**Solution**:
+Added `requires_api_key() -> True` to the RFC endpoint:
+- Consistent with other internal API endpoints (`api_message.py`, `api_files_get.py`, etc.)
+- Uses `mcp_server_token` from settings for API key validation
+- Requires `X-API-KEY` header or `api_key` in request body
+
+**Audit Results**:
+Most endpoints in Issue #592 were already properly secured:
+- ✅ `api_message.py` - API key required
+- ✅ `api_files_get.py` - API key required
+- ✅ `api_reset_chat.py` - API key required
+- ✅ `api_terminate_chat.py` - API key required
+- ✅ `api_log_get.py` - API key required
+- ✅ `config_validation.py` - API key required
+- ✅ `scheduler_tick.py` - Loopback only (localhost)
+- ⚠️ `health.py` - No auth (acceptable for monitoring)
+- ⚠️ `csrf_token.py` - Web session required (correct)
+- ✅ `rfc.py` - Fixed with this change
+
+**Testing**:
+- AST verification confirms `requires_api_key` returns `True`
+- Pattern matches other secured endpoints
+
