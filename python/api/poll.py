@@ -31,14 +31,6 @@ class Poll(ApiHandler):
                 context = None
         else:
             context = None
-        if ctxid:
-            try:
-                context = self.use_context(ctxid, create_if_not_exists=False)
-            except Exception:
-                context = None
-        else:
-            context = None
-
         # Get logs only if we have a context
         logs = context.log.output(start=from_no) if context else []
 

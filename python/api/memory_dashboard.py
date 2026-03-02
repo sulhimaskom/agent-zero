@@ -19,6 +19,7 @@ from python.helpers.memory import (
     get_context_memory_subdir,
     get_existing_memory_subdirs,
 )
+from python.helpers.print_style import PrintStyle
 
 
 class MemoryDashboard(ApiHandler):
@@ -152,7 +153,8 @@ class MemoryDashboard(ApiHandler):
                 "memory_subdir": memory_subdir or "default",
             }
 
-        except Exception:
+        except Exception as e:
+            PrintStyle.warning(f"Failed to get current memory subdir: {e}")
             return {
                 "success": True,  # Still success, just fallback to default
                 "memory_subdir": "default",
