@@ -935,6 +935,6 @@ class BackupService:
                     )
 
             return files_to_delete
-        except Exception:
+        except Exception as e:
             # If pattern testing fails, return empty list to avoid breaking restore
             return []
