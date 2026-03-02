@@ -374,6 +374,31 @@ TH|- No regressions in existing tests
 
 ---
 
+### Issue: Upload API - Missing File Type Validation
+**Status:** FIXED - 2026-03-02
+
+**Problem:**
+- upload.py had `allowed_file()` that always returned True (security vulnerability)
+- No file type restrictions - any file could be uploaded including executables, scripts
+- This is a critical security issue enabling arbitrary file upload
+
+**Changes:**
+1. Re-enabled file type validation in upload.py
+2. Added ALLOWED_EXTENSIONS set with common safe file types:
+   - Images: png, jpg, jpeg, gif
+   - Documents: txt, pdf, csv, md, html, json, xml, yaml, yml
+   - Code: js, ts, py, sh, sql, log, css
+3. The allowed_file() method now validates extension properly
+
+**Files Modified:**
+- python/api/upload.py (+3 lines, -2 lines)
+
+**Verification:**
+- Python syntax: PASS (py_compile)
+- Logic validation now: Extension works correctly
+
+---
+
 ### Issue #415: Generic Exception Messages - Dead Code and Specific Types
 **Status:** FIXED - 2026-02-28
 

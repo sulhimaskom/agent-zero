@@ -40,8 +40,8 @@
 
                 <!-- Clean Before Restore Option -->
                 <div x-show="$store.backupStore.backupMetadata" class="clean-before-restore">
-                    <label class="checkbox-label">
-                        <input type="checkbox" x-model="$store.backupStore.cleanBeforeRestore">
+                    <label class="checkbox-label" for="clean-before-restore">
+                        <input type="checkbox" id="clean-before-restore" x-model="$store.backupStore.cleanBeforeRestore">
                         <span class="checkbox-text">Clean before restore (delete existing files matching original backup patterns)</span>
                     </label>
                     <div class="clean-description">
