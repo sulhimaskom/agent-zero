@@ -960,6 +960,11 @@ export const store = createStore("speech", model);
 // Initialize speech store
 // window.speechStore = speechStore;
 
-// Event listeners
-document.addEventListener("settings-updated", () => store.loadSettings());
-// document.addEventListener("DOMContentLoaded", () => speechStore.init());
+// Store reference for cleanup to prevent memory leak
+const _settingsUpdatedHandler = () => store.loadSettings();
+document.addEventListener("settings-updated", _settingsUpdatedHandler);
+
+// Cleanup function to remove event listeners
+export function cleanupSpeechStore() {
+  document.removeEventListener("settings-updated", _settingsUpdatedHandler);
+}
