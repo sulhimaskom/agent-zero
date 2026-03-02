@@ -84,7 +84,7 @@
   - Memory leaks (intervals): ✅ BALANCED - 18 setInterval calls with 18 clearInterval calls
   - Console statements: ✅ APPROPRIATE - All in logger utility (production-safe) or vendor files
   - Type ignores: ✅ LEGITIMATE - 20 instances, mostly for external libraries (fasta2a, faiss monkey patches)
-- **Remaining Issue**: CSP allows 'unsafe-eval' in index.html (#516) - requires analysis of eval usage
+- **Remaining Issue**: CSP 'unsafe-eval' removed from both run_ui.py and index.html (#516) - awaiting testing verification
 - **Recommendation**: No small atomic fixes available in this scan cycle
 
 ### 2026-03-01: Fix test_searxng.py Async Mocking
