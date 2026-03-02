@@ -238,7 +238,7 @@ WB|#XZ|
 ### Medium Priority
 5. ~~**Add "last updated" metadata** to doc headers~~ ✅ ALL docs now have timestamps
 YJ|6. ~~**Create API reference**~~ ✅ Issue #474 - Created docs/api.md with 64+ endpoints
-#XZ|7. ~~**Add inline TOCs** for long docs~~ ✅ architecture.md, connectivity.md, usage.md, extensibility.md, blueprint.md, installation.md
+#HB|#XZ|7. ~~**Add inline TOCs** for long docs~~ ✅ architecture.md, connectivity.md, usage.md, extensibility.md, blueprint.md, installation.md, development.md, troubleshooting.md, contribution.md
 #QM|8. ~~**Testing Guide**~~ ✅ Issue #418 - Created docs/testing.md, CLOSED 2026-02-28
 #XZ|
 #QM|### Low Priority
