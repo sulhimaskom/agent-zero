@@ -4,6 +4,15 @@
 **Agent:** frontend-engineer (autonomous mode)
 > Last Updated: 2026-03-02
 
+### 2026-03-02: Issue #467 - JavaScript Memory Leaks Fixed
+- Fixed remaining memory leak in speech-store.js (settings-updated event listener)
+- Fixed remaining memory leak in scheduler.js (global click handler)
+- Added cleanup functions:
+  - `cleanupSpeechStore()` in speech-store.js
+  - `cleanupSchedulerGlobalHandlers()` in scheduler.js
+- Issue #467 is now fully resolved
+- PR: https://github.com/sulhimaskom/agent-zero/pull/633
+
 ### 2026-03-02: Issue #516 - CSP unsafe-eval Removal
 - Removed `'unsafe-eval'` from Content-Security-Policy headers to improve XSS protection
 - Files changed:
@@ -69,7 +78,7 @@ All critical issues have been addressed:
 1. **CSP unsafe-eval**: ✅ Removed from both run_ui.py and index.html (needs testing)
 2. **Accessibility**: ✅ All buttons have aria-labels (fixed)
 3. **Console statements**: ✅ Source files use Logger utility (vendor files excluded)
-4. **Memory leaks**: ✅ All intervals and event listeners properly cleaned up
+4. **Memory leaks**: ✅ All addEventListener have corresponding removeEventListener (fixed)
 5. **Duplicate handlers**: ✅ Fixed in PR #365, #375
 
 ## Remaining Opportunities (Lower Priority)
