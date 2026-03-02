@@ -526,3 +526,47 @@ Most endpoints in Issue #592 were already properly secured:
 - AST verification confirms `requires_api_key` returns `True`
 - Pattern matches other secured endpoints
 
+---
+
+## 2026-03-02: Trivy Security Scanning Added to CI
+
+**Issue**: #279 - Add Trivy/Clair Security Scanning to CI
+**Date Fixed**: 2026-03-02
+**Severity**: MEDIUM (Defense in Depth)
+**Files Changed**: 
+- `.github/workflows/security-scan.yml` (new)
+
+**Solution**:
+Added automated security scanning using Trivy to the CI pipeline:
+
+1. **Filesystem Scan** - Scans Python code and dependencies for vulnerabilities:
+   - Scans `**.py` files and `requirements*.txt`
+   - Detects CVEs in dependencies
+   - Runs on every push and pull request
+
+2. **Configuration Scan** - Scans for security misconfigurations:
+   - Checks for exposed secrets
+   - Detects insecure configurations
+   - Uses `misconfig` and `secret` scanners
+
+3. **Docker Scan** (on-demand):
+   - Scans Docker images for OS and library vulnerabilities
+   - Can be triggered manually via workflow_dispatch
+
+**Security Standards**:
+- Fails build on CRITICAL and HIGH severity vulnerabilities
+- Ignores unfixed vulnerabilities (requires manual review)
+- Results uploaded to GitHub Security tab (SARIF format)
+- Results visible in PR comments
+
+**Workflow Triggers**:
+- Push to `main` or `custom` branches
+- Pull requests modifying Python files or Dockerfiles
+- Manual trigger (`workflow_dispatch`) for full Docker scan
+
+**Acceptance Criteria Met**:
+- ✅ Trivy scans codebase on push/PR
+- ✅ CRITICAL/HIGH vulnerabilities fail build
+- ✅ Results visible in GitHub Security tab
+- ✅ SBOM generation capability (via SARIF)
+
