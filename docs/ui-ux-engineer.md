@@ -405,10 +405,71 @@ Added aria-label attributes to buttons in backup configuration (`webui/component
 
 ---
 
+## Scroll to Bottom Button Keyboard Accessibility (2026-03-02)
+**Status:** ✅ COMPLETED
 
-Fixed checkbox accessibility in backup restore form (`webui/components/settings/backup/restore.html`):
+Fixed keyboard accessibility issue in scroll to bottom button (`webui/components/chat/scroll-to-bottom/scroll-to-bottom-button.html`):
 
-1. **Checkbox ID** - Added `id="clean-before-restore"` to the checkbox input
-2. **Label Association** - Added `for="clean-before-restore"` to the label element
+1. **Keyboard Handlers** - Added `@keydown.enter.prevent` and `@keydown.space.prevent` to the button element.
 
-**Impact:** Screen readers will now properly associate the label "Clean before restore" with the checkbox, improving accessibility for visually impaired users.
+**Impact:** Users can now activate the scroll to bottom button using keyboard (Enter or Space) in addition to click.
+
+---
+
+## Progress Bar Stop Speech Button Accessibility (2026-03-02)
+**Status:** ✅ COMPLETED
+
+Fixed accessibility issue in progress bar stop speech button (`webui/components/chat/input/progress.html`):
+
+1. **Stop Speech Span** - Added accessibility attributes to the stop speech span:
+   - `tabindex="0"` - Makes the span focusable
+   - `role="button"` - Indicates it's a button
+   - `@keydown.enter.prevent` - Handles Enter key
+   - `@keydown.space.prevent` - Handles Space key
+   - `aria-label="Stop speech"` - Screen reader announcement
+
+**Impact:** Keyboard users can now focus and activate the stop speech button using Tab + Enter/Space.
+
+---
+
+## Attachment Preview Image Accessibility (2026-03-02)
+**Status:** ✅ COMPLETED
+
+Fixed accessibility issue in attachment preview image (`webui/components/chat/attachments/inputPreview.html`):
+
+1. **Image Button** - Added accessibility attributes to the clickable image:
+   - `tabindex="0"` - Makes the image focusable
+   - `role="button"` - Indicates it's a button
+   - `@keydown.enter.prevent` - Handles Enter key
+   - `:aria-label="'View image: ' + attachment.name"` - Dynamic screen reader announcement
+
+**Impact:** Keyboard users can now focus and activate image previews using Tab + Enter/Space.
+
+---
+
+## Project Color Selector Accessibility (2026-03-02)
+**Status:** ✅ COMPLETED
+
+Fixed accessibility issue in project color selector (`webui/components/projects/project-edit-basic-data.html`):
+
+1. **Color Group** - Added `role="group"` and `aria-labelledby="color-label"` to the color row container
+2. **Color Balls** - Added accessibility to each color option:
+   - `tabindex="0"` - Makes each color focusable
+   - `role="button"` - Indicates it's a button
+   - `@keydown.enter.prevent` - Handles Enter key
+   - `@keydown.space.prevent` - Handles Space key
+   - `aria-label` - Dynamic announcement ("No color" or "Color #HEX")
+
+**Impact:** Keyboard users can now navigate and select colors using Tab + Enter/Space.
+
+---
+
+## Project Memory Toggle Accessibility (2026-03-02)
+**Status:** ✅ COMPLETED
+
+Fixed accessibility issue in project memory toggle (`webui/components/projects/project-edit-memory.html`):
+
+1. **Label Association** - Added `id="project-memory-toggle"` to the checkbox input
+2. **Label For** - Added `for="project-memory-toggle"` to the label element
+
+**Impact:** Screen readers will now properly associate the label "Project-specific memory" with the checkbox.

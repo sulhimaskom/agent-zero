@@ -14,7 +14,7 @@
 
                 <div class="projects-setting-row" style="padding: 1rem 0;">
                     <div class="projects-setting-text">
-                        <label class="projects-form-label">Project-specific memory</label>
+                        <label class="projects-form-label" for="project-memory-toggle">Project-specific memory</label>
                         <span class="projects-form-description">When turned on, the agent's memory while working on this
                             project will be isolated from the global memory. The memory will be stored in <strong><span
                                     x-text="$store.projects.getSelectedAbsPath('.a0proj','memory')"></span></strong>.
@@ -22,8 +22,8 @@
                             Project-specific knowledge files can be used only when project-specific memory is turned on.</span>
                     </div>
                     <div class="projects-setting-control">
-                        <label class="toggle">
-                            <input type="checkbox" x-model="$store.projects.selectedProject._ownMemory">
+                        <label class="toggle" for="project-memory-toggle">
+                            <input type="checkbox" id="project-memory-toggle" x-model="$store.projects.selectedProject._ownMemory">
                             <span class="toggler"></span>
                         </label>
                     </div>

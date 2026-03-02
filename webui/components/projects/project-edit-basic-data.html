@@ -43,17 +43,27 @@
                 </div> -->
 
                 <div class="projects-form-group">
-                    <label class="projects-form-label">Color</label>
-                    <div class="projects-color-row">
+                    <label class="projects-form-label" id="color-label">Color</label>
+                    <div class="projects-color-row" role="group" aria-labelledby="color-label">
                         <div class="projects-color-ball projects-color-none"
                             :class="{'selected': !$store.projects.selectedProject.color}"
-                            @click="$store.projects.selectedProject.color = ''">
+                            @click="$store.projects.selectedProject.color = ''"
+                            @keydown.enter.prevent="$store.projects.selectedProject.color = ''"
+                            @keydown.space.prevent="$store.projects.selectedProject.color = ''"
+                            tabindex="0" 
+                            role="button"
+                            aria-label="No color">
                             <span class="projects-color-x">×</span>
                         </div>
                         <template x-for="c in $store.projects.colors" :key="c">
                             <div class="projects-color-ball" :style="`background:${c}`"
                                 :class="{'selected': $store.projects.selectedProject.color === c}"
-                                @click="$store.projects.selectedProject.color = c">
+                                @click="$store.projects.selectedProject.color = c"
+                                @keydown.enter.prevent="$store.projects.selectedProject.color = c"
+                                @keydown.space.prevent="$store.projects.selectedProject.color = c"
+                                tabindex="0" 
+                                role="button"
+                                :aria-label="'Color ' + c">
                             </div>
                         </template>
                     </div>

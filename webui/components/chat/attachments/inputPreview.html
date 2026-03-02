@@ -12,7 +12,11 @@
                     :class="{'image-type': attachment.type === 'image', 'file-type': attachment.type === 'file'}">
                     <template x-if="attachment.type === 'image'">
                         <img :src="attachment.url" class="attachment-preview" :alt="attachment.name" width="80" height="80" loading="lazy" style="cursor: pointer;"
-                            @click="$store.imageViewer.open(attachment.url, { name: attachment.name })">
+                            @click="$store.imageViewer.open(attachment.url, { name: attachment.name })"
+                            @keydown.enter.prevent="$store.imageViewer.open(attachment.url, { name: attachment.name })"
+                            tabindex="0" 
+                            role="button"
+                            :aria-label="'View image: ' + attachment.name">
                     </template>
                     <template x-if="attachment.type === 'file'">
                         <div>

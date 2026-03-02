@@ -10,7 +10,14 @@
             <span id="progress-bar-i">|></span><span id="progress-bar"></span>
         </h4>
         <h4 id="progress-bar-stop-speech" x-data x-cloak x-show="$store.speech && $store.speech.isSpeaking">
-            <span id="stop-speech" @click="$store.speech.stop()" class="cursor-pointer">Stop Speech</span>
+            <span id="stop-speech" 
+                  @click="$store.speech.stop()" 
+                  @keydown.enter.prevent="$store.speech.stop()" 
+                  @keydown.space.prevent="$store.speech.stop()" 
+                  class="cursor-pointer" 
+                  tabindex="0" 
+                  role="button" 
+                  aria-label="Stop speech">Stop Speech</span>
         </h4>
     </div>
 

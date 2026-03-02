@@ -20,6 +20,8 @@
             x-transition:leave-start="scroll-btn-leave-start"
             x-transition:leave-end="scroll-btn-leave-end"
             @click="$store.scrollToBottom && $store.scrollToBottom.scrollToBottom()"
+            @keydown.enter.prevent="$store.scrollToBottom && $store.scrollToBottom.scrollToBottom()"
+            @keydown.space.prevent="$store.scrollToBottom && $store.scrollToBottom.scrollToBottom()"
             class="scroll-to-bottom-btn"
             :class="{ 'has-new-messages': $store.scrollToBottom && $store.scrollToBottom.newMessageCount > 0 }"
             aria-label="Scroll to bottom"
