@@ -15,10 +15,26 @@ class UploadFile(ApiHandler):
     # SECURITY: Whitelist of allowed file extensions
     # Blocks dangerous extensions that could lead to RCE
     ALLOWED_EXTENSIONS = {
-        "png", "jpg", "jpeg", "gif", "bmp", "webp",  # Images
+        "png",
+        "jpg",
+        "jpeg",
+        "gif",
+        "bmp",
+        "webp",  # Images
         "pdf",  # Documents
-        "txt", "md", "csv", "json", "xml", "yaml", "yml",  # Text/Config
-        "doc", "docx", "xls", "xlsx", "ppt", "pptx",  # Office
+        "txt",
+        "md",
+        "csv",
+        "json",
+        "xml",
+        "yaml",
+        "yml",  # Text/Config
+        "doc",
+        "docx",
+        "xls",
+        "xlsx",
+        "ppt",
+        "pptx",  # Office
     }
 
     # SECURITY: Whitelist of allowed MIME type prefixes
