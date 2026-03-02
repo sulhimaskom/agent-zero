@@ -25,7 +25,7 @@ def verify_password(user: str, password: str, stored_hash: str) -> bool:
     """Verify a password against a stored bcrypt hash."""
     try:
         return bcrypt.checkpw(f"{user}:{password}".encode(), stored_hash.encode())
-    except Exception:
+    except Exception as e:
         return False
 
 

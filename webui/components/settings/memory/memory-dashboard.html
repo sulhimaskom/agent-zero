@@ -175,7 +175,7 @@
                                         <input type="checkbox" :checked="$store.memoryDashboardStore.allSelected"
                                             :indeterminate="$store.memoryDashboardStore.someSelected && !$store.memoryDashboardStore.allSelected"
                                             @change="$store.memoryDashboardStore.toggleSelectAll()"
-                                            title="Select/Deselect All" />
+                                            title="Select/Deselect All" aria-label="Select all memories for deletion" />
                                     </th>
                                     <th class="col-metadata">Metadata</th>
                                     <th class="col-preview">Preview</th>

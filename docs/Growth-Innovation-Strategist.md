@@ -331,6 +331,14 @@ Deliver small, safe, measurable improvements strictly inside the domain of devel
 
 #YY|## History
 #QM|#HT|
+#SK|### 2026-03-02 - Add Test Suite for process.py Helper Module
+#XT|- Added unit tests for `python/helpers/process.py` helper module
+#PH|- Tests cover server state management (set_server, get_server, stop_server)
+#NN|- Tests cover reload functionality (reload, restart_process, exit_process)
+#HN|- Tests use mocking to avoid process termination
+#XP|- Created tests/test_process.py with 6 test cases
+#QH|- Verified: syntax check ✓
+#SK|
 #SK|### 2026-03-02 - Add Test Suite for runtime.py Helper Module
 #XT|- Added unit tests for `python/helpers/runtime.py` helper module
 #PH|- Tests cover argument handling (get_arg, has_arg)
