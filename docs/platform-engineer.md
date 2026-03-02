@@ -1,8 +1,8 @@
 # Platform Engineer Agent - Long-term Memory
 
 #NZ|**Created:** 2026-02-25
-#VN|> Last Updated: 2026-03-01
-> Last Updated: 2026-02-28
+#VN|> Last Updated: 2026-03-02
+> Last Updated: 2026-03-02
 
 
 ## Mission
@@ -47,6 +47,19 @@ Deliver small, safe, measurable improvements strictly inside the platform engine
   - Benefits from latest v5 features and bug fixes
 
 ## Improvements Log
+
+### 2026-03-02 - DockerfileLocal Security Hardening
+- **Change:** Added `USER a0user` directive to `DockerfileLocal`
+- **Details:**
+  - Added non-root user directive before CMD to run container as non-root
+  - Matches security hardening pattern already present in `docker/run/Dockerfile` (line 37)
+  - The `a0user` is created in `docker/base/Dockerfile` (lines 22-23)
+- **Rationale:** `DockerfileLocal` was missing the security hardening that exists in `docker/run/Dockerfile`. Running containers as non-root follows the principle of least privilege and is a security best practice.
+- **Impact:**
+  - Consistent security posture across all Docker build targets
+  - Follows principle of least privilege
+  - Consistent with production Docker configuration
+- **PR:** #630
 
 ### 2026-03-01 - Add pytest Job to CI Workflow
 - **Change:** Added pytest job to `.github/workflows/on-pull-optimized.yml`
