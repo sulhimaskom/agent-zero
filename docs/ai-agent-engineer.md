@@ -1,5 +1,5 @@
 # AI Agent Engineer - Long-term Memory
-> Last Updated: 2026-03-01
+> Last Updated: 2026-03-02
 
 ## Overview
 This document serves as the long-term memory for the ai-agent-engineer domain in the Agent Zero project.
@@ -12,6 +12,30 @@ This document serves as the long-term memory for the ai-agent-engineer domain in
 
 #BY|
 ## Implemented Fixes
+### 2026-03-02: Tool Argument Validation Fixes
+**Issue**: Proactive scan found tools that could crash with KeyError when LLMs call them without required arguments.
+
+**Root Cause**: Three tools accessed dict arguments directly without validation:
+- code_execution_tool.py: self.args["code"] accessed without checking if key exists
+- document_query.py: kwargs["queries"] accessed without handling None/empty values  
+- memory_save.py: No validation that text parameter is non-empty
+
+**Fix Applied**:
+- code_execution_tool.py: Added code validation with .get() and empty check
+- document_query.py: Changed to use .get() with defaults
+- memory_save.py: Added empty text validation
+
+**Files Modified**:
+- python/tools/code_execution_tool.py - Added code argument validation
+- python/tools/document_query.py - Fixed kwargs.get() usage
+- python/tools/memory_save.py - Added empty text validation
+
+**Verification**:
+- Python syntax check: PASSED on all 3 files
+- PR #608 created with ai-agent-engineer label
+
+---
+
 #BY|
 ### 2026-03-01: Bare Exception Handlers Fix in Domain Files
 **Issue**: Proactive scan found bare exception handlers (`except Exception:`) without capturing exception variable in ai-agent-engineer domain files.
