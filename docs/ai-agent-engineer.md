@@ -12,6 +12,31 @@ This document serves as the long-term memory for the ai-agent-engineer domain in
 
 #BY|
 ## Implemented Fixes
+### 2026-03-02: Silent Exception Handler Logging in models.py
+**Issue**: Proactive scan found silent exception handlers in the LLM model wrapper code that were swallowing errors without any debugging information.
+
+**Root Cause**: 
+- Line 644-645: Gemini content cleaning transformation used `except (AttributeError, TypeError): pass`
+- Line 657-658: JSON response format fix used `except (KeyError, IndexError, AttributeError): pass`
+- Both silently swallowed exceptions, making debugging LLM response handling issues difficult
+
+**Fix Applied**:
+- Added exception variable capture (`as e`) to both handlers
+- Added `logging.warning()` with descriptive messages:
+  - "Gemini content cleaning failed: {e}"
+  - "JSON response format fix failed: {e}"
+
+**Files Modified**:
+- models.py - Added logging warnings to 2 exception handlers in BrowserCompatibleChatWrapper
+
+**Verification**:
+- Python syntax check: PASSED
+- No functional changes - only adds debugging visibility
+
+**PR**: [#640](https://github.com/sulhimaskom/agent-zero/pull/640) created with ai-agent-engineer label
+
+---
+
 ### 2026-03-02: Extension Ordering Bug Fix
 **Issue**: Extensions were sorted alphabetically instead of by numeric prefix, violating documented behavior.
 
