@@ -1,4 +1,3 @@
-import pytest
 from unittest.mock import MagicMock, patch
 
 
@@ -57,7 +56,7 @@ class TestTunnelManager:
             manager = TunnelManager()
             # Verify provider can be set before tunnel starts
             manager.provider = "cloudflared"
-            
+
             assert manager.provider == "cloudflared"
             assert manager.is_running is False
             assert manager.tunnel_url is None
@@ -71,7 +70,7 @@ class TestTunnelManager:
             manager = TunnelManager()
             # Verify provider can be set before tunnel starts
             manager.provider = "serveo"
-            
+
             assert manager.provider == "serveo"
             assert manager.is_running is False
 
