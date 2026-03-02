@@ -1,6 +1,6 @@
 # AGENT ZERO PROJECT KNOWLEDGE BASE
 
-**Generated:** 2026-03-01
+**Generated:** 2026-03-02
 **Branch:** custom
 **Commit:** d7c3076
 **Last RepoKeeper Run:** 2026-03-01 (Repository maintenance - synchronized with origin/main, statistics updated, branch merged, documentation sync)
@@ -12,7 +12,7 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 ```
 ./
 ├── agents/              # Agent profiles (_example, agent0, brocula, default, developer, hacker, researcher) with custom prompts/tools/extensions
-├── prompts/             # 96 system prompts defining framework behavior (fw.* = framework, agent.system.* = agent behavior)
+├── prompts/             # 97 system prompts defining framework behavior (fw.* = framework, agent.system.* = agent behavior)
 ├── python/
 │   ├── api/            # 63 Flask API endpoints (auto-registered via ApiHandler base class)
 │   ├── helpers/        # 74 utility modules (memory, history, settings, mcp, scheduler)
@@ -29,7 +29,7 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 ├── knowledge/          # RAG document storage (separate from agent memory)
 ├── lib/                # Library dependencies (browser automation, etc.)
 ├── memory/             # FAISS vector DB for agent's persistent learnings
-# pytest tests (37 test files, 711 tests, pytest/ruff/mypy configured)
+# pytest tests (46 test files, 851 tests, pytest/ruff/mypy configured)
 └── usr/                # User-specific configurations and data
 ```
 
@@ -101,7 +101,7 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 - `/python/helpers/history.py:236` - FIXME: vision bytes sent to utility LLM (inefficiency)
 - `/python/helpers/vector_db.py`, `/python/helpers/memory.py` - FAISS patch for Python 3.12 ARM (remove when fixed upstream)
 - `/python/helpers/job_loop.py:34` - TODO: lowering SLEEP_TIME below 1min causes job duplication
-- 183 `# type: ignore` comments across 50 files - mostly legitimate (external libraries)
+- 139 `# type: ignore` comments across 39 files - mostly legitimate (external libraries)
 - Zero bare `except Exception:` handlers (all fixed to capture as `e`)
 - 289 PrintStyle calls across 45 files - intentional framework logging (not bare prints)
 
@@ -210,7 +210,7 @@ docker run -p 50001:80 agent0ai/agent-zero
 
 | Criterion | Weight | Score | Notes |
 |-----------|--------|-------|-------|
-Valid syntax, 183 type ignores
+Valid syntax, 139 type ignores
 | Readability | 10% | 7/10 | Good structure, prints for logging |
 | Simplicity | 10% | 6/10 | Large modules (settings.py: 1747 lines) |
 | Modularity | 15% | 9/15 | Extensions good, some too large |
@@ -224,7 +224,7 @@ Valid syntax, 183 type ignores
 **Critical Issues:**
 1. ~~**Test Coverage Crisis**: Only 11 test files for 228 Python files (~5% coverage) - tests passing~~ ✅ **IMPROVED**: 37 test files with 711 tests (~23% coverage)
 2. ~~**Error Handling**: 182 broad `except Exception` handlers mask bugs~~ ✅ **FIXED**: All bare `except Exception:` handlers converted to `except Exception as e:`
-3. **Type Safety**: 183 `# type: ignore` comments bypass type checking
+3. **Type Safety**: 139 `# type: ignore` comments bypass type checking
 4. **Observability**: PrintStyle logging is intentional framework behavior (not bare print statements)
 
 ### B. SYSTEM QUALITY BREAKDOWN (72/100)
@@ -242,7 +242,7 @@ Valid syntax, 183 type ignores
 
 | Criterion | Score | Notes |
 |-----------|-------|-------|
-Documentation | 18/20 | Comprehensive (39 docs files) |
+Documentation | 18/20 | Comprehensive (33 docs files) |
 | API Clarity | 14/15 | 61 Flask endpoints well-structured |
 | Local Dev Setup | 13/15 | Docker support excellent |
 | Debuggability | 12/15 | Real-time streaming, HTML logs |
@@ -257,7 +257,7 @@ Documentation | 18/20 | Comprehensive (39 docs files) |
 | Release Safety | 20% | 13/20 | No rollback mechanism |
 | Config Parity | 15% | 11/15 | Docker configs consistent |
 | Migration Safety | 15% | 10/15 | Backup/restore exists |
-Tech Debt | 15% | 9/15 | 183 type ignores, complex modules |
+Tech Debt | 15% | 9/15 | 139 type ignores, complex modules |
 | Change Velocity | 15% | 8/15 | Large modules slow dev |
 
 ### RECOMMENDED PRIORITY ACTIONS
@@ -286,7 +286,7 @@ Tech Debt | 15% | 9/15 | 183 type ignores, complex modules |
     - JSON format for production
     - Log rotation
 
-6. ~~**Type Safety**: Address 176 `# type: ignore` comments~~ ✅ **IMPROVED**: 183 type ignores (reduced from 185), gradual mypy enforcement underway
+6. ~~**Type Safety**: Address 176 `# type: ignore` comments~~ ✅ **IMPROVED**: 139 type ignores (reduced from 185), gradual mypy enforcement underway
    - Add proper type annotations
    - Use stubs for external libs
    - Gradual mypy enforcement
@@ -297,7 +297,7 @@ Tech Debt | 15% | 9/15 | 183 type ignores, complex modules |
 |--------|---------|--------|----------|
 Test Coverage | ~23% (711 tests passing) | 30% | P0 |
 | Broad Exceptions | 0 ✅ | 0 | P1 |
-Type Ignores | 183 | 70 | P2 |
+Type Ignores | 139 | 70 | P2 |
 | PrintStyle Calls | Intentional | N/A | - |
 Linter Configs | 5 ✅ (ruff/mypy/pre-commit) | 3+ | P2 |
 
@@ -313,6 +313,6 @@ Linter Configs | 5 ✅ (ruff/mypy/pre-commit) | 3+ | P2 |
 ### RECENT CLEANUP (2026-03-01)
 
 ✅ **Branch synchronized**: Merged origin/main into custom branch
-✅ **Updated AGENTS.md statistics**: ~100 Python files, 587 JS files, 100 Markdown files, 183 type ignores, 0 bare exceptions, 37 test files (711 tests)
+✅ **Updated AGENTS.md statistics**: ~100 Python files, 587 JS files, 100 Markdown files, 139 type ignores, 0 bare exceptions, 46 test files (851 tests)
 ✅ **Verified repository cleanliness**: No .pyc, __pycache__, .DS_Store, Thumbs.db, or temp files found
 ✅ **No temporary files**: Repository clean of .pyc, __pycache__, .DS_Store, Thumbs.db, cache directories
