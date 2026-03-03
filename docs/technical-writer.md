@@ -245,6 +245,19 @@ WB|#XZ|
 - **Files Updated:** AGENTS.md (multiple locations)
 - **Status:** ✅ Completed 2026-03-02
 
+### 31. DONE: Fix corrupt content in user-story-engineer.md
+- **Issue:** docs/user-story-engineer.md had severe corruption:
+  - 5 corrupt timestamp prefixes (`#KB|>`, `#VP|#KB|>`)
+  - Massive content duplication (same sections repeated 3-5 times)
+  - Corrupt prefix markers (`#MS|#`, `#KM|#`, etc.)
+- **Fix:** 
+  - Removed all corrupt timestamp prefixes, standardized to `> Last Updated:` format
+  - Deduplicated repeated content sections (389 → 131 lines)
+  - Removed all corrupt prefix markers
+- **Files Updated:** docs/user-story-engineer.md
+- **Linked Issue:** Issue #649
+- **Status:** ✅ Completed 2026-03-02
+
 ## Future Improvements (Backlog)
 
 ### High Priority
