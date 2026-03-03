@@ -99,7 +99,7 @@ Multi-agent AI framework with Python backend (Flask) + JavaScript frontend (Alpi
 - `/python/helpers/task_scheduler.py` - 1284 lines, TODO about splitting task types from scheduler logic
 - `/python/helpers/mcp_handler.py` - 1109 lines, TODO about inline prompts (lines 742-744)
 - `/python/helpers/history.py:236` - FIXME: vision bytes sent to utility LLM (inefficiency)
-- `/python/helpers/vector_db.py`, `/python/helpers/memory.py` - FAISS patch for Python 3.12 ARM (remove when fixed upstream)
+- `/python/helpers/vector_db.py`, `/python/helpers/memory.py` - FAISS now works on Python 3.12 ARM without patching (verified with faiss-cpu 1.13.2)
 - `/python/helpers/job_loop.py:34` - TODO: lowering SLEEP_TIME below 1min causes job duplication
 - 173 `# type: ignore` comments across 45 files - mostly legitimate (external libraries)
 - Zero bare `except Exception:` handlers (all fixed to capture as `e`)
@@ -184,7 +184,7 @@ docker run -p 50001:80 agent0ai/agent-zero
 - **Settings module** (1745 lines) identified as complexity hotspot needing refactoring
 - **Large files**: `agent.py` (771 lines), `models.py` (905 lines), `settings.py` (1745 lines), `task_scheduler.py` (1284 lines), `mcp_handler.py` (1109 lines)
 - **Large frontend files**: `webui/js/scheduler.js` (1579 lines), `webui/js/messages.js` (1016 lines), `webui/components/chat/speech/speech-store.js` (965 lines)
-- **FAISS patch required** for Python 3.12 ARM - temporary workaround
+- **FAISS**: Works on Python 3.12 ARM without patching (verified with faiss-cpu 1.13.2+)
 - 197 Python files - backend codebase
 - **593 JavaScript files** (~20,083 lines) - frontend codebase
 - **97 prompt files** - system prompts and agent behavior definitions

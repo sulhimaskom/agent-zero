@@ -4,7 +4,7 @@ import uuid
 from collections.abc import Sequence
 from typing import Any
 
-# faiss needs to be patched for python 3.12 on arm #TODO remove once not needed
+# faiss-cpu works on Python 3.12 ARM without patching (verified with faiss-cpu 1.13.2)
 import faiss
 from langchain.embeddings import CacheBackedEmbeddings
 from langchain.storage import InMemoryByteStore

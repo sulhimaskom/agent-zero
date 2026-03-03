@@ -64,7 +64,7 @@ python/helpers/
 - **Singleton patterns**: `Memory.index`, `MCPConfig.get_instance()`
 - **TypedDict**: Heavy use for data structures (Settings, BasicProjectData, etc.)
 - **Pydantic models**: Used for config (TaskSchedule, TaskPlan, etc.)
-- **FAISS patch**: `faiss_monkey_patch.py` required for Python 3.12 ARM (TODO remove upstream fix)
+- **FAISS**: Works on Python 3.12 ARM without patching (faiss-cpu 1.13.2+)
 - **Streaming**: StreamingSecretsFilter for real-time secret masking
 - **Context-aware**: Most modules accept `agent` or `AgentContext` parameters
 - **Path resolution**: Use `files.get_abs_path()` for consistent paths
@@ -72,6 +72,6 @@ python/helpers/
 ## ANTI-PATTERNS
 - **Settings blocking**: settings.py has 5 TODOs about replacing blocking operations with background tasks (lines 1558, 1616, 1621, 1631, 1643)
 - **Vision inefficiency**: history.py:218 - FIXME: vision bytes sent to utility LLM (send summary instead)
-- **FAISS patch**: vector_db.py, memory.py - Monkey patch for Python 3.12 ARM (temporary workaround)
+- **FAISS**: No longer needs patching on Python 3.12 ARM (verified with faiss-cpu 1.13.2)
 - **Job timing**: job_loop.py:34 - TODO: lowering SLEEP_TIME below 1min causes job duplication
 - **MCP prompts**: mcp_handler.py:742-744 - TODO: inline prompts should be external prompt files

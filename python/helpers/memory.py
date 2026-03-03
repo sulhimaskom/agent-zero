@@ -158,9 +158,8 @@ def safe_eval_condition(condition: str, data: dict) -> any:
 import models  # noqa: E402
 from agent import Agent, AgentContext  # noqa: E402
 
-# faiss needs to be patched for python 3.12 on arm #TODO remove once not needed
+# FAISS now works on Python 3.12 ARM without patching (verified with faiss-cpu 1.13.2)
 from python.helpers import (  # noqa: F401, E402
-    faiss_monkey_patch,
     guids,
     knowledge_import,
 )
