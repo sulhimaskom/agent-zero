@@ -151,8 +151,10 @@ class TestSSHInteractiveSession:
     def test_client_initialization_with_security_settings(self):
         """Test that SSH client is properly initialized with RejectPolicy"""
         import unittest.mock as mock
+        import paramiko
 
-        with mock.patch("paramiko.SSHClient") as mock_ssh_client:
+        with mock.patch.object(paramiko, 'SSHClient') as mock_ssh_client, \
+             mock.patch.object(paramiko, 'RejectPolicy', wraps=paramiko.RejectPolicy) as mock_reject_policy:
             mock_client_instance = mock.MagicMock()
             mock_ssh_client.return_value = mock_client_instance
 
@@ -172,7 +174,4 @@ class TestSSHInteractiveSession:
             mock_ssh_client.assert_called_once()
             mock_client_instance.load_system_host_keys.assert_called_once()
             mock_client_instance.set_missing_host_key_policy.assert_called_once()
-
-            policy_call = mock_client_instance.set_missing_host_key_policy.call_args
-            policy = policy_call[0][0]
-            assert policy.__class__.__name__ == "RejectPolicy"
+            mock_reject_policy.assert_called_once()
