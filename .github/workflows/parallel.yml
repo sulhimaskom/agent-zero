@@ -69,7 +69,7 @@ jobs:
         with:
           node-version: "20"
 
-      - run: npm ci || true
+      - run: npm ci
 
       - name: Install OpenCode
         run: |
@@ -342,7 +342,7 @@ jobs:
         with:
           node-version: "20"
 
-      - run: npm ci || true
+      - run: npm ci
 
       - name: Install OpenCode
         run: |
