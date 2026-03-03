@@ -2,7 +2,15 @@
 
 **Created:** 2026-02-25
 **Agent:** frontend-engineer (autonomous mode)
-> Last Updated: 2026-03-02
+> Last Updated: 2026-03-03
+
+### 2026-03-03: TODO Cleanup - chats-store.js deselectChat
+- Fixed redundant `globalThis.deselectChat()` call in chats-store.js
+- Inlined the logic directly in the store method instead of calling global function
+- Added STORAGE_KEYS import from constants.js
+- Used document.getElementById() for safer DOM access
+- This resolves the TODO comment about moving the logic "here"
+- PR: https://github.com/sulhimaskom/agent-zero/pull/661
 
 ### 2026-03-02: Issue #467 - JavaScript Memory Leaks Fixed
 - Fixed remaining memory leak in speech-store.js (settings-updated event listener)
@@ -72,7 +80,7 @@ Located in: `/webui/js/api.js`
 - Centralized fetch wrapper
 - CSRF token handling
 
-## Known Issues (2026-03-02)
+## Known Issues (2026-03-03)
 
 All critical issues have been addressed:
 1. **CSP unsafe-eval**: ✅ Removed from both run_ui.py and index.html (needs testing)
@@ -80,6 +88,7 @@ All critical issues have been addressed:
 3. **Console statements**: ✅ Source files use Logger utility (vendor files excluded)
 4. **Memory leaks**: ✅ All addEventListener have corresponding removeEventListener (fixed)
 5. **Duplicate handlers**: ✅ Fixed in PR #365, #375
+6. **TODO comments**: ✅ chats-store.js deselectChat resolved (PR #661)
 
 ## Remaining Opportunities (Lower Priority)
 - Color contrast issues (visual audit needed)
