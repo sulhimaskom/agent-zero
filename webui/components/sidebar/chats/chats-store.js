@@ -13,7 +13,7 @@ import {
 } from '/index.js';
 import { store as notificationStore } from '/components/notifications/notification-store.min.js';
 import { store as tasksStore } from '/components/sidebar/tasks/tasks-store.min.js';
-import { RETRY, TIMING } from '/js/constants.js';
+import { RETRY, TIMING, STORAGE_KEYS } from '/js/constants.js';
 
 const model = {
   contexts: [],
@@ -168,7 +168,24 @@ const model = {
   },
 
   deselectChat(){
-    globalThis.deselectChat(); //TODO move here
+    // Clear current context to show welcome screen
+    setContext(null);
+
+    // Clear localStorage selections so we don't auto-restore
+    try {
+      localStorage.removeItem(STORAGE_KEYS.LAST_SELECTED_CHAT);
+      localStorage.removeItem(STORAGE_KEYS.LAST_SELECTED_TASK);
+    } catch (e) {
+      // Silent fail in private browsing mode
+    }
+
+    // Clear the chat history safely
+    const chatHistoryEl = document.getElementById('chat-history');
+    if (chatHistoryEl) {
+      while (chatHistoryEl.firstChild) {
+        chatHistoryEl.removeChild(chatHistoryEl.firstChild);
+      }
+    }
   },
 
   // Smoothly scroll the chats list to top if present
