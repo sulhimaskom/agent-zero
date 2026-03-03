@@ -1,5 +1,5 @@
 # AI Agent Engineer - Long-term Memory
-> Last Updated: 2026-03-02
+> Last Updated: 2026-03-03
 
 ## Overview
 This document serves as the long-term memory for the ai-agent-engineer domain in the Agent Zero project.
@@ -10,8 +10,10 @@ This document serves as the long-term memory for the ai-agent-engineer domain in
 - Agent tool execution and extensions
 - Memory and history management for agents
 
-#BY|
+---
+
 ## Implemented Fixes
+
 ### 2026-03-02: Extension Ordering Bug Fix
 **Issue**: Extensions were sorted alphabetically instead of by numeric prefix, violating documented behavior.
 
@@ -57,7 +59,6 @@ This document serves as the long-term memory for the ai-agent-engineer domain in
 
 **Verification**:
 - Python syntax check: PASSED on all 5 files
-- PR #626 created with ai-agent-engineer label
 
 ---
 
@@ -81,31 +82,6 @@ This document serves as the long-term memory for the ai-agent-engineer domain in
 
 **Verification**:
 - Python syntax check: PASSED on all 3 files
-- PR #608 created with ai-agent-engineer label
-
----
-
-#BY|
-### 2026-03-01: Bare Exception Handlers Fix in Domain Files
-**Issue**: Proactive scan found bare exception handlers (`except Exception:`) without capturing exception variable in ai-agent-engineer domain files.
-
-**Root Cause**: Multiple locations in tools and helper modules were using `except Exception:` without capturing the exception variable, making debugging difficult.
-
-**Fix Applied**: Changed all bare exception handlers to `except Exception as e:` and added PrintStyle warning logging:
-- `python/tools/browser_agent.py` - Added exception capture and logging at 2 locations (get_current_page, _mask methods)
-- `python/tools/scheduler.py` - Added exception capture, logging, and PrintStyle import
-- `python/helpers/memory.py` - Added exception capture and logging in safe_eval function
-
-**Files Modified**:
-- `python/tools/browser_agent.py` - 2 exception handlers fixed with logging
-- `python/tools/scheduler.py` - 1 exception handler fixed with logging + PrintStyle import
-- `python/helpers/memory.py` - 1 exception handler fixed with logging
-
-**Verification**:
-- Python syntax check: PASSED on all 3 files
-- Tests: 193 passed (pre-existing failures due to missing dependencies)
-
-**PR**: [To be created] with ai-agent-engineer label
 
 ---
 
@@ -128,7 +104,26 @@ This document serves as the long-term memory for the ai-agent-engineer domain in
 
 ---
 
-### 2026-03-01: Duplicate Print Statement in task_scheduler.py
+### 2026-03-01: Bare Exception Handlers Fix in Domain Files
+**Issue**: Proactive scan found bare exception handlers (`except Exception:`) without capturing exception variable in ai-agent-engineer domain files.
+
+**Root Cause**: Multiple locations in tools and helper modules were using `except Exception:` without capturing the exception variable, making debugging difficult.
+
+**Fix Applied**: Changed all bare exception handlers to `except Exception as e:` and added PrintStyle warning logging:
+- `python/tools/browser_agent.py` - Added exception capture and logging at 2 locations (get_current_page, _mask methods)
+- `python/tools/scheduler.py` - Added exception capture, logging, and PrintStyle import
+- `python/helpers/memory.py` - Added exception capture and logging in safe_eval function
+
+**Files Modified**:
+- `python/tools/browser_agent.py` - 2 exception handlers fixed with logging
+- `python/tools/scheduler.py` - 1 exception handler fixed with logging + PrintStyle import
+- `python/helpers/memory.py` - 1 exception handler fixed with logging
+
+**Verification**:
+- Python syntax check: PASSED on all 3 files
+- Tests: 193 passed (pre-existing failures due to missing dependencies)
+
+---
 
 ### 2026-03-01: Duplicate Print Statement in task_scheduler.py
 **Issue**: Duplicate print statement in exception handler in task_scheduler.py
@@ -143,10 +138,7 @@ This document serves as the long-term memory for the ai-agent-engineer domain in
 **Verification**:
 - Python syntax check: PASSED
 
-**PR**: [To be created] with ai-agent-engineer label
-
 ---
-
 
 ### 2026-02-28: Dead Code Removal in document_query.py
 **Issue**: Unreachable code after raise statement in document_query.py
@@ -161,38 +153,11 @@ This document serves as the long-term memory for the ai-agent-engineer domain in
 **Verification**:
 - Python syntax check: PASSED
 
-ZW|**PR**: [#487](https://github.com/sulhimaskom/agent-zero/pull/487) created with ai-agent-engineer label
-ZR|
-QR|---
-WH|
-### 2026-02-28: Dead Code and Duplicate Imports Fix
-**Issue**: Proactive scan found two code quality issues:
-
-1. **Dead code in browser_agent.py**: Unreachable code after return statement in `get_selector_map()` method
-2. **Duplicate imports in speech-store.js**: [Issue #497] - Copy-paste error causing duplicate import statements
-
-**Root Cause**: 
-- browser_agent.py: Redundant conditional expressions followed by unreachable return statements
-- speech-store.js: Manual file creation with copy-paste errors
-
-**Fix Applied**:
-- `python/tools/browser_agent.py`: Removed redundant conditional expressions, cleaned up `get_selector_map()` method
-- `webui/components/chat/speech/speech-store.js`: Removed 4 duplicate import statements
-
-**Files Modified**:
-- `python/tools/browser_agent.py` - Removed 12 lines of dead/unreachable code
-- `webui/components/chat/speech/speech-store.js` - Removed 4 duplicate import lines
-
-**Verification**:
-- Python syntax check: PASSED
-
-**PR**: [#503](https://github.com/sulhimaskom/agent-zero/pull/503) created with ai-agent-engineer label, linked to Issue #497
-
+**PR**: [#487](https://github.com/sulhimaskom/agent-zero/pull/487) created with ai-agent-engineer label
 
 ---
-#BY|
 
-### 2026-02-28: Code Quality Improvements - Dead Code and Exception Logging
+### 2026-02-28: Dead Code and Duplicate Imports Fix
 **Issue**: Multiple code quality issues found during proactive scan:
 
 1. **Duplicate return statement in strings.py**: Dead code with duplicate `return replacement[:length]`
@@ -213,29 +178,7 @@ WH|
 - Python syntax check: PASSED on all 3 files
 - pytest: 475 passed, 7 pre-existing failures (unrelated to changes)
 
-**PR**: Created with ai-agent-engineer label
-
 ---
-
-## Implemented Fixes
-
-### 2026-03-01: Duplicate Print Statement in task_scheduler.py
-**Issue**: Duplicate print statement in exception handler in task_scheduler.py
-
-**Root Cause**: Copy-paste error - same print statement appeared twice consecutively in exception handler
-
-**Fix Applied**: Removed duplicate print statement line 939
-
-**Files Modified**:
-- `python/helpers/task_scheduler.py` - Removed 1 duplicate line
-
-**Verification**:
-- Python syntax check: PASSED
-
-**PR**: [To be created] with ai-agent-engineer label
-
----
-
 
 ### 2026-02-28: Duplicate Return Statements Fix in test_fasta2a_client.py
 **Issue**: [Issue #413] - Duplicate return statements in test_fasta2a_client.py affecting test reliability
@@ -398,8 +341,6 @@ WH|
 **Verification**:
 - Python syntax check: PASSED
 - Reduced bare exception count in python/helpers from 21 to 18 (3 fixed)
-
-**Status**: PR #304 ready for merge - creates Issue #309 for remaining 23 files
 
 ---
 
