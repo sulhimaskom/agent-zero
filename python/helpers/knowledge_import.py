@@ -23,10 +23,12 @@ class KnowledgeImport(TypedDict):
 
 
 def calculate_checksum(file_path: str) -> str:
+    """Calculate MD5 checksum using buffered reading for memory efficiency."""
     hasher = hashlib.md5()
     with open(file_path, "rb") as f:
-        buf = f.read()
-        hasher.update(buf)
+        # Read in 64KB chunks to avoid loading large files into memory
+        for chunk in iter(lambda: f.read(65536), b""):
+            hasher.update(chunk)
     return hasher.hexdigest()
 
 
