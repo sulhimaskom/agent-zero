@@ -86,4 +86,5 @@ JW|- **2026-02-28**: Added module docstrings to 8 backup/chat API files: `backup
 #NV|#JW|- **2026-03-01**: Fixed 2 bare exception handlers in Python helpers - Changed `except Exception:` to `except Exception as e:` in `extract_tools.py` (line 28) and `print_style.py` (line 188). Added debug logging for secret masking failure in print_style.py. Addresses Issue #595.
 #XB|
 #JW|- **2026-03-02**: Fixed 14 bare exception handlers in python/helpers/ - Changed `except Exception:` to `except Exception as e:` in backup.py, browser_use_monkeypatch.py, defer.py, file_browser.py, localization.py, log.py (2), login.py, projects.py (2), shell_ssh.py, task_scheduler.py, tty_session.py. This enables debugging of silently caught exceptions without changing behavior. Proactive scan found 11 files with bare exception handlers in python/helpers/. PR pending.
+#TM|- **2026-03-03**: Added 31 unit tests for backup.py - Tests cover pure functions: _parse_patterns, _patterns_to_string, _get_explicit_patterns, _is_explicitly_included, _translate_patterns, _count_directories. Addresses test coverage gap for critical 940-line backup.py module. PR #665.
 
