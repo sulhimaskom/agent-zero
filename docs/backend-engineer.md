@@ -1,6 +1,6 @@
 # Backend Engineer Agent Memory
 
-#RJ|> Last Updated: 2026-03-02
+#RJ|> Last Updated: 2026-03-03
 
 ## Domain Focus
 - Python backend (Flask API)
@@ -10,6 +10,29 @@
 - API endpoints
 
 ## Completed Fixes
+
+### Issue: Add Test Coverage for knowledge_import.py
+**Status:** COMPLETED - 2026-03-03
+
+**Problem:**
+- knowledge_import.py (218 lines) was missing test coverage
+- Module provides knowledge import functionality with calculate_checksum() function
+- No existing tests for the checksum calculation or KnowledgeImport TypedDict
+
+**Changes:**
+1. Added tests/test_knowledge_import.py with 8 tests covering:
+   - calculate_checksum: 6 tests (empty file, simple content, binary content, large file, deterministic, different hash)
+   - KnowledgeImport TypedDict: 2 tests (creation, state values)
+
+**Files Modified:**
+- tests/test_knowledge_import.py (new file, 166 lines)
+
+**Verification:**
+- 8 tests: ALL PASS ✅
+- Python syntax: PASS (py_compile)
+- No regressions: 791 tests pass (including new tests)
+
+---
 
 ### Issue #593: SSH Host Key Trust - Paramiko MITM Vulnerability
 **Status:** FIXED - 2026-03-02
