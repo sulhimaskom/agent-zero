@@ -1,3 +1,31 @@
+#YQ|## 2026-03-03
+#MM|
+#NM|### Issue #647: constants.py 979 Lines - FIXED ✅
+#QT|
+#HV|**Problem**:
+#QT|- Monolithic `python/helpers/constants.py` had 979 lines
+#QT|- Duplicate constant definitions that already existed in modular `constants/` directory
+#QT|
+#VP|**Root Cause**:
+#QT|- Constants were split into modular `constants/` directory (11 files)
+#QT|- But the monolithic `constants.py` wasn't updated to re-export from the modular package
+#QT|
+#WR|**Solution Applied**:
+#QT|- Replaced 979 lines of duplicate constant definitions with re-exports from `constants/__init__.py`
+#QT|- Added `noqa: F401` to suppress unused import warnings (expected for re-export modules)
+#QT|- All imports like `from python.helpers.constants import Timeouts` continue to work
+#QT|
+#YR|**Files Changed**:
+#QT|- `python/helpers/constants.py` (-951 lines, now 28 lines)
+#QT|
+#YX|**Verification**:
+#QT|- Python import test: ✅
+#QT|- Ruff linting: ✅
+#QT|- Test suite: 178 passed (6 pre-existing failures unrelated to this change)
+#QT|
+#HZ|**Status**: PR #660 created.
+#QT|
+#MW|---
 #YQ|## 2026-03-02
 #MM|
 #NM|### Performance: Tiktoken Encoding Caching - FIXED ✅
