@@ -232,20 +232,6 @@ function adjustTextareaHeight() {
 
 export const sendJsonData = async function (url, data) {
   return await api.callJsonApi(url, data);
-  // const response = await api.fetchApi(url, {
-  //     method: 'POST',
-  //     headers: {
-  //         'Content-Type': 'application/json'
-  //     },
-  //     body: JSON.stringify(data)
-  // });
-
-  // if (!response.ok) {
-  //     const error = await response.text();
-  //     throw new Error(error);
-  // }
-  // const jsonResponse = await response.json();
-  // return jsonResponse;
 };
 globalThis.sendJsonData = sendJsonData;
 
@@ -613,8 +599,6 @@ function scrollChanged(isAtBottom) {
 }
 
 export function updateAfterScroll() {
-  // const toleranceEm = 1; // Tolerance in em units
-  // const tolerancePx = toleranceEm * parseFloat(getComputedStyle(document.documentElement).fontSize); // Convert em to pixels
   const tolerancePx = 10;
   const chatHistory = document.getElementById('chat-history');
   if (!chatHistory) return;
@@ -626,8 +610,6 @@ export function updateAfterScroll() {
   scrollChanged(isAtBottom);
 }
 globalThis.updateAfterScroll = updateAfterScroll;
-
-// setInterval(poll, 250);
 
 async function startPolling() {
   const shortInterval = 25;
