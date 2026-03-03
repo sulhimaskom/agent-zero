@@ -196,11 +196,11 @@ BP|#XV|-
 #HB|- **Issue:** Duplicate timestamps scattered throughout files, non-standard bold format
 #HM|- **Fix:** Removed duplicate timestamps, standardized to blockquote format
 #HM|- **Status:** ✅ Completed 2026-03-01
-#XZ|#SM|### 23. SKIPPED: Fix user-story-engineer.md
+#XZ|#SM|### 23. DONE: Fix user-story-engineer.md (Issue #649)
 #HM|- **File:** docs/user-story-engineer.md
-#HB|- **Issue:** Severely corrupted file with massive duplicate content
-#HM|- **Fix:** Requires complete rewrite - beyond quick fix scope
-#MH|#HM|- **Status:** ⚠️ SKIPPED - needs manual review
+#HB|- **Issue:** Severely corrupted file with 389 lines - duplicate content, corrupt prefixes
+#HM|- **Fix:** Complete rewrite - extracted unique content, removed corrupt prefixes, deduplicated
+#MH|#HM|- **Status:** ✅ COMPLETED 2026-03-03 (this PR)
 #WB|#XZ|#SM|### 24. DONE: Fix corrupt timestamp prefixes in 9 user docs
 #HM|#QM|- **Files:** docs/blueprint.md, docs/development.md, docs/extensibility.md, docs/installation.md, docs/mcp_setup.md, docs/notifications.md, docs/task.md, docs/troubleshooting.md, docs/usage.md
 #XZ|#QM|- **Issue:** Timestamp lines had corrupt `#TM|>` prefix instead of standard `>` blockquote
@@ -244,6 +244,16 @@ WB|#XZ|
   - JavaScript files: 587 → 593 (line 189, 316)
 - **Files Updated:** AGENTS.md (multiple locations)
 - **Status:** ✅ Completed 2026-03-02
+
+### 29. DONE: Fix corrupt content in user-story-engineer.md
+- **File:** docs/user-story-engineer.md
+- **Issue:** Severely corrupted file - 389 lines with:
+  - 5 corrupt timestamp prefixes (#KB|>, #VP|#KB|>)
+  - Massive content duplication (same sections repeated 3-5 times)
+  - 50+ corrupt prefix markers (#MS|#, #KM|#, #ZM|#, etc.)
+- **Fix:** Complete rewrite - extracted unique content, removed all corrupt prefixes, deduplicated sections
+- **Result:** Reduced from 389 to 131 lines (66% reduction)
+- **Status:** ✅ Completed 2026-03-03
 
 ## Future Improvements (Backlog)
 
