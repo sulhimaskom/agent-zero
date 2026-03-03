@@ -899,12 +899,6 @@ function drawKvpsIncremental(container, kvps, latex) {
         pre.appendChild(span);
         tdiv.appendChild(pre);
 
-        // Add action buttons to the row
-        // const row = tdiv.closest(".kvps-row");
-        // if (row) {
-        // addActionButtonsToElement(pre);
-        // }
-
         // KaTeX rendering for markdown
         if (latex) {
           span.querySelectorAll('latex').forEach((element) => {
